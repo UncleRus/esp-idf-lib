@@ -110,9 +110,7 @@ bool ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, i
     if (!ds18x20_measure(pin, ds18x20_ANY, true))
     {
         for (int i = 0; i < addr_count; i++)
-        {
             result_list[i] = NAN;
-        }
         return false;
     }
     return ds18x20_read_temp_multi(pin, addr_list, addr_count, result_list);
