@@ -1,6 +1,6 @@
 #V := 1
 PROJECT_NAME := esp-idf-lib
-EXTRA_COMPONENTS :=
+EXTRA_COMPONENTS := onewire ds18x20
 
 
 DEFAULT_COMPONENTS := \

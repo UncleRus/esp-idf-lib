@@ -10,6 +10,7 @@ void task(void *pvParameter)
     {
         printf("Hello world! Free heap: %d kB\n", xPortGetFreeHeapSize());
         vTaskDelay(1000 / portTICK_PERIOD_MS);
+        ets_delay_us(100);
     }
 }
 
