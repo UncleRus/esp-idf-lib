@@ -102,6 +102,15 @@ typedef struct
 } hmc5883l_data_t;
 
 /**
+ * @brief Configure I2C hardware and install driver
+ * @param i2c_num I2C port number
+ * @param scl_pin IO pin number for SCL
+ * @param sda_pin IO pin number for SDA
+ * @return ESP_OK if no errors occured
+ */
+esp_err_t hmc5883l_i2c_init(i2c_port_t i2c_num, gpio_num_t scl_pin, gpio_num_t sda_pin);
+
+/**
  * \brief Init device
  * \return ESP_OK if no errors occured
  */

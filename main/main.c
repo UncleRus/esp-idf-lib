@@ -4,7 +4,7 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <ds18x20.h>
-
+#include <hmc5883l.h>
 
 void ds18x20_test(void *pvParameter)
 {
@@ -27,23 +27,28 @@ void ds18x20_test(void *pvParameter)
     // For a real application, a proper 4.7k external pull-up resistor is
     // recommended instead!)
 
-    while(1) {
+    while (1)
+    {
         // Every RESCAN_INTERVAL samples, check to see if the sensors connected
         // to our bus have changed.
         sensor_count = ds18x20_scan_devices(SENSOR_GPIO, addrs, MAX_SENSORS);
 
-        if (sensor_count < 1) {
-            printf("\nNo sensors detected!\n");
-        } else {
-            printf("\n%d sensors detected:\n", sensor_count);
+        if (sensor_count < 1)
+            printf("No sensors detected!\n");
+        else
+        {
+            printf("%d sensors detected:\n", sensor_count);
             // If there were more sensors found than we have space to handle,
             // just report the first MAX_SENSORS..
-            if (sensor_count > MAX_SENSORS) sensor_count = MAX_SENSORS;
+            if (sensor_count > MAX_SENSORS)
+                sensor_count = MAX_SENSORS;
 
             // Do a number of temperature samples, and print the results.
-            for (int i = 0; i < RESCAN_INTERVAL; i++) {
+            for (int i = 0; i < RESCAN_INTERVAL; i++)
+            {
                 ds18x20_measure_and_read_multi(SENSOR_GPIO, addrs, sensor_count, temps);
-                for (int j = 0; j < sensor_count; j++) {
+                for (int j = 0; j < sensor_count; j++)
+                {
                     // The ds18x20 address is a 64-bit integer, but newlib-nano
                     // printf does not support printing 64-bit values, so we
                     // split it up into two 32-bit integers and print them
@@ -63,11 +68,42 @@ void ds18x20_test(void *pvParameter)
             }
         }
     }
+}
 
+
+void hmc5883l_test(void *pvParameters)
+{
+    while (hmc5883l_i2c_init(0, 17, 16) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+    while (hmc5883l_init(0) != ESP_OK)
+    {
+        printf("HMC5883L not found\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    hmc5883l_set_opmode(0, HMC5883L_MODE_CONTINUOUS);
+    hmc5883l_set_samples_averaged(0, HMC5883L_SAMPLES_8);
+    hmc5883l_set_data_rate(0, HMC5883L_DATA_RATE_07_50);
+    hmc5883l_set_gain(0, HMC5883L_GAIN_1090);
+
+    while (1)
+    {
+        hmc5883l_data_t data;
+        if (hmc5883l_get_data(0, &data) == ESP_OK)
+            printf("Magnetic data: X:%.2f mG, Y:%.2f mG, Z:%.2f mG\n", data.x, data.y, data.z);
+        else
+            printf("Could not read HMC5883L data\n");
+
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
 }
 
 void app_main()
 {
-    xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
+    //xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
+    xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 
