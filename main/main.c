@@ -5,6 +5,8 @@
 #include <esp_system.h>
 #include <ds18x20.h>
 #include <hmc5883l.h>
+#include <dht.h>
+
 
 void ds18x20_test(void *pvParameter)
 {
@@ -70,7 +72,6 @@ void ds18x20_test(void *pvParameter)
     }
 }
 
-
 void hmc5883l_test(void *pvParameters)
 {
     while (hmc5883l_i2c_init(0, 17, 16) != ESP_OK)
@@ -101,9 +102,34 @@ void hmc5883l_test(void *pvParameters)
     }
 }
 
+void dht_test(void *pvParameters)
+{
+    static const dht_sensor_type_t sensor_type = DHT_TYPE_DHT11;
+    static const gpio_num_t dht_gpio = 17;
+
+    int16_t temperature = 0;
+    int16_t humidity = 0;
+
+    // DHT sensors that come mounted on a PCB generally have
+    // pull-up resistors on the data pin.  It is recommended
+    // to provide an external pull-up resistor otherwise...
+
+    while (1)
+    {
+        if (dht_read_data(sensor_type, dht_gpio, &humidity, &temperature))
+            printf("Humidity: %d%% Temp: %dC\n", humidity / 10, temperature / 10);
+        else
+            printf("Could not read data from sensor\n");
+
+        // Three second delay...
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+    }
+}
+
 void app_main()
 {
     //xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
-    xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    //xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 
