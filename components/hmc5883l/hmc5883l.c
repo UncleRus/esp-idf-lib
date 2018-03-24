@@ -61,24 +61,22 @@ static inline uint32_t get_time_us()
     return tv.tv_usec;
 }
 
-#define MEASUREMENT_TIMEOUT 6000
-
 #define timeout_expired(start, len) ((uint32_t)(get_time_us() - (start)) >= (len))
 
 static esp_err_t write_register(i2c_port_t i2c_num, uint8_t reg, uint8_t val)
 {
-    ESP_LOGI(TAG, "Write register %d = %d, I2C port: %d", reg, val, i2c_num);
-    uint16_t data = (uint16_t)reg << 8 | val;
+    ESP_LOGD(TAG, "Write register %d = %d, I2C port: %d", reg, val, i2c_num);
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, HMC5883L_ADDR << 1, true);
-    i2c_master_write(cmd, (uint8_t *)&data, 2, true);
+    i2c_master_write_byte(cmd, reg, true);
+    i2c_master_write_byte(cmd, val, true);
     i2c_master_stop(cmd);
 
-    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
+    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, CONFIG_HMC5883L_I2C_TIMEOUT / portTICK_RATE_MS);
     if (ret != ESP_OK)
-        ESP_LOGE(TAG, "Could not write register, err = %d", ret);
+        ESP_LOGE(TAG, "Could not write register %d, err = %d", reg, ret);
 
     i2c_cmd_link_delete(cmd);
 
@@ -87,20 +85,23 @@ static esp_err_t write_register(i2c_port_t i2c_num, uint8_t reg, uint8_t val)
 
 static esp_err_t i2c_slave_read(i2c_port_t i2c_num, uint8_t reg, void *res, size_t size)
 {
-    ESP_LOGI(TAG, "Read register %d, I2C port: %d", reg, i2c_num);
+    ESP_LOGD(TAG, "Read register %d, I2C port: %d", reg, i2c_num);
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (HMC5883L_ADDR << 1) | 1, true);
+    i2c_master_write_byte(cmd, HMC5883L_ADDR << 1, true);
     i2c_master_write_byte(cmd, reg, true);
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (HMC5883L_ADDR << 1) | 1, true);
-    i2c_master_read(cmd, res, size, true);
+    i2c_master_read(cmd, res, size, I2C_MASTER_LAST_NACK);
     i2c_master_stop(cmd);
 
-    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
+    if (size == 1)
+        ESP_LOGD(TAG, "Register val = 0x%02x", *((uint8_t *)res));
+
+    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, CONFIG_HMC5883L_I2C_TIMEOUT / portTICK_RATE_MS);
     if (ret != ESP_OK)
-        ESP_LOGE(TAG, "Could not read register, err = %d", ret);
+        ESP_LOGE(TAG, "Could not read register %d, err = %d", reg, ret);
 
     i2c_cmd_link_delete(cmd);
 
@@ -285,7 +286,7 @@ esp_err_t hmc5883l_get_raw_data(i2c_port_t i2c_num, hmc5883l_raw_data_t *data)
         do
         {
             res = hmc5883l_data_is_ready(i2c_num, &dready);
-            if (timeout_expired(start, MEASUREMENT_TIMEOUT))
+            if (timeout_expired(start, CONFIG_HMC5883L_MEAS_TIMEOUT))
                 return ESP_ERR_TIMEOUT;
         } while (!dready);
     }
