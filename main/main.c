@@ -7,6 +7,7 @@
 #include <hmc5883l.h>
 #include <dht.h>
 #include <ds1307.h>
+#include <ds3231.h>
 
 
 void ds18x20_test(void *pvParameter)
@@ -159,12 +160,48 @@ void ds1307_test(void *pvParameters)
     }
 }
 
+void ds3231_test(void *pvParameters)
+{
+    static const i2c_port_t bus = 0;
+
+    while (ds3231_i2c_init(bus, 17, 16) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    // setup datetime: 2016-10-09 13:50:10
+    struct tm time = {
+        .tm_year = 2016,
+        .tm_mon  = 9,  // 0-based
+        .tm_mday = 9,
+        .tm_hour = 13,
+        .tm_min  = 50,
+        .tm_sec  = 10
+    };
+    ds3231_set_time(bus, &time);
+
+    while (1)
+    {
+        float temp;
+
+        ds3231_get_temp_float(bus, &temp);
+        ds3231_get_time(bus, &time);
+
+        printf("%04d-%02d-%02d %02d:%02d:%02d, %.2f deg Cel\n", time.tm_year, time.tm_mon + 1,
+            time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec, temp);
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+}
+
 
 void app_main()
 {
     //xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
     //xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
-    xTaskCreate(ds1307_test, "ds1307_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    //xTaskCreate(ds1307_test, "ds1307_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    xTaskCreate(ds1307_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 
