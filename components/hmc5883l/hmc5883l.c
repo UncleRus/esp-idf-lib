@@ -8,7 +8,7 @@
 #include "hmc5883l.h"
 
 #include <sys/time.h>
-#include <driver/i2c.h>
+#include <i2c_utils.h>
 #include <esp_log.h>
 
 #define REG_CR_A 0x00
@@ -66,45 +66,18 @@ static inline uint32_t get_time_us()
 static esp_err_t write_register(i2c_port_t i2c_num, uint8_t reg, uint8_t val)
 {
     ESP_LOGD(TAG, "Write register %d = %d, I2C port: %d", reg, val, i2c_num);
-
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, HMC5883L_ADDR << 1, true);
-    i2c_master_write_byte(cmd, reg, true);
-    i2c_master_write_byte(cmd, val, true);
-    i2c_master_stop(cmd);
-
-    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, CONFIG_HMC5883L_I2C_TIMEOUT / portTICK_RATE_MS);
+    esp_err_t ret = i2c_write_register(i2c_num, HMC5883L_ADDR, reg, &val, 1);
     if (ret != ESP_OK)
         ESP_LOGE(TAG, "Could not write register %d, err = %d", reg, ret);
-
-    i2c_cmd_link_delete(cmd);
-
     return ret;
 }
 
 static esp_err_t i2c_slave_read(i2c_port_t i2c_num, uint8_t reg, void *res, size_t size)
 {
     ESP_LOGD(TAG, "Read register %d, I2C port: %d", reg, i2c_num);
-
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, HMC5883L_ADDR << 1, true);
-    i2c_master_write_byte(cmd, reg, true);
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (HMC5883L_ADDR << 1) | 1, true);
-    i2c_master_read(cmd, res, size, I2C_MASTER_LAST_NACK);
-    i2c_master_stop(cmd);
-
-    if (size == 1)
-        ESP_LOGD(TAG, "Register val = 0x%02x", *((uint8_t *)res));
-
-    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, CONFIG_HMC5883L_I2C_TIMEOUT / portTICK_RATE_MS);
+    esp_err_t ret = i2c_read_register(i2c_num, HMC5883L_ADDR, reg, res, size);
     if (ret != ESP_OK)
         ESP_LOGE(TAG, "Could not read register %d, err = %d", reg, ret);
-
-    i2c_cmd_link_delete(cmd);
-
     return ret;
 }
 
@@ -124,18 +97,7 @@ static esp_err_t update_register(i2c_port_t i2c_num, uint8_t reg, uint8_t mask, 
 
 esp_err_t hmc5883l_i2c_init(i2c_port_t i2c_num, gpio_num_t scl_pin, gpio_num_t sda_pin)
 {
-    i2c_config_t conf;
-    conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = sda_pin;
-    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = scl_pin;
-    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = I2C_FREQ_HZ;
-
-    esp_err_t res = i2c_param_config(i2c_num, &conf);
-    if (res != ESP_OK)
-        return res;
-    return i2c_driver_install(i2c_num, conf.mode, 0, 0, 0);
+    return i2c_setup_master(i2c_num, scl_pin, sda_pin, I2C_FREQ_HZ);
 }
 
 esp_err_t hmc5883l_init(i2c_port_t i2c_num)

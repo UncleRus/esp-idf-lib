@@ -1,6 +1,6 @@
 #V := 1
 PROJECT_NAME := esp-idf-lib
-EXTRA_COMPONENTS := onewire ds18x20 hmc5883l dht
+EXTRA_COMPONENTS := onewire ds18x20 dht i2c_utils hmc5883l ds1307
 
 
 DEFAULT_COMPONENTS := \
