@@ -1,3 +1,11 @@
+/**
+ * @file ds18x20.h
+ *
+ * ESP-IDF driver for the DS18x20 family of one-wire temperature sensor ICs
+ *
+ * Ported from esp-open-rtos
+ */
+
 #ifndef __DS18X20_H__
 #define __DS18X20_H__
 
@@ -6,12 +14,6 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-/** @file ds18x20.h
- *
- *  Communicate with the ds18x20 family of one-wire temperature sensor ICs.
- *
- */
 
 typedef onewire_addr_t ds18x20_addr_t;
 
