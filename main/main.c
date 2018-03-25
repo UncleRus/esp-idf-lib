@@ -116,13 +116,13 @@ void dht_test(void *pvParameters)
 
     while (1)
     {
-        if (dht_read_data(sensor_type, dht_gpio, &humidity, &temperature))
+        if (dht_read_data(sensor_type, dht_gpio, &humidity, &temperature) == ESP_OK)
             printf("Humidity: %d%% Temp: %dC\n", humidity / 10, temperature / 10);
         else
             printf("Could not read data from sensor\n");
 
         // Three second delay...
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        vTaskDelay(300 / portTICK_PERIOD_MS);
     }
 }
 

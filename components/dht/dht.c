@@ -85,43 +85,47 @@ static inline esp_err_t dht_fetch_data(gpio_num_t pin, bool bits[DHT_DATA_BITS])
 
     // Phase 'A' pulling signal low to initiate read sequence
     gpio_set_level(pin, 0);
-    vTaskDelay(20 / portTICK_PERIOD_MS);
-    //ets_delay_us(20000);
+    ets_delay_us(20000);
     gpio_set_level(pin, 1);
 
     // Step through Phase 'B', 40us
-    if (!dht_await_pin_state(pin, 40, false, NULL))
+    esp_err_t res = dht_await_pin_state(pin, 40, 0, NULL);
+    if (res != ESP_OK)
     {
         ESP_LOGE(TAG, "Initialization error, problem in phase 'B'");
-        return ESP_ERR_NOT_FOUND;
+        return res;
     }
 
     // Step through Phase 'C', 88us
-    if (!dht_await_pin_state(pin, 88, true, NULL))
+    res = dht_await_pin_state(pin, 88, 1, NULL);
+    if (res != ESP_OK)
     {
         ESP_LOGE(TAG, "Initialization error, problem in phase 'C'");
-        return ESP_ERR_NOT_FOUND;
+        return res;
     }
 
     // Step through Phase 'D', 88us
-    if (!dht_await_pin_state(pin, 88, false, NULL))
+    res = dht_await_pin_state(pin, 88, 0, NULL);
+    if (res != ESP_OK)
     {
         ESP_LOGE(TAG, "Initialization error, problem in phase 'D'");
-        return ESP_ERR_NOT_FOUND;
+        return res;
     }
 
     // Read in each of the 40 bits of data...
     for (int i = 0; i < DHT_DATA_BITS; i++)
     {
-        if (!dht_await_pin_state(pin, 65, true, &low_duration))
+        res = dht_await_pin_state(pin, 65, 1, &low_duration);
+        if (res != ESP_OK)
         {
             ESP_LOGE(TAG, "LOW bit timeout");
-            return ESP_ERR_TIMEOUT;
+            return res;
         }
-        if (!dht_await_pin_state(pin, 75, false, &high_duration))
+        res = dht_await_pin_state(pin, 75, 0, &high_duration);
+        if (res != ESP_OK)
         {
             ESP_LOGE(TAG, "HIGH bit timeout");
-            return ESP_ERR_TIMEOUT;
+            return res;
         }
         bits[i] = high_duration > low_duration;
     }
@@ -153,15 +157,14 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin, int16_t *
     bool bits[DHT_DATA_BITS];
     uint8_t data[DHT_DATA_BITS / 8] = { 0 };
 
-    gpio_config_t io_conf;
-    memset(&io_conf, 0, sizeof(gpio_config_t));
-    io_conf.mode = GPIO_MODE_INPUT_OUTPUT_OD;
-    io_conf.pin_bit_mask = (1 << pin);
-    gpio_config(&io_conf);
+    gpio_set_direction(pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    gpio_set_level(pin, 1);
 
     taskENTER_CRITICAL(&mux);
     esp_err_t result = dht_fetch_data(pin, bits);
     taskEXIT_CRITICAL(&mux);
+
+    gpio_set_level(pin, 1);
 
     if (result != ESP_OK)
         return result;
