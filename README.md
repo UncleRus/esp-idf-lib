@@ -2,7 +2,7 @@
 
 Components for ESP-32.
 
-Most of this components are ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
+Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
 
 ## Components
