@@ -8,7 +8,7 @@
 #include <dht.h>
 #include <ds1307.h>
 #include <ds3231.h>
-
+#include <bmp180.h>
 
 void ds18x20_test(void *pvParameter)
 {
@@ -195,6 +195,39 @@ void ds3231_test(void *pvParameters)
     }
 }
 
+void bmp180_test(void *pvParameters)
+{
+    static const i2c_port_t bus = 0;
+
+    bmp180_dev_t dev;
+    esp_err_t res;
+
+    while ((res = bmp180_i2c_init(bus, 17, 16)) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    while ((res = bmp180_init(bus, &dev)) != ESP_OK)
+    {
+        printf("Could not init BMP180, err: %d\n", res);
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    while (1)
+    {
+        float temp;
+        uint32_t pressure;
+
+        res = bmp180_measure(&dev, &temp, &pressure, BMP180_MODE_STANDARD);
+        if (res != ESP_OK)
+            printf("Could not measure: %d\n", res);
+        else
+            printf("Temperature: %.2f degrees Celsius; Pressure: %d MPa\n", temp, pressure);
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+}
 
 void app_main()
 {
@@ -202,6 +235,7 @@ void app_main()
     //xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(ds1307_test, "ds1307_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
-    xTaskCreate(ds1307_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    //xTaskCreate(ds1307_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    xTaskCreate(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }
 

@@ -1,6 +1,9 @@
 #include "i2c_utils.h"
 
 #include <freertos/FreeRTOS.h>
+#include <esp_log.h>
+
+static const char *TAG = "I2C";
 
 esp_err_t i2c_write_register(i2c_port_t i2c_num, uint8_t addr, uint8_t reg, void *data, size_t size)
 {
@@ -12,6 +15,19 @@ esp_err_t i2c_write_register(i2c_port_t i2c_num, uint8_t addr, uint8_t reg, void
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, CONFIG_I2C_TIMEOUT / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
+
+    if (size == 1)
+    {
+        ESP_LOGD(TAG, "i2c_write_register(PORT = %d, ADDR = 0x%02x, REG = 0x%02x, VAL = 0x%02x): 0x%02x", i2c_num, addr, reg, *((uint8_t *)data), ret)
+    }
+    else if (size == 2)
+    {
+        ESP_LOGD(TAG, "i2c_write_register(PORT = %d, ADDR = 0x%02x, REG = 0x%02x, VAL = 0x%04x): 0x%02x", i2c_num, addr, reg, *((uint16_t *)data), ret)
+    }
+    else
+    {
+        ESP_LOGD(TAG, "i2c_write_register(PORT = %d, ADDR = 0x%02x, REG = 0x%02x, SIZE = %d): 0x%02x", i2c_num, addr, reg, size, ret);
+    }
 
     return ret;
 }
@@ -28,6 +44,19 @@ esp_err_t i2c_read_register(i2c_port_t i2c_num, uint8_t addr, uint8_t reg, void 
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, CONFIG_I2C_TIMEOUT / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
+
+    if (size == 1)
+    {
+        ESP_LOGD(TAG, "i2c_read_register(PORT = %d, ADDR = 0x%02x, REG = 0x%02x, VAL = 0x%02x): 0x%02x", i2c_num, addr, reg, *((uint8_t *)res), ret)
+    }
+    else if (size == 2)
+    {
+        ESP_LOGD(TAG, "i2c_read_register(PORT = %d, ADDR = 0x%02x, REG = 0x%02x, VAL = 0x%04x): 0x%02x", i2c_num, addr, reg, *((uint16_t *)res), ret)
+    }
+    else
+    {
+        ESP_LOGD(TAG, "i2c_read_register(PORT = %d, ADDR = 0x%02x, REG = 0x%02x, SIZE = %d): 0x%02x", i2c_num, addr, reg, size, ret);
+    }
 
     return ret;
 }
