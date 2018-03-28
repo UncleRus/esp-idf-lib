@@ -29,15 +29,16 @@ static const char *TAG = "BMP180";
 // Reset value for BMP180_RESET_REG
 #define BMP180_RESET_VALUE        0xB6
 
+#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
+
 static esp_err_t bmp180_read_reg_16(i2c_port_t port, uint8_t reg, int16_t *r)
 {
     uint8_t d[] = { 0, 0 };
 
-    esp_err_t res = i2c_read_register(port, BMP180_DEVICE_ADDRESS, reg, d, 2);
-    if (res == ESP_OK)
-        *r = ((int16_t)d[0] << 8) | (d[1]);
+    CHECK(i2c_read_register(port, BMP180_DEVICE_ADDRESS, reg, d, 2));
+    *r = ((int16_t)d[0] << 8) | (d[1]);
 
-    return res;
+    return ESP_OK;
 }
 
 static inline esp_err_t bmp180_start_messurement(i2c_port_t port, uint8_t cmd)
@@ -48,22 +49,18 @@ static inline esp_err_t bmp180_start_messurement(i2c_port_t port, uint8_t cmd)
 static esp_err_t bmp180_get_uncompensated_temperature(i2c_port_t port, int32_t *ut)
 {
     // Write Start Code into reg 0xF4.
-    esp_err_t res = bmp180_start_messurement(port, BMP180_MEASURE_TEMP);
-    if (res != ESP_OK)
-        return res;
+    CHECK(bmp180_start_messurement(port, BMP180_MEASURE_TEMP));
 
     // Wait 5ms, datasheet states 4.5ms
     ets_delay_us(5000);
 
     int16_t v;
-    res = bmp180_read_reg_16(port, BMP180_OUT_MSB_REG, &v);
-    if (res == ESP_OK)
-        *ut = v;
-
-    return res;
+    CHECK(bmp180_read_reg_16(port, BMP180_OUT_MSB_REG, &v));
+    *ut = v;
+    return ESP_OK;
 }
 
-static bool bmp180_get_uncompensated_pressure(i2c_port_t port, bmp180_mode_t oss, uint32_t *up)
+static esp_err_t bmp180_get_uncompensated_pressure(i2c_port_t port, bmp180_mode_t oss, uint32_t *up)
 {
     uint16_t us;
 
@@ -78,17 +75,13 @@ static bool bmp180_get_uncompensated_pressure(i2c_port_t port, bmp180_mode_t oss
     }
 
     // Write Start Code into reg 0xF4
-    esp_err_t res = bmp180_start_messurement(port, BMP180_MEASURE_PRESS | (oss << 6));
-    if (res != ESP_OK)
-        return res;
+    CHECK(bmp180_start_messurement(port, BMP180_MEASURE_PRESS | (oss << 6)));
 
     ets_delay_us(us);
 
     uint8_t d[] = { 0, 0, 0 };
     uint8_t reg = BMP180_OUT_MSB_REG;
-    res = i2c_read_register(port, BMP180_DEVICE_ADDRESS, reg, d, 3);
-    if (res != ESP_OK)
-        return res;
+    CHECK(i2c_read_register(port, BMP180_DEVICE_ADDRESS, reg, d, 3));
 
     uint32_t r = ((uint32_t)d[0] << 16) | ((uint32_t)d[1] << 8) | d[2];
     r >>= 8 - oss;
@@ -102,18 +95,14 @@ esp_err_t bmp180_i2c_init(i2c_port_t port, gpio_num_t scl_pin, gpio_num_t sda_pi
     return i2c_setup_master(port, scl_pin, sda_pin, I2C_FREQ_HZ);
 }
 
-#define CHECK(x) do { if ((res = x) != ESP_OK) return res; } while (0)
-
 esp_err_t bmp180_init(i2c_port_t port, bmp180_dev_t *dev)
 {
-    if (!bmp180_is_available(port))
+    if (!bmp180_is_available(dev->port))
     {
         ESP_LOGI(TAG, "not found");
         return ESP_ERR_NOT_FOUND;
     }
-    dev->port = port;
 
-    esp_err_t res;
     CHECK(bmp180_read_reg_16(dev->port, BMP180_CALIBRATION_REG + 0, &dev->AC1));
     CHECK(bmp180_read_reg_16(dev->port, BMP180_CALIBRATION_REG + 2, &dev->AC2));
     CHECK(bmp180_read_reg_16(dev->port, BMP180_CALIBRATION_REG + 4, &dev->AC3));
@@ -162,8 +151,7 @@ esp_err_t bmp180_measure(const bmp180_dev_t *dev, float *temperature, uint32_t *
     // Calculation taken from BMP180 Datasheet
     int32_t UT, X1, X2, B5;
     UT = 0;
-    if ((res = bmp180_get_uncompensated_temperature(dev->port, &UT)) != ESP_OK)
-        return res;
+    CHECK(bmp180_get_uncompensated_temperature(dev->port, &UT));
 
     X1 = ((UT - (int32_t)dev->AC6) * (int32_t)dev->AC5) >> 15;
     X2 = ((int32_t)dev->MC << 11) / (X1 + (int32_t)dev->MD);
@@ -180,8 +168,7 @@ esp_err_t bmp180_measure(const bmp180_dev_t *dev, float *temperature, uint32_t *
         int32_t X3, B3, B6;
         uint32_t B4, B7, UP;
 
-        if ((res = bmp180_get_uncompensated_pressure(dev->port, oss, &UP)) != ESP_OK)
-            return res;
+        CHECK(bmp180_get_uncompensated_pressure(dev->port, oss, &UP));
 
         // Calculation taken from BMP180 Datasheet
         B6 = B5 - 4000;

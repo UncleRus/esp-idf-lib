@@ -13,4 +13,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 - **hmc5883l** - Driver for HMC5883L 3-axis digital compass
 - **onewire** - Bit-banging one wire driver
 - **ds18x20** - Driver for DS18x20 family of one-wire temperature sensor ICs
-- **dht** - Driver for DHT11/DHT22 temperature sebsors
+- **dht** - Driver for DHT11/DHT22 temperature and humidity sensors
+- **bmp180** - Driver for BMP180 digital pressure sensor
+- **bmp280** - Driver for BMP280 digital pressure sensor
+
