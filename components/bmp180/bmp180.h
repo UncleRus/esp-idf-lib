@@ -27,7 +27,7 @@ extern "C" {
  */
 typedef struct
 {
-    i2c_port_t port;
+    i2c_dev_t i2c_dev;
 
     int16_t  AC1;
     int16_t  AC2;
@@ -59,20 +59,18 @@ typedef enum
 /**
  * Setup I2C bus.
  * I2C master, 1000000 Hz
- * @param port I2C port number
  * @param scl_pin GPIO for SCL pin
  * @param sda_pin GPIO for SDA pin
  * @return ESP_OK on success
  */
-esp_err_t bmp180_i2c_init(i2c_port_t port, gpio_num_t scl_pin, gpio_num_t sda_pin);
+esp_err_t bmp180_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin);
 
 /**
  * Init bmp180 driver
- * @param port I2C port number
  * @param dev Pointer to BMP180 device descriptor
  * @return ESP_OK on success
  */
-esp_err_t bmp180_init(i2c_port_t port, bmp180_dev_t *dev);
+esp_err_t bmp180_init(bmp180_dev_t *dev);
 
 /**
  * Check BMP180 availability
@@ -89,7 +87,7 @@ bool bmp180_is_available(i2c_port_t port);
  * @param oss Measurement mode
  * @return ESP_OK on success
  */
-esp_err_t bmp180_measure(const bmp180_dev_t *dev, float *temperature, uint32_t *pressure, bmp180_mode_t oss);
+esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressure, bmp180_mode_t oss);
 
 #ifdef __cplusplus
 }

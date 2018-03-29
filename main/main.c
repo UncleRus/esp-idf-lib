@@ -197,18 +197,17 @@ void ds3231_test(void *pvParameters)
 
 void bmp180_test(void *pvParameters)
 {
-    static const i2c_port_t bus = 0;
-
     bmp180_dev_t dev;
+    dev.i2c_dev.port = 0;
     esp_err_t res;
 
-    while ((res = bmp180_i2c_init(bus, 17, 16)) != ESP_OK)
+    while ((res = bmp180_i2c_init(&dev.i2c_dev, 17, 16)) != ESP_OK)
     {
         printf("Could not init I2C bus\n");
         vTaskDelay(250 / portTICK_PERIOD_MS);
     }
 
-    while ((res = bmp180_init(bus, &dev)) != ESP_OK)
+    while ((res = bmp180_init(&dev)) != ESP_OK)
     {
         printf("Could not init BMP180, err: %d\n", res);
         vTaskDelay(250 / portTICK_PERIOD_MS);
