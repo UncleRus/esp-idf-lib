@@ -9,6 +9,7 @@
 #include <ds1307.h>
 #include <ds3231.h>
 #include <bmp180.h>
+#include <bmp280.h>
 
 void ds18x20_test(void *pvParameter)
 {
@@ -228,6 +229,51 @@ void bmp180_test(void *pvParameters)
     }
 }
 
+void bmp280_test(void *pvParamters)
+{
+    bmp280_params_t params;
+    bmp280_init_default_params(&params);
+
+    bmp280_t dev;
+    dev.i2c_dev.addr = BMP280_I2C_ADDRESS_0;
+    dev.i2c_dev.port = 0;
+
+    esp_err_t res;
+
+    while (bmp280_i2c_init(&dev.i2c_dev, 17, 16) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    while ((res = bmp280_init(&dev, &params)) != ESP_OK)
+    {
+        printf("Could not init BMP280, err: %d\n", res);
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    bool bme280p = dev.id == BME280_CHIP_ID;
+    printf("BMP280: found %s\n", bme280p ? "BME280" : "BMP280");
+
+    float pressure, temperature, humidity;
+
+    while (1)
+    {
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        if (bmp280_read_float(&dev, &temperature, &pressure, &humidity) != ESP_OK)
+        {
+            printf("Temperature/pressure reading failed\n");
+            continue;
+        }
+
+        printf("Pressure: %.2f Pa, Temperature: %.2f C", pressure, temperature);
+        if (bme280p)
+            printf(", Humidity: %.2f\n", humidity);
+        else
+            printf("\n");
+    }
+}
+
 void app_main()
 {
     //xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
@@ -235,6 +281,7 @@ void app_main()
     //xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(ds1307_test, "ds1307_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(ds1307_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
-    xTaskCreate(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    //xTaskCreate(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    xTaskCreate(bmp280_test, "bmp280_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }
 

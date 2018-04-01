@@ -26,6 +26,8 @@
 
 #include <esp_log.h>
 
+#define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
+
 static const char *TAG = "BMP280";
 
 /**
@@ -47,7 +49,6 @@ static const char *TAG = "BMP280";
 #define BMP280_REG_ID          0xD0
 #define BMP280_REG_CALIB       0x88
 #define BMP280_REG_HUM_CALIB   0x88
-
 
 #define BMP280_RESET_VALUE     0xB6
 
@@ -124,6 +125,11 @@ static esp_err_t read_hum_calibration_data(bmp280_t *dev)
     ESP_LOGD(TAG, "dig_H6=%d", dev->dig_H6);
 
     return ESP_OK;
+}
+
+esp_err_t bmp280_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin)
+{
+    return i2c_setup_master(dev->port, scl_pin, sda_pin, I2C_FREQ_HZ);
 }
 
 void bmp280_init_default_params(bmp280_params_t *params)

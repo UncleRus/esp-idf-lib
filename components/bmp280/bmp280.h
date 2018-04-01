@@ -129,6 +129,8 @@ typedef struct {
     uint8_t  id;        /* Chip ID */
 } bmp280_t;
 
+esp_err_t bmp280_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin);
+
 /**
  * Initialize default parameters.
  * Default configuration:
