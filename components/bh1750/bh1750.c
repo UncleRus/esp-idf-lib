@@ -22,8 +22,16 @@
 #define OPCODE_OT   0x20
 
 
+#define I2C_FREQ_HZ 400000
+
+
 static const char *TAG = "BH1750";
 
+
+esp_err_t bh1750_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin)
+{
+    return i2c_setup_master(dev->port, scl_pin, sda_pin, I2C_FREQ_HZ);
+}
 
 esp_err_t bh1750_setup(i2c_dev_t *dev, bh1750_mode_t mode, bh1750_resolution_t resolution)
 {

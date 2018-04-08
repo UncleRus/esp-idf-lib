@@ -65,7 +65,6 @@ static inline uint32_t get_time_us()
 
 static esp_err_t write_register(i2c_port_t i2c_num, uint8_t reg, uint8_t val)
 {
-    ESP_LOGD(TAG, "Write register %d = %d, I2C port: %d", reg, val, i2c_num);
     esp_err_t ret = i2c_write_register(i2c_num, HMC5883L_ADDR, reg, &val, 1);
     if (ret != ESP_OK)
         ESP_LOGE(TAG, "Could not write register %d, err = %d", reg, ret);
@@ -74,7 +73,6 @@ static esp_err_t write_register(i2c_port_t i2c_num, uint8_t reg, uint8_t val)
 
 static esp_err_t i2c_slave_read(i2c_port_t i2c_num, uint8_t reg, void *res, size_t size)
 {
-    ESP_LOGD(TAG, "Read register %d, I2C port: %d", reg, i2c_num);
     esp_err_t ret = i2c_read_register(i2c_num, HMC5883L_ADDR, reg, res, size);
     if (ret != ESP_OK)
         ESP_LOGE(TAG, "Could not read register %d, err = %d", reg, ret);

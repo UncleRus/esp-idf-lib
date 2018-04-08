@@ -3,7 +3,7 @@
  *
  * ESP-IDF driver for DS3231 high precision RTC module
  *
- * Ported from esp-open-rtos
+ * Ported from esp-open-rtos by UncleRus
  * Copyright (C) 2015 Richard A Burton <richardaburton@gmail.com>
  * Copyright (C) 2016 Bhuvanchandra DV <bhuvanchandra.dv@gmail.com>
  * MIT Licensed as described in the file LICENSE

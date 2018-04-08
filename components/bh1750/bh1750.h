@@ -44,6 +44,8 @@ typedef enum
     BH1750_RES_HIGH2     //!< 0.5 lx resolution, measurement time is typically 120 ms
 } bh1750_resolution_t;
 
+esp_err_t bh1750_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin);
+
 /**
  *
  * @param dev

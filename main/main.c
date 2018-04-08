@@ -10,6 +10,9 @@
 #include <ds3231.h>
 #include <bmp180.h>
 #include <bmp280.h>
+#include <bh1750.h>
+#include <ultrasonic.h>
+
 
 void ds18x20_test(void *pvParameter)
 {
@@ -274,6 +277,61 @@ void bmp280_test(void *pvParamters)
     }
 }
 
+void bh1750_test(void *pvParamters)
+{
+    i2c_dev_t dev;
+    dev.addr = BH1750_ADDR_LO;
+    dev.port = 0;
+
+    while (bh1750_i2c_init(&dev, 17, 16) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    // FIXME
+}
+
+#define MAX_DISTANCE_CM 500 // 5m max
+
+void ultrasonic_test(void *pvParamters)
+{
+    ultrasonic_sensor_t sensor = {
+        .trigger_pin = 17,
+        .echo_pin = 16
+    };
+
+    ultrasonic_init(&sensor);
+
+    while (true)
+    {
+        uint32_t distance;
+        esp_err_t res = ultrasonic_measure_cm(&sensor, MAX_DISTANCE_CM, &distance);
+        if (res != ESP_OK)
+        {
+            printf("Error: ");
+            switch (res)
+            {
+                case ESP_ERR_ULTRASONIC_PING:
+                    printf("Cannot ping (device is in invalid state)\n");
+                    break;
+                case ESP_ERR_ULTRASONIC_PING_TIMEOUT:
+                    printf("Ping timeout (no device found)\n");
+                    break;
+                case ESP_ERR_ULTRASONIC_ECHO_TIMEOUT:
+                    printf("Echo timeout (i.e. distance too big)\n");
+                    break;
+                default:
+                    printf("%d\n", res);
+            }
+        }
+        else
+            printf("Distance: %d cm, %.02f m\n", distance, distance / 100.0);
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+}
+
 void app_main()
 {
     //xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
@@ -282,6 +340,7 @@ void app_main()
     //xTaskCreate(ds1307_test, "ds1307_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(ds1307_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
-    xTaskCreate(bmp280_test, "bmp280_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    //xTaskCreate(bmp280_test, "bmp280_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    xTaskCreate(ultrasonic_test, "ultrasonic_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 
