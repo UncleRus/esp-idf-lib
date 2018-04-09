@@ -2,7 +2,7 @@
 PROJECT_NAME := esp-idf-lib
 #EXTRA_COMPONENTS := onewire ds18x20 dht i2c_utils hmc5883l ds1307 ds3231 bmp180 bmp280 bh1750 ultrasonic 
 
-EXTRA_COMPONENTS := i2cdev hmc5883l
+EXTRA_COMPONENTS := i2cdev hmc5883l pcf8574
 
 
 DEFAULT_COMPONENTS := \

@@ -30,12 +30,13 @@ static const char *TAG = "BMP180";
 #define BMP180_RESET_VALUE        0xB6
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
+#define CHECK_VAL(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
 static esp_err_t bmp180_read_reg_16(i2c_dev_t *dev, uint8_t reg, int16_t *r)
 {
     uint8_t d[] = { 0, 0 };
 
-    CHECK(i2c_dev_read_register(dev, reg, d, 2));
+    CHECK(i2c_dev_read_reg(dev, reg, d, 2));
     *r = ((int16_t)d[0] << 8) | (d[1]);
 
     return ESP_OK;
@@ -43,7 +44,7 @@ static esp_err_t bmp180_read_reg_16(i2c_dev_t *dev, uint8_t reg, int16_t *r)
 
 static inline esp_err_t bmp180_start_messurement(i2c_dev_t *dev, uint8_t cmd)
 {
-    return i2c_dev_write_register(dev, BMP180_CONTROL_REG, &cmd, 1);
+    return i2c_dev_write_reg(dev, BMP180_CONTROL_REG, &cmd, 1);
 }
 
 static esp_err_t bmp180_get_uncompensated_temperature(i2c_dev_t *dev, int32_t *ut)
@@ -68,10 +69,10 @@ static esp_err_t bmp180_get_uncompensated_pressure(i2c_dev_t *dev, bmp180_mode_t
     // states 4.5, 7.5, 13.5, 25.5ms for oss 0 to 3.
     switch (oss)
     {
-      case BMP180_MODE_ULTRA_LOW_POWER:                 us = 5000; break;
-      case BMP180_MODE_STANDARD:                        us = 8000; break;
-      case BMP180_MODE_HIGH_RESOLUTION:                 us = 14000; break;
-      default: oss = BMP180_MODE_ULTRA_HIGH_RESOLUTION; us = 26000; break;
+        case BMP180_MODE_ULTRA_LOW_POWER:                 us = 5000; break;
+        case BMP180_MODE_STANDARD:                        us = 8000; break;
+        case BMP180_MODE_HIGH_RESOLUTION:                 us = 14000; break;
+        default: oss = BMP180_MODE_ULTRA_HIGH_RESOLUTION; us = 26000; break;
     }
 
     // Write Start Code into reg 0xF4
@@ -81,7 +82,7 @@ static esp_err_t bmp180_get_uncompensated_pressure(i2c_dev_t *dev, bmp180_mode_t
 
     uint8_t d[] = { 0, 0, 0 };
     uint8_t reg = BMP180_OUT_MSB_REG;
-    CHECK(i2c_dev_read_register(dev, reg, d, 3));
+    CHECK(i2c_dev_read_reg(dev, reg, d, 3));
 
     uint32_t r = ((uint32_t)d[0] << 16) | ((uint32_t)d[1] << 8) | d[2];
     r >>= 8 - oss;
@@ -90,31 +91,53 @@ static esp_err_t bmp180_get_uncompensated_pressure(i2c_dev_t *dev, bmp180_mode_t
     return ESP_OK;
 }
 
-esp_err_t bmp180_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin)
+esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    dev->addr = BMP180_DEVICE_ADDRESS;
-    return i2c_setup_master(dev->port, scl_pin, sda_pin, I2C_FREQ_HZ);
+    CHECK_VAL(dev);
+
+    dev->i2c_dev.port = port;
+    dev->i2c_dev.addr = BMP180_DEVICE_ADDRESS;
+    dev->i2c_dev.cfg.sda_io_num = sda_gpio;
+    dev->i2c_dev.cfg.scl_io_num = scl_gpio;
+    dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
+
+    CHECK(i2c_dev_create_mutex(dev));
+
+    return ESP_OK;
+}
+
+esp_err_t bmp180_free_desc(i2c_dev_t *dev)
+{
+    CHECK_VAL(dev);
+
+    return i2c_dev_delete_mutex(dev);
 }
 
 esp_err_t bmp180_init(bmp180_dev_t *dev)
 {
-    if (!bmp180_is_available(dev->i2c_dev.port))
+    CHECK_VAL(dev);
+
+    if (!bmp180_is_available(&dev->i2c_dev))
     {
-        ESP_LOGI(TAG, "not found");
+        ESP_LOGE(TAG, "Device not found");
         return ESP_ERR_NOT_FOUND;
     }
 
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 0, &dev->AC1));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 2, &dev->AC2));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 4, &dev->AC3));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 6, (int16_t *)&dev->AC4));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 8, (int16_t *)&dev->AC5));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 10, (int16_t *)&dev->AC6));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 12, &dev->B1));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 14, &dev->B2));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 16, &dev->MB));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 18, &dev->MC));
-    CHECK(bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 20, &dev->MD));
+    I2C_DEV_TAKE_MUTEX(dev);
+
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 0, &dev->AC1));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 2, &dev->AC2));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 4, &dev->AC3));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 6, (int16_t *)&dev->AC4));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 8, (int16_t *)&dev->AC5));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 10, (int16_t *)&dev->AC6));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 12, &dev->B1));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 14, &dev->B2));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 16, &dev->MB));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 18, &dev->MC));
+    I2C_DEV_CHECK(dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 20, &dev->MD));
+
+    I2C_DEV_GIVE_MUTEX(dev);
 
     ESP_LOGD(TAG, "AC1:=%d AC2:=%d AC3:=%d AC4:=%u AC5:=%u AC6:=%u", dev->AC1, dev->AC2, dev->AC3, dev->AC4, dev->AC5, dev->AC6);
     ESP_LOGD(TAG, "B1:=%d B2:=%d", dev->B1, dev->B2);
@@ -141,17 +164,19 @@ bool bmp180_is_available(i2c_port_t port)
 
 esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressure, bmp180_mode_t oss)
 {
-    int32_t T, P;
+    CHECK_VAL(dev);
+    CHECK_VAL(temperature);
+    CHECK_VAL(pressure);
 
-    if (!temperature && !pressure)
-        return ESP_ERR_INVALID_ARG;
+    I2C_DEV_TAKE_MUTEX(dev);
 
     // Temperature is always needed, also required for pressure only.
     //
     // Calculation taken from BMP180 Datasheet
+    int32_t T, P;
     int32_t UT, X1, X2, B5;
     UT = 0;
-    CHECK(bmp180_get_uncompensated_temperature(&dev->i2c_dev, &UT));
+    I2C_DEV_CHECK(dev, bmp180_get_uncompensated_temperature(&dev->i2c_dev, &UT));
 
     X1 = ((UT - (int32_t)dev->AC6) * (int32_t)dev->AC5) >> 15;
     X2 = ((int32_t)dev->MC << 11) / (X1 + (int32_t)dev->MD);
@@ -168,7 +193,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
         int32_t X3, B3, B6;
         uint32_t B4, B7, UP = 0;
 
-        CHECK(bmp180_get_uncompensated_pressure(&dev->i2c_dev, oss, &UP));
+        I2C_DEV_CHECK(dev, bmp180_get_uncompensated_pressure(&dev->i2c_dev, oss, &UP));
 
         // Calculation taken from BMP180 Datasheet
         B6 = B5 - 4000;
@@ -197,6 +222,8 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
 
         ESP_LOGD(TAG, "P:= %d", P);
     }
+
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }

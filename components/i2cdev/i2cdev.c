@@ -27,8 +27,6 @@
  */
 #include "i2cdev.h"
 #include <string.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
 #include <freertos/task.h>
 #include <esp_log.h>
 
@@ -40,7 +38,7 @@ static i2c_config_t configs[I2C_NUM_MAX];
 #define SEMAPHORE_TAKE(port) do { \
         if (!xSemaphoreTake(locks[port], CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS)) \
         { \
-            ESP_LOGE(TAG, "Could not take mutex %d", port); \
+            ESP_LOGE(TAG, "Could not take port mutex %d", port); \
             return ESP_ERR_TIMEOUT; \
         } \
         } while (0)
@@ -48,11 +46,10 @@ static i2c_config_t configs[I2C_NUM_MAX];
 #define SEMAPHORE_GIVE(port) do { \
         if (!xSemaphoreGive(locks[port])) \
         { \
-            ESP_LOGE(TAG, "Could not give mutex %d", port); \
+            ESP_LOGE(TAG, "Could not give port mutex %d", port); \
             return ESP_FAIL; \
         } \
         } while (0)
-
 
 esp_err_t i2cdev_init()
 {
@@ -61,7 +58,7 @@ esp_err_t i2cdev_init()
         locks[i] = xSemaphoreCreateMutex();
         if (!locks[i])
         {
-            ESP_LOGE(TAG, "Could not create mutex %d", i);
+            ESP_LOGE(TAG, "Could not create port mutex %d", i);
             return ESP_FAIL;
         }
     }
@@ -79,6 +76,52 @@ esp_err_t i2cdev_done()
         i2c_driver_delete(i);
         SEMAPHORE_GIVE(i);
         vSemaphoreDelete(locks[i]);
+    }
+    return ESP_OK;
+}
+
+esp_err_t i2c_dev_create_mutex(i2c_dev_t *dev)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    dev->mutex = xSemaphoreCreateMutex();
+    if (!dev->mutex)
+    {
+        ESP_LOGE(TAG, "[0x%02x at %d] Could not create device mutex", dev->addr, dev->port);
+        return ESP_FAIL;
+    }
+
+    return ESP_OK;
+}
+
+esp_err_t i2c_dev_delete_mutex(i2c_dev_t *dev)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    vSemaphoreDelete(dev->mutex);
+    return ESP_OK;
+}
+
+esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    if (!xSemaphoreTake(dev->mutex, CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS))
+    {
+        ESP_LOGE(TAG, "[0x%02x at %d] Could not take device mutex", dev->addr, dev->port);
+        return ESP_ERR_TIMEOUT;
+    }
+    return ESP_OK;
+}
+
+esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    if (!xSemaphoreGive(dev->mutex))
+    {
+        ESP_LOGE(TAG, "[0x%02x at %d] Could not give device mutex", dev->addr, dev->port);
+        return ESP_FAIL;
     }
     return ESP_OK;
 }

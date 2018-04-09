@@ -29,6 +29,8 @@
 #define __I2CDEV_H__
 
 #include <driver/i2c.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,6 +44,7 @@ typedef struct
     i2c_port_t port;
     i2c_config_t cfg;
     uint8_t addr;       //!< Unshifted address
+    SemaphoreHandle_t mutex;
 } i2c_dev_t;
 
 /**
@@ -54,9 +57,38 @@ esp_err_t i2cdev_init();
 
 /**
  * @brief Finish work with I2CDev lib
+ * Uninstall i2c drivers
  * @return ESP_OK on success
  */
 esp_err_t i2cdev_done();
+
+/**
+ * @brief Create mutex for device descriptor
+ * @param[out] dev Device descriptor
+ * @return ESP_OK on success
+ */
+esp_err_t i2c_dev_create_mutex(i2c_dev_t *dev);
+
+/**
+ * @brief Delete mutex for device descriptor
+ * @param[out] dev Device descriptor
+ * @return ESP_OK on success
+ */
+esp_err_t i2c_dev_delete_mutex(i2c_dev_t *dev);
+
+/**
+ * @brief Take device mutex
+ * @param[out] dev Device descriptor
+ * @return ESP_OK on success
+ */
+esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev);
+
+/**
+ * @brief Give device mutex
+ * @param[out] dev Device descriptor
+ * @return ESP_OK on success
+ */
+esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev);
 
 /**
  * @brief Read from slave device
@@ -116,6 +148,24 @@ inline esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
 {
     return i2c_dev_write(dev, &reg, 1, out_data, out_size);
 }
+
+#define I2C_DEV_TAKE_MUTEX(dev) do { \
+        esp_err_t __ = i2c_dev_take_mutex(dev); \
+        if (__ != ESP_OK) return __;\
+    } while (0)
+
+#define I2C_DEV_GIVE_MUTEX(dev) do { \
+        esp_err_t __ = i2c_dev_give_mutex(dev); \
+        if (__ != ESP_OK) return __;\
+    } while (0)
+
+#define I2C_DEV_CHECK(dev,X) do { \
+        esp_err_t ___ = X; \
+        if (___ != ESP_OK) { \
+            I2C_DEV_GIVE_MUTEX(dev); \
+            return ___; \
+        } \
+    } while (0)
 
 #ifdef __cplusplus
 }

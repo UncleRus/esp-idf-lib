@@ -103,119 +103,117 @@ typedef struct
 
 /**
  * @brief Initialize device descriptior
- * @param[out] dev Pointer to device descriptor
- * @param[in] i2c_port I2C port number
- * @param[in] scl_pin GPIO pin number for SCL
- * @param[in] sda_pin GPIO pin number for SDA
- * @return ESP_OK if no errors occured
+ * @param dev Pointer to device descriptor
+ * @param i2c_port I2C port number
+ * @param scl_pin GPIO pin number for SCL
+ * @param sda_pin GPIO pin number for SDA
+ * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * @brief Init device
- * @param[in] dev Device descriptor
+ * @brief Free device descriptor
+ * @param dev Pointer to device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_init(const i2c_dev_t *dev);
+esp_err_t hmc5883l_free_desc(i2c_dev_t *dev);
 
 /**
- * @brief Get device ID
- * Always returns 0x00333448 if IC is working properly.
- * @param[in] dev Device descriptor
- * @param[out] id Device ID
+ * @brief Init device
+ * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_id(const i2c_dev_t *dev, uint32_t *id);
+esp_err_t hmc5883l_init(i2c_dev_t *dev);
 
 /**
  * @brief Get operating mode
- * @param[in] dev Device descriptor
- * @param[out] val Measurement mode
+ * @param dev Device descriptor
+ * @param val Measurement mode
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_opmode(const i2c_dev_t *dev, hmc5883l_opmode_t *val);
+esp_err_t hmc5883l_get_opmode(i2c_dev_t *dev, hmc5883l_opmode_t *val);
 
 /**
  * @brief Set operating mode
- * @param[in] dev Device descriptor
- * @param[in] mode Measurement mode
+ * @param dev Device descriptor
+ * @param mode Measurement mode
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_opmode(const i2c_dev_t *dev, hmc5883l_opmode_t mode);
+esp_err_t hmc5883l_set_opmode(i2c_dev_t *dev, hmc5883l_opmode_t mode);
 
 /**
  * @brief Get number of samples averaged per measurement output
- * @param[in] dev Device descriptor
- * @param[out] val Number of samples
+ * @param dev Device descriptor
+ * @param val Number of samples
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_samples_averaged(const i2c_dev_t *dev, hmc5883l_samples_averaged_t *val);
+esp_err_t hmc5883l_get_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_averaged_t *val);
 
 /**
  * @brief Set number of samples averaged per measurement output
- * @param[in] dev Device descriptor
- * @param[in] samples Number of samples
+ * @param dev Device descriptor
+ * @param samples Number of samples
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_samples_averaged(const i2c_dev_t *dev, hmc5883l_samples_averaged_t samples);
+esp_err_t hmc5883l_set_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_averaged_t samples);
 
 /**
  * @brief Get data output rate in continuous measurement mode
- * @param[in] dev Device descriptor
- * @param[out] val Data output rate
+ * @param dev Device descriptor
+ * @param val Data output rate
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_data_rate(const i2c_dev_t *dev, hmc5883l_data_rate_t *val);
+esp_err_t hmc5883l_get_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t *val);
 
 /**
  * @brief Set data output rate in continuous measurement mode
- * @param[in] dev Device descriptor
- * @param[in] rate Data output rate
+ * @param dev Device descriptor
+ * @param rate Data output rate
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_data_rate(const i2c_dev_t *dev, hmc5883l_data_rate_t rate);
+esp_err_t hmc5883l_set_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t rate);
 
 /**
  * @brief Get measurement mode (bias of the axes)
  * See datasheet for self test description
- * @param[in] dev Device descriptor
- * @param[out] val Bias
+ * @param dev Device descriptor
+ * @param val Bias
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_bias(const i2c_dev_t *dev, hmc5883l_bias_t *val);
+esp_err_t hmc5883l_get_bias(i2c_dev_t *dev, hmc5883l_bias_t *val);
 
 /**
  * @brief Set measurement mode (bias of the axes)
  * See datasheet for self test description
- * @param[in] dev Device descriptor
- * @param[in] bias Bias
+ * @param dev Device descriptor
+ * @param bias Bias
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_bias(const i2c_dev_t *dev, hmc5883l_bias_t bias);
+esp_err_t hmc5883l_set_bias(i2c_dev_t *dev, hmc5883l_bias_t bias);
 
 /**
  * @brief Get device gain
- * @param[in] dev Device descriptor
- * @param[out] val Current gain
+ * @param dev Device descriptor
+ * @param val Current gain
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_gain(const i2c_dev_t *dev, hmc5883l_gain_t *val);
+esp_err_t hmc5883l_get_gain(i2c_dev_t *dev, hmc5883l_gain_t *val);
 
 /**
  * @brief Set device gain
- * @param[in] dev Device descriptor
- * @param[in] gain Gain
+ * @param dev Device descriptor
+ * @param gain Gain
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_gain(const i2c_dev_t *dev, hmc5883l_gain_t gain);
+esp_err_t hmc5883l_set_gain(i2c_dev_t *dev, hmc5883l_gain_t gain);
 
 /**
  * @brief Get data state
- * @param[in] dev Device descriptor
- * @param[out] true when data is written to all six data registers
+ * @param dev Device descriptor
+ * @param true when data is written to all six data registers
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_data_is_ready(const i2c_dev_t *dev, bool *val);
+esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val);
 
 /**
  * @brief Get lock state.
@@ -225,34 +223,34 @@ esp_err_t hmc5883l_data_is_ready(const i2c_dev_t *dev, bool *val);
  * 2. operating mode is changed,
  * 3. the measurement configuration (bias) is changed,
  * 4. power is reset.
- * @param[in] dev Device descriptor
- * @param[out] true when data registers is locked
+ * @param dev Device descriptor
+ * @param true when data registers is locked
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_data_is_locked(const i2c_dev_t *dev, bool *val);
+esp_err_t hmc5883l_data_is_locked(i2c_dev_t *dev, bool *val);
 
 /**
  * @brief Get raw magnetic data
- * @param[in] dev Device descriptor
- * @param[out] data Pointer to the struct to write raw data
+ * @param dev Device descriptor
+ * @param data Pointer to the struct to write raw data
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_raw_data(const i2c_dev_t *dev, hmc5883l_raw_data_t *data);
+esp_err_t hmc5883l_get_raw_data(i2c_dev_t *dev, hmc5883l_raw_data_t *data);
 
 /**
  * @brief Convert raw magnetic data to milligausses
- * @param[in] raw Pointer to source raw data struct
- * @param[out] mg Pointer to target struct to write converted data
+ * @param raw Pointer to source raw data struct
+ * @param mg Pointer to target struct to write converted data
  */
 void hmc5883l_raw_to_mg(const hmc5883l_raw_data_t *raw, hmc5883l_data_t *mg);
 
 /**
  * @brief Get magnetic data in milligausses
- * @param[in] dev Device descriptor
- * @param[out] data Pointer to the struct to write data
+ * @param dev Device descriptor
+ * @param data Pointer to the struct to write data
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_data(const i2c_dev_t *dev, hmc5883l_data_t *data);
+esp_err_t hmc5883l_get_data(i2c_dev_t *dev, hmc5883l_data_t *data);
 
 #ifdef __cplusplus
 }

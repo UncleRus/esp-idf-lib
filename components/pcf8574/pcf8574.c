@@ -1,4 +1,5 @@
 #include "pcf8574.h"
+#include <esp_err.h>
 
 #define CLOCK_FREQ_HZ 100000
 

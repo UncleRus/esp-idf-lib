@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <esp_err.h>
-#include <i2c_utils.h>
+#include <i2cdev.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,7 +129,7 @@ typedef struct {
     uint8_t  id;        /* Chip ID */
 } bmp280_t;
 
-esp_err_t bmp280_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin);
+esp_err_t bmp280_init_desc(bmp180_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * Initialize default parameters.
@@ -139,7 +139,7 @@ esp_err_t bmp280_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin
  *      oversampling: x4
  *      standby time: 250ms
  */
-void bmp280_init_default_params(bmp280_params_t *params);
+esp_err_t bmp280_init_default_params(bmp280_params_t *params);
 
 /**
  * Initialize BMP280 module, probes for the device, soft resets the device,
@@ -165,7 +165,7 @@ esp_err_t bmp280_force_measurement(bmp280_t *dev);
  * Check if BMP280 is busy with measuring temperature/pressure.
  * Return true if BMP280 is busy.
  */
-bool bmp280_is_measuring(bmp280_t *dev);
+esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy);
 
 /**
  * Read compensated temperature and pressure data:
