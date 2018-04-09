@@ -8,8 +8,8 @@
 #include "hmc5883l.h"
 
 #include <sys/time.h>
-#include <i2c_utils.h>
 #include <esp_log.h>
+#include <esp_err.h>
 
 #define REG_CR_A 0x00
 #define REG_CR_B 0x01
@@ -62,46 +62,50 @@ static inline uint32_t get_time_us()
 }
 
 #define timeout_expired(start, len) ((uint32_t)(get_time_us() - (start)) >= (len))
+#define CHECK_VAL(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
-static esp_err_t write_register(i2c_port_t i2c_num, uint8_t reg, uint8_t val)
+esp_err_t hmc5883l_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    esp_err_t ret = i2c_write_register(i2c_num, HMC5883L_ADDR, reg, &val, 1);
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    dev->port = port;
+    dev->addr = HMC5883L_ADDR;
+    dev->cfg.sda_io_num = sda_gpio;
+    dev->cfg.scl_io_num = scl_gpio;
+    dev->cfg.master.clk_speed = I2C_FREQ_HZ;
+
+    return ESP_OK;
+}
+
+static esp_err_t write_register(const i2c_dev_t *dev, uint8_t reg, uint8_t val)
+{
+    esp_err_t ret = i2c_dev_write_reg(dev, reg, &val, 1);
     if (ret != ESP_OK)
-        ESP_LOGE(TAG, "Could not write register %d, err = %d", reg, ret);
+        ESP_LOGE(TAG, "Could not write 0x%02x to register 0x%02x, err = %d", val, reg, ret);
     return ret;
 }
 
-static esp_err_t i2c_slave_read(i2c_port_t i2c_num, uint8_t reg, void *res, size_t size)
+static inline esp_err_t read_register(const i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 {
-    esp_err_t ret = i2c_read_register(i2c_num, HMC5883L_ADDR, reg, res, size);
+    esp_err_t ret = i2c_dev_read_reg(dev, reg, val, 1);
     if (ret != ESP_OK)
-        ESP_LOGE(TAG, "Could not read register %d, err = %d", reg, ret);
+        ESP_LOGE(TAG, "Could not read register 0x%02x, err = %d", reg, ret);
     return ret;
 }
 
-static inline esp_err_t read_register(i2c_port_t i2c_num, uint8_t reg, uint8_t *val)
-{
-    return i2c_slave_read(i2c_num, reg, val, 1);
-}
-
-static esp_err_t update_register(i2c_port_t i2c_num, uint8_t reg, uint8_t mask, uint8_t val)
+static esp_err_t update_register(const i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val)
 {
     uint8_t old;
-    esp_err_t ret = read_register(i2c_num, reg, &old);
+    esp_err_t ret = read_register(dev, reg, &old);
     if (ret != ESP_OK)
         return ret;
-    return write_register(i2c_num, reg, (old & mask) | val);
+    return write_register(dev, reg, (old & mask) | val);
 }
 
-esp_err_t hmc5883l_i2c_init(i2c_port_t i2c_num, gpio_num_t scl_pin, gpio_num_t sda_pin)
-{
-    return i2c_setup_master(i2c_num, scl_pin, sda_pin, I2C_FREQ_HZ);
-}
-
-esp_err_t hmc5883l_init(i2c_port_t i2c_num)
+esp_err_t hmc5883l_init(const i2c_dev_t *dev)
 {
     uint32_t id;
-    esp_err_t res = hmc5883l_get_id(i2c_num, &id);
+    esp_err_t res = hmc5883l_get_id(dev, &id);
     if (res != ESP_OK)
         return res;
     if (id != HMC5883L_ID)
@@ -111,23 +115,27 @@ esp_err_t hmc5883l_init(i2c_port_t i2c_num)
     }
 
     hmc5883l_gain_t gain;
-    res = hmc5883l_get_gain(i2c_num, &gain);
+    res = hmc5883l_get_gain(dev, &gain);
     if (res != ESP_OK)
         return res;
     current_gain = gain_values[gain];
 
-    return hmc5883l_get_opmode(i2c_num, &current_mode);
+    return hmc5883l_get_opmode(dev, &current_mode);
 }
 
-esp_err_t hmc5883l_get_id(i2c_port_t i2c_num, uint32_t *id)
+esp_err_t hmc5883l_get_id(const i2c_dev_t *dev, uint32_t *id)
 {
+    CHECK_VAL(id);
+
     *id = 0;
-    return i2c_slave_read(i2c_num, REG_ID_A, id, 3);
+    return i2c_dev_read_reg(dev, REG_ID_A, id, 3);
 }
 
-esp_err_t hmc5883l_get_opmode(i2c_port_t i2c_num, hmc5883l_opmode_t *val)
+esp_err_t hmc5883l_get_opmode(const i2c_dev_t *dev, hmc5883l_opmode_t *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_MODE, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_MODE, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -135,9 +143,9 @@ esp_err_t hmc5883l_get_opmode(i2c_port_t i2c_num, hmc5883l_opmode_t *val)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_set_opmode(i2c_port_t i2c_num, hmc5883l_opmode_t mode)
+esp_err_t hmc5883l_set_opmode(const i2c_dev_t *dev, hmc5883l_opmode_t mode)
 {
-    esp_err_t ret = write_register(i2c_num, REG_MODE, mode);
+    esp_err_t ret = write_register(dev, REG_MODE, mode);
     if (ret != ESP_OK)
         return ret;
 
@@ -145,9 +153,11 @@ esp_err_t hmc5883l_set_opmode(i2c_port_t i2c_num, hmc5883l_opmode_t mode)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_get_samples_averaged(i2c_port_t i2c_num, hmc5883l_samples_averaged_t *val)
+esp_err_t hmc5883l_get_samples_averaged(const i2c_dev_t *dev, hmc5883l_samples_averaged_t *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_CR_A, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_CR_A, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -155,14 +165,16 @@ esp_err_t hmc5883l_get_samples_averaged(i2c_port_t i2c_num, hmc5883l_samples_ave
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_set_samples_averaged(i2c_port_t i2c_num, hmc5883l_samples_averaged_t samples)
+esp_err_t hmc5883l_set_samples_averaged(const i2c_dev_t *dev, hmc5883l_samples_averaged_t samples)
 {
-    return update_register(i2c_num, REG_CR_A, MASK_MA, samples << BIT_MA);
+    return update_register(dev, REG_CR_A, MASK_MA, samples << BIT_MA);
 }
 
-esp_err_t hmc5883l_get_data_rate(i2c_port_t i2c_num, hmc5883l_data_rate_t *val)
+esp_err_t hmc5883l_get_data_rate(const i2c_dev_t *dev, hmc5883l_data_rate_t *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_CR_A, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_CR_A, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -170,14 +182,16 @@ esp_err_t hmc5883l_get_data_rate(i2c_port_t i2c_num, hmc5883l_data_rate_t *val)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_set_data_rate(i2c_port_t i2c_num, hmc5883l_data_rate_t rate)
+esp_err_t hmc5883l_set_data_rate(const i2c_dev_t *dev, hmc5883l_data_rate_t rate)
 {
-    return update_register(i2c_num, REG_CR_A, MASK_DO, rate << BIT_DO);
+    return update_register(dev, REG_CR_A, MASK_DO, rate << BIT_DO);
 }
 
-esp_err_t hmc5883l_get_bias(i2c_port_t i2c_num, hmc5883l_bias_t *val)
+esp_err_t hmc5883l_get_bias(const i2c_dev_t *dev, hmc5883l_bias_t *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_CR_A, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_CR_A, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -185,14 +199,16 @@ esp_err_t hmc5883l_get_bias(i2c_port_t i2c_num, hmc5883l_bias_t *val)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_set_bias(i2c_port_t i2c_num, hmc5883l_bias_t bias)
+esp_err_t hmc5883l_set_bias(const i2c_dev_t *dev, hmc5883l_bias_t bias)
 {
-    return update_register(i2c_num, REG_CR_A, MASK_MS, bias);
+    return update_register(dev, REG_CR_A, MASK_MS, bias);
 }
 
-esp_err_t hmc5883l_get_gain(i2c_port_t i2c_num, hmc5883l_gain_t *val)
+esp_err_t hmc5883l_get_gain(const i2c_dev_t *dev, hmc5883l_gain_t *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_CR_B, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_CR_B, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -200,9 +216,9 @@ esp_err_t hmc5883l_get_gain(i2c_port_t i2c_num, hmc5883l_gain_t *val)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_set_gain(i2c_port_t i2c_num, hmc5883l_gain_t gain)
+esp_err_t hmc5883l_set_gain(const i2c_dev_t *dev, hmc5883l_gain_t gain)
 {
-    esp_err_t ret = write_register(i2c_num, REG_CR_B, gain << BIT_GN);
+    esp_err_t ret = write_register(dev, REG_CR_B, gain << BIT_GN);
     if (ret != ESP_OK)
         return ret;
 
@@ -210,9 +226,11 @@ esp_err_t hmc5883l_set_gain(i2c_port_t i2c_num, hmc5883l_gain_t gain)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_data_is_locked(i2c_port_t i2c_num, bool *val)
+esp_err_t hmc5883l_data_is_locked(const i2c_dev_t *dev, bool *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_STAT, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_STAT, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -220,9 +238,11 @@ esp_err_t hmc5883l_data_is_locked(i2c_port_t i2c_num, bool *val)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_data_is_ready(i2c_port_t i2c_num, bool *val)
+esp_err_t hmc5883l_data_is_ready(const i2c_dev_t *dev, bool *val)
 {
-    esp_err_t res = read_register(i2c_num, REG_STAT, (uint8_t *)val);
+    CHECK_VAL(val);
+
+    esp_err_t res = read_register(dev, REG_STAT, (uint8_t *)val);
     if (res != ESP_OK)
         return res;
 
@@ -230,13 +250,15 @@ esp_err_t hmc5883l_data_is_ready(i2c_port_t i2c_num, bool *val)
     return ESP_OK;
 }
 
-esp_err_t hmc5883l_get_raw_data(i2c_port_t i2c_num, hmc5883l_raw_data_t *data)
+esp_err_t hmc5883l_get_raw_data(const i2c_dev_t *dev, hmc5883l_raw_data_t *data)
 {
+    CHECK_VAL(data);
+
     esp_err_t res;
     if (current_mode == HMC5883L_MODE_SINGLE)
     {
         // overwrite mode register for measurement
-        res = hmc5883l_set_opmode(i2c_num, current_mode);
+        res = hmc5883l_set_opmode(dev, current_mode);
         if (res != ESP_OK)
             return res;
 
@@ -245,14 +267,14 @@ esp_err_t hmc5883l_get_raw_data(i2c_port_t i2c_num, hmc5883l_raw_data_t *data)
         bool dready = false;
         do
         {
-            res = hmc5883l_data_is_ready(i2c_num, &dready);
+            res = hmc5883l_data_is_ready(dev, &dready);
             if (timeout_expired(start, CONFIG_HMC5883L_MEAS_TIMEOUT))
                 return ESP_ERR_TIMEOUT;
         } while (!dready);
     }
     uint8_t buf[6];
     uint8_t reg = REG_DX_H;
-    res = i2c_slave_read(i2c_num, reg, buf, 6);
+    res = i2c_dev_read_reg(dev, reg, buf, 6);
     if (res != ESP_OK)
         return res;
 
@@ -270,11 +292,11 @@ void hmc5883l_raw_to_mg(const hmc5883l_raw_data_t *raw, hmc5883l_data_t *mg)
     mg->z = raw->z * current_gain;
 }
 
-esp_err_t hmc5883l_get_data(i2c_port_t i2c_num, hmc5883l_data_t *data)
+esp_err_t hmc5883l_get_data(const i2c_dev_t *dev, hmc5883l_data_t *data)
 {
     hmc5883l_raw_data_t raw;
 
-    esp_err_t res = hmc5883l_get_raw_data(i2c_num, &raw);
+    esp_err_t res = hmc5883l_get_raw_data(dev, &raw);
     if (res != ESP_OK)
         return res;
 

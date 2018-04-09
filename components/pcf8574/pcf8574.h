@@ -1,5 +1,6 @@
 /**
- * The MIT License (MIT)
+ * @file ESP-IDF driver for PCF8574 compartible remote
+ *       8-bit I/O expanders for I2C-bus
  *
  * Copyright (c) 2018 Ruslan V. Uss (https://github.com/UncleRus)
  *
@@ -21,40 +22,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __I2C_UTILS_H__
-#define __I2C_UTILS_H__
+#ifndef __PCF8574_H__
+#define __PCF8574_H__
 
-#include <driver/i2c.h>
+#include <stddef.h>
+#include <i2cdev.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct
+/**
+ * @brief Initialize device descriptior
+ * SCL frequency is 100kHz
+ * @param dev Pointer to I2C device descriptor
+ * @param port I2C port number
+ * @param addr I2C address (0b0100<A2><A1><A0> for PCF8574)
+ * @param sda_gpio SDA GPIO
+ * @param scl_gpio SCL GPIO
+ * @return ESP_OK on success
+ */
+esp_err_t pcf8574_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
+/**
+ * @brief Read GPIO port value
+ * @param dev Pointer to I2C device descriptor
+ * @param val 8-bit GPIO port value
+ * @return ESP_OK on success
+ */
+inline esp_err_t pcf8574_port_read(const i2c_dev_t *dev, uint8_t *val)
 {
-    i2c_port_t port;
-    uint8_t addr;
-} i2c_dev_t;
-
-esp_err_t i2c_setup_master(i2c_port_t i2c_num, gpio_num_t scl_pin, gpio_num_t sda_pin, uint32_t clk_freq);
-
-esp_err_t i2c_read_register(i2c_port_t i2c_num, uint8_t addr, uint8_t reg, void *res, size_t size);
-
-esp_err_t i2c_write_register(i2c_port_t i2c_num, uint8_t addr, uint8_t reg, void *data, size_t size);
-
-
-inline esp_err_t i2c_dev_read_register(i2c_dev_t *dev, uint8_t reg, void *res, size_t size)
-{
-    return i2c_read_register(dev->port, dev->addr, reg, res, size);
+    return i2c_dev_read(dev, NULL, 0, val, 1);
 }
 
-inline esp_err_t i2c_dev_write_register(i2c_dev_t *dev, uint8_t reg, void *data, size_t size)
+/**
+ * @brief Write value to GPIO port
+ * @param dev Pointer to I2C device descriptor
+ * @param value GPIO port value
+ * @return ESP_OK on success
+ */
+inline esp_err_t pcf8574_port_write(const i2c_dev_t *dev, uint8_t value)
 {
-    return i2c_write_register(dev->port, dev->addr, reg, data, size);
+    return i2c_dev_write(dev, NULL, 0, &value, 1);
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __I2C_UTILS_H__ */
+#endif /* __PCF8574_H__ */
