@@ -3,13 +3,13 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_system.h>
-#include <hmc5883l.h>
+//#include <hmc5883l.h>
 //#include <ds18x20.h>
 //#include <dht.h>
 //#include <ds1307.h>
 //#include <ds3231.h>
-//#include <bmp180.h>
-//#include <bmp280.h>
+#include <bmp180.h>
+#include <bmp280.h>
 //#include <bh1750.h>
 //#include <ultrasonic.h>
 
@@ -78,39 +78,39 @@
 //    }
 //}
 
-void hmc5883l_test(void *pvParameters)
-{
-    i2c_dev_t dev;
-
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2C bus\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    hmc5883l_init_desc(&dev, 0, 16, 17);
-    while (hmc5883l_init(&dev) != ESP_OK)
-    {
-        printf("HMC5883L not found\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    hmc5883l_set_opmode(&dev, HMC5883L_MODE_CONTINUOUS);
-    hmc5883l_set_samples_averaged(&dev, HMC5883L_SAMPLES_8);
-    hmc5883l_set_data_rate(&dev, HMC5883L_DATA_RATE_07_50);
-    hmc5883l_set_gain(&dev, HMC5883L_GAIN_1090);
-
-    while (1)
-    {
-        hmc5883l_data_t data;
-        if (hmc5883l_get_data(&dev, &data) == ESP_OK)
-            printf("Magnetic data: X:%.2f mG, Y:%.2f mG, Z:%.2f mG\n", data.x, data.y, data.z);
-        else
-            printf("Could not read HMC5883L data\n");
-
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-}
+//void hmc5883l_test(void *pvParameters)
+//{
+//    i2c_dev_t dev;
+//
+//    while (i2cdev_init() != ESP_OK)
+//    {
+//        printf("Could not init I2C bus\n");
+//        vTaskDelay(250 / portTICK_PERIOD_MS);
+//    }
+//
+//    hmc5883l_init_desc(&dev, 0, 16, 17);
+//    while (hmc5883l_init(&dev) != ESP_OK)
+//    {
+//        printf("HMC5883L not found\n");
+//        vTaskDelay(250 / portTICK_PERIOD_MS);
+//    }
+//
+//    hmc5883l_set_opmode(&dev, HMC5883L_MODE_CONTINUOUS);
+//    hmc5883l_set_samples_averaged(&dev, HMC5883L_SAMPLES_8);
+//    hmc5883l_set_data_rate(&dev, HMC5883L_DATA_RATE_07_50);
+//    hmc5883l_set_gain(&dev, HMC5883L_GAIN_1090);
+//
+//    while (1)
+//    {
+//        hmc5883l_data_t data;
+//        if (hmc5883l_get_data(&dev, &data) == ESP_OK)
+//            printf("Magnetic data: X:%.2f mG, Y:%.2f mG, Z:%.2f mG\n", data.x, data.y, data.z);
+//        else
+//            printf("Could not read HMC5883L data\n");
+//
+//        vTaskDelay(250 / portTICK_PERIOD_MS);
+//    }
+//}
 
 //void dht_test(void *pvParameters)
 //{
@@ -135,7 +135,7 @@ void hmc5883l_test(void *pvParameters)
 //        vTaskDelay(300 / portTICK_PERIOD_MS);
 //    }
 //}
-//
+
 //void ds1307_test(void *pvParameters)
 //{
 //    static const i2c_port_t bus = 0;
@@ -203,83 +203,83 @@ void hmc5883l_test(void *pvParameters)
 //    }
 //}
 //
-//void bmp180_test(void *pvParameters)
-//{
-//    bmp180_dev_t dev;
-//    dev.i2c_dev.port = 0;
-//    esp_err_t res;
-//
-//    while ((res = bmp180_i2c_init(&dev.i2c_dev, 17, 16)) != ESP_OK)
-//    {
-//        printf("Could not init I2C bus\n");
-//        vTaskDelay(250 / portTICK_PERIOD_MS);
-//    }
-//
-//    while ((res = bmp180_init(&dev)) != ESP_OK)
-//    {
-//        printf("Could not init BMP180, err: %d\n", res);
-//        vTaskDelay(250 / portTICK_PERIOD_MS);
-//    }
-//
-//    while (1)
-//    {
-//        float temp;
-//        uint32_t pressure;
-//
-//        res = bmp180_measure(&dev, &temp, &pressure, BMP180_MODE_STANDARD);
-//        if (res != ESP_OK)
-//            printf("Could not measure: %d\n", res);
-//        else
-//            printf("Temperature: %.2f degrees Celsius; Pressure: %d MPa\n", temp, pressure);
-//
-//        vTaskDelay(500 / portTICK_PERIOD_MS);
-//    }
-//}
-//
-//void bmp280_test(void *pvParamters)
-//{
-//    bmp280_params_t params;
-//    bmp280_init_default_params(&params);
-//
-//    bmp280_t dev;
-//    dev.i2c_dev.addr = BMP280_I2C_ADDRESS_0;
-//    dev.i2c_dev.port = 0;
-//
-//    esp_err_t res;
-//
-//    while (bmp280_i2c_init(&dev.i2c_dev, 17, 16) != ESP_OK)
-//    {
-//        printf("Could not init I2C bus\n");
-//        vTaskDelay(250 / portTICK_PERIOD_MS);
-//    }
-//
-//    while ((res = bmp280_init(&dev, &params)) != ESP_OK)
-//    {
-//        printf("Could not init BMP280, err: %d\n", res);
-//        vTaskDelay(250 / portTICK_PERIOD_MS);
-//    }
-//
-//    bool bme280p = dev.id == BME280_CHIP_ID;
-//    printf("BMP280: found %s\n", bme280p ? "BME280" : "BMP280");
-//
-//    float pressure, temperature, humidity;
-//
-//    while (1)
-//    {
-//        vTaskDelay(500 / portTICK_PERIOD_MS);
-//        if (bmp280_read_float(&dev, &temperature, &pressure, &humidity) != ESP_OK)
-//        {
-//            printf("Temperature/pressure reading failed\n");
-//            continue;
-//        }
-//
-//        printf("Pressure: %.2f Pa, Temperature: %.2f C", pressure, temperature);
-//        if (bme280p)
-//            printf(", Humidity: %.2f\n", humidity);
-//        else
-//            printf("\n");
-//    }
-//}
+void bmp180_test(void *pvParameters)
+{
+    bmp180_dev_t dev;
+    dev.i2c_dev.port = 0;
+    esp_err_t res;
+
+    while ((res = bmp180_i2c_init(&dev.i2c_dev, 17, 16)) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    while ((res = bmp180_init(&dev)) != ESP_OK)
+    {
+        printf("Could not init BMP180, err: %d\n", res);
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    while (1)
+    {
+        float temp;
+        uint32_t pressure;
+
+        res = bmp180_measure(&dev, &temp, &pressure, BMP180_MODE_STANDARD);
+        if (res != ESP_OK)
+            printf("Could not measure: %d\n", res);
+        else
+            printf("Temperature: %.2f degrees Celsius; Pressure: %d MPa\n", temp, pressure);
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+}
+
+void bmp280_test(void *pvParamters)
+{
+    bmp280_params_t params;
+    bmp280_init_default_params(&params);
+
+    bmp280_t dev;
+    dev.i2c_dev.addr = BMP280_I2C_ADDRESS_0;
+    dev.i2c_dev.port = 0;
+
+    esp_err_t res;
+
+    while (bmp280_i2c_init(&dev.i2c_dev, 17, 16) != ESP_OK)
+    {
+        printf("Could not init I2C bus\n");
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    while ((res = bmp280_init(&dev, &params)) != ESP_OK)
+    {
+        printf("Could not init BMP280, err: %d\n", res);
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+
+    bool bme280p = dev.id == BME280_CHIP_ID;
+    printf("BMP280: found %s\n", bme280p ? "BME280" : "BMP280");
+
+    float pressure, temperature, humidity;
+
+    while (1)
+    {
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        if (bmp280_read_float(&dev, &temperature, &pressure, &humidity) != ESP_OK)
+        {
+            printf("Temperature/pressure reading failed\n");
+            continue;
+        }
+
+        printf("Pressure: %.2f Pa, Temperature: %.2f C", pressure, temperature);
+        if (bme280p)
+            printf(", Humidity: %.2f\n", humidity);
+        else
+            printf("\n");
+    }
+}
 //
 //void bh1750_test(void *pvParamters)
 //{
@@ -339,8 +339,8 @@ void hmc5883l_test(void *pvParameters)
 void app_main()
 {
     //xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
-    xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
-    //xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    //xTaskCreate(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+    xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(ds1307_test, "ds1307_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(ds1307_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
     //xTaskCreate(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);

@@ -32,7 +32,7 @@
 
 static const char *TAG = "I2C_DEV";
 
-static SemaphoreHandle_t locks[I2C_NUM_MAX];
+static SemaphoreHandle_t locks[I2C_NUM_MAX] = { 0 };
 static i2c_config_t configs[I2C_NUM_MAX];
 
 #define SEMAPHORE_TAKE(port) do { \
@@ -55,6 +55,8 @@ esp_err_t i2cdev_init()
 {
     for (int i = 0; i < I2C_NUM_MAX; i++)
     {
+        if (locks[i]) continue;
+
         locks[i] = xSemaphoreCreateMutex();
         if (!locks[i])
         {
@@ -76,6 +78,7 @@ esp_err_t i2cdev_done()
         i2c_driver_delete(i);
         SEMAPHORE_GIVE(i);
         vSemaphoreDelete(locks[i]);
+        locks[i] = NULL;
     }
     return ESP_OK;
 }

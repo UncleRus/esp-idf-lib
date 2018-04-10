@@ -69,7 +69,7 @@ esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gp
  * @param dev Pointer to device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t bmp180_free_desc(i2c_dev_t *dev);
+esp_err_t bmp180_free_desc(bmp180_dev_t *dev);
 
 /**
  * Init bmp180 driver
@@ -80,10 +80,10 @@ esp_err_t bmp180_init(bmp180_dev_t *dev);
 
 /**
  * Check BMP180 availability
- * @param port I2C port number
+ * @param port I2C device descriptor
  * @return true if bmp180 is available
  */
-bool bmp180_is_available(i2c_port_t port);
+bool bmp180_is_available(i2c_dev_t *i2c_dev);
 
 /**
  * Measure temperature and pressure
