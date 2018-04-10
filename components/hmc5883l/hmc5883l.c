@@ -62,11 +62,11 @@ static inline uint32_t get_time_us()
 }
 
 #define timeout_expired(start, len) ((uint32_t)(get_time_us() - (start)) >= (len))
-#define CHECK_VAL(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
 esp_err_t hmc5883l_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     dev->port = port;
     dev->addr = HMC5883L_ADDR;
@@ -80,7 +80,7 @@ esp_err_t hmc5883l_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpi
 
 esp_err_t hmc5883l_free_desc(i2c_dev_t *dev)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     return i2c_dev_delete_mutex(dev);
 }
@@ -117,7 +117,7 @@ static esp_err_t update_register(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint
 
 esp_err_t hmc5883l_init(i2c_dev_t *dev)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
 
@@ -143,8 +143,8 @@ esp_err_t hmc5883l_init(i2c_dev_t *dev)
 
 esp_err_t hmc5883l_get_opmode(i2c_dev_t *dev, hmc5883l_opmode_t *val)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(val);
+    CHECK_ARG(dev);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_MODE, (uint8_t *)val));
@@ -156,7 +156,7 @@ esp_err_t hmc5883l_get_opmode(i2c_dev_t *dev, hmc5883l_opmode_t *val)
 
 esp_err_t hmc5883l_set_opmode(i2c_dev_t *dev, hmc5883l_opmode_t mode)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, write_register(dev, REG_MODE, mode));
@@ -168,8 +168,8 @@ esp_err_t hmc5883l_set_opmode(i2c_dev_t *dev, hmc5883l_opmode_t mode)
 
 esp_err_t hmc5883l_get_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_averaged_t *val)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(val);
+    CHECK_ARG(dev);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_CR_A, (uint8_t *)val));
@@ -181,7 +181,7 @@ esp_err_t hmc5883l_get_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_average
 
 esp_err_t hmc5883l_set_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_averaged_t samples)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, update_register(dev, REG_CR_A, MASK_MA, samples << BIT_MA));
@@ -192,7 +192,7 @@ esp_err_t hmc5883l_set_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_average
 
 esp_err_t hmc5883l_get_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t *val)
 {
-    CHECK_VAL(val);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_CR_A, (uint8_t *)val));
@@ -204,7 +204,7 @@ esp_err_t hmc5883l_get_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t *val)
 
 esp_err_t hmc5883l_set_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t rate)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, update_register(dev, REG_CR_A, MASK_DO, rate << BIT_DO));
@@ -215,8 +215,8 @@ esp_err_t hmc5883l_set_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t rate)
 
 esp_err_t hmc5883l_get_bias(i2c_dev_t *dev, hmc5883l_bias_t *val)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(val);
+    CHECK_ARG(dev);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_CR_A, (uint8_t *)val));
@@ -228,7 +228,7 @@ esp_err_t hmc5883l_get_bias(i2c_dev_t *dev, hmc5883l_bias_t *val)
 
 esp_err_t hmc5883l_set_bias(i2c_dev_t *dev, hmc5883l_bias_t bias)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, update_register(dev, REG_CR_A, MASK_MS, bias));
@@ -239,8 +239,8 @@ esp_err_t hmc5883l_set_bias(i2c_dev_t *dev, hmc5883l_bias_t bias)
 
 esp_err_t hmc5883l_get_gain(i2c_dev_t *dev, hmc5883l_gain_t *val)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(val);
+    CHECK_ARG(dev);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_CR_B, (uint8_t *)val));
@@ -262,8 +262,8 @@ esp_err_t hmc5883l_set_gain(i2c_dev_t *dev, hmc5883l_gain_t gain)
 
 esp_err_t hmc5883l_data_is_locked(i2c_dev_t *dev, bool *val)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(val);
+    CHECK_ARG(dev);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_STAT, (uint8_t *)val));
@@ -275,8 +275,8 @@ esp_err_t hmc5883l_data_is_locked(i2c_dev_t *dev, bool *val)
 
 esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(val);
+    CHECK_ARG(dev);
+    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_register(dev, REG_STAT, (uint8_t *)val));
@@ -288,8 +288,8 @@ esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val)
 
 esp_err_t hmc5883l_get_raw_data(i2c_dev_t *dev, hmc5883l_raw_data_t *data)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(data);
+    CHECK_ARG(dev);
+    CHECK_ARG(data);
 
     if (current_mode == HMC5883L_MODE_SINGLE)
     {

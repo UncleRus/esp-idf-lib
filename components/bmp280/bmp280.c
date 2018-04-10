@@ -53,7 +53,7 @@ static const char *TAG = "BMP280";
 #define BMP280_RESET_VALUE     0xB6
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_VAL(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 #define CHECK_LOGE(dev, x, msg, ...) do { \
         esp_err_t __; \
         if ((__ = x) != ESP_OK) { \
@@ -136,7 +136,7 @@ static esp_err_t read_hum_calibration_data(bmp280_t *dev)
 
 esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     if (dev->i2c_dev.addr != BMP280_I2C_ADDRESS_0 && dev->i2c_dev.addr != BMP280_I2C_ADDRESS_1)
     {
@@ -157,14 +157,14 @@ esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
 
 esp_err_t bmp280_free_desc(bmp280_t *dev)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
 esp_err_t bmp280_init_default_params(bmp280_params_t *params)
 {
-    CHECK_VAL(params);
+    CHECK_ARG(params);
 
     params->mode = BMP280_MODE_NORMAL;
     params->filter = BMP280_FILTER_OFF;
@@ -178,8 +178,8 @@ esp_err_t bmp280_init_default_params(bmp280_params_t *params)
 
 esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(params);
+    CHECK_ARG(dev);
+    CHECK_ARG(params);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -238,7 +238,7 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
 
 esp_err_t bmp280_force_measurement(bmp280_t *dev)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -256,8 +256,8 @@ esp_err_t bmp280_force_measurement(bmp280_t *dev)
 
 esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(busy);
+    CHECK_ARG(dev);
+    CHECK_ARG(busy);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -338,9 +338,9 @@ static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32
 
 esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *pressure, uint32_t *humidity)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(temperature);
-    CHECK_VAL(pressure);
+    CHECK_ARG(dev);
+    CHECK_ARG(temperature);
+    CHECK_ARG(pressure);
 
     int32_t adc_pressure;
     int32_t adc_temp;

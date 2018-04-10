@@ -50,7 +50,7 @@ static const char *TAG = "DHTxx";
 
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
-#define CHECK_VAL(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
 #define CHECK_LOGE(x, msg, ...) do { \
         esp_err_t __; \
@@ -146,8 +146,8 @@ static inline int16_t dht_convert_data(dht_sensor_type_t sensor_type, uint8_t ms
 esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
         int16_t *humidity, int16_t *temperature)
 {
-    CHECK_VAL(humidity);
-    CHECK_VAL(temperature);
+    CHECK_ARG(humidity);
+    CHECK_ARG(temperature);
 
     bool bits[DHT_DATA_BITS];
     uint8_t data[DHT_DATA_BITS / 8] = { 0 };
@@ -188,8 +188,8 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
 esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
         float *humidity, float *temperature)
 {
-    CHECK_VAL(humidity);
-    CHECK_VAL(temperature);
+    CHECK_ARG(humidity);
+    CHECK_ARG(temperature);
 
     int16_t i_humidity, i_temp;
 

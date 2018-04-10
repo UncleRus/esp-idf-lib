@@ -30,7 +30,7 @@ static const char *TAG = "BMP180";
 #define BMP180_RESET_VALUE        0xB6
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_VAL(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
 static esp_err_t bmp180_read_reg_16(i2c_dev_t *dev, uint8_t reg, int16_t *r)
 {
@@ -93,7 +93,7 @@ static esp_err_t bmp180_get_uncompensated_pressure(i2c_dev_t *dev, bmp180_mode_t
 
 esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     dev->i2c_dev.port = port;
     dev->i2c_dev.addr = BMP180_DEVICE_ADDRESS;
@@ -108,14 +108,14 @@ esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gp
 
 esp_err_t bmp180_free_desc(bmp180_dev_t *dev)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
 esp_err_t bmp180_init(bmp180_dev_t *dev)
 {
-    CHECK_VAL(dev);
+    CHECK_ARG(dev);
 
     if (!bmp180_is_available(&dev->i2c_dev))
     {
@@ -167,9 +167,9 @@ bool bmp180_is_available(i2c_dev_t *i2c_dev)
 
 esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressure, bmp180_mode_t oss)
 {
-    CHECK_VAL(dev);
-    CHECK_VAL(temperature);
-    CHECK_VAL(pressure);
+    CHECK_ARG(dev);
+    CHECK_ARG(temperature);
+    CHECK_ARG(pressure);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
