@@ -129,7 +129,23 @@ typedef struct {
     uint8_t  id;        /* Chip ID */
 } bmp280_t;
 
-esp_err_t bmp280_init_desc(bmp180_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+/**
+ * @brief Initialize device descriptior
+ * @param[out] dev Pointer to device descriptor
+ * @param[in] addr BMP280 address
+ * @param[in] i2c_port I2C port number
+ * @param[in] scl_pin GPIO pin number for SCL
+ * @param[in] sda_pin GPIO pin number for SDA
+ * @return ESP_OK if no errors occured
+ */
+esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
+/**
+ * @brief Free device descriptor
+ * @param dev Pointer to device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t bmp280_free_desc(bmp280_t *dev);
 
 /**
  * Initialize default parameters.

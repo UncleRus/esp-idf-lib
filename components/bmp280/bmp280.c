@@ -57,7 +57,7 @@ static const char *TAG = "BMP280";
 #define CHECK_LOGE(dev, x, msg, ...) do { \
         esp_err_t __; \
         if ((__ = x) != ESP_OK) { \
-            I2C_DEV_GIVE_MUTEX(dev); \
+            I2C_DEV_GIVE_MUTEX(&dev->i2c_dev); \
             ESP_LOGE(TAG, msg, ## __VA_ARGS__); \
             return __; \
         } \
@@ -114,12 +114,12 @@ static esp_err_t read_hum_calibration_data(bmp280_t *dev)
 {
     uint16_t h4, h5;
 
-    CHECK(i2c_dev_read_register(&dev->i2c_dev, 0xa1, &dev->dig_H1, 1));
+    CHECK(i2c_dev_read_reg(&dev->i2c_dev, 0xa1, &dev->dig_H1, 1));
     CHECK(read_register16(&dev->i2c_dev, 0xe1, (uint16_t *)&dev->dig_H2));
-    CHECK(i2c_dev_read_register(&dev->i2c_dev, 0xe3, &dev->dig_H3, 1));
+    CHECK(i2c_dev_read_reg(&dev->i2c_dev, 0xe3, &dev->dig_H3, 1));
     CHECK(read_register16(&dev->i2c_dev, 0xe4, &h4));
     CHECK(read_register16(&dev->i2c_dev, 0xe5, &h5));
-    CHECK(i2c_dev_read_register(&dev->i2c_dev, 0xe7, (uint8_t *)&dev->dig_H6, 1));
+    CHECK(i2c_dev_read_reg(&dev->i2c_dev, 0xe7, (uint8_t *)&dev->dig_H6, 1));
 
     dev->dig_H4 = (h4 & 0x00ff) << 4 | (h4 & 0x0f00) >> 8;
     dev->dig_H5 = h5 >> 4;
@@ -134,7 +134,7 @@ static esp_err_t read_hum_calibration_data(bmp280_t *dev)
     return ESP_OK;
 }
 
-esp_err_t bmp280_init_desc(bmp180_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_VAL(dev);
 
@@ -150,16 +150,16 @@ esp_err_t bmp280_init_desc(bmp180_dev_t *dev, uint8_t addr, i2c_port_t port, gpi
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 
-    CHECK(i2c_dev_create_mutex(dev));
+    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
 
     return ESP_OK;
 }
 
-esp_err_t bmp280_free_desc(i2c_dev_t *dev)
+esp_err_t bmp280_free_desc(bmp280_t *dev)
 {
     CHECK_VAL(dev);
 
-    return i2c_dev_delete_mutex(dev);
+    return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
 esp_err_t bmp280_init_default_params(bmp280_params_t *params)
@@ -181,9 +181,9 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
     CHECK_VAL(dev);
     CHECK_VAL(params);
 
-    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
-    CHECK_LOGE(dev, i2c_dev_read_register(&dev->i2c_dev, BMP280_REG_ID, &dev->id, 1), "Sensor not found");
+    CHECK_LOGE(dev, i2c_dev_read_reg(&dev->i2c_dev, BMP280_REG_ID, &dev->id, 1), "Sensor not found");
 
     if (dev->id != BMP280_CHIP_ID && dev->id != BME280_CHIP_ID)
     {
@@ -197,7 +197,7 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
     while (1)
     {
         uint8_t status;
-        if (!i2c_dev_read_register(&dev->i2c_dev, BMP280_REG_STATUS, &status, 1) && (status & 1) == 0)
+        if (!i2c_dev_read_reg(&dev->i2c_dev, BMP280_REG_STATUS, &status, 1) && (status & 1) == 0)
             break;
     }
 
@@ -231,7 +231,7 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
     ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
     CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL, ctrl), "Failed controlling sensor");
 
-    I2C_DEV_GIVE_MUTEX(dev);
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
 }
@@ -240,16 +240,16 @@ esp_err_t bmp280_force_measurement(bmp280_t *dev)
 {
     CHECK_VAL(dev);
 
-    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     uint8_t ctrl;
-    I2C_DEV_CHECK(dev, i2c_dev_read_register(&dev->i2c_dev, BMP280_REG_CTRL, &ctrl, 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, BMP280_REG_CTRL, &ctrl, 1));
     ctrl &= ~0b11;  // clear two lower bits
     ctrl |= BMP280_MODE_FORCED;
     ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
     CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL, ctrl), "Failed starting forced mode");
 
-    I2C_DEV_GIVE_MUTEX(dev);
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
 }
@@ -259,14 +259,14 @@ esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy)
     CHECK_VAL(dev);
     CHECK_VAL(busy);
 
-    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     uint8_t status;
-    CHECK_LOGE(dev, i2c_dev_read_register(&dev->i2c_dev, BMP280_REG_STATUS, &status, 1), "Could not read status register");
+    CHECK_LOGE(dev, i2c_dev_read_reg(&dev->i2c_dev, BMP280_REG_STATUS, &status, 1), "Could not read status register");
 
     *busy = status & (1 << 3);
 
-    I2C_DEV_GIVE_MUTEX(dev);
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
 }
@@ -354,11 +354,11 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
         humidity = NULL;
     }
 
-    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     // Need to read in one sequence to ensure they match.
     size_t size = humidity ? 8 : 6;
-    CHECK_LOGE(dev, i2c_dev_read_register(&dev->i2c_dev, 0xf7, data, size), "Failed reading");
+    CHECK_LOGE(dev, i2c_dev_read_reg(&dev->i2c_dev, 0xf7, data, size), "Failed reading");
 
     adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
     adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;
@@ -376,7 +376,7 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
         *humidity = compensate_humidity(dev, adc_humidity, fine_temp);
     }
 
-    I2C_DEV_GIVE_MUTEX(dev);
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
 }
