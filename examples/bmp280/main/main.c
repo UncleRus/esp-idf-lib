@@ -58,6 +58,6 @@ void bmp280_test(void *pvParamters)
 
 void app_main()
 {
-    xTaskCreate(bmp280_test, "bmp280_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(bmp280_test, "bmp280_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
 

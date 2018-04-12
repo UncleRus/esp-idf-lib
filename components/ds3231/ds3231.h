@@ -97,12 +97,15 @@ esp_err_t ds3231_set_alarm(i2c_dev_t *dev, ds3231_alarm_t alarms, struct tm *tim
 /**
  * @brief Check if oscillator has previously stopped, e.g. no power/battery or disabled
  * sets flag to true if there has been a stop
+ * @param dev Device descriptor
+ * @param[out] flag Stop flag
  * @return ESP_OK to indicate success
  */
 esp_err_t ds3231_get_oscillator_stop_flag(i2c_dev_t *dev, bool *flag);
 
 /**
  * @brief Clear the oscillator stopped flag
+ * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */
 esp_err_t ds3231_clear_oscillator_stop_flag(i2c_dev_t *dev);
@@ -110,6 +113,8 @@ esp_err_t ds3231_clear_oscillator_stop_flag(i2c_dev_t *dev);
 /**
  * @brief Check which alarm(s) have past
  * sets alarms to DS3231_ALARM_NONE/DS3231_ALARM_1/DS3231_ALARM_2/DS3231_ALARM_BOTH
+ * @param dev Device descriptor
+ * @param[out] alarms Alarms
  * @return ESP_OK to indicate success
  */
 esp_err_t ds3231_get_alarm_flags(i2c_dev_t *dev, ds3231_alarm_t *alarms);
@@ -117,6 +122,8 @@ esp_err_t ds3231_get_alarm_flags(i2c_dev_t *dev, ds3231_alarm_t *alarms);
 /**
  * @brief Clear alarm past flag(s)
  * pass DS3231_ALARM_1/DS3231_ALARM_2/DS3231_ALARM_BOTH
+ * @param dev Device descriptor
+ * @param alarms Alarms
  * @return ESP_OK to indicate success
  */
 esp_err_t ds3231_clear_alarm_flags(i2c_dev_t *dev, ds3231_alarm_t alarms);
@@ -127,6 +134,8 @@ esp_err_t ds3231_clear_alarm_flags(i2c_dev_t *dev, ds3231_alarm_t alarms);
  * if you set only one alarm the status of the other is not changed
  * you must also clear any alarm past flag(s) for alarms with
  * interrupt enabled, else it will trigger immediately
+ * @param dev Device descriptor
+ * @param alarms Alarms
  * @return ESP_OK to indicate success
  */
 esp_err_t ds3231_enable_alarm_ints(i2c_dev_t *dev, ds3231_alarm_t alarms);

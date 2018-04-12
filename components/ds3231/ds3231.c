@@ -98,7 +98,7 @@ esp_err_t ds3231_set_time(i2c_dev_t *dev, struct tm *time)
     data[3] = dec2bcd(time->tm_wday + 1);
     data[4] = dec2bcd(time->tm_mday);
     data[5] = dec2bcd(time->tm_mon + 1);
-    data[6] = dec2bcd(time->tm_year - 100);
+    data[6] = dec2bcd(time->tm_year - 2000);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, DS3231_ADDR_TIME, data, 7));
@@ -392,7 +392,7 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
     time->tm_wday = bcd2dec(data[3]) - 1;
     time->tm_mday = bcd2dec(data[4]);
     time->tm_mon  = bcd2dec(data[5] & DS3231_MONTH_MASK) - 1;
-    time->tm_year = bcd2dec(data[6]) + 100;
+    time->tm_year = bcd2dec(data[6]) + 2000;
     time->tm_isdst = 0;
 
     // apply a time zone (if you are not using localtime on the rtc or you want to check/apply DST)

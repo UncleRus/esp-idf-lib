@@ -87,6 +87,8 @@ esp_err_t i2c_dev_create_mutex(i2c_dev_t *dev)
 {
     if (!dev) return ESP_ERR_INVALID_ARG;
 
+    ESP_LOGV(TAG, "[0x%02x at %d] creating mutex", dev->addr, dev->port);
+
     dev->mutex = xSemaphoreCreateMutex();
     if (!dev->mutex)
     {
@@ -101,6 +103,8 @@ esp_err_t i2c_dev_delete_mutex(i2c_dev_t *dev)
 {
     if (!dev) return ESP_ERR_INVALID_ARG;
 
+    ESP_LOGV(TAG, "[0x%02x at %d] deleting mutex", dev->addr, dev->port);
+
     vSemaphoreDelete(dev->mutex);
     return ESP_OK;
 }
@@ -108,6 +112,8 @@ esp_err_t i2c_dev_delete_mutex(i2c_dev_t *dev)
 esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev)
 {
     if (!dev) return ESP_ERR_INVALID_ARG;
+
+    ESP_LOGV(TAG, "[0x%02x at %d] taking mutex", dev->addr, dev->port);
 
     if (!xSemaphoreTake(dev->mutex, CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS))
     {
@@ -120,6 +126,8 @@ esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev)
 esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev)
 {
     if (!dev) return ESP_ERR_INVALID_ARG;
+
+    ESP_LOGV(TAG, "[0x%02x at %d] giving mutex", dev->addr, dev->port);
 
     if (!xSemaphoreGive(dev->mutex))
     {
@@ -145,6 +153,7 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
     esp_err_t res;
     if (!cfg_equal(cfg, &configs[port]))
     {
+        ESP_LOGD(TAG, "Reconfiguring I2C driver on port %d", port);
         i2c_config_t temp;
         memcpy(&temp, cfg, sizeof(i2c_config_t));
         temp.mode = I2C_MODE_MASTER;
@@ -154,6 +163,7 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
             return res;
         if ((res = i2c_driver_install(port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
+        memcpy(&configs[port], &temp, sizeof(i2c_config_t));
     }
 
     return ESP_OK;

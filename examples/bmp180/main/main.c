@@ -36,6 +36,8 @@ void bmp180_test(void *pvParameters)
         float temp;
         uint32_t pressure;
 
+        printf("Current core: %d\n", xPortGetCoreID());
+
         res = bmp180_measure(&dev, &temp, &pressure, BMP180_MODE_STANDARD);
         if (res != ESP_OK)
             printf("Could not measure: %d\n", res);
@@ -48,6 +50,6 @@ void bmp180_test(void *pvParameters)
 
 void app_main()
 {
-    xTaskCreate(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 15, NULL, 5, NULL, APP_CPU_NUM);
 }
 
