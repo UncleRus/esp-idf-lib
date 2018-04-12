@@ -11,12 +11,9 @@
 #define DRIVER_BMP180_H_
 
 #include <stdbool.h>
-#include <i2c_utils.h>
+#include <i2cdev.h>
 
 #define BMP180_DEVICE_ADDRESS 0x77
-
-#define BMP180_TEMPERATURE (1<<0)
-#define BMP180_PRESSURE    (1<<1)
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,14 +53,23 @@ typedef enum
     BMP180_MODE_ULTRA_HIGH_RESOLUTION //!< 8 samples, 25.5 ms
 } bmp180_mode_t;
 
+
 /**
- * Setup I2C bus.
- * I2C master, 1000000 Hz
- * @param scl_pin GPIO for SCL pin
- * @param sda_pin GPIO for SDA pin
- * @return ESP_OK on success
+ * @brief Initialize device descriptior
+ * @param[out] dev Pointer to device descriptor
+ * @param[in] i2c_port I2C port number
+ * @param[in] scl_pin GPIO pin number for SCL
+ * @param[in] sda_pin GPIO pin number for SDA
+ * @return ESP_OK if no errors occured
  */
-esp_err_t bmp180_i2c_init(i2c_dev_t *dev, gpio_num_t scl_pin, gpio_num_t sda_pin);
+esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
+/**
+ * @brief Free device descriptor
+ * @param dev Pointer to device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t bmp180_free_desc(bmp180_dev_t *dev);
 
 /**
  * Init bmp180 driver
@@ -74,10 +80,10 @@ esp_err_t bmp180_init(bmp180_dev_t *dev);
 
 /**
  * Check BMP180 availability
- * @param port I2C port number
+ * @param port I2C device descriptor
  * @return true if bmp180 is available
  */
-bool bmp180_is_available(i2c_port_t port);
+bool bmp180_is_available(i2c_dev_t *i2c_dev);
 
 /**
  * Measure temperature and pressure

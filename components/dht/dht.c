@@ -10,6 +10,7 @@
 
 #include "dht.h"
 
+#include <freertos/FreeRTOS.h>
 #include <string.h>
 #include <esp_log.h>
 
@@ -48,6 +49,17 @@
 static const char *TAG = "DHTxx";
 
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+
+#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+
+#define CHECK_LOGE(x, msg, ...) do { \
+        esp_err_t __; \
+        if ((__ = x) != ESP_OK) { \
+            ESP_LOGE(TAG, msg, ## __VA_ARGS__); \
+            return __; \
+        } \
+    } while (0)
+
 
 /**
  * Wait specified time for pin to go to a specified state.
@@ -89,46 +101,25 @@ static inline esp_err_t dht_fetch_data(gpio_num_t pin, bool bits[DHT_DATA_BITS])
     gpio_set_level(pin, 1);
 
     // Step through Phase 'B', 40us
-    esp_err_t res = dht_await_pin_state(pin, 40, 0, NULL);
-    if (res != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Initialization error, problem in phase 'B'");
-        return res;
-    }
-
+    CHECK_LOGE(dht_await_pin_state(pin, 40, 0, NULL),
+            "Initialization error, problem in phase 'B'");
     // Step through Phase 'C', 88us
-    res = dht_await_pin_state(pin, 88, 1, NULL);
-    if (res != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Initialization error, problem in phase 'C'");
-        return res;
-    }
-
+    CHECK_LOGE(dht_await_pin_state(pin, 88, 1, NULL),
+            "Initialization error, problem in phase 'C'");
     // Step through Phase 'D', 88us
-    res = dht_await_pin_state(pin, 88, 0, NULL);
-    if (res != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Initialization error, problem in phase 'D'");
-        return res;
-    }
+    CHECK_LOGE(dht_await_pin_state(pin, 88, 0, NULL),
+            "Initialization error, problem in phase 'D'");
 
     // Read in each of the 40 bits of data...
     for (int i = 0; i < DHT_DATA_BITS; i++)
     {
-        res = dht_await_pin_state(pin, 65, 1, &low_duration);
-        if (res != ESP_OK)
-        {
-            ESP_LOGE(TAG, "LOW bit timeout");
-            return res;
-        }
-        res = dht_await_pin_state(pin, 75, 0, &high_duration);
-        if (res != ESP_OK)
-        {
-            ESP_LOGE(TAG, "HIGH bit timeout");
-            return res;
-        }
+        CHECK_LOGE(dht_await_pin_state(pin, 65, 1, &low_duration),
+                "LOW bit timeout");
+        CHECK_LOGE(dht_await_pin_state(pin, 75, 0, &high_duration),
+                "HIGH bit timeout");
         bits[i] = high_duration > low_duration;
     }
+
     return ESP_OK;
 }
 
@@ -152,17 +143,21 @@ static inline int16_t dht_convert_data(dht_sensor_type_t sensor_type, uint8_t ms
     return data;
 }
 
-esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin, int16_t *humidity, int16_t *temperature)
+esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
+        int16_t *humidity, int16_t *temperature)
 {
+    CHECK_ARG(humidity);
+    CHECK_ARG(temperature);
+
     bool bits[DHT_DATA_BITS];
     uint8_t data[DHT_DATA_BITS / 8] = { 0 };
 
     gpio_set_direction(pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_level(pin, 1);
 
-    taskENTER_CRITICAL(&mux);
+    portENTER_CRITICAL(&mux);
     esp_err_t result = dht_fetch_data(pin, bits);
-    taskEXIT_CRITICAL(&mux);
+    portEXIT_CRITICAL(&mux);
 
     gpio_set_level(pin, 1);
 
@@ -190,8 +185,12 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin, int16_t *
     return ESP_OK;
 }
 
-esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin, float *humidity, float *temperature)
+esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
+        float *humidity, float *temperature)
 {
+    CHECK_ARG(humidity);
+    CHECK_ARG(temperature);
+
     int16_t i_humidity, i_temp;
 
     esp_err_t res = dht_read_data(sensor_type, pin, &i_humidity, &i_temp);
@@ -200,5 +199,6 @@ esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin, flo
 
     *humidity = (float)i_humidity / 10;
     *temperature = (float)i_temp / 10;
+
     return ESP_OK;
 }

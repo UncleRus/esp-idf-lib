@@ -1,3 +1,22 @@
+/**
+ * @file onewire.c
+ *
+ * Routines to access devices using the Dallas Semiconductor 1-Wire(tm)
+ * protocol.
+ *
+ * This is a port of a bit-banging one wire driver based on the implementation
+ * from NodeMCU.
+ *
+ * This, in turn, appears to have been based on the PJRC Teensy driver
+ * (https://www.pjrc.com/teensy/td_libs_OneWire.html), by Jim Studt, Paul
+ * Stoffregen, and a host of others.
+ *
+ * The original code is licensed under the MIT license.  The CRC code was taken
+ * (at least partially) from Dallas Semiconductor sample code, which was licensed
+ * under an MIT license with an additional clause (prohibiting inappropriate use
+ * of the Dallas Semiconductor name).  See the accompanying LICENSE file for
+ * details.
+ */
 #include "onewire.h"
 
 #include <string.h>
@@ -55,11 +74,11 @@ bool onewire_reset(gpio_num_t pin)
     gpio_set_level(pin, 0);
     ets_delay_us(480);
 
-    taskENTER_CRITICAL(&mux);
+    portENTER_CRITICAL(&mux);
     gpio_set_level(pin, 1); // allow it to float
     ets_delay_us(70);
     bool r = !gpio_get_level(pin);
-    taskEXIT_CRITICAL(&mux);
+    portEXIT_CRITICAL(&mux);
 
     // Wait for all devices to finish pulling the bus low before returning
     if (!_onewire_wait_for_bus(pin, 410))
@@ -74,20 +93,20 @@ static bool _onewire_write_bit(gpio_num_t pin, bool v)
         return false;
     if (v)
     {
-        taskENTER_CRITICAL(&mux);
+        portENTER_CRITICAL(&mux);
         gpio_set_level(pin, 0);  // drive output low
         ets_delay_us(10);
         gpio_set_level(pin, 1);  // allow output high
-        taskEXIT_CRITICAL(&mux);
+        portEXIT_CRITICAL(&mux);
         ets_delay_us(55);
     }
     else
     {
-        taskENTER_CRITICAL(&mux);
+        portENTER_CRITICAL(&mux);
         gpio_set_level(pin, 0);  // drive output low
         ets_delay_us(65);
         gpio_set_level(pin, 1); // allow output high
-        taskEXIT_CRITICAL(&mux);
+        portEXIT_CRITICAL(&mux);
     }
     ets_delay_us(1);
 
@@ -99,14 +118,14 @@ static int _onewire_read_bit(gpio_num_t pin)
     if (!_onewire_wait_for_bus(pin, 10))
         return -1;
 
-    taskENTER_CRITICAL(&mux);
+    portENTER_CRITICAL(&mux);
     gpio_set_level(pin, 0);
     ets_delay_us(2);
     gpio_set_level(pin, 1);  // let pin float, pull up will raise
     ets_delay_us(11);
     int r = gpio_get_level(pin);  // Must sample within 15us of start
-    taskEXIT_CRITICAL(&mux);
     ets_delay_us(48);
+    portEXIT_CRITICAL(&mux);
 
     return r;
 }

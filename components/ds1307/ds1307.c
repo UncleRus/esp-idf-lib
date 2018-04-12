@@ -32,6 +32,8 @@
 #define SQWE_MASK    0xef
 #define OUT_MASK     0x7f
 
+#define CHECK_ARG(ARG) do { if (!ARG) return ESP_ERR_INVALID_ARG; } while (0)
+
 static uint8_t bcd2dec(uint8_t val)
 {
     return (val >> 4) * 10 + (val & 0x0f);
@@ -42,48 +44,73 @@ static uint8_t dec2bcd(uint8_t val)
     return ((val / 10) << 4) + (val % 10);
 }
 
-static inline esp_err_t read_register(i2c_port_t bus, uint8_t reg, uint8_t *val)
+static esp_err_t update_register(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val)
 {
-    return i2c_read_register(bus, DS1307_ADDR, reg, val, 1);
-}
+    CHECK_ARG(dev);
 
-static esp_err_t update_register(i2c_port_t bus, uint8_t reg, uint8_t mask, uint8_t val)
-{
     uint8_t old;
-    esp_err_t res = read_register(bus, reg, &old);
-    if (res != ESP_OK)
-        return res;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, &old, 1));
     uint8_t buf = (old & mask) | val;
-    return i2c_write_register(bus, DS1307_ADDR, reg, &buf, 1);
-}
+    esp_err_t res = i2c_dev_write_reg(dev, reg, &buf, 1);
+    I2C_DEV_GIVE_MUTEX(dev);
 
-esp_err_t ds1307_i2c_init(i2c_port_t i2c_num, gpio_num_t scl_pin, gpio_num_t sda_pin)
-{
-    return i2c_setup_master(i2c_num, scl_pin, sda_pin, I2C_FREQ_HZ);
-}
-
-esp_err_t ds1307_start(i2c_port_t bus, bool start)
-{
-    return update_register(bus, TIME_REG, CH_MASK, start ? 0 : CH_BIT);
-}
-
-esp_err_t ds1307_is_running(i2c_port_t bus, bool *running)
-{
-    uint8_t val;
-    esp_err_t res = read_register(bus, TIME_REG, &val);
-    if (res == ESP_OK)
-        *running = val & CH_BIT;
     return res;
 }
 
-esp_err_t ds1307_get_time(i2c_port_t bus, struct tm *time)
+esp_err_t ds1307_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    uint8_t buf[7];
-    uint8_t reg = TIME_REG;
+    CHECK_ARG(dev);
 
-    esp_err_t res = i2c_read_register(bus, DS1307_ADDR, reg, buf, 7);
-    if (res != ESP_OK)
-        return res;
+    dev->port = port;
+    dev->addr = DS1307_ADDR;
+    dev->cfg.sda_io_num = sda_gpio;
+    dev->cfg.scl_io_num = scl_gpio;
+    dev->cfg.master.clk_speed = I2C_FREQ_HZ;
+    i2c_dev_create_mutex(dev);
+
+    return ESP_OK;
+}
+
+esp_err_t ds1307_free_desc(i2c_dev_t *dev)
+{
+    CHECK_ARG(dev);
+
+    return i2c_dev_delete_mutex(dev);
+}
+
+esp_err_t ds1307_start(i2c_dev_t *dev, bool start)
+{
+    return update_register(dev, TIME_REG, CH_MASK, start ? 0 : CH_BIT);
+}
+
+esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running)
+{
+    CHECK_ARG(dev);
+    CHECK_ARG(running);
+
+    uint8_t val;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, TIME_REG, &val, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *running = val & CH_BIT;
+
+    return ESP_OK;
+}
+
+esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time)
+{
+    CHECK_ARG(dev);
+    CHECK_ARG(time);
+
+    uint8_t buf[7];
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, TIME_REG, buf, 7));
+    I2C_DEV_GIVE_MUTEX(dev);
 
     time->tm_sec = bcd2dec(buf[0] & SECONDS_MASK);
     time->tm_min = bcd2dec(buf[1]);
@@ -104,79 +131,109 @@ esp_err_t ds1307_get_time(i2c_port_t bus, struct tm *time)
     return ESP_OK;
 }
 
-esp_err_t ds1307_set_time(i2c_port_t bus, const struct tm *time)
+esp_err_t ds1307_set_time(i2c_dev_t *dev, const struct tm *time)
 {
-    uint8_t buf[8];
-    buf[0] = TIME_REG;
-    buf[1] = dec2bcd(time->tm_sec);
-    buf[2] = dec2bcd(time->tm_min);
-    buf[3] = dec2bcd(time->tm_hour);
-    buf[4] = dec2bcd(time->tm_wday + 1);
-    buf[5] = dec2bcd(time->tm_mday);
-    buf[6] = dec2bcd(time->tm_mon + 1);
-    buf[7] = dec2bcd(time->tm_year - 2000);
+    CHECK_ARG(dev);
+    CHECK_ARG(time);
 
-    return i2c_write_register(bus, DS1307_ADDR, buf[0], &buf[1], 7);
+    uint8_t buf[7] = {
+        dec2bcd(time->tm_sec),
+        dec2bcd(time->tm_min),
+        dec2bcd(time->tm_hour),
+        dec2bcd(time->tm_wday + 1),
+        dec2bcd(time->tm_mday),
+        dec2bcd(time->tm_mon + 1),
+        dec2bcd(time->tm_year - 2000)
+    };
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, TIME_REG, buf, sizeof(buf)));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
 }
 
-esp_err_t ds1307_enable_squarewave(i2c_port_t bus, bool enable)
+esp_err_t ds1307_enable_squarewave(i2c_dev_t *dev, bool enable)
 {
-    return update_register(bus, CONTROL_REG, SQWE_MASK, enable ? SQWE_BIT : 0);
+    return update_register(dev, CONTROL_REG, SQWE_MASK, enable ? SQWE_BIT : 0);
 }
 
-esp_err_t ds1307_is_squarewave_enabled(i2c_port_t bus, bool *sqw_en)
+esp_err_t ds1307_is_squarewave_enabled(i2c_dev_t *dev, bool *sqw_en)
 {
+    CHECK_ARG(dev);
+    CHECK_ARG(sqw_en);
+
     uint8_t val;
-    esp_err_t res = read_register(bus, CONTROL_REG, &val);
-    if (res == ESP_OK)
-        *sqw_en = val & SQWE_BIT;
-    return res;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, CONTROL_REG, &val, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *sqw_en = val & SQWE_BIT;
+
+    return ESP_OK;
 }
 
-esp_err_t ds1307_set_squarewave_freq(i2c_port_t bus, ds1307_squarewave_freq_t freq)
+esp_err_t ds1307_set_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t freq)
 {
-    return update_register(bus, CONTROL_REG, SQWEF_MASK, freq);
+    return update_register(dev, CONTROL_REG, SQWEF_MASK, freq);
 }
 
-esp_err_t ds1307_get_squarewave_freq(i2c_port_t bus, ds1307_squarewave_freq_t *sqw_freq)
+esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *sqw_freq)
 {
+    CHECK_ARG(dev);
+    CHECK_ARG(sqw_freq);
+
     uint8_t val;
-    esp_err_t res = read_register(bus, CONTROL_REG, &val);
-    if (res == ESP_OK)
-        *sqw_freq = val & SQWEF_MASK;
-    return res;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, CONTROL_REG, &val, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *sqw_freq = val & SQWEF_MASK;
+
+    return ESP_OK;
 }
 
-esp_err_t ds1307_get_output(i2c_port_t bus, bool *out)
+esp_err_t ds1307_get_output(i2c_dev_t *dev, bool *out)
 {
+    CHECK_ARG(dev);
+    CHECK_ARG(out);
+
     uint8_t val;
-    esp_err_t res = read_register(bus, CONTROL_REG, &val);
-    if (res == ESP_OK)
-        *out = val & OUT_BIT;
-    return res;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, CONTROL_REG, &val, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *out = val & OUT_BIT;
+
+    return ESP_OK;
 }
 
-esp_err_t ds1307_set_output(i2c_port_t bus, bool value)
+esp_err_t ds1307_set_output(i2c_dev_t *dev, bool value)
 {
-    return update_register(bus, CONTROL_REG, OUT_MASK, value ? OUT_BIT : 0);
+    return update_register(dev, CONTROL_REG, OUT_MASK, value ? OUT_BIT : 0);
 }
 
-esp_err_t ds1307_read_ram(i2c_port_t bus, uint8_t offset, uint8_t *buf, uint8_t len)
+esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t len)
 {
+    CHECK_ARG(dev);
+    CHECK_ARG(buf);
+
     if (offset + len > RAM_SIZE)
         return ESP_ERR_INVALID_SIZE;
 
-    uint8_t reg = RAM_REG + offset;
-
-    return i2c_read_register(bus, DS1307_ADDR, reg, buf, len);
+    return i2c_dev_read_reg(dev, RAM_REG + offset, buf, len);
 }
 
-esp_err_t ds1307_write_ram(i2c_port_t bus, uint8_t offset, uint8_t *buf, uint8_t len)
+esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t len)
 {
+    CHECK_ARG(dev);
+    CHECK_ARG(buf);
+
     if (offset + len > RAM_SIZE)
         return ESP_ERR_INVALID_SIZE;
 
-    uint8_t reg = RAM_REG + offset;
-
-    return i2c_write_register(bus, DS1307_ADDR, reg, buf, len);
+    return i2c_dev_write_reg(dev, RAM_REG + offset, buf, len);
 }
