@@ -21,15 +21,21 @@
 extern "C" {
 #endif
 
-#define DS3231_ADDR 0x68
+#define DS3231_ADDR 0x68 //!< I2C address
 
+/**
+ * Alarms
+ */
 typedef enum {
-    DS3231_ALARM_NONE = 0,
-    DS3231_ALARM_1,
-    DS3231_ALARM_2,
-    DS3231_ALARM_BOTH
+    DS3231_ALARM_NONE = 0,//!< No alarms
+    DS3231_ALARM_1,       //!< First alarm
+    DS3231_ALARM_2,       //!< Second alarm
+    DS3231_ALARM_BOTH     //!< Both alarms
 } ds3231_alarm_t;
 
+/**
+ * First alarm rate
+ */
 typedef enum {
     DS3231_ALARM1_EVERY_SECOND = 0,
     DS3231_ALARM1_MATCH_SEC,
@@ -39,6 +45,9 @@ typedef enum {
     DS3231_ALARM1_MATCH_SECMINHOURDATE
 } ds3231_alarm1_rate_t;
 
+/**
+ * Second alarm rate
+ */
 typedef enum {
     DS3231_ALARM2_EVERY_MIN = 0,
     DS3231_ALARM2_MATCH_MIN,
@@ -47,6 +56,9 @@ typedef enum {
     DS3231_ALARM2_MATCH_MINHOURDATE
 } ds3231_alarm2_rate_t;
 
+/**
+ * Squarewave frequency
+ */
 typedef enum {
     DS3231_SQWAVE_1HZ    = 0x00,
     DS3231_SQWAVE_1024HZ = 0x08,

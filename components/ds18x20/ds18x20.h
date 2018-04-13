@@ -11,7 +11,7 @@
 
 #include <onewire.h>
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -73,12 +73,12 @@ esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait);
  * This should be called after ds18x20_measure() to fetch the result of the
  * temperature measurement.
  *
- * @param pin     The GPIO pin connected to the ds18x20 device
- * @param addr    The 64-bit address of the device to read.  This can be set
- *                to ::ds18x20_ANY to read any device on the bus (but note
- *                that this will only work if there is exactly one device
- *                connected, or they will corrupt each others' transmissions)
- * @param float   The temperature in degrees Celsius
+ * @param pin         The GPIO pin connected to the ds18x20 device
+ * @param addr        The 64-bit address of the device to read.  This can be set
+ *                    to ::ds18x20_ANY to read any device on the bus (but note
+ *                    that this will only work if there is exactly one device
+ *                    connected, or they will corrupt each others' transmissions)
+ * @param temperature The temperature in degrees Celsius
  *
  * @returns `ESP_OK` if the command was successfully issued
  */
@@ -141,7 +141,7 @@ esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_li
  */
 esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *buffer);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 

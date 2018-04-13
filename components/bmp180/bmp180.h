@@ -13,7 +13,7 @@
 #include <stdbool.h>
 #include <i2cdev.h>
 
-#define BMP180_DEVICE_ADDRESS 0x77
+#define BMP180_DEVICE_ADDRESS 0x77 //!< I2C address
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,16 +57,16 @@ typedef enum
 /**
  * @brief Initialize device descriptior
  * @param[out] dev Pointer to device descriptor
- * @param[in] i2c_port I2C port number
- * @param[in] sda_pin GPIO pin number for SDA
- * @param[in] scl_pin GPIO pin number for SCL
+ * @param[in] port I2C port number
+ * @param[in] sda_gpio GPIO pin number for SDA
+ * @param[in] scl_gpio GPIO pin number for SCL
  * @return ESP_OK if no errors occured
  */
 esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
- * @param dev Pointer to device descriptor
+ * @param dev Pointer to BMP180 device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t bmp180_free_desc(bmp180_dev_t *dev);
@@ -80,7 +80,7 @@ esp_err_t bmp180_init(bmp180_dev_t *dev);
 
 /**
  * Check BMP180 availability
- * @param port I2C device descriptor
+ * @param i2c_dev I2C device descriptor
  * @return true if bmp180 is available
  */
 bool bmp180_is_available(i2c_dev_t *i2c_dev);

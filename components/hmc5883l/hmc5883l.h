@@ -18,9 +18,9 @@
 extern "C" {
 #endif
 
-#define HMC5883L_ADDR 0x1e
+#define HMC5883L_ADDR 0x1e //!< I2C address
 
-#define HMC5883L_ID 0x00333448  // "H43"
+#define HMC5883L_ID 0x00333448  //!< Chip ID, "H43"
 
 /**
  * Device operating mode
@@ -104,9 +104,9 @@ typedef struct
 /**
  * @brief Initialize device descriptior
  * @param dev Pointer to device descriptor
- * @param i2c_port I2C port number
- * @param scl_pin GPIO pin number for SCL
- * @param sda_pin GPIO pin number for SDA
+ * @param port I2C port number
+ * @param sda_gpio GPIO pin number for SDA
+ * @param scl_gpio GPIO pin number for SCL
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
@@ -210,7 +210,7 @@ esp_err_t hmc5883l_set_gain(i2c_dev_t *dev, hmc5883l_gain_t gain);
 /**
  * @brief Get data state
  * @param dev Device descriptor
- * @param true when data is written to all six data registers
+ * @param[out] val true when data is written to all six data registers
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val);
@@ -224,7 +224,7 @@ esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val);
  * 3. the measurement configuration (bias) is changed,
  * 4. power is reset.
  * @param dev Device descriptor
- * @param true when data registers is locked
+ * @param[out] val true when data registers is locked
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_data_is_locked(i2c_dev_t *dev, bool *val);
