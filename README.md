@@ -7,7 +7,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 
 ## Components
 
-- **i2c_utils** - Low level i2c utilites.
+- **i2cdev** - I2C utilites.
 - **ds1307** - Driver for DS1307 RTC module
 - **ds3231** - Driver for DS3231 high precision RTC module
 - **hmc5883l** - Driver for HMC5883L 3-axis digital compass
@@ -18,3 +18,4 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 - **bmp280** - Driver for BMP280 digital pressure sensor
 - **bh1750** - Driver for BH1750 light sensor
 - **ultrasonic** - Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05
+- **pcf8574** - Driver for PCF8574 remote 8-bit I/O expander for I2C-bus
