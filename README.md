@@ -1,6 +1,6 @@
 # ESP-IDF Components library
 
-Components for ESP-32.
+Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf)
 
 Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
