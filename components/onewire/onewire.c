@@ -18,7 +18,6 @@
  * details.
  */
 #include "onewire.h"
-
 #include <string.h>
 
 #define ONEWIRE_SELECT_ROM 0x55

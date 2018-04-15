@@ -1,3 +1,10 @@
+/**
+ * ESP-IDF driver for HD44780 compartible LCD text displays
+ *
+ * Ported from esp-open-rtos
+ * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * BSD Licensed as described in the file LICENSE
+ */
 #include "hd44780.h"
 #include <string.h>
 #include <esp_system.h>

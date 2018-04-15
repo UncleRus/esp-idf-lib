@@ -1,3 +1,14 @@
+/**
+ * @file bmp180.c
+ *
+ * ESP-IDF driver for BMP180 digital pressure sensor
+ *
+ * Ported from esp-open-rtos
+ *
+ * Copyright (C) 2015 Frank Bargstedt
+ * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * MIT Licensed as described in the file LICENSE
+ */
 #include "bmp180.h"
 
 #include <esp_err.h>

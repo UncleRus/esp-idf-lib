@@ -19,3 +19,4 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 - **bh1750** - Driver for BH1750 light sensor
 - **ultrasonic** - Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05
 - **pcf8574** - Driver for PCF8574 remote 8-bit I/O expander for I2C-bus
+- **hd44780** - Universal driver for HD44780 LCD display

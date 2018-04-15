@@ -1,5 +1,5 @@
 /**
- * ESP32 driver for HD44780 compartible LCD text displays
+ * ESP-IDF driver for HD44780 compartible LCD text displays
  *
  * Ported from esp-open-rtos
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>

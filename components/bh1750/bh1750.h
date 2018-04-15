@@ -3,7 +3,7 @@
  *
  * Ported from esp-open-rtos
  * Copyright (C) 2017 Andrej Krutak <dev@andree.sk>
- *               2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
  * BSD Licensed as described in the file LICENSE
  *
  * ROHM Semiconductor bh1750fvi-e.pdf

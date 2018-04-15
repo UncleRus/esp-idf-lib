@@ -3,12 +3,14 @@
  *
  * ESP-IDF driver for BMP180 digital pressure sensor
  *
- *  Created on: 23.08.2015
- *      Author: fbargste
- *  Ported from esp-open-rtos by UncleRus 2018
+ * Ported from esp-open-rtos
+ *
+ * Copyright (C) 2015 Frank Bargstedt
+ * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * MIT Licensed as described in the file LICENSE
  */
-#ifndef DRIVER_BMP180_H_
-#define DRIVER_BMP180_H_
+#ifndef __BMP180_H__
+#define __BMP180_H__
 
 #include <stdbool.h>
 #include <i2cdev.h>
@@ -99,4 +101,4 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
 }
 #endif
 
-#endif /* DRIVER_BMP180_H_ */
+#endif /* __BMP180_H__ */

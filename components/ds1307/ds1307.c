@@ -1,7 +1,7 @@
 /**
  * @file ds1307.c
  *
- * Driver for DS1307 RTC
+ * ESP-IDF Driver for DS1307 RTC
  *
  * Ported from esp-open-rtos
  * Copyright (C) 2016 Ruslan V. Uss <unclerus@gmail.com>

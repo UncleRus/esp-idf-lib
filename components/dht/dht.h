@@ -1,13 +1,14 @@
 /**
  * @file dht.h
  *
- * DHT11/DHT22 driver for ESP-IDF
+ * ESP-IDF driver for DHT11/DHT22
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016 Jonathan Hartsuiker (https://github.com/jsuiker)
+ * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
  * BSD Licensed as described in the file LICENSE
  */
-
 #ifndef __DHT_H__
 #define __DHT_H__
 

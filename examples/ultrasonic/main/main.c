@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_system.h>
 #include <ultrasonic.h>
 
 #define MAX_DISTANCE_CM 500 // 5m max

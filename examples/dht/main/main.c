@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_system.h>
 #include <dht.h>
 
 static const dht_sensor_type_t sensor_type = DHT_TYPE_DHT11;
