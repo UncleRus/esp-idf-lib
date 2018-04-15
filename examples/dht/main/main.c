@@ -27,7 +27,6 @@ void dht_test(void *pvParameters)
         else
             printf("Could not read data from sensor\n");
 
-        // Three second delay...
         vTaskDelay(300 / portTICK_PERIOD_MS);
     }
 }
