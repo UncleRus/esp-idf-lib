@@ -24,15 +24,22 @@ extern "C" {
  * @param addr I2C address (0b0100<A2><A1><A0> for PCF8574)
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
- * @return ESP_OK on success
+ * @return `ESP_OK` on success
  */
 esp_err_t pcf8574_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
+/**
+ * @brief Free device descriptor
+ * @param dev Pointer to I2C device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t pcf8574_free_desc(i2c_dev_t *dev);
 
 /**
  * @brief Read GPIO port value
  * @param dev Pointer to I2C device descriptor
  * @param val 8-bit GPIO port value
- * @return ESP_OK on success
+ * @return `ESP_OK` on success
  */
 inline esp_err_t pcf8574_port_read(const i2c_dev_t *dev, uint8_t *val)
 {
