@@ -9,7 +9,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 
 | Component      | Description                                                             | License | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------------
-| **i2cdev**     | I2C utilites.                                                           | MIT     | Yes
+| **i2cdev**     | I2C utilites                                                            | MIT     | Yes
 | **ds1307**     | Driver for DS1307 RTC module                                            | BSD     | Yes
 | **ds3231**     | Driver for DS3231 high precision RTC module                             | MIT     | Yes
 | **hmc5883l**   | Driver for HMC5883L 3-axis digital compass                              | BSD     | Yes
