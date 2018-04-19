@@ -9,40 +9,36 @@
 #define SDA_GPIO 16
 #define SCL_GPIO 17
 
+#define CHECK_LOOP(X, msg, ...) do { esp_err_t __; while((__ = X) != ESP_OK) { printf(msg "\n", ## __VA_ARGS__); vTaskDelay(250 / portTICK_PERIOD_MS); }} while (0)
+
 void pca9685_test(void *pvParamters)
 {
     i2c_dev_t dev;
-    esp_err_t res;
 
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    CHECK_LOOP(i2cdev_init(),
+            "Could not init I2Cdev library");
+    CHECK_LOOP(pca9685_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO),
+            "Could not init device descriptor");
+    CHECK_LOOP(pca9685_init(&dev),
+            "Could not init PCA9685");
+    CHECK_LOOP(pca9685_restart(&dev),
+            "Could not restart");
 
-    while (pca9685_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    while ((res = pca9685_init(&dev)) != ESP_OK)
-    {
-        printf("Could not init PCA9685, err: %d\n", res);
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    pca9685_set_pwm_frequency(&dev, 1000);
+    CHECK_LOOP(pca9685_set_pwm_frequency(&dev, 1000),
+            "Could not set PWM frequency");
     uint16_t freq;
-    pca9685_get_pwm_frequency(&dev, &freq);
+    CHECK_LOOP(pca9685_get_pwm_frequency(&dev, &freq),
+            "Could not get PWM frequency");
     printf("Freq 1000Hz, real %d\n", freq);
 
     uint16_t val = 0;
     while (1)
     {
         printf("Set ch0 to %d, ch4 to %d\n", val, 4096 - val);
-        pca9685_set_pwm_value(&dev, 0, val);
-        pca9685_set_pwm_value(&dev, 4, 4096 - val);
+        CHECK_LOOP(pca9685_set_pwm_value(&dev, 0, val),
+                "Could not set PWM value to ch0");
+        CHECK_LOOP(pca9685_set_pwm_value(&dev, 4, 4096 - val),
+                "Could not set PWM value to ch4");
 
         if (val++ == 4096)
             val = 0;

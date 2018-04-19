@@ -17,7 +17,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **ds18x20**    | Driver for DS18B20/DS18S20 families of one-wire temperature sensor ICs  | BSD     | No
 | **dht**        | Driver for DHT11/DHT22 temperature and humidity sensors                 | BSD     | No
 | **bmp180**     | Driver for BMP180 digital pressure sensor                               | MIT     | Yes
-| **bmp280**     | Driver for BMP280 digital pressure sensor                               | MIT     | Yes
+| **bmp280**     | Driver for BMP280/BME280 digital pressure sensor                        | MIT     | Yes
 | **bh1750**     | Driver for BH1750 light sensor                                          | BSD     | Yes
 | **ultrasonic** | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05              | BSD     | No
 | **pcf8574**    | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                | MIT     | Yes
