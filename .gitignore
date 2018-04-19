@@ -53,6 +53,7 @@ dkms.conf
 
 build/
 sdkconfig.old
+sdkconfig
 /.cproject
 /.project
 /.settings/
