@@ -40,7 +40,7 @@ static const char *TAG = "BMP280";
 #define BMP280_RESET_VALUE     0xB6
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 #define CHECK_LOGE(dev, x, msg, ...) do { \
         esp_err_t __; \
         if ((__ = x) != ESP_OK) { \
