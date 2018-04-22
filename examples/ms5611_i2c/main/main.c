@@ -10,6 +10,7 @@
 void ms5611_test(void *pvParamters)
 {
     ms5611_t dev;
+    dev.osr = MS5611_OSR_1024; // set oversampling ratio
 
     while (i2cdev_init() != ESP_OK)
     {
