@@ -23,3 +23,4 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **pcf8574**    | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                | MIT     | Yes
 | **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | No
 | **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes
+| **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
