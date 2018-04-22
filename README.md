@@ -24,3 +24,4 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | No
 | **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes
 | **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
+| **ads111x**    | Driver for ADS1113/ADS1114/ADS1115 I2C ADC                              | BSD     | Yes
