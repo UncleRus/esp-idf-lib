@@ -4,7 +4,7 @@
 #include <freertos/task.h>
 #include <max7219.h>
 
-#define SCROLL_DELAY 100
+#define SCROLL_DELAY 50
 #define CASCADE_SIZE 1
 
 #define HOST HSPI_HOST
@@ -38,7 +38,7 @@ static const uint64_t symbols[] = {
     0x3c66607c66663c00,
     0x3c66666e76663c00
 };
-const static size_t symbols_size = sizeof(symbols) - sizeof(uint64_t);
+const static size_t symbols_size = sizeof(symbols) - sizeof(uint64_t) * CASCADE_SIZE;
 
 void task(void *pvParameter)
 {
@@ -59,7 +59,7 @@ void task(void *pvParameter)
 
     // Configure device
     max7219_t dev = {
-       .cascade_size = 1,
+       .cascade_size = CASCADE_SIZE,
        .digits = 0,
        .mirrored = true
     };
@@ -72,8 +72,8 @@ void task(void *pvParameter)
     {
         printf("---------- draw\n");
 
-        max7219_clear(&dev);
-        max7219_draw_image_8x8(&dev, 0, (uint8_t *)symbols + offs);
+        for (uint8_t c = 0; c < CASCADE_SIZE; c ++)
+            max7219_draw_image_8x8(&dev, c, (uint8_t *)symbols + c * 8 + offs);
         vTaskDelay(SCROLL_DELAY / portTICK_PERIOD_MS);
 
         if (++ offs == symbols_size)
