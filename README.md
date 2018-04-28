@@ -27,3 +27,5 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **ads111x**    | Driver for ADS1113/ADS1114/ADS1115 I2C ADC                              | BSD     | Yes
 | **pcf8591**    | Driver for 8-bit ADC and an 8-bit DAC PCF8591                           | BSD     | Yes
 | **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes
+| **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | Yes
+
