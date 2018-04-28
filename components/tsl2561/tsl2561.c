@@ -223,15 +223,15 @@ esp_err_t tsl2561_init(tsl2561_t *dev)
     return ESP_OK;
 }
 
-esp_err_t tsl2561_set_integration_time(tsl2561_t *dev, tsl2561_integration_time_t integration_time_id)
+esp_err_t tsl2561_set_integration_time(tsl2561_t *dev, tsl2561_integration_time_t integration_time)
 {
     CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, enable(dev));
 
-    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, TSL2561_REG_TIMING, integration_time_id | dev->gain));
-    dev->integration_time = integration_time_id;
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, TSL2561_REG_TIMING, integration_time | dev->gain));
+    dev->integration_time = integration_time;
 
     I2C_DEV_CHECK(&dev->i2c_dev, disable(dev));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);

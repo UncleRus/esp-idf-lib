@@ -59,16 +59,53 @@ typedef struct
     tsl2561_package_t package_type;
 } tsl2561_t;
 
+/**
+ * Initialize device descriptior
+ * @param dev Device descriptor
+ * @param addr I2C device address, `TSL2561_I2C_ADDR_...` const
+ * @param port I2C port
+ * @param sda_gpio SDA GPIO pin
+ * @param scl_gpio SCL GPIO pin
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl2561_init_desc(tsl2561_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
+/**
+ * Free device descriptor
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl2561_free_desc(tsl2561_t *dev);
 
+/**
+ * Initialize device
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl2561_init(tsl2561_t *dev);
 
-esp_err_t tsl2561_set_integration_time(tsl2561_t *dev, tsl2561_integration_time_t integration_time_id);
+/**
+ * Set device integration time
+ * @param dev Device descriptor
+ * @param integration_time Integration time
+ * @return `ESP_OK` on success
+ */
+esp_err_t tsl2561_set_integration_time(tsl2561_t *dev, tsl2561_integration_time_t integration_time);
 
+/**
+ * Set device gain
+ * @param dev Device descriptor
+ * @param gain Gain
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl2561_set_gain(tsl2561_t *dev, tsl2561_gain_t gain);
 
+/**
+ * Read light intensity from device
+ * @param dev Device descriptor
+ * @param lux Light intensity, lux
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl2561_read_lux(tsl2561_t *dev, uint32_t *lux);
 
 #ifdef __cplusplus
