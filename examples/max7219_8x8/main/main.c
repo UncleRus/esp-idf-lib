@@ -63,7 +63,7 @@ void task(void *pvParameter)
        .digits = 0,
        .mirrored = true
     };
-    CHECK(max7219_init_descriptor(&dev, HOST, PIN_NUM_CS),
+    CHECK(max7219_init_desc(&dev, HOST, PIN_NUM_CS),
             "Could not initialize MAX7129 descriptor: %d");
     CHECK(max7219_init(&dev),
             "Could not initialize MAX7129: %d");

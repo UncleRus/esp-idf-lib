@@ -87,7 +87,7 @@ inline static uint8_t get_char(max7219_t *dev, char c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t max7219_init_descriptor(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin)
+esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin)
 {
     CHECK_ARG(dev);
 
@@ -101,7 +101,7 @@ esp_err_t max7219_init_descriptor(max7219_t *dev, spi_host_device_t host, gpio_n
     return spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
 }
 
-esp_err_t max7219_free_descriptor(max7219_t *dev)
+esp_err_t max7219_free_desc(max7219_t *dev)
 {
     CHECK_ARG(dev);
 

@@ -42,14 +42,14 @@ typedef struct
  * @param cs_pin CS GPIO number
  * @return `ESP_OK` on success
  */
-esp_err_t max7219_init_descriptor(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin);
+esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin);
 
 /**
  * Free device descriptor
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t max7219_free_descriptor(max7219_t *dev);
+esp_err_t max7219_free_desc(max7219_t *dev);
 
 /**
  * @brief Initialize display
