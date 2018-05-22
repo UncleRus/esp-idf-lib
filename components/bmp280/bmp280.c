@@ -248,10 +248,13 @@ esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy)
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
-    uint8_t status;
-    CHECK_LOGE(dev, i2c_dev_read_reg(&dev->i2c_dev, BMP280_REG_STATUS, &status, 1), "Could not read status register");
+    const uint8_t regs[2] = { BMP280_REG_STATUS, BMP280_REG_CTRL };
+    uint8_t status[2];
+    CHECK_LOGE(dev, i2c_dev_read(&dev->i2c_dev, regs, 2, status, 2), "Could not read status registers");
 
-    *busy = status & (1 << 3);
+    // Check mode - FORCED means BM280 is busy (it switches to SLEEP mode when finished)
+    // Additionally, check 'measuring' bit in status register
+    *busy = ((status[1] & 0b11) == BMP280_MODE_FORCED) || (status[0] & (1 << 3));
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
