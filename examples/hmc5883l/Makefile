@@ -6,7 +6,7 @@ EXTRA_COMPONENT_DIRS := $(CURDIR)/../../components
 EXTRA_COMPONENTS := i2cdev hmc5883l
 
 DEFAULT_COMPONENTS := \
-    esptool_py \
+	esptool_py \
 	heap \
 	soc \
 	esp32 \
@@ -25,6 +25,7 @@ DEFAULT_COMPONENTS := \
 	xtensa-debug-module \
 	nvs_flash \
 	wpa_supplicant \
+	smartconfig_ack \
 	main \
 	newlib \
 	vfs \

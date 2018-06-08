@@ -1,12 +1,12 @@
 #V := 1
-PROJECT_NAME := example-max7219-7seg
+PROJECT_NAME := example-max7219-8x8
 
 EXTRA_COMPONENT_DIRS := $(CURDIR)/../../components
 
 EXTRA_COMPONENTS := max7219
 
 DEFAULT_COMPONENTS := \
-    esptool_py \
+	esptool_py \
 	heap \
 	soc \
 	esp32 \
@@ -25,6 +25,7 @@ DEFAULT_COMPONENTS := \
 	xtensa-debug-module \
 	nvs_flash \
 	wpa_supplicant \
+	smartconfig_ack \
 	main \
 	newlib \
 	vfs \

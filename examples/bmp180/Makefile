@@ -6,7 +6,7 @@ EXTRA_COMPONENT_DIRS := $(CURDIR)/../../components
 EXTRA_COMPONENTS := i2cdev bmp180
 
 DEFAULT_COMPONENTS := \
-    esptool_py \
+	esptool_py \
 	heap \
 	soc \
 	esp32 \
@@ -25,6 +25,7 @@ DEFAULT_COMPONENTS := \
 	xtensa-debug-module \
 	nvs_flash \
 	wpa_supplicant \
+	smartconfig_ack \
 	main \
 	newlib \
 	vfs \
