@@ -25,6 +25,7 @@
 
 static const char *TAG = "BH1750";
 
+#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
 esp_err_t bh1750_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -62,13 +63,13 @@ esp_err_t bh1750_setup(i2c_dev_t *dev, bh1750_mode_t mode, bh1750_resolution_t r
     uint8_t opcode = mode == BH1750_MODE_CONTINIOUS ? OPCODE_CONT : OPCODE_OT;
     switch (resolution)
     {
-        case BH1750_RES_LOW:  opcode |= OPCODE_LOW; break;
-        case BH1750_RES_HIGH: opcode |= OPCODE_HIGH; break;
+        case BH1750_RES_LOW:  opcode |= OPCODE_LOW;   break;
+        case BH1750_RES_HIGH: opcode |= OPCODE_HIGH;  break;
         default:              opcode |= OPCODE_HIGH2; break;
     }
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, opcode, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, &opcode, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     ESP_LOGD(TAG, "bh1750_setup(PORT = %d, ADDR = 0x%02x, VAL = 0x%02x)", dev->port, dev->addr, opcode);

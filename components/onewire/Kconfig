@@ -1,9 +1,9 @@
 menu "OneWire"
 
 config ONEWIRE_CRC8_TABLE
-    bool "Use Flash CRC-8 table"
+    bool "Fast CRC-8 algorithm"
     default "y"
     help
-        Compute a Dallas Semiconductor 8 bit CRC by using faster CRC table
+        Compute a Dallas Semiconductor 8 bit CRC using a CRC table located in flash
 
 endmenu
