@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_system.h>
 #include <hmc5883l.h>
 
 #define SDA_GPIO 16

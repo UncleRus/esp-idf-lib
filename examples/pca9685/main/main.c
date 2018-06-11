@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_system.h>
 #include <pca9685.h>
 
 #define ADDR PCA9685_ADDR_BASE

@@ -25,6 +25,7 @@ DEFAULT_COMPONENTS := \
 	xtensa-debug-module \
 	nvs_flash \
 	wpa_supplicant \
+	smartconfig_ack \
 	main \
 	newlib \
 	vfs \

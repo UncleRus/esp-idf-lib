@@ -12,7 +12,6 @@
 #define EXTRAS_BH1750_H_
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <i2cdev.h>
 
 #ifdef __cplusplus

@@ -12,7 +12,6 @@
 #ifndef __TSL2561_H__
 #define __TSL2561_H__
 
-#include <stdbool.h>
 #include <i2cdev.h>
 
 #ifdef __cplusplus

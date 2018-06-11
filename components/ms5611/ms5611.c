@@ -147,9 +147,11 @@ esp_err_t ms5611_free_desc(ms5611_t *dev)
     return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
-esp_err_t ms5611_init(ms5611_t *dev)
+esp_err_t ms5611_init(ms5611_t *dev, ms5611_osr_t osr)
 {
     CHECK_ARG(dev);
+
+    dev->osr = osr;
 
     // First of all we need to reset the chip
     CHECK(ms5611_reset(dev));
@@ -157,7 +159,6 @@ esp_err_t ms5611_init(ms5611_t *dev)
     ets_delay_us(10000);
     // Get the config
     CHECK(read_prom(dev));
-    // Every thing went fine
 
     return ESP_OK;
 }

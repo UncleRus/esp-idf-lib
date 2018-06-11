@@ -12,7 +12,6 @@
 #define __MS5611_H__
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <i2cdev.h>
 
 #ifdef __cplusplus
@@ -79,9 +78,10 @@ esp_err_t ms5611_free_desc(ms5611_t *dev);
  * @brief Init MS5611-01BA03
  * Reset device and read calibration data
  * @param dev Device descriptor
+ * @param osr Oversampling ratio
  * @return `ESP_OK` on success
  */
-esp_err_t ms5611_init(ms5611_t *dev);
+esp_err_t ms5611_init(ms5611_t *dev, ms5611_osr_t osr);
 
 /**
  * @brief Measure pressure and temperature
