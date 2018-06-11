@@ -10,7 +10,7 @@
 
 void hmc5883l_test(void *pvParameters)
 {
-    i2c_dev_t dev;
+    hmc5883l_dev_t dev;
 
     while (i2cdev_init() != ESP_OK)
     {

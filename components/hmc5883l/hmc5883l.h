@@ -81,6 +81,13 @@ typedef enum
     HMC5883L_GAIN_230       //!< 4.35 mG/LSb, range -8.1..+8.1 G
 } hmc5883l_gain_t;
 
+typedef struct
+{
+    hmc5883l_opmode_t opmode;
+    float gain;
+    i2c_dev_t i2c_dev;
+} hmc5883l_dev_t;
+
 /**
  * Raw measurement result
  */
@@ -109,21 +116,21 @@ typedef struct
  * @param scl_gpio GPIO pin number for SCL
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t hmc5883l_init_desc(hmc5883l_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
  * @param dev Pointer to device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_free_desc(i2c_dev_t *dev);
+esp_err_t hmc5883l_free_desc(hmc5883l_dev_t *dev);
 
 /**
  * @brief Init device
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_init(i2c_dev_t *dev);
+esp_err_t hmc5883l_init(hmc5883l_dev_t *dev);
 
 /**
  * @brief Get operating mode
@@ -131,7 +138,7 @@ esp_err_t hmc5883l_init(i2c_dev_t *dev);
  * @param val Measurement mode
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_opmode(i2c_dev_t *dev, hmc5883l_opmode_t *val);
+esp_err_t hmc5883l_get_opmode(hmc5883l_dev_t *dev, hmc5883l_opmode_t *val);
 
 /**
  * @brief Set operating mode
@@ -139,7 +146,7 @@ esp_err_t hmc5883l_get_opmode(i2c_dev_t *dev, hmc5883l_opmode_t *val);
  * @param mode Measurement mode
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_opmode(i2c_dev_t *dev, hmc5883l_opmode_t mode);
+esp_err_t hmc5883l_set_opmode(hmc5883l_dev_t *dev, hmc5883l_opmode_t mode);
 
 /**
  * @brief Get number of samples averaged per measurement output
@@ -147,7 +154,7 @@ esp_err_t hmc5883l_set_opmode(i2c_dev_t *dev, hmc5883l_opmode_t mode);
  * @param val Number of samples
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_averaged_t *val);
+esp_err_t hmc5883l_get_samples_averaged(hmc5883l_dev_t *dev, hmc5883l_samples_averaged_t *val);
 
 /**
  * @brief Set number of samples averaged per measurement output
@@ -155,7 +162,7 @@ esp_err_t hmc5883l_get_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_average
  * @param samples Number of samples
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_averaged_t samples);
+esp_err_t hmc5883l_set_samples_averaged(hmc5883l_dev_t *dev, hmc5883l_samples_averaged_t samples);
 
 /**
  * @brief Get data output rate in continuous measurement mode
@@ -163,7 +170,7 @@ esp_err_t hmc5883l_set_samples_averaged(i2c_dev_t *dev, hmc5883l_samples_average
  * @param val Data output rate
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t *val);
+esp_err_t hmc5883l_get_data_rate(hmc5883l_dev_t *dev, hmc5883l_data_rate_t *val);
 
 /**
  * @brief Set data output rate in continuous measurement mode
@@ -171,7 +178,7 @@ esp_err_t hmc5883l_get_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t *val);
  * @param rate Data output rate
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t rate);
+esp_err_t hmc5883l_set_data_rate(hmc5883l_dev_t *dev, hmc5883l_data_rate_t rate);
 
 /**
  * @brief Get measurement mode (bias of the axes)
@@ -180,7 +187,7 @@ esp_err_t hmc5883l_set_data_rate(i2c_dev_t *dev, hmc5883l_data_rate_t rate);
  * @param val Bias
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_bias(i2c_dev_t *dev, hmc5883l_bias_t *val);
+esp_err_t hmc5883l_get_bias(hmc5883l_dev_t *dev, hmc5883l_bias_t *val);
 
 /**
  * @brief Set measurement mode (bias of the axes)
@@ -189,7 +196,7 @@ esp_err_t hmc5883l_get_bias(i2c_dev_t *dev, hmc5883l_bias_t *val);
  * @param bias Bias
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_bias(i2c_dev_t *dev, hmc5883l_bias_t bias);
+esp_err_t hmc5883l_set_bias(hmc5883l_dev_t *dev, hmc5883l_bias_t bias);
 
 /**
  * @brief Get device gain
@@ -197,7 +204,7 @@ esp_err_t hmc5883l_set_bias(i2c_dev_t *dev, hmc5883l_bias_t bias);
  * @param val Current gain
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_gain(i2c_dev_t *dev, hmc5883l_gain_t *val);
+esp_err_t hmc5883l_get_gain(hmc5883l_dev_t *dev, hmc5883l_gain_t *val);
 
 /**
  * @brief Set device gain
@@ -205,7 +212,7 @@ esp_err_t hmc5883l_get_gain(i2c_dev_t *dev, hmc5883l_gain_t *val);
  * @param gain Gain
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_set_gain(i2c_dev_t *dev, hmc5883l_gain_t gain);
+esp_err_t hmc5883l_set_gain(hmc5883l_dev_t *dev, hmc5883l_gain_t gain);
 
 /**
  * @brief Get data state
@@ -213,7 +220,7 @@ esp_err_t hmc5883l_set_gain(i2c_dev_t *dev, hmc5883l_gain_t gain);
  * @param[out] val true when data is written to all six data registers
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val);
+esp_err_t hmc5883l_data_is_ready(hmc5883l_dev_t *dev, bool *val);
 
 /**
  * @brief Get lock state.
@@ -227,7 +234,7 @@ esp_err_t hmc5883l_data_is_ready(i2c_dev_t *dev, bool *val);
  * @param[out] val true when data registers is locked
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_data_is_locked(i2c_dev_t *dev, bool *val);
+esp_err_t hmc5883l_data_is_locked(hmc5883l_dev_t *dev, bool *val);
 
 /**
  * @brief Get raw magnetic data
@@ -235,14 +242,15 @@ esp_err_t hmc5883l_data_is_locked(i2c_dev_t *dev, bool *val);
  * @param data Pointer to the struct to write raw data
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_raw_data(i2c_dev_t *dev, hmc5883l_raw_data_t *data);
+esp_err_t hmc5883l_get_raw_data(hmc5883l_dev_t *dev, hmc5883l_raw_data_t *data);
 
 /**
  * @brief Convert raw magnetic data to milligausses
+ * @param dev Device descriptor
  * @param raw Pointer to source raw data struct
  * @param mg Pointer to target struct to write converted data
  */
-void hmc5883l_raw_to_mg(const hmc5883l_raw_data_t *raw, hmc5883l_data_t *mg);
+esp_err_t hmc5883l_raw_to_mg(const hmc5883l_dev_t *dev, const hmc5883l_raw_data_t *raw, hmc5883l_data_t *mg);
 
 /**
  * @brief Get magnetic data in milligausses
@@ -250,7 +258,7 @@ void hmc5883l_raw_to_mg(const hmc5883l_raw_data_t *raw, hmc5883l_data_t *mg);
  * @param data Pointer to the struct to write data
  * @return `ESP_OK` on success
  */
-esp_err_t hmc5883l_get_data(i2c_dev_t *dev, hmc5883l_data_t *data);
+esp_err_t hmc5883l_get_data(hmc5883l_dev_t *dev, hmc5883l_data_t *data);
 
 #ifdef __cplusplus
 }
