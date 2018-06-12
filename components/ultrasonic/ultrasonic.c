@@ -28,7 +28,7 @@ static inline uint32_t get_time_us()
 
 #define timeout_expired(start, len) ((uint32_t)(get_time_us() - (start)) >= (len))
 
-#define RETURN_CRTCAL(MUX, RES) do { taskEXIT_CRITICAL(&MUX); return RES; } while(0)
+#define RETURN_CRTCAL(MUX, RES) do { portEXIT_CRITICAL(&MUX); return RES; } while(0)
 
 void ultrasonic_init(const ultrasonic_sensor_t *dev)
 {
@@ -43,7 +43,7 @@ esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_dis
     if (!distance)
         return ESP_ERR_INVALID_ARG;
 
-    taskENTER_CRITICAL(&mux);
+    portENTER_CRITICAL(&mux);
 
     // Ping: Low for 2..4 us, then high 10 us
     gpio_set_level(dev->trigger_pin, 0);
@@ -74,7 +74,7 @@ esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_dis
         if (timeout_expired(echo_start, meas_timeout))
             RETURN_CRTCAL(mux, ESP_ERR_ULTRASONIC_ECHO_TIMEOUT);
     }
-    taskEXIT_CRITICAL(&mux);
+    portEXIT_CRITICAL(&mux);
 
     *distance = (time - echo_start) / ROUNDTRIP;
 

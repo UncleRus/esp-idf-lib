@@ -47,12 +47,12 @@ esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait)
     else
         onewire_select(pin, addr);
 
-    taskENTER_CRITICAL(&mux);
+    portENTER_CRITICAL(&mux);
     onewire_write(pin, ds18x20_CONVERT_T);
     // For parasitic devices, power must be applied within 10us after issuing
     // the convert command.
     onewire_power(pin);
-    taskEXIT_CRITICAL(&mux);
+    portEXIT_CRITICAL(&mux);
 
     if (wait)
     {
