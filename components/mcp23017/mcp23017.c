@@ -7,8 +7,9 @@
  * BSD Licensed as described in the file LICENSE
  */
 #include "mcp23017.h"
+#include <esp_log.h>
 
-#define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf, but device support up to 1.7Mhz
+#define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf, but device supports up to 1.7Mhz
 
 #define REG_IODIRA   0x00
 #define REG_IODIRB   0x01
@@ -21,7 +22,6 @@
 #define REG_INTCONA  0x08
 #define REG_INTCONB  0x09
 #define REG_IOCON    0x0A
-#define REG_IOCON    0x0B
 #define REG_GPPUA    0x0C
 #define REG_GPPUB    0x0D
 #define REG_INTFA    0x0E
@@ -134,7 +134,7 @@ esp_err_t mcp23017_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio
     CHECK_ARG(dev);
     if (addr < MCP23017_I2C_ADDR_BASE || addr > MCP23017_I2C_ADDR_BASE + 7)
     {
-        ESP_LOGE(TAG, "Invlid device address: 0x%02x", addr);
+        ESP_LOGE(TAG, "Invalid device address: 0x%02x", addr);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -152,6 +152,14 @@ esp_err_t mcp23017_free_desc(i2c_dev_t *dev)
     CHECK_ARG(dev);
 
     return i2c_dev_delete_mutex(dev);
+}
+
+esp_err_t mcp23017_setup_hw_addr(i2c_dev_t *dev, bool enable, uint8_t new_addr)
+{
+    CHECK(write_reg_bit_8(dev, REG_IOCON, enable, BIT_IOCON_HAEN));
+    dev->addr = enable ? new_addr : MCP23017_I2C_ADDR_BASE;
+
+    return ESP_OK;
 }
 
 esp_err_t mcp23017_get_int_out_mode(i2c_dev_t *dev, mcp23017_int_out_mode_t *mode)
@@ -199,19 +207,25 @@ esp_err_t mcp23017_port_set_pullup(i2c_dev_t *dev, uint16_t val)
     return write_reg_16(dev, REG_GPPUA, val);
 }
 
-esp_err_t mcp23017_port_read(const i2c_dev_t *dev, uint16_t *val)
+esp_err_t mcp23017_port_read(i2c_dev_t *dev, uint16_t *val)
 {
     return read_reg_16(dev, REG_GPIOA, val);
 }
 
-esp_err_t mcp23017_port_write(const i2c_dev_t *dev, uint16_t val)
+esp_err_t mcp23017_port_write(i2c_dev_t *dev, uint16_t val)
 {
     return write_reg_16(dev, REG_GPIOA, val);
 }
 
 esp_err_t mcp23017_get_mode(i2c_dev_t *dev, uint8_t pin, mcp23017_gpio_mode_t *mode)
 {
-    return read_reg_bit_16(dev, REG_IODIRA, mode, pin);
+    CHECK_ARG(mode);
+
+    bool buf;
+    CHECK(read_reg_bit_16(dev, REG_IODIRA, &buf, pin));
+    *mode = buf ? MCP23017_GPIO_INPUT : MCP23017_GPIO_OUTPUT;
+
+    return ESP_OK;
 }
 
 esp_err_t mcp23017_set_mode(i2c_dev_t *dev, uint8_t pin, mcp23017_gpio_mode_t mode)
@@ -231,7 +245,13 @@ esp_err_t mcp23017_set_pullup(i2c_dev_t *dev, uint8_t pin, bool enable)
 
 esp_err_t mcp23017_get_level(i2c_dev_t *dev, uint8_t pin, uint32_t *val)
 {
-    return read_reg_bit_16(dev, REG_GPIOA, val, pin);
+    CHECK_ARG(val);
+
+    bool buf;
+    CHECK(read_reg_bit_16(dev, REG_GPIOA, &buf, pin));
+    *val = buf ? 1 : 0;
+
+    return ESP_OK;
 }
 
 esp_err_t mcp23017_set_level(i2c_dev_t *dev, uint8_t pin, uint32_t val)
