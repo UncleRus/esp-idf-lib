@@ -8,8 +8,8 @@
  *
  * ROHM Semiconductor bh1750fvi-e.pdf
  */
-#ifndef EXTRAS_BH1750_H_
-#define EXTRAS_BH1750_H_
+#ifndef __BH1750_H__
+#define __BH1750_H__
 
 #include <stdint.h>
 #include <i2cdev.h>
@@ -83,4 +83,4 @@ esp_err_t bh1750_read(i2c_dev_t *dev, uint16_t *level);
 }
 #endif
 
-#endif /* EXTRAS_BH1750_H_ */
+#endif /* __BH1750_H__ */

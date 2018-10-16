@@ -7,8 +7,8 @@
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
  * BSD Licensed as described in the file LICENSE
  */
-#ifndef EXTRAS_ULTRASONIC_H_
-#define EXTRAS_ULTRASONIC_H_
+#ifndef __ULTRASONIC_H__
+#define __ULTRASONIC_H__
 
 #include <driver/gpio.h>
 
@@ -47,4 +47,4 @@ esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_dis
 }
 #endif
 
-#endif /* EXTRAS_ULTRASONIC_H_ */
+#endif /* __ULTRASONIC_H__ */

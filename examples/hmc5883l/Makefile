@@ -11,6 +11,7 @@ DEFAULT_COMPONENTS := \
 	soc \
 	esp32 \
 	driver \
+	esp_ringbuf \
 	pthread \
 	partition_table \
 	log \

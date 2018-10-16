@@ -7,8 +7,8 @@
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
  * BSD Licensed as described in the file LICENSE
  */
-#ifndef EXTRAS_HMC5883L_H_
-#define EXTRAS_HMC5883L_H_
+#ifndef __HMC5883L_H__
+#define __HMC5883L_H__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -264,4 +264,4 @@ esp_err_t hmc5883l_get_data(hmc5883l_dev_t *dev, hmc5883l_data_t *data);
 }
 #endif
 
-#endif /* EXTRAS_HMC5883L_H_ */
+#endif /* __HMC5883L_H__ */

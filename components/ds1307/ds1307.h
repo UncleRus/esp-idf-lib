@@ -7,8 +7,8 @@
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
  * BSD Licensed as described in the file LICENSE
  */
-#ifndef EXTRAS_DS1307_H_
-#define EXTRAS_DS1307_H_
+#ifndef __DS1307_H__
+#define __DS1307_H__
 
 #include <stdbool.h>
 #include <time.h>
@@ -154,4 +154,4 @@ esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t
 }
 #endif
 
-#endif /* EXTRAS_DS1307_H_ */
+#endif /* __DS1307_H__ */
