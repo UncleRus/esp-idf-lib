@@ -29,4 +29,5 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes
 | **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | Yes
 | **mcp23017**   | Driver for 16-bit I2C GPIO expander                                     | BSD     | Yes
+| **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
 
