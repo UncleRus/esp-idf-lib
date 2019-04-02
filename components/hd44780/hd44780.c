@@ -15,7 +15,7 @@
 
 #define DELAY_CMD_LONG  (3 * MS) // >1.53ms according to datasheet
 #define DELAY_CMD_SHORT (60)     // >39us according to datasheet
-#define DELAY_TOGGLE    (10)
+#define DELAY_TOGGLE    (1)      // E cycle time >= 1μs, E pulse width >= 450ns, Data set-up time >= 195ns
 #define DELAY_INIT      (5 * MS)
 
 #define CMD_CLEAR        0x01
@@ -67,12 +67,13 @@ static esp_err_t write_nibble(const hd44780_t *lcd, uint8_t b, bool rs)
     }
     else
     {
+        CHECK(gpio_set_level(lcd->pins.rs, rs));
+        ets_delay_us(1); // Address Setup time >= 60ns.
+        CHECK(gpio_set_level(lcd->pins.e, true));
         CHECK(gpio_set_level(lcd->pins.d7, (b >> 3) & 1));
         CHECK(gpio_set_level(lcd->pins.d6, (b >> 2) & 1));
         CHECK(gpio_set_level(lcd->pins.d5, (b >> 1) & 1));
         CHECK(gpio_set_level(lcd->pins.d4, b & 1));
-        CHECK(gpio_set_level(lcd->pins.rs, rs));
-        CHECK(gpio_set_level(lcd->pins.e, true));
         toggle_delay();
         CHECK(gpio_set_level(lcd->pins.e, false));
     }
@@ -117,6 +118,7 @@ esp_err_t hd44780_init(const hd44780_t *lcd)
         init_delay();
     }
     CHECK(write_nibble(lcd, CMD_FUNC_SET >> 4, false));
+    short_delay();
 
     // Specify the number of display lines and character font
     CHECK(write_byte(lcd,
