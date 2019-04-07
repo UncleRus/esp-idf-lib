@@ -222,7 +222,7 @@ esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t 
     CHECK_ARG(buf);
 
     if (offset + len > RAM_SIZE)
-        return ESP_ERR_INVALID_SIZE;
+        return ESP_ERR_NO_MEM;
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, RAM_REG + offset, buf, len));
@@ -237,7 +237,7 @@ esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t
     CHECK_ARG(buf);
 
     if (offset + len > RAM_SIZE)
-        return ESP_ERR_INVALID_SIZE;
+        return ESP_ERR_NO_MEM;
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, RAM_REG + offset, buf, len));

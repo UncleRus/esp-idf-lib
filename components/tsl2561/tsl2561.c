@@ -394,7 +394,7 @@ esp_err_t tsl2561_read_lux(tsl2561_t *dev, uint32_t *lux)
             return ESP_ERR_NOT_SUPPORTED;
     }
 
-    uint32_t temp;
+    int32_t temp;
     temp = ((channel0 * b) - (channel1 * m));
 
     // Round lsb (2^(LUX_SCALE−1))
