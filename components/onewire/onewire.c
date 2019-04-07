@@ -262,7 +262,7 @@ onewire_addr_t onewire_search_next(onewire_search_t *search, gpio_num_t pin)
     uint8_t id_bit_number;
     uint8_t last_zero, search_result;
     int rom_byte_number;
-    uint8_t id_bit, cmp_id_bit;
+    int8_t id_bit, cmp_id_bit;
     onewire_addr_t addr;
     unsigned char rom_byte_mask;
     bool search_direction;
