@@ -12,6 +12,7 @@
 #define MS 1000
 
 #define BV(x) (1 << (x))
+#define GPIO_BIT(x) (1ULL << (x))
 
 #define DELAY_CMD_LONG  (3 * MS) // >1.53ms according to datasheet
 #define DELAY_CMD_SHORT (60)     // >39us according to datasheet
@@ -100,14 +101,14 @@ esp_err_t hd44780_init(const hd44780_t *lcd)
         memset(&io_conf, 0, sizeof(gpio_config_t));
         io_conf.mode = GPIO_MODE_OUTPUT;
         io_conf.pin_bit_mask =
-                BV(lcd->pins.rs) |
-                BV(lcd->pins.e) |
-                BV(lcd->pins.d4) |
-                BV(lcd->pins.d5) |
-                BV(lcd->pins.d6) |
-                BV(lcd->pins.d7);
+                GPIO_BIT(lcd->pins.rs) |
+                GPIO_BIT(lcd->pins.e) |
+                GPIO_BIT(lcd->pins.d4) |
+                GPIO_BIT(lcd->pins.d5) |
+                GPIO_BIT(lcd->pins.d6) |
+                GPIO_BIT(lcd->pins.d7);
         if (lcd->pins.bl != HD44780_NOT_USED)
-            io_conf.pin_bit_mask |= BV(lcd->pins.bl);
+            io_conf.pin_bit_mask |= GPIO_BIT(lcd->pins.bl);
         CHECK(gpio_config(&io_conf));
     }
 
