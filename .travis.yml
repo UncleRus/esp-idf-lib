@@ -1,0 +1,51 @@
+sudo: false
+language: bash
+os:
+  - linux
+
+env:
+  XTENSA_TOOLCHAIN=xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz
+ 
+addons:
+  apt:
+    packages:
+      - gcc
+      - wget
+      - make
+      - libncurses-dev
+      - flex
+      - bison
+      - python
+      - python-pip
+      - gperf
+
+before_install:
+  # Save path to the git respository
+  - PROJECT_PATH=$(pwd)
+
+install:
+  # Install ESP32 toochain following steps as desribed
+  # in http://esp-idf.readthedocs.io/en/latest/linux-setup.html
+
+  # Prepare directory for the toolchain
+  - mkdir -p ~/esp
+  - cd ~/esp
+  # Download binary toolchain for the ESP32
+  - wget https://dl.espressif.com/dl/$XTENSA_TOOLCHAIN
+  - tar -xzf $XTENSA_TOOLCHAIN
+  # Make xtensa-esp32-elf available for all terminal sessions
+  - export PATH=$PATH:$HOME/esp/xtensa-esp32-elf/bin
+  # Get ESP-IDF from github
+  - git clone --recursive https://github.com/espressif/esp-idf.git
+  # Set the path to ESP-IDF directory
+  - export IDF_PATH=~/esp/esp-idf
+  # Get Python requirements
+  - python -m pip install --user -r $IDF_PATH/requirements.txt
+
+script:
+  - cd $PROJECT_PATH/examples
+  - for i in $(ls -d */); do cd $PROJECT_PATH/examples/$i; make defconfig; make; done
+  
+  
+  
+  
