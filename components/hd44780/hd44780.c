@@ -8,6 +8,7 @@
 #include "hd44780.h"
 #include <string.h>
 #include <esp_system.h>
+#include <esp32/rom/ets_sys.h> // add by nopnop2002
 
 #define MS 1000
 
