@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <driver/spi_master.h>
+#include <driver/gpio.h> // add by nopnop2002
 
 #ifdef __cplusplus
 extern "C" {
