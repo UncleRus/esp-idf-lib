@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <hd44780.h>
 #include <pcf8574.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -51,6 +52,8 @@ void lcd_test(void *pvParameters)
         printf("Could not init I2Cdev library\n");
         vTaskDelay(250 / portTICK_PERIOD_MS);
     }
+
+    memset(&pcf8574, 0, sizeof(i2c_dev_t));
 
     // Init I2C device descriptor
     while (pcf8574_init_desc(&pcf8574, 0, I2C_ADDR, SDA_GPIO, SCL_GPIO) != ESP_OK)

@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <bmp180.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -10,6 +11,9 @@
 void bmp180_test(void *pvParameters)
 {
     bmp180_dev_t dev;
+
+    memset(&dev, 0, sizeof(bmp180_dev_t)); // Zero descriptor
+
     esp_err_t res;
 
     while (i2cdev_init() != ESP_OK)

@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 #include <mcp23017.h>
 #include <driver/gpio.h>
+#include <string.h>
 
 // A0, A1, A2 pins are grounded
 
@@ -18,6 +19,7 @@ static void IRAM_ATTR intr_handler(void *arg)
 void test(void *pvParameters)
 {
     i2c_dev_t dev;
+    memset(&dev, 0, sizeof(i2c_dev_t));
 
     while (i2cdev_init() != ESP_OK)
     {

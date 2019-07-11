@@ -2,6 +2,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <tda74xx.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -16,6 +17,7 @@
 void tda74xx_test(void *pvParameters)
 {
     i2c_dev_t dev;
+    memset(&dev, 0, sizeof(i2c_dev_t));
 
     // init device descriptor
     ESP_ERROR_CHECK(tda74xx_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));

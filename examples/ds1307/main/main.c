@@ -2,6 +2,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ds1307.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -9,6 +10,7 @@
 void ds1307_test(void *pvParameters)
 {
     i2c_dev_t dev;
+    memset(&dev, 0, sizeof(i2c_dev_t));
 
     while (i2cdev_init() != ESP_OK)
     {

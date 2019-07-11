@@ -2,6 +2,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <pca9685.h>
+#include <string.h>
 
 #define ADDR PCA9685_ADDR_BASE
 #define SDA_GPIO 16
@@ -12,6 +13,7 @@
 void pca9685_test(void *pvParamters)
 {
     i2c_dev_t dev;
+    memset(&dev, 0, sizeof(i2c_dev_t));
 
     CHECK_LOOP(i2cdev_init(),
             "Could not init I2Cdev library");

@@ -2,6 +2,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <hmc5883l.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -9,6 +10,8 @@
 void hmc5883l_test(void *pvParameters)
 {
     hmc5883l_dev_t dev;
+
+    memset(&dev, 0, sizeof(hmc5883l_dev_t));
 
     while (i2cdev_init() != ESP_OK)
     {

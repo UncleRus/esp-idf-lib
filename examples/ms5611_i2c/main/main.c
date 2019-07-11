@@ -2,6 +2,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ms5611.h>
+#include <string.h>
 
 #define I2C_ADDR MS5611_ADDR_CSB_LOW
 #define I2C_PORT 0
@@ -12,6 +13,7 @@
 void ms5611_test(void *pvParamters)
 {
     ms5611_t dev;
+    memset(&dev, 0, sizeof(ms5611_t));
 
     while (i2cdev_init() != ESP_OK)
     {

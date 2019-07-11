@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <bmp280.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -12,6 +13,7 @@ void bmp280_test(void *pvParamters)
     bmp280_params_t params;
     bmp280_init_default_params(&params);
     bmp280_t dev;
+    memset(&dev, 0, sizeof(bmp280_t));
 
     esp_err_t res;
 

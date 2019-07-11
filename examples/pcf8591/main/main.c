@@ -2,6 +2,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <pcf8591.h>
+#include <string.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -10,6 +11,7 @@
 void pcf8591_test(void *pvParamters)
 {
     i2c_dev_t dev;
+    memset(&dev, 0, sizeof(i2c_dev_t));
 
     while (i2cdev_init() != ESP_OK)
     {
