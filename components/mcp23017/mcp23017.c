@@ -62,7 +62,6 @@ static esp_err_t read_reg_16(i2c_dev_t *dev, uint8_t reg, uint16_t *val)
 static esp_err_t write_reg_16(i2c_dev_t *dev, uint8_t reg, uint16_t val)
 {
     CHECK_ARG(dev);
-    CHECK_ARG(val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, &val, 2));
@@ -116,7 +115,6 @@ static esp_err_t read_reg_bit_8(i2c_dev_t *dev, uint8_t reg, bool *val, uint8_t 
 static esp_err_t write_reg_bit_8(i2c_dev_t *dev, uint8_t reg, bool val, uint8_t bit)
 {
     CHECK_ARG(dev);
-    CHECK_ARG(val);
 
     uint8_t buf;
 
