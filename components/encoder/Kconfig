@@ -1,0 +1,43 @@
+menu "Rotary encoders"
+
+	choice RE_TGROUP
+		prompt "Timer group"
+		config RE_TGROUP_0
+			bool "0"
+		config RE_TGROUP_1
+			bool "1"
+	endchoice
+	
+	choice RE_TIMER
+		prompt "Timer"
+		config RE_TIMER_0
+			bool "0"
+		config RE_TIMER_1
+			bool "1"
+	endchoice
+	
+	config RE_MAX
+		int "Maximum number of rotary encoders"
+		default 1
+			
+	config RE_INTERVAL_US
+		int "Polling interval, us"
+		default 1000
+		
+	config RE_BTN_DEAD_TIME_US
+		int "Button dead time, us"
+		default 10000
+			
+	choice RE_BTN_PRESSED_LEVEL
+		prompt "Logical level on pressed button"
+		config RE_BTN_PRESSED_LEVEL_0
+			bool "0"
+		config RE_BTN_PRESSED_LEVEL_1
+			bool "1"
+	endchoice
+	
+	config RE_BTN_LONG_PRESS_TIME_US
+		int "Long press timeout, us"
+		default 500000
+
+endmenu
