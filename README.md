@@ -33,4 +33,4 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **mcp23017**   | Driver for 16-bit I2C GPIO expander                                     | BSD     | Yes
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
 | **mcp4725**    | Driver for 12-bit DAC MCP4725                                           | BSD     | Yes
-| **encoder***   | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
+| **encoder**   | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
