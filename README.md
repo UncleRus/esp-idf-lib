@@ -30,6 +30,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **ads111x**    | Driver for ADS1113/ADS1114/ADS1115 I2C ADC                              | BSD     | Yes
 | **pcf8591**    | Driver for 8-bit ADC and an 8-bit DAC PCF8591                           | BSD     | Yes
 | **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes
+| **tsl4531**    | Driver for digital ambient light sensor TSL4531                         | BSD     | Yes
 | **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | Yes
 | **mcp23017**   | Driver for 16-bit I2C GPIO expander                                     | BSD     | Yes
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
