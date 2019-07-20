@@ -1,12 +1,15 @@
 /**
  * @file bmp180.h
+ * @defgroup bmp180 bmp180
+ * @{
  *
  * ESP-IDF driver for BMP180 digital pressure sensor
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2015 Frank Bargstedt
+ * Copyright (C) 2015 Frank Bargstedt\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #ifndef __BMP180_H__
@@ -100,5 +103,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __BMP180_H__ */

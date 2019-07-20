@@ -1,9 +1,12 @@
 /**
  * @file mcp23017.h
+ * @defgroup mcp23017 mcp23017
+ * @{
  *
  * ESP-IDF driver for I2C 16 bit GPIO expander MCP23017
  *
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __MCP23017_H__

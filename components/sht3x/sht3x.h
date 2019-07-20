@@ -1,12 +1,15 @@
 /**
  * @file sht3x.h
+ * @defgroup sht3x sht3x
+ * @{
  *
  * ESP-IDF driver for Sensirion SHT3x digital temperature and humidity sensor
  *
- * Forked from https://github.com/gschorcht/sht3x-esp-idf
+ * Forked from <https://github.com/gschorcht/sht3x-esp-idf>
  *
- * Copyright (c) 2017 Gunar Schorcht (https://github.com/gschorcht)
- * Copyright (C) 2019 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>\n
+ * Copyright (C) 2019 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __SHT3X_H__

@@ -1,12 +1,18 @@
 /**
+ * @file bh1750.c
+ *
+ * @ingroup bh1750 ESP-IDF driver for BH1750 light sensor
+ *
  * ESP-IDF driver for BH1750 light sensor
  *
- * Ported from esp-open-rtos
- * Copyright (C) 2017 Andrej Krutak <dev@andree.sk>
- *               2018 Ruslan V. Uss <unclerus@gmail.com>
- * BSD Licensed as described in the file LICENSE
+ * Datasheet: ROHM Semiconductor bh1750fvi-e.pdf
  *
- * ROHM Semiconductor bh1750fvi-e.pdf
+ * Ported from esp-open-rtos
+ *
+ * Copyright (C) 2017 Andrej Krutak <dev@andree.sk>\n
+ * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * BSD Licensed as described in the file LICENSE
  */
 #include "bh1750.h"
 #include <stdio.h>

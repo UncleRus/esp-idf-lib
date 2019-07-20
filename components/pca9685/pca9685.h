@@ -1,10 +1,14 @@
 /**
  * @file pca9685.h
+ * @defgroup pca9685 pca9685
+ * @{
  *
  * ESP-IDF driver for 16-channel, 12-bit PWM PCA9685
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __PCA9685_H__

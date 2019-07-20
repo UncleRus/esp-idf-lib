@@ -4,7 +4,9 @@
  * ESP-IDF Driver for 3-axis digital compass HMC5883L
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "hmc5883l.h"

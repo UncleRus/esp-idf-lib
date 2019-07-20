@@ -1,9 +1,10 @@
 /**
  * @file encoder.c
  *
- * ESP-IDF timer-based driver for rotary encoders
+ * ESP-IDF HW timer-based driver for rotary encoders
  *
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "encoder.h"

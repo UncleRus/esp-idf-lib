@@ -1,11 +1,15 @@
 /**
  * @file tsl4531.h
+ * @defgroup tsl4531 tsl4531
+ * @{
  *
  * ESP-IDF driver for I2C 16 bit GPIO expander MCP23017
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2017 Brian Schwind (https://github.com/bschwind)
+ *
+ * Copyright (C) 2017 Brian Schwind <https://github.com/bschwind>\n
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __TSL4531_H__

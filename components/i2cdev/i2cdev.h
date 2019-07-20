@@ -1,9 +1,12 @@
 /**
  * @file i2cdev.h
+ * @defgroup i2cdev i2cdev
+ * @{
  *
  * ESP-IDF I2C master thread-safe functions for communication with I2C slave
  *
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #ifndef __I2CDEV_H__

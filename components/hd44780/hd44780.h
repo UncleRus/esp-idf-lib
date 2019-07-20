@@ -1,4 +1,6 @@
 /**
+ * @file hd44780.h
+ *
  * ESP-IDF driver for HD44780 compartible LCD text displays
  *
  * Ported from esp-open-rtos

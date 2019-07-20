@@ -6,8 +6,9 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2017 Pham Ngoc Thanh <pnt239@gmail.com>
+ * Copyright (C) 2017 Pham Ngoc Thanh <pnt239@gmail.com>\n
  * Copyright (C) 2017, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "pcf8591.h"

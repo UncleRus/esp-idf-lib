@@ -1,9 +1,12 @@
 /**
  * @file pcf8574.h
+ * @defgroup pcf8574 pcf8574
+ * @{
  *
  * ESP-IDF driver for PCF8574 compartible remote 8-bit I/O expanders for I2C-bus
  *
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #ifndef __PCF8574_H__

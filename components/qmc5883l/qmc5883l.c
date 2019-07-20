@@ -4,6 +4,7 @@
  * ESP-IDF Driver for 3-axis magnetic sensor QMC5883L
  *
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "qmc5883l.h"

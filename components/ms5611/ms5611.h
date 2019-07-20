@@ -1,11 +1,15 @@
 /**
  * @file ms5611.h
+ * @defgroup ms5611 ms5611
+ * @{
  *
  * ESP-IDF driver for barometic pressure sensor MS5611-01BA03
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2016 Bernhard Guillon <Bernhard.Guillon@begu.org>
+ *
+ * Copyright (C) 2016 Bernhard Guillon <Bernhard.Guillon@begu.org>\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __MS5611_H__

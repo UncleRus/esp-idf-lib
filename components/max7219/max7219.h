@@ -1,11 +1,15 @@
 /**
  * @file max7219.h
+ * @defgroup max7219 max7219
+ * @{
  *
  * ESP-IDF driver for MAX7219/MAX7221
  * Serially Interfaced, 8-Digit LED Display Drivers
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2017, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __MAX7219_H__

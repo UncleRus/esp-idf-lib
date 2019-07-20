@@ -1,9 +1,10 @@
 /**
  * @file tda74xx.c
  *
- * ESP-IDF driver for TDA7439/TDA7439DS/TDA7440
+ * ESP-IDF driver for TDA7439/TDA7439DS/TDA7440 audioprocessors
  *
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 

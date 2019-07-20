@@ -1,10 +1,14 @@
 /**
  * @file hmc5883l.h
+ * @defgroup hmc5883l hmc5883l
+ * @{
  *
  * ESP-IDF Driver for 3-axis digital compass HMC5883L
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __HMC5883L_H__
@@ -81,11 +85,14 @@ typedef enum
     HMC5883L_GAIN_230       //!< 4.35 mG/LSb, range -8.1..+8.1 G
 } hmc5883l_gain_t;
 
+/**
+ * Device descriptor
+ */
 typedef struct
 {
-    hmc5883l_opmode_t opmode;
-    float gain;
-    i2c_dev_t i2c_dev;
+    i2c_dev_t i2c_dev;        //!< I2C device descriptor
+    hmc5883l_opmode_t opmode; //!< Operating mode
+    float gain;               //!< Gain
 } hmc5883l_dev_t;
 
 /**

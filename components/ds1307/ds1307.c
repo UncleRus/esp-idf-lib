@@ -1,10 +1,12 @@
 /**
  * @file ds1307.c
  *
- * ESP-IDF Driver for DS1307 RTC
+ * ESP-IDF driver for DS1307 real-time clock
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2016 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "ds1307.h"

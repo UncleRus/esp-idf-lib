@@ -1,10 +1,15 @@
 /**
  * @file ads111x.h
  *
+ * @defgroup ads111x ads111x
+ * @{
+ *
  * ESP-IDF driver for ADS1113/ADS1114/ADS1115 I2C ADC
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __ADS111X_H__
@@ -17,12 +22,12 @@
 extern "C" {
 #endif
 
-#define ADS111X_ADDR_GND 0x48
-#define ADS111X_ADDR_VCC 0x49
-#define ADS111X_ADDR_SDA 0x4a
-#define ADS111X_ADDR_SCL 0x4b
+#define ADS111X_ADDR_GND 0x48 //!< I2C device address with ADDR pin connected to ground
+#define ADS111X_ADDR_VCC 0x49 //!< I2C device address with ADDR pin connected to VCC
+#define ADS111X_ADDR_SDA 0x4a //!< I2C device address with ADDR pin connected to SDA
+#define ADS111X_ADDR_SCL 0x4b //!< I2C device address with ADDR pin connected to SCL
 
-#define ADS111X_MAX_VALUE 0x7fff
+#define ADS111X_MAX_VALUE 0x7fff //!< Maximum ADC value
 
 /**
  * Gain amplifier
@@ -333,5 +338,7 @@ esp_err_t ads111x_set_comp_high_thresh(i2c_dev_t *dev, int16_t th);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __ADS111X_H__ */

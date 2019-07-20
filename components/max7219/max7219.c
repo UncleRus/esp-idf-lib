@@ -5,7 +5,9 @@
  * Serially Interfaced, 8-Digit LED Display Drivers
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2017, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "max7219.h"
