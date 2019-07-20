@@ -1,0 +1,13 @@
+menu "SHT3X demo"
+
+	choice
+		prompt "Demo mode"
+		config SHT3X_DEMO_SSHL
+			bool "Single shot high level"
+		config SHT3X_DEMO_SSLL
+			bool "Single shot low level"
+		config SHT3X_DEMO_PERIODIC
+			bool "Periodic"
+	endchoice
+    
+endmenu
