@@ -22,10 +22,10 @@ extern "C" {
  */
 typedef struct
 {
-    i2c_port_t port;
-    i2c_config_t cfg;
-    uint8_t addr;       //!< Unshifted address
-    SemaphoreHandle_t mutex;
+    i2c_port_t port;         //!< I2C port number, 0 or 1
+    i2c_config_t cfg;        //!< I2C driver configuration
+    uint8_t addr;            //!< Unshifted address
+    SemaphoreHandle_t mutex; //!< Device mutex
 } i2c_dev_t;
 
 /**
