@@ -19,6 +19,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **onewire**    | Bit-banging one wire driver                                             | MIT*    | No
 | **ds18x20**    | Driver for DS18B20/DS18S20 families of one-wire temperature sensor ICs  | BSD     | No
 | **dht**        | Driver for DHT11/DHT22 temperature and humidity sensors                 | BSD     | No
+| **sht31x**     | Driver for Sensirion SHT3x digital temperature and humidity sensor      | BSD     | Yes
 | **bmp180**     | Driver for BMP180 digital pressure sensor                               | MIT     | Yes
 | **bmp280**     | Driver for BMP280/BME280 digital pressure sensor                        | MIT     | Yes
 | **bh1750**     | Driver for BH1750 light sensor                                          | BSD     | Yes
