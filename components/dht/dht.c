@@ -1,7 +1,7 @@
 /**
  * @file dht.c
  *
- * ESP-IDF driver for DHT11/DHT22
+ * ESP-IDF driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021
  *
  * Ported from esp-open-rtos
  *
@@ -91,14 +91,14 @@ static esp_err_t dht_await_pin_state(gpio_num_t pin, uint32_t timeout,
  * The function call should be protected from task switching.
  * Return false if error occurred.
  */
-static inline esp_err_t dht_fetch_data(gpio_num_t pin, bool bits[DHT_DATA_BITS])
+static inline esp_err_t dht_fetch_data(gpio_num_t pin, bool bits[DHT_DATA_BITS], dht_sensor_type_t sensor_type)
 {
     uint32_t low_duration;
     uint32_t high_duration;
 
     // Phase 'A' pulling signal low to initiate read sequence
     gpio_set_level(pin, 0);
-    ets_delay_us(20000);
+    ets_delay_us(sensor_type == DHT_TYPE_SI7021 ? 500 : 20000);
     gpio_set_level(pin, 1);
 
     // Step through Phase 'B', 40us
@@ -131,7 +131,11 @@ static inline int16_t dht_convert_data(dht_sensor_type_t sensor_type, uint8_t ms
 {
     int16_t data;
 
-    if (sensor_type == DHT_TYPE_DHT22)
+    if (sensor_type == DHT_TYPE_DHT11)
+    {
+        data = msb * 10;
+    }
+    else
     {
         data = msb & 0x7F;
         data <<= 8;
@@ -139,7 +143,6 @@ static inline int16_t dht_convert_data(dht_sensor_type_t sensor_type, uint8_t ms
         if (msb & BIT(7))
             data = -data;       // convert it to negative
     }
-    else data = msb * 10;
 
     return data;
 }
@@ -157,7 +160,7 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     gpio_set_level(pin, 1);
 
     portENTER_CRITICAL(&mux);
-    esp_err_t result = dht_fetch_data(pin, bits);
+    esp_err_t result = dht_fetch_data(pin, bits, sensor_type);
     portEXIT_CRITICAL(&mux);
 
     gpio_set_level(pin, 1);
@@ -198,8 +201,8 @@ esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     if (res != ESP_OK)
         return res;
 
-    *humidity = (float)i_humidity / 10;
-    *temperature = (float)i_temp / 10;
+    *humidity = i_humidity / 10.0;
+    *temperature = i_temp / 10.0;
 
     return ESP_OK;
 }
