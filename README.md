@@ -37,3 +37,4 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
 | **mcp4725**    | Driver for 12-bit DAC MCP4725                                           | BSD     | Yes
 | **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
+| **ina3221**    | Driver for INA3221 shunt and bus voltage monitor                        | MIT     | Yes
