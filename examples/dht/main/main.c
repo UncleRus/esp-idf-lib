@@ -3,7 +3,7 @@
 #include <freertos/task.h>
 #include <dht.h>
 
-static const dht_sensor_type_t sensor_type = DHT_TYPE_DHT11;
+static const dht_sensor_type_t sensor_type = DHT_TYPE_AM2301;
 static const gpio_num_t dht_gpio = 17;
 
 
@@ -25,7 +25,9 @@ void dht_test(void *pvParameters)
         else
             printf("Could not read data from sensor\n");
 
-        vTaskDelay(300 / portTICK_PERIOD_MS);
+        // If you read the sensor data too often, it will heat up
+        // http://www.kandrsmith.org/RJS/Misc/Hygrometers/dht_sht_how_fast.html
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }
 

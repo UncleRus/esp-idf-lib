@@ -91,7 +91,7 @@ static esp_err_t dht_await_pin_state(gpio_num_t pin, uint32_t timeout,
  * The function call should be protected from task switching.
  * Return false if error occurred.
  */
-static inline esp_err_t dht_fetch_data(gpio_num_t pin, bool bits[DHT_DATA_BITS], dht_sensor_type_t sensor_type)
+static inline esp_err_t dht_fetch_data(dht_sensor_type_t sensor_type, gpio_num_t pin, bool bits[DHT_DATA_BITS])
 {
     uint32_t low_duration;
     uint32_t high_duration;
@@ -160,7 +160,7 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     gpio_set_level(pin, 1);
 
     portENTER_CRITICAL(&mux);
-    esp_err_t result = dht_fetch_data(pin, bits, sensor_type);
+    esp_err_t result = dht_fetch_data(sensor_type, pin, bits);
     portEXIT_CRITICAL(&mux);
 
     gpio_set_level(pin, 1);
