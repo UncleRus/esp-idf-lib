@@ -26,6 +26,8 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **bh1750**     | Driver for BH1750 light sensor                                          | BSD     | Yes
 | **ultrasonic** | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05              | BSD     | No
 | **pcf8574**    | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                | MIT     | Yes
+| **mcp23008**   | Driver for 8-bit I2C GPIO expander MCP23008                             | BSD     | Yes
+| **mcp23017**   | Driver for 16-bit I2C GPIO expander MCP23017                            | BSD     | Yes
 | **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | No
 | **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes
 | **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
@@ -34,7 +36,6 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes
 | **tsl4531**    | Driver for digital ambient light sensor TSL4531                         | BSD     | Yes
 | **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | Yes
-| **mcp23017**   | Driver for 16-bit I2C GPIO expander                                     | BSD     | Yes
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
 | **mcp4725**    | Driver for 12-bit DAC MCP4725                                           | BSD     | Yes
 | **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
