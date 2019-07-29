@@ -4,56 +4,68 @@
 #include <ads111x.h>
 #include <string.h>
 
+#define DEV_COUNT 2   // 2 ICs
+
+#define I2C_PORT 0
+
 #define SDA_GPIO 16
 #define SCL_GPIO 17
-#define ADDRESS ADS111X_ADDR_GND // connect ADDR pin to GND
-#define GAIN ADS111X_GAIN_4V096
 
+#define GAIN ADS111X_GAIN_4V096 // +-4.096V
+
+// I2C addresses
+static const uint8_t addr[DEV_COUNT] = {
+    ADS111X_ADDR_GND,
+    ADS111X_ADDR_VCC
+};
+
+// Descriptors
+static i2c_dev_t devices[DEV_COUNT];
+
+// Gain value
+static float gain_val;
+
+static void measure(size_t n)
+{
+    // wait for conversion end
+    bool busy;
+    do
+    {
+        ads111x_is_busy(&devices[n], &busy);
+    }
+    while (busy);
+
+    // Read result
+    int16_t raw = 0;
+    if (ads111x_get_value(&devices[n], &raw) == ESP_OK)
+    {
+        float voltage = gain_val / ADS111X_MAX_VALUE * raw;
+        printf("[%u] Raw ADC value: %d, voltage: %.04f volts\n", n, raw, voltage);
+    }
+    else
+        printf("[%u] Cannot read ADC value\n", n);
+}
+
+// Main task
 void ads111x_test(void *pvParamters)
 {
-    i2c_dev_t dev;
-    memset(&dev, 0, sizeof(i2c_dev_t));
+    gain_val = ads111x_gain_values[GAIN];
 
-    while (i2cdev_init() != ESP_OK)
+    // Setup ICs
+    for (size_t i = 0; i < DEV_COUNT; i++)
     {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        ESP_ERROR_CHECK(ads111x_init_desc(&devices[i], addr[i], I2C_PORT, SDA_GPIO, SCL_GPIO));
+
+        ESP_ERROR_CHECK(ads111x_set_mode(&devices[i], ADS111X_MODE_CONTUNOUS));    // Continuous conversion mode
+        ESP_ERROR_CHECK(ads111x_set_data_rate(&devices[i], ADS111X_DATA_RATE_32)); // 32 samples per second
+        ESP_ERROR_CHECK(ads111x_set_input_mux(&devices[i], ADS111X_MUX_0_GND));    // positive = AIN0, negative = GND
+        ESP_ERROR_CHECK(ads111x_set_gain(&devices[i], GAIN));
     }
-
-    while (ads111x_init_desc(&dev, ADDRESS, 0, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    ads111x_set_mode(&dev, ADS111X_MODE_CONTUNOUS);
-    ads111x_set_data_rate(&dev, ADS111X_DATA_RATE_32);
-
-    ads111x_set_input_mux(&dev, ADS111X_MUX_0_GND);
-    ads111x_set_gain(&dev, GAIN);
-
-    float gain_val = ads111x_gain_values[GAIN];
 
     while (1)
     {
-        // wait for conversion end
-        bool busy;
-        do
-        {
-            ads111x_is_busy(&dev, &busy);
-        }
-        while (busy);
-
-        // Read result
-        int16_t raw = 0;
-        if (ads111x_get_value(&dev, &raw) == ESP_OK)
-        {
-            float voltage = gain_val / ADS111X_MAX_VALUE * raw;
-            printf("Raw ADC value: %d, voltage: %.04f volts\n", raw, voltage);
-        }
-        else
-            printf("Cannot read ADC value\n");
-
+        for (size_t i = 0; i < DEV_COUNT; i++)
+            measure(i);
 
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
@@ -61,6 +73,13 @@ void ads111x_test(void *pvParamters)
 
 void app_main()
 {
+    // Init library
+    ESP_ERROR_CHECK(i2cdev_init());
+
+    // Clear device descriptors
+    memset(devices, 0, sizeof(devices));
+
+    // Start task
     xTaskCreatePinnedToCore(ads111x_test, "ads111x_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
 
