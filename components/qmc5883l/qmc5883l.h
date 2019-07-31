@@ -1,9 +1,12 @@
 /**
  * @file qmc5883l.h
+ * @defgroup qmc5883l qmc5883l
+ * @{
  *
  * ESP-IDF Driver for 3-axis magnetic sensor QMC5883L
  *
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __QMC5883L_H__
@@ -216,5 +219,7 @@ esp_err_t qmc5883l_get_raw_temp(qmc5883l_t *dev, int16_t *temp);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __QMC5883L_H__ */

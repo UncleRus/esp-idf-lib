@@ -57,3 +57,4 @@ sdkconfig
 /.cproject
 /.project
 /.settings/
+/.pydevproject

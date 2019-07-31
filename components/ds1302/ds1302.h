@@ -1,5 +1,7 @@
 /**
  * @file ds1302.h
+ * @defgroup ds1302 ds1302
+ * @{
  *
  * ESP-IDF driver for DS1302 RTC
  *
@@ -67,7 +69,11 @@ esp_err_t ds1302_set_write_protect(ds1302_t *dev, bool wp);
 /**
  * @brief Get write protection status
  * @param dev Device descriptor
+<<<<<<< HEAD
  * @return true if RTC write-protected
+=======
+ * @param wp true if RTC write-protected
+>>>>>>> docs
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp);
@@ -111,5 +117,7 @@ esp_err_t ds1302_write_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t le
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __DS1302_H__ */

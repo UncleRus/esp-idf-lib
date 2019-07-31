@@ -1,0 +1,5 @@
+ds18x20 - Driver for DS18B20/DS18S20
+====================================
+
+.. doxygengroup:: ds18x20
+

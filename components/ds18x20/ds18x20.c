@@ -1,12 +1,14 @@
 /**
  * @file ds18x20.c
  *
- * ESP-IDF driver for the DS18x20 family of one-wire temperature sensor ICs
+ * ESP-IDF driver for the DS18S20/DS18B20 one-wire temperature sensor ICs
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2016 Grzegorz Hetman <ghetman@gmail.com>
- * Copyright (C) 2016 Alex Stewart <foogod@gmail.com>
+ *
+ * Copyright (C) 2016 Grzegorz Hetman <ghetman@gmail.com>\n
+ * Copyright (C) 2016 Alex Stewart <foogod@gmail.com>\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "ds18x20.h"

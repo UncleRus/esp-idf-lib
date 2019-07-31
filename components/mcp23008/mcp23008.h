@@ -1,5 +1,7 @@
 /**
  * @file mcp23008.h
+ * @defgroup mcp23008 mcp23008
+ * @{
  *
  * ESP-IDF driver for I2C 8 bit GPIO expander MCP23008
  *
@@ -131,7 +133,11 @@ esp_err_t mcp23008_port_read(i2c_dev_t *dev, uint8_t *val);
 /**
  * @brief Write value to GPIO port
  * @param dev Pointer to I2C device descriptor
+<<<<<<< HEAD
  * @param value GPIO port value, 0 bit for GPIO0..7 bit for GPIO7
+=======
+ * @param val GPIO port value, 0 bit for GPIO0..7 bit for GPIO7
+>>>>>>> docs
  * @return `ESP_OK` on success
  */
 esp_err_t mcp23008_port_write(i2c_dev_t *dev, uint8_t val);
@@ -213,5 +219,7 @@ esp_err_t mcp23008_set_interrupt(i2c_dev_t *dev, uint8_t pin, mcp23008_gpio_intr
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __MCP23008_H__ */

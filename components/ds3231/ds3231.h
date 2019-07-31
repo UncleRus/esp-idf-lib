@@ -1,15 +1,18 @@
 /**
  * @file ds3231.h
+ * @defgroup ds3231 ds3231
+ * @{
  *
  * ESP-IDF driver for DS3231 high precision RTC module
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2015 Richard A Burton <richardaburton@gmail.com>
- * Copyright (C) 2016 Bhuvanchandra DV <bhuvanchandra.dv@gmail.com>
+ *
+ * Copyright (C) 2015 Richard A Burton <richardaburton@gmail.com>\n
+ * Copyright (C) 2016 Bhuvanchandra DV <bhuvanchandra.dv@gmail.com>\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * MIT Licensed as described in the file LICENSE
  */
-
 #ifndef __DS3231_H__
 #define __DS3231_H__
 
@@ -232,5 +235,7 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time);
 #ifdef	__cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif  /* __DS3231_H__ */

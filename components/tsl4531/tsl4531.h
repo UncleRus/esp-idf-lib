@@ -1,11 +1,15 @@
 /**
  * @file tsl4531.h
+ * @defgroup tsl4531 tsl4531
+ * @{
  *
  * ESP-IDF driver for I2C 16 bit GPIO expander MCP23017
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2017 Brian Schwind (https://github.com/bschwind)
+ *
+ * Copyright (C) 2017 Brian Schwind <https://github.com/bschwind>\n
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __TSL4531_H__
@@ -52,18 +56,52 @@ typedef struct {
     tsl4531_part_id_t part_id;
 } tsl4531_t;
 
+/**
+ * Initialize device descriptior
+ * @param dev Device descriptor
+ * @param port I2C port
+ * @param sda_gpio SDA GPIO pin
+ * @param scl_gpio SCL GPIO pin
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl4531_init_desc(tsl4531_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
+/**
+ * Free device descriptor
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t tsl4531_free_desc(tsl4531_t *dev);
 
-esp_err_t tsl4531_init(tsl4531_t *device);
+/**
+ * Initialize device
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t tsl4531_init(tsl4531_t *dev);
 
-esp_err_t tsl4531_config(tsl4531_t *device, tsl4531_integration_time_t integration_time, bool skip_power_save);
+/**
+ * Configure device
+ * @param dev Device descriptor
+ * @param integration_time Integration time
+ * @param skip_power_save PowerSave Mode. When true, the power save states are
+ *        skipped following a light integration cyclefor shorter sampling rates
+ * @return `ESP_OK` on success
+ */
+esp_err_t tsl4531_config(tsl4531_t *dev, tsl4531_integration_time_t integration_time, bool skip_power_save);
 
-esp_err_t tsl4531_read_lux(tsl4531_t *device, uint16_t *lux);
+/**
+ * Read conversion results in lux
+ * @param dev Device descriptor
+ * @param lux Conversion result in lux
+ * @return `ESP_OK` on success
+ */
+esp_err_t tsl4531_read_lux(tsl4531_t *dev, uint16_t *lux);
 
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif  // __TSL4531_H__

@@ -1,11 +1,15 @@
 /**
  * @file tsl2561.h
+ * @defgroup tsl2561 tsl2561
+ * @{
  *
  * ESP-IDF driver for TSL2561 light-to-digital converter
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2016 Brian Schwind (https://github.com/bschwind)
+ *
+ * Copyright (C) 2016 Brian Schwind <https://github.com/bschwind>\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 
@@ -110,5 +114,7 @@ esp_err_t tsl2561_read_lux(tsl2561_t *dev, uint32_t *lux);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif  // __TSL2561_H__

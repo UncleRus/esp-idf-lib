@@ -5,8 +5,9 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2016 Jonathan Hartsuiker (https://github.com/jsuiker)
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2016 Jonathan Hartsuiker <https://github.com/jsuiker>\n
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>\n
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "dht.h"

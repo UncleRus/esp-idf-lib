@@ -1,8 +1,10 @@
 /**
  * @file onewire.h
+ * @defgroup onewire onewire
+ * @{
  *
- * Routines to access devices using the Dallas Semiconductor 1-Wire(tm)
- * protocol.
+ * @brief Routines to access devices using the Dallas Semiconductor 1-Wire(tm)
+ *        protocol.
  *
  * This is a port of a bit-banging one wire driver based on the implementation
  * from NodeMCU.
@@ -266,5 +268,7 @@ uint16_t onewire_crc16(const uint8_t* input, size_t len, uint16_t crc_iv);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif  /* __ONEWIRE_H__ */

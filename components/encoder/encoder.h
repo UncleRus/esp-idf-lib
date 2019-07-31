@@ -1,9 +1,12 @@
 /**
  * @file encoder.h
+ * @defgroup encoder encoder
+ * @{
  *
- * ESP-IDF timer-based driver for rotary encoders
+ * ESP-IDF HW timer-based driver for rotary encoders
  *
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __ENCODER_H__
@@ -22,9 +25,9 @@ extern "C" {
  * Button state
  */
 typedef enum {
-    RE_BTN_RELEASED = 0,
-    RE_BTN_PRESSED = 1,
-    RE_BTN_LONG_PRESSED = 2
+    RE_BTN_RELEASED = 0,      //!< Button currently released
+    RE_BTN_PRESSED = 1,       //!< Button currently pressed
+    RE_BTN_LONG_PRESSED = 2   //!< Button currently long pressed
 } rotary_encoder_btn_state_t;
 
 /**
@@ -83,5 +86,7 @@ esp_err_t rotary_encoder_remove(rotary_encoder_t *re);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __ENCODER_H__ */

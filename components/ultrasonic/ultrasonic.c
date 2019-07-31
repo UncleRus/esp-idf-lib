@@ -4,7 +4,9 @@
  * ESP-IDF driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05 and so on
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #include "ultrasonic.h"

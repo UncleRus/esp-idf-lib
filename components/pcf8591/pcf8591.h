@@ -1,13 +1,16 @@
 /**
  * @file pcf8591.h
+ * @defgroup pcf8591 pcf8591
+ * @{
  *
  * ESP-IDF driver for 8-bit analog-to-digital conversion and
  * an 8-bit digital-to-analog conversion PCF8591
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2017 Pham Ngoc Thanh <pnt239@gmail.com>
+ * Copyright (C) 2017 Pham Ngoc Thanh <pnt239@gmail.com>\n
  * Copyright (C) 2017, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __PCF8591_H__
@@ -71,5 +74,7 @@ esp_err_t pcf8591_write(i2c_dev_t *dev, uint8_t value);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __PCF8591_H__ */

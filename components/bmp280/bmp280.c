@@ -5,8 +5,9 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2016 sheinz (https://github.com/sheinz)
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2016 sheinz <https://github.com/sheinz>\n
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #include "bmp280.h"

@@ -1,8 +1,14 @@
 /**
+ * @file hd44780.h
+ * @defgroup hd44780 hd44780
+ * @{
+ *
  * ESP-IDF driver for HD44780 compartible LCD text displays
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __HD44780_H__
@@ -124,5 +130,7 @@ esp_err_t hd44780_upload_character(const hd44780_t *lcd, uint8_t num, const uint
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __HD44780_H__ */

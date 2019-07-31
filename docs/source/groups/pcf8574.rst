@@ -1,0 +1,5 @@
+pcf8574 - Driver for PCF8574 8-bit I/O expander for I2C-bus
+===========================================================
+
+.. doxygengroup:: pcf8574
+

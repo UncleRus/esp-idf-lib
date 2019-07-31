@@ -1,13 +1,19 @@
 /**
  * @file dht.h
+ * @defgroup dht dht
+ * @{
  *
  * ESP-IDF driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2016 Jonathan Hartsuiker (https://github.com/jsuiker)
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2016 Jonathan Hartsuiker <https://github.com/jsuiker>\n
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>\n
+ *
  * BSD Licensed as described in the file LICENSE
+ *
+ * @note A suitable pull-up resistor should be connected to the selected GPIO line
+ *
  */
 #ifndef __DHT_H__
 #define __DHT_H__
@@ -59,5 +65,7 @@ esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif  // __DHT_H__

@@ -1,12 +1,19 @@
 /**
+ * @file bh1750.h
+ *
+ * @defgroup bh1750 bh1750
+ * @{
+ *
  * ESP-IDF driver for BH1750 light sensor
  *
- * Ported from esp-open-rtos
- * Copyright (C) 2017 Andrej Krutak <dev@andree.sk>
- * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
- * BSD Licensed as described in the file LICENSE
+ * Datasheet: ROHM Semiconductor bh1750fvi-e.pdf
  *
- * ROHM Semiconductor bh1750fvi-e.pdf
+ * Ported from esp-open-rtos
+ *
+ * Copyright (C) 2017 Andrej Krutak <dev@andree.sk>\n
+ * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * BSD Licensed as described in the file LICENSE
  */
 #ifndef __BH1750_H__
 #define __BH1750_H__
@@ -18,11 +25,8 @@
 extern "C" {
 #endif
 
-/**
- * Possible chip addresses
- */
-#define BH1750_ADDR_LO 0x23 //!< ADDR pin floating/low
-#define BH1750_ADDR_HI 0x5c //!< ADDR pin high
+#define BH1750_ADDR_LO 0x23 //!< I2C address when ADDR pin floating/low
+#define BH1750_ADDR_HI 0x5c //!< I2C address when ADDR pin high
 
 /**
  * Measurement mode
@@ -48,8 +52,8 @@ typedef enum
  * @param[out] dev Pointer to device descriptor
  * @param[in] addr I2C address, BH1750_ADDR_LO or BH1750_ADDR_HI
  * @param[in] port I2C port number
- * @param[in] sda_pin GPIO pin number for SDA
- * @param[in] scl_pin GPIO pin number for SCL
+ * @param[in] sda_gpio GPIO pin number for SDA
+ * @param[in] scl_gpio GPIO pin number for SCL
  * @return `ESP_OK` on success
  */
 esp_err_t bh1750_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
@@ -82,5 +86,7 @@ esp_err_t bh1750_read(i2c_dev_t *dev, uint16_t *level);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __BH1750_H__ */

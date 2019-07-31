@@ -4,8 +4,10 @@
  * ESP-IDF driver for TSL2561 light-to-digital converter
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2016 Brian Schwind (https://github.com/bschwind)
+ *
+ * Copyright (C) 2016 Brian Schwind <https://github.com/bschwind>\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 

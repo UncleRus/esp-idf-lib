@@ -1,12 +1,16 @@
 /**
  * @file ds18x20.h
+ * @defgroup ds18x20 ds18x20
+ * @{
  *
- * ESP-IDF driver for the DS18x20 family of one-wire temperature sensor ICs
+ * ESP-IDF driver for the DS18S20/DS18B20 one-wire temperature sensor ICs
  *
  * Ported from esp-open-rtos
- * Copyright (C) 2016 Grzegorz Hetman <ghetman@gmail.com>
- * Copyright (C) 2016 Alex Stewart <foogod@gmail.com>
+ *
+ * Copyright (C) 2016 Grzegorz Hetman <ghetman@gmail.com>\n
+ * Copyright (C) 2016 Alex Stewart <foogod@gmail.com>\n
  * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __DS18X20_H__
@@ -147,5 +151,7 @@ esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif  /* __DS18X20_H__ */

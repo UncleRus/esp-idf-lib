@@ -1,11 +1,15 @@
 /**
  * @file ina3221.h
+ * @defgroup ina3221 ina3221
+ * @{
  *
  * ESP-IDF driver for Shunt and Bus Voltage Monitor INA3221
  *
  * Ported from esp-open-rtos
- * Copyright (c) 2016 Zaltora (https://github.com/Zaltora)
+ *
+ * Copyright (C) 2016 Zaltora <https://github.com/Zaltora>\n
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #ifndef __INA3221_H__
@@ -133,6 +137,10 @@ typedef struct
 /**
  * @brief Initialize device descriptor
  * @param dev Device descriptor
+<<<<<<< HEAD
+=======
+ * @param addr Device I2C address
+>>>>>>> docs
  * @param port I2C port
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
@@ -264,7 +272,10 @@ esp_err_t ina3221_get_shunt_value(ina3221_t *dev, ina3221_channel_t channel, flo
 /**
  * @brief Get Shunt-voltage (mV) sum value of selected channels
  * @param dev Device descriptor
+<<<<<<< HEAD
  * @param channel Select channel value to get
+=======
+>>>>>>> docs
  * @param voltage Data pointer to get shunt voltage (mV)
  * @return ESP_OK to indicate success
  */
@@ -322,5 +333,7 @@ esp_err_t ina3221_set_power_valid_lower_limit(ina3221_t *dev, float voltage);
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __INA3221_H__ */

@@ -1,0 +1,5 @@
+ds1302 - Driver for DS1302 RTC module
+=====================================
+
+.. doxygengroup:: ds1302
+

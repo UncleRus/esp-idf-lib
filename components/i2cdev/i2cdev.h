@@ -1,9 +1,12 @@
 /**
  * @file i2cdev.h
+ * @defgroup i2cdev i2cdev
+ * @{
  *
  * ESP-IDF I2C master thread-safe functions for communication with I2C slave
  *
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #ifndef __I2CDEV_H__
@@ -22,14 +25,15 @@ extern "C" {
  */
 typedef struct
 {
-    i2c_port_t port;
-    i2c_config_t cfg;
-    uint8_t addr;       //!< Unshifted address
-    SemaphoreHandle_t mutex;
+    i2c_port_t port;         //!< I2C port number, 0 or 1
+    i2c_config_t cfg;        //!< I2C driver configuration
+    uint8_t addr;            //!< Unshifted address
+    SemaphoreHandle_t mutex; //!< Device mutex
 } i2c_dev_t;
 
 /**
  * @brief Init I2Cdev lib
+ *
  * The function must be called before any other
  * functions of this library
  * @return ESP_OK on success
@@ -38,6 +42,7 @@ esp_err_t i2cdev_init();
 
 /**
  * @brief Finish work with I2CDev lib
+ *
  * Uninstall i2c drivers
  * @return ESP_OK on success
  */
@@ -73,6 +78,7 @@ esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev);
 
 /**
  * @brief Read from slave device
+ *
  * Issue a send operation of \p out_data register adress, followed by reading \p in_size bytes
  * from slave into \p in_data .
  * Function is thread-safe.
@@ -88,6 +94,7 @@ esp_err_t i2c_dev_read(const i2c_dev_t *dev, const void *out_data,
 
 /**
  * @brief Write to slave device
+ *
  * Write \p out_size bytes from \p out_data to slave into \p out_reg register address.
  * Function is thread-safe.
  * @param[in] dev Device descriptor
@@ -102,6 +109,7 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg,
 
 /**
  * @brief Read from register with an 8-bit address
+ *
  * Shortcut to i2c_dev_read().
  * @param[in] dev Device descriptor
  * @param[in] reg Register address
@@ -117,6 +125,7 @@ inline esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
 
 /**
  * @brief Write to register with an 8-bit address
+ *
  * Shortcut to i2c_dev_write().
  * @param[in] dev Device descriptor
  * @param[in] reg Register address
@@ -151,5 +160,7 @@ inline esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __I2CDEV_H__ */

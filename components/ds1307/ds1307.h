@@ -1,10 +1,14 @@
 /**
  * @file ds1307.h
+ * @defgroup ds1307 ds1307
+ * @{
  *
- * ESP-IDF Driver for DS1307 RTC
+ * ESP-IDF driver for DS1307 real-time clock
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __DS1307_H__
@@ -153,5 +157,7 @@ esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __DS1307_H__ */

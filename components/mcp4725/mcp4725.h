@@ -1,10 +1,14 @@
 /**
  * @file mcp4725.h
+ * @defgroup mcp4725 mcp4725
+ * @{
  *
  * ESP-IDF Driver for 12-bit DAC MCP4725
  *
  * Ported from esp-open-rtos
+ *
  * Copyright (C) 2016, 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * BSD Licensed as described in the file LICENSE
  */
 #ifndef __MCP4725_H__
@@ -123,5 +127,7 @@ esp_err_t mcp4725_set_voltage(i2c_dev_t *dev, float vdd, float value, bool eepro
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __MCP4725_H__ */

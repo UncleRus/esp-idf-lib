@@ -1,9 +1,12 @@
 /**
  * @file pcf8574.h
+ * @defgroup pcf8574 pcf8574
+ * @{
  *
  * ESP-IDF driver for PCF8574 compartible remote 8-bit I/O expanders for I2C-bus
  *
- * Copyright (C) 2018 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #ifndef __PCF8574_H__
@@ -21,7 +24,7 @@ extern "C" {
  * SCL frequency is 100kHz
  * @param dev Pointer to I2C device descriptor
  * @param port I2C port number
- * @param addr I2C address (0b0100<A2><A1><A0> for PCF8574)
+ * @param addr I2C address (0b0100[A2][A1][A0] for PCF8574, 0b0111[A2][A1][A0] for PCF8574A)
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
  * @return `ESP_OK` on success
@@ -60,5 +63,7 @@ inline esp_err_t pcf8574_port_write(const i2c_dev_t *dev, uint8_t value)
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __PCF8574_H__ */
