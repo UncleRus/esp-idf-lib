@@ -3,7 +3,7 @@
  * @defgroup dht dht
  * @{
  *
- * ESP-IDF driver for DHT11/DHT22 (AM2302)
+ * ESP-IDF driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021
  *
  * Ported from esp-open-rtos
  *
@@ -29,8 +29,9 @@ extern "C" {
  */
 typedef enum
 {
-    DHT_TYPE_DHT11 = 0, //!< DHT11
-    DHT_TYPE_DHT22      //!< DHT22, AM2302
+    DHT_TYPE_DHT11 = 0,   //!< DHT11
+    DHT_TYPE_AM2301,      //!< AM2301 (DHT21, DHT22, AM2302, AM2321)
+    DHT_TYPE_SI7021       //!< Itead Si7021
 } dht_sensor_type_t;
 
 /**
