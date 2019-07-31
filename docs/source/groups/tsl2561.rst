@@ -1,0 +1,5 @@
+tsl2561 - Driver for light-to-digital converter TSL2561
+=======================================================
+
+.. doxygengroup:: tsl2561
+

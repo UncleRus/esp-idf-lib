@@ -1,0 +1,5 @@
+pcf8591 - Driver for 8-bit ADC and an 8-bit DAC PCF8591
+=======================================================
+
+.. doxygengroup:: pcf8591
+

@@ -100,4 +100,6 @@ esp_err_t ms5611_get_sensor_data(ms5611_t *dev, int32_t *pressure, float *temper
 }
 #endif
 
+/**@}*/
+
 #endif /* __MS5611_H__ */

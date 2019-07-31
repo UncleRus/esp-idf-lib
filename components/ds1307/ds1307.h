@@ -158,4 +158,6 @@ esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t
 }
 #endif
 
+/**@}*/
+
 #endif /* __DS1307_H__ */

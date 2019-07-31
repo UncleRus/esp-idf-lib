@@ -128,4 +128,6 @@ esp_err_t mcp4725_set_voltage(i2c_dev_t *dev, float vdd, float value, bool eepro
 }
 #endif
 
+/**@}*/
+
 #endif /* __MCP4725_H__ */

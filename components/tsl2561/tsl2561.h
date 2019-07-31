@@ -115,4 +115,6 @@ esp_err_t tsl2561_read_lux(tsl2561_t *dev, uint32_t *lux);
 }
 #endif
 
+/**@}*/
+
 #endif  // __TSL2561_H__

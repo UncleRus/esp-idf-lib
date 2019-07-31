@@ -132,7 +132,7 @@ esp_err_t pca9685_get_output_open_drain(i2c_dev_t *dev, bool *od);
 /**
  * Set outputs mode
  * @param dev Device descriptor
- * @param open_drain True to set open drain mode, false to normal mode
+ * @param od True to set open drain mode, false to normal mode
  * @return `ESP_OK` on success
  */
 esp_err_t pca9685_set_output_open_drain(i2c_dev_t *dev, bool od);
@@ -192,5 +192,7 @@ esp_err_t pca9685_set_pwm_values(i2c_dev_t *dev, uint8_t first_ch, uint8_t chann
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __PCA9685_H__ */

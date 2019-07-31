@@ -127,4 +127,6 @@ esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image)
 }
 #endif
 
+/**@}*/
+
 #endif /* __MAX7219_H__ */

@@ -75,4 +75,6 @@ esp_err_t pcf8591_write(i2c_dev_t *dev, uint8_t value);
 }
 #endif
 
+/**@}*/
+
 #endif /* __PCF8591_H__ */

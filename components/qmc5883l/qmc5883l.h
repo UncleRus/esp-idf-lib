@@ -220,4 +220,6 @@ esp_err_t qmc5883l_get_raw_temp(qmc5883l_t *dev, int16_t *temp);
 }
 #endif
 
+/**@}*/
+
 #endif /* __QMC5883L_H__ */

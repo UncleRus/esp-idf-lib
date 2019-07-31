@@ -1,6 +1,5 @@
 /**
  * @file ads111x.h
- *
  * @defgroup ads111x ads111x
  * @{
  *
@@ -189,7 +188,7 @@ esp_err_t ads111x_set_gain(i2c_dev_t *dev, ads111x_gain_t gain);
 /**
  * Read the input multiplexer configuration (ADS1115 only)
  * @param dev Deivce descriptor
- * @return Input multiplexer configuration
+ * @param mux Input multiplexer configuration
  * @return `ESP_OK` on success
  */
 esp_err_t ads111x_get_input_mux(i2c_dev_t *dev, ads111x_mux_t *mux);

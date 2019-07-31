@@ -52,8 +52,8 @@ typedef enum
  * @param[out] dev Pointer to device descriptor
  * @param[in] addr I2C address, BH1750_ADDR_LO or BH1750_ADDR_HI
  * @param[in] port I2C port number
- * @param[in] sda_pin GPIO pin number for SDA
- * @param[in] scl_pin GPIO pin number for SCL
+ * @param[in] sda_gpio GPIO pin number for SDA
+ * @param[in] scl_gpio GPIO pin number for SCL
  * @return `ESP_OK` on success
  */
 esp_err_t bh1750_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);

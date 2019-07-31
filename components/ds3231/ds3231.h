@@ -236,4 +236,6 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time);
 }
 #endif
 
+/**@}*/
+
 #endif  /* __DS3231_H__ */

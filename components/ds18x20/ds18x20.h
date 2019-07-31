@@ -152,4 +152,6 @@ esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *
 }
 #endif
 
+/**@}*/
+
 #endif  /* __DS18X20_H__ */

@@ -269,4 +269,6 @@ uint16_t onewire_crc16(const uint8_t* input, size_t len, uint16_t crc_iv);
 }
 #endif
 
+/**@}*/
+
 #endif  /* __ONEWIRE_H__ */

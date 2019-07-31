@@ -4,8 +4,10 @@
  * ESP-IDF driver for Shunt and Bus Voltage Monitor INA3221
  *
  * Ported from esp-open-rtos
- * Copyright (c) 2016 Zaltora (https://github.com/Zaltora)
+ *
+ * Copyright (C) 2016 Zaltora <https://github.com/Zaltora>\n
  * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
  * MIT Licensed as described in the file LICENSE
  */
 #include "ina3221.h"

@@ -1,0 +1,5 @@
+max7219 - Driver for 8-Digit LED display drivers, MAX7219/MAX7221
+=================================================================
+
+.. doxygengroup:: max7219
+

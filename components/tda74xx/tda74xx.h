@@ -101,4 +101,6 @@ esp_err_t tda74xx_set_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t chan
 }
 #endif
 
+/**@}*/
+
 #endif /* __TDA74XX_H__ */

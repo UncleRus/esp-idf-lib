@@ -87,4 +87,6 @@ esp_err_t rotary_encoder_remove(rotary_encoder_t *re);
 }
 #endif
 
+/**@}*/
+
 #endif /* __ENCODER_H__ */

@@ -271,4 +271,6 @@ esp_err_t hmc5883l_get_data(hmc5883l_dev_t *dev, hmc5883l_data_t *data);
 }
 #endif
 
+/**@}*/
+
 #endif /* __HMC5883L_H__ */

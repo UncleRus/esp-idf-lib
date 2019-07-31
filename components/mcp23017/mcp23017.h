@@ -145,7 +145,7 @@ esp_err_t mcp23017_port_read(i2c_dev_t *dev, uint16_t *val);
 /**
  * @brief Write value to GPIO port
  * @param dev Pointer to I2C device descriptor
- * @param value GPIO port value, 0 bit for PORTA/GPIO0..15 bit for PORTB/GPIO7
+ * @param val GPIO port value, 0 bit for PORTA/GPIO0..15 bit for PORTB/GPIO7
  * @return `ESP_OK` on success
  */
 esp_err_t mcp23017_port_write(i2c_dev_t *dev, uint16_t val);
@@ -227,5 +227,7 @@ esp_err_t mcp23017_set_interrupt(i2c_dev_t *dev, uint8_t pin, mcp23017_gpio_intr
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __MCP23017_H__ */
