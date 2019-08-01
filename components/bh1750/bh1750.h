@@ -66,6 +66,20 @@ esp_err_t bh1750_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_n
 esp_err_t bh1750_free_desc(i2c_dev_t *dev);
 
 /**
+ * @brief Power down device
+ * @param dev Pointer to device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t bh1750_power_down(i2c_dev_t *dev);
+
+/**
+ * @brief Power on device
+ * @param dev Pointer to device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t bh1750_power_on(i2c_dev_t *dev);
+
+/**
  * @brief Setup device parameters
  * @param dev Pointer to device descriptor
  * @param mode Measurement mode
@@ -74,6 +88,13 @@ esp_err_t bh1750_free_desc(i2c_dev_t *dev);
  */
 esp_err_t bh1750_setup(i2c_dev_t *dev, bh1750_mode_t mode, bh1750_resolution_t resolution);
 
+/**
+ * @brief Set measurement time
+ * @param dev Pointer to device descriptor
+ * @param time Measurement time (see datasheet)
+ * @return `ESP_OK` on success
+ */
+esp_err_t bh1750_set_measurement_time(i2c_dev_t *dev, uint8_t time);
 
 /**
  * @brief Read LUX value from the device.
