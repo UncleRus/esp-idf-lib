@@ -5,13 +5,16 @@
 #include <driver/gpio.h>
 #include <string.h>
 
-// A0, A1, A2 pins are grounded
-
 #define INTA_GPIO 19  // INTA pin
-#define SDA_GPIO 16
-#define SCL_GPIO 17
 
-static void IRAM_ATTR intr_handler(void *arg)
+#define PIN_NUM_MOSI 23
+#define PIN_NUM_MISO 19
+#define PIN_NUM_CLK  18
+#define PIN_NUM_CS   5
+
+#define HOST VSPI_HOST
+
+static void intr_handler(void *arg)
 {
     printf("Interrupt!\n");
 }
@@ -19,19 +22,19 @@ static void IRAM_ATTR intr_handler(void *arg)
 void test(void *pvParameters)
 {
     mcp23x17_t dev;
-    memset(&dev, 0, sizeof(mcp23x17_t));
 
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    while (mcp23x17_init_desc(&dev, 0, MCP23X17_ADDR_BASE, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    // Configure SPI bus
+    spi_bus_config_t cfg = {
+       .mosi_io_num = PIN_NUM_MOSI,
+       .miso_io_num = -1,
+       .sclk_io_num = PIN_NUM_CLK,
+       .quadwp_io_num = -1,
+       .quadhd_io_num = -1,
+       .max_transfer_sz = 0,
+       .flags = 0
+    };
+    ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));
+    ESP_ERROR_CHECK(mcp23x17_init_desc_spi(&dev, HOST, MCP23X17_MAX_SPI_FREQ, MCP23X17_ADDR_BASE, PIN_NUM_CS));
 
     // Setup PORTA0 as input
     mcp23x17_set_mode(&dev, 0, MCP23X17_GPIO_INPUT);

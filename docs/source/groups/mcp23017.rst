@@ -1,5 +1,0 @@
-mcp23017 - Driver for 16-bit I2C GPIO expander MCP23017
-=======================================================
-
-.. doxygengroup:: mcp23017
-

@@ -1,0 +1,11 @@
+menu "MCP23x17"
+
+	choice MCP23X17_IFACE
+		prompt "Chip type"
+		config MCP23X17_IFACE_I2C
+			bool "MCP23017 [I2C]"
+		config MCP23X17_IFACE_SPI
+			bool "MCP23S17 [SPI]"
+	endchoice
+
+endmenu

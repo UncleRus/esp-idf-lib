@@ -44,7 +44,7 @@ install:
 
 script:
   - cd $PROJECT_PATH/examples
-  - for i in $(ls -d */); do cd $PROJECT_PATH/examples/$i; make defconfig; make -j 2; done
+  - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
   
   
   

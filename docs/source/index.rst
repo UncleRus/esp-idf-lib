@@ -19,7 +19,7 @@ Most of them ported from `esp-open-rtos <https://github.com/SuperHouse/esp-open-
    groups/hd44780
    groups/i2cdev
    groups/max7219
-   groups/mcp23017
+   groups/mcp23x17
    groups/ms5611
    groups/pca9685
    groups/pcf8591
