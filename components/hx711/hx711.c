@@ -33,7 +33,7 @@ static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
     {
         gpio_set_level(pd_sck, 1);
         ets_delay_us(1);
-        data |= gpio_get_level(dout) << (24 - i);
+        data |= gpio_get_level(dout) << (23 - i);
         gpio_set_level(pd_sck, 0);
         ets_delay_us(1);
     }
