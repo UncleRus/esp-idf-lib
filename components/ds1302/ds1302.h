@@ -69,11 +69,7 @@ esp_err_t ds1302_set_write_protect(ds1302_t *dev, bool wp);
 /**
  * @brief Get write protection status
  * @param dev Device descriptor
-<<<<<<< HEAD
- * @return true if RTC write-protected
-=======
  * @param wp true if RTC write-protected
->>>>>>> docs
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp);
