@@ -77,6 +77,7 @@ GPIO expanders
    :maxdepth: 1
 
    groups/pcf8574
+   groups/tca95x5
    groups/mcp23008
    groups/mcp23x17
 
