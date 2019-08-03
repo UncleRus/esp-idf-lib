@@ -44,10 +44,7 @@ esp_err_t pcf8574_free_desc(i2c_dev_t *dev);
  * @param val 8-bit GPIO port value
  * @return `ESP_OK` on success
  */
-inline esp_err_t pcf8574_port_read(const i2c_dev_t *dev, uint8_t *val)
-{
-    return i2c_dev_read(dev, NULL, 0, val, 1);
-}
+esp_err_t pcf8574_port_read(i2c_dev_t *dev, uint8_t *val);
 
 /**
  * @brief Write value to GPIO port
@@ -55,10 +52,7 @@ inline esp_err_t pcf8574_port_read(const i2c_dev_t *dev, uint8_t *val)
  * @param value GPIO port value
  * @return ESP_OK on success
  */
-inline esp_err_t pcf8574_port_write(const i2c_dev_t *dev, uint8_t value)
-{
-    return i2c_dev_write(dev, NULL, 0, &value, 1);
-}
+esp_err_t pcf8574_port_write(i2c_dev_t *dev, uint8_t value);
 
 #ifdef __cplusplus
 }
