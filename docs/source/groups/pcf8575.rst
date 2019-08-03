@@ -1,0 +1,5 @@
+pcf8575 - Driver for PCF8575 16-bit I/O expander for I2C-bus
+============================================================
+
+.. doxygengroup:: pcf8575
+
