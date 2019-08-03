@@ -25,7 +25,7 @@ EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
 include $(IDF_PATH)/make/project.mk
 ```
 
-See [examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples).
+See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples) or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/examples).
 
 ## Documentation
 
