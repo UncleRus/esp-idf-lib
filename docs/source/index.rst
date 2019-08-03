@@ -8,6 +8,50 @@ Components for Espressif ESP32 `ESP-IDF framework <https://github.com/espressif/
 
 Some of them ported from `esp-open-rtos <https://github.com/SuperHouse/esp-open-rtos>`_.
 
+**Project home**:
+
+- GitHub: https://github.com/UncleRus/esp-idf-lib
+- GitLab: https://gitlab.com/UncleRus/esp-idf-lib
+
+==========
+How to use
+==========
+
+Clone respository:
+
+.. code-block:: shell
+   
+   cd ~/my/work/path
+   git clone git@github.com:UncleRus/esp-idf-lib.git
+
+or 
+
+.. code-block:: shell
+   
+   cd ~/my/work/path
+   git clone git@gitlab.com:UncleRus/esp-idf-lib.git
+
+Add path to components in your project makefile, e.g:
+
+.. code-block:: make
+   
+   PROJECT_NAME := my-esp-project
+   EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
+   include $(IDF_PATH)/make/project.mk
+   
+or in CMakeLists.txt:
+
+.. code-block:: cmake
+
+   cmake_minimum_required(VERSION 3.5)
+   set(EXTRA_COMPONENT_DIRS $ENV{HOME}/my/work/path/esp-idf-lib/components)
+   include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+   project(my-esp-project)
+   
+====================
+Available components
+====================
+
 Common drivers
 ==============
 .. toctree::
@@ -94,7 +138,8 @@ Other
    groups/encoder
    groups/tda74xx
    
-   
+
+==================
 Indices and tables
 ==================
 
