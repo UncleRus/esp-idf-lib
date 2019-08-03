@@ -13,17 +13,7 @@ void pcf8591_test(void *pvParamters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    while (pcf8591_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(pcf8591_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
 
     while (1)
     {
@@ -39,6 +29,9 @@ void pcf8591_test(void *pvParamters)
 
 void app_main()
 {
+    // Init i2cdev library
+    ESP_ERROR_CHECK(i2cdev_init());
+
     xTaskCreatePinnedToCore(pcf8591_test, "pcf8591_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
 

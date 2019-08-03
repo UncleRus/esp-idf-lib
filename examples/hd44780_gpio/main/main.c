@@ -32,11 +32,7 @@ void lcd_test(void *pvParameters)
         }
     };
 
-    while(hd44780_init(&lcd) != ESP_OK)
-    {
-        printf("Cannot init display\n");
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(hd44780_init(&lcd));
 
     hd44780_upload_character(&lcd, 0, char_data);
     hd44780_upload_character(&lcd, 1, char_data + 8);

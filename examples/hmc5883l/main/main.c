@@ -10,16 +10,9 @@
 void hmc5883l_test(void *pvParameters)
 {
     hmc5883l_dev_t dev;
-
     memset(&dev, 0, sizeof(hmc5883l_dev_t));
 
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2C bus\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    hmc5883l_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO);
+    ESP_ERROR_CHECK(hmc5883l_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
     while (hmc5883l_init(&dev) != ESP_OK)
     {
         printf("HMC5883L not found\n");
@@ -45,6 +38,7 @@ void hmc5883l_test(void *pvParameters)
 
 void app_main()
 {
+    ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreatePinnedToCore(hmc5883l_test, "hmc5883l_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL, APP_CPU_NUM);
 }
 

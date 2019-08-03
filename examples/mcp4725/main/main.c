@@ -27,8 +27,6 @@ void task(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    // Init i2cdev library
-    ESP_ERROR_CHECK(i2cdev_init());
     // Init device descriptor
     ESP_ERROR_CHECK(mcp4725_init_desc(&dev, 0, ADDR, SDA_GPIO, SCL_GPIO));
 
@@ -63,6 +61,9 @@ void task(void *pvParameters)
 
 void app_main()
 {
+    // Init i2cdev library
+    ESP_ERROR_CHECK(i2cdev_init());
+
     xTaskCreate(task, "test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }
 

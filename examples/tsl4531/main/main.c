@@ -13,7 +13,6 @@ void tsl4531_test(void *pvParamters)
     tsl4531_t dev;
     memset(&dev, 0, sizeof(tsl4531_t));
 
-    ESP_ERROR_CHECK(i2cdev_init());
     ESP_ERROR_CHECK(tsl4531_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
 
     ESP_ERROR_CHECK(tsl4531_init(&dev));
@@ -35,5 +34,7 @@ void tsl4531_test(void *pvParamters)
 
 void app_main()
 {
+    ESP_ERROR_CHECK(i2cdev_init());
+
     xTaskCreatePinnedToCore(tsl4531_test, "tsl4531_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }

@@ -12,17 +12,7 @@ void ds3231_test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    while (ds3231_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(ds3231_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
 
     // setup datetime: 2016-10-09 13:50:10
     struct tm time = {
@@ -33,11 +23,7 @@ void ds3231_test(void *pvParameters)
         .tm_min  = 50,
         .tm_sec  = 10
     };
-    while (ds3231_set_time(&dev, &time) != ESP_OK)
-    {
-        printf("Could not set time\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(ds3231_set_time(&dev, &time));
 
     while (1)
     {
@@ -64,6 +50,7 @@ void ds3231_test(void *pvParameters)
 
 void app_main()
 {
+    ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreate(ds3231_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 

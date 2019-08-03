@@ -6,7 +6,7 @@
 #define PD_SCK_GPIO 18
 #define DOUT_GPIO   19
 
-void dht_test(void *pvParameters)
+void test(void *pvParameters)
 {
     hx711_t dev = {
         .dout = DOUT_GPIO,
@@ -35,9 +35,10 @@ void dht_test(void *pvParameters)
         }
 
         int32_t data;
-        if (hx711_read_data(&dev, &data) != ESP_OK)
+        r = hx711_read_data(&dev, &data);
+        if (r != ESP_OK)
         {
-            printf("Could not read data\n");
+            printf("Could not read data: %d (%s)\n", r, esp_err_to_name(r));
             continue;
         }
 
@@ -49,6 +50,6 @@ void dht_test(void *pvParameters)
 
 void app_main()
 {
-    xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL);
+    xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL);
 }
 

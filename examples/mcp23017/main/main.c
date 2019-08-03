@@ -21,17 +21,7 @@ void test(void *pvParameters)
     mcp23x17_t dev;
     memset(&dev, 0, sizeof(mcp23x17_t));
 
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    while (mcp23x17_init_desc(&dev, 0, MCP23X17_ADDR_BASE, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(mcp23x17_init_desc(&dev, 0, MCP23X17_ADDR_BASE, SDA_GPIO, SCL_GPIO));
 
     // Setup PORTA0 as input
     mcp23x17_set_mode(&dev, 0, MCP23X17_GPIO_INPUT);
@@ -57,6 +47,7 @@ void test(void *pvParameters)
 
 void app_main()
 {
+    ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 6, NULL, 5, NULL);
 }
 

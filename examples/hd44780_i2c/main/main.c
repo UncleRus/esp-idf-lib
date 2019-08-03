@@ -46,27 +46,10 @@ void lcd_test(void *pvParameters)
         }
     };
 
-    // Init i2cdev lib
-    while (i2cdev_init() != ESP_OK)
-    {
-        printf("Could not init I2Cdev library\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
     memset(&pcf8574, 0, sizeof(i2c_dev_t));
+    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, 0, I2C_ADDR, SDA_GPIO, SCL_GPIO));
 
-    // Init I2C device descriptor
-    while (pcf8574_init_desc(&pcf8574, 0, I2C_ADDR, SDA_GPIO, SCL_GPIO) != ESP_OK)
-    {
-        printf("Could not init device descriptor\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
-
-    while(hd44780_init(&lcd) != ESP_OK)
-    {
-        printf("Cannot init display\n");
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(hd44780_init(&lcd));
 
     hd44780_switch_backlight(&lcd, true);
 
@@ -95,6 +78,7 @@ void lcd_test(void *pvParameters)
 
 void app_main()
 {
+    ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreate(lcd_test, "lcd_test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL);
 }
 
