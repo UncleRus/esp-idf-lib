@@ -1,0 +1,23 @@
+bme680 - Driver for BME680 digital environmental sensor
+=======================================================
+
+Functional Description of the BME680 sensor
+-------------------------------------------
+
+The BME680 sensor only support two modes, the sleep mode and the forced
+mode in which measurements are done. After power-up sequence, the sensor
+automatically starts in sleep mode. To start a measurement, the sensor has
+to switch in the forced mode. In this mode it performs exactly one
+measurement of temperature, pressure, humidity, and gas in that order,
+the so-called TPHG measurement cycle. After the execution of this TPHG
+measurement cycle, raw sensor data are available and the sensor returns
+automatically back to sleep mode.
+
+Using the BME680 consists of the following steps:
+
+- Trigger the sensor to switch into forced mode to perform one THPG cycle
+- Wait until the THPG cycle has been finished (measurement duration)
+- Fetch raw sensor data, compensate and convert them to sensor values
+
+.. doxygengroup:: bme680
+
