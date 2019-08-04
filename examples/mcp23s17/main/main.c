@@ -26,7 +26,7 @@ void test(void *pvParameters)
     // Configure SPI bus
     spi_bus_config_t cfg = {
        .mosi_io_num = PIN_NUM_MOSI,
-       .miso_io_num = -1,
+       .miso_io_num = PIN_NUM_MISO,
        .sclk_io_num = PIN_NUM_CLK,
        .quadwp_io_num = -1,
        .quadhd_io_num = -1,
