@@ -54,7 +54,7 @@ esp_err_t tda74xx_free_desc(i2c_dev_t *dev)
 esp_err_t tda74xx_set_input(i2c_dev_t *dev, uint8_t input)
 {
     CHECK_ARG(dev);
-    CHECK_ARG(input < 4);
+    CHECK_ARG(input <= TDA74XX_MAX_INPUT);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_INPUT_SELECTOR, &input, 1));
@@ -68,7 +68,7 @@ esp_err_t tda74xx_set_input(i2c_dev_t *dev, uint8_t input)
 esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db)
 {
     CHECK_ARG(dev);
-    CHECK_ARG(gain_db < 31);
+    CHECK_ARG(gain_db <= TDA74XX_MAX_INPUT_GAIN);
 
     uint8_t gain = gain_db / 2;
 
@@ -84,9 +84,9 @@ esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db)
 esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db)
 {
     CHECK_ARG(dev);
-    CHECK_ARG((volume_db <= 0) && (volume_db >= -48));
+    CHECK_ARG((volume_db <= TDA74XX_MAX_VOLUME) && (volume_db >= TDA74XX_MIN_VOLUME));
 
-    uint8_t volume = volume_db == -48 ? MUTE_VALUE : -volume_db;
+    uint8_t volume = volume_db == TDA74XX_MIN_VOLUME ? MUTE_VALUE : -volume_db;
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_VOLUME, &volume, 1));
@@ -100,7 +100,7 @@ esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db)
 esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t gain_db)
 {
     CHECK_ARG(dev);
-    CHECK_ARG((gain_db >= -14) && (gain_db <= 14));
+    CHECK_ARG((gain_db >= TDA74XX_MIN_EQ_GAIN) && (gain_db <= TDA74XX_MAX_EQ_GAIN));
 
     uint8_t gain = (gain_db + 14) / 2;
 
@@ -133,7 +133,7 @@ esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t
 esp_err_t tda74xx_set_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t channel, uint8_t atten_db)
 {
     CHECK_ARG(dev);
-    CHECK_ARG(atten_db <= 56);
+    CHECK_ARG(atten_db <= TDA74XX_MAX_ATTEN);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, channel == TDA74XX_CHANNEL_LEFT ? REG_ATTEN_L : REG_ATTEN_R, &atten_db, 1));

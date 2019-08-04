@@ -21,6 +21,18 @@ extern "C" {
 
 #define TDA74XX_ADDR 0x44 //!< I2C address
 
+#define TDA74XX_MAX_INPUT      3    //!< Maximum input number
+
+#define TDA74XX_MIN_VOLUME     -48  //!< Mute volume level, dB
+#define TDA74XX_MAX_VOLUME     0    //!< Maximum colume level, dB
+
+#define TDA74XX_MAX_INPUT_GAIN 30   //!< Maximum input gain, dB
+
+#define TDA74XX_MIN_EQ_GAIN    -14  //!< Minimum equalizer gain, dB
+#define TDA74XX_MAX_EQ_GAIN    14   //!< Maximum equalizer gain, dB
+
+#define TDA74XX_MAX_ATTEN      56   //!< Maximum speaker attenuation level, dB
+
 /**
  * Audio channel
  */
