@@ -1,7 +1,7 @@
 /**
  * @file ds3231.c
  *
- * ESP-IDF driver for DS3231 high precision RTC module
+ * ESP-IDF driver for DS337 RTC and DS3231 high precision RTC module
  *
  * Ported from esp-open-rtos
  *
@@ -18,12 +18,10 @@
 
 #define DS3231_STAT_OSCILLATOR 0x80
 #define DS3231_STAT_32KHZ      0x08
-#define DS3231_STAT_BUSY       0x04
 #define DS3231_STAT_ALARM_2    0x02
 #define DS3231_STAT_ALARM_1    0x01
 
 #define DS3231_CTRL_OSCILLATOR    0x80
-#define DS3231_CTRL_SQUAREWAVE_BB 0x40
 #define DS3231_CTRL_TEMPCONV      0x20
 #define DS3231_CTRL_ALARM_INTS    0x04
 #define DS3231_CTRL_ALARM2_INT    0x02
