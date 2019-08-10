@@ -137,10 +137,7 @@ typedef struct
 /**
  * @brief Initialize device descriptor
  * @param dev Device descriptor
-<<<<<<< HEAD
-=======
  * @param addr Device I2C address
->>>>>>> docs
  * @param port I2C port
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
@@ -272,10 +269,6 @@ esp_err_t ina3221_get_shunt_value(ina3221_t *dev, ina3221_channel_t channel, flo
 /**
  * @brief Get Shunt-voltage (mV) sum value of selected channels
  * @param dev Device descriptor
-<<<<<<< HEAD
- * @param channel Select channel value to get
-=======
->>>>>>> docs
  * @param voltage Data pointer to get shunt voltage (mV)
  * @return ESP_OK to indicate success
  */

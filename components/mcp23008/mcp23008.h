@@ -133,11 +133,7 @@ esp_err_t mcp23008_port_read(i2c_dev_t *dev, uint8_t *val);
 /**
  * @brief Write value to GPIO port
  * @param dev Pointer to I2C device descriptor
-<<<<<<< HEAD
- * @param value GPIO port value, 0 bit for GPIO0..7 bit for GPIO7
-=======
  * @param val GPIO port value, 0 bit for GPIO0..7 bit for GPIO7
->>>>>>> docs
  * @return `ESP_OK` on success
  */
 esp_err_t mcp23008_port_write(i2c_dev_t *dev, uint8_t val);
