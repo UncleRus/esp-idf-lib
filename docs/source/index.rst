@@ -97,6 +97,13 @@ ADC/DAC
    groups/hx711
    groups/pcf8591
    groups/mcp4725
+
+Power/Current monitors
+======================
+.. toctree::
+   :maxdepth: 1
+   
+   groups/ina219
    groups/ina3221
 
 Magnetic sensors

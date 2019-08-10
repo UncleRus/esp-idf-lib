@@ -1,0 +1,5 @@
+ina219 - Driver for INA219/INA220 bidirectional current/power monitor
+=====================================================================
+
+.. doxygengroup:: ina219
+
