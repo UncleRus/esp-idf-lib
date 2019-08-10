@@ -145,6 +145,7 @@ Other
    groups/ultrasonic
    groups/encoder
    groups/tda74xx
+   groups/rda5807m
    
 
 ==================
