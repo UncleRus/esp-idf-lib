@@ -1,6 +1,7 @@
 # ESP-IDF Components library
 
 [![Build Status](https://travis-ci.org/UncleRus/esp-idf-lib.svg?branch=master)](https://travis-ci.org/UncleRus/esp-idf-lib)
+[![Docs Status](https://readthedocs.org/projects/esp-idf-lib/badge/?version=latest&style=flat)](https://esp-idf-lib.readthedocs.io/en/latest/)
 
 Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf)
 
