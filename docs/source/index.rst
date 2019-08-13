@@ -78,6 +78,7 @@ Humidity & temperature sensors
    groups/sht3x
    groups/si7021
    groups/ds18x20
+   groups/max31725
    
 Pressure sensors
 ================
