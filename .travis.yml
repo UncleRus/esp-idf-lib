@@ -4,8 +4,9 @@ os:
   - linux
 
 env:
-  XTENSA_TOOLCHAIN=xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-linux-amd64.tar.gz
- 
+  XTENSA_ESP32_TOOLCHAIN=xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-linux-amd64.tar.gz
+  XTENSA_ESP8266_TOOLCHAIN=xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+
 addons:
   apt:
     packages:
@@ -28,24 +29,33 @@ install:
   # in http://esp-idf.readthedocs.io/en/latest/linux-setup.html
 
   # Prepare directory for the toolchain
-  - mkdir -p ~/esp
-  - cd ~/esp
+  - mkdir -p ~/esp32 ~/esp8266
   # Download binary toolchain for the ESP32
-  - wget https://dl.espressif.com/dl/$XTENSA_TOOLCHAIN
-  - tar -xzf $XTENSA_TOOLCHAIN
-  # Make xtensa-esp32-elf available for all terminal sessions
-  - export PATH=$PATH:$HOME/esp/xtensa-esp32-elf/bin
+  - cd ~/esp32
+  - wget https://dl.espressif.com/dl/$XTENSA_ESP32_TOOLCHAIN
+  - tar -xzf $XTENSA_ESP32_TOOLCHAIN
   # Get ESP-IDF from github
   - git clone --recursive https://github.com/espressif/esp-idf.git
-  # Set the path to ESP-IDF directory
-  - export IDF_PATH=~/esp/esp-idf
+
+  # Download binary toolchain for the ESP8266
+  - cd ~/esp8266
+  - wget https://dl.espressif.com/dl/$XTENSA_ESP8266_TOOLCHAIN
+  - tar -xzf $XTENSA_ESP8266_TOOLCHAIN
+  # Get ESP8266_RTOS_SDK from github
+  - git clone --recursive https://github.com/espressif/ESP8266_RTOS_SDK.git
+
+  # Make toolchains available for all terminal sessions
+  - export PATH=$PATH:$HOME/esp32/xtensa-esp32-elf/bin:$HOME/esp8266/xtensa-lx106-elf/bin
   # Get Python requirements
-  - python -m pip install --user -r $IDF_PATH/requirements.txt
+  - python -m pip install --user -r ~/esp32/esp-idf/requirements.txt
+  - python -m pip install --user -r ~/esp8266/ESP8266_RTOS_SDK/requirements.txt
 
 script:
   - cd $PROJECT_PATH/examples
+  # Set the path to ESP-IDF directory
+  - export IDF_PATH=~/esp32/esp-idf
   - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
-  
-  
-  
-  
+  - export IDF_PATH=~/esp8266/ESP8266_RTOS_SDK
+  # these drivers do not compile for ESP8266 yet
+  - export EXCLUDE_COMPONENTS="onewire dht encoder ds18x20 max7219 mcp23x17"
+  - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore-esp8266 ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
