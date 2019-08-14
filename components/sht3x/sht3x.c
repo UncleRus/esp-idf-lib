@@ -160,7 +160,9 @@ esp_err_t sht3x_init_desc(sht3x_t *dev, i2c_port_t port, uint8_t addr, gpio_num_
     dev->i2c_dev.addr = addr;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
+#if defined(CONFIG_IDF_TARGET_ESP32)
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
+#endif
 
     return i2c_dev_create_mutex(&dev->i2c_dev);
 }

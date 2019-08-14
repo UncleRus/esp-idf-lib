@@ -50,7 +50,9 @@
 
 static const char *TAG = "DHTxx";
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+#endif
 
 #define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
 
@@ -160,9 +162,17 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     gpio_set_direction(pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_level(pin, 1);
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
     portENTER_CRITICAL(&mux);
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+    portENTER_CRITICAL();
+#endif
     esp_err_t result = dht_fetch_data(sensor_type, pin, bits);
+#if defined(CONFIG_IDF_TARGET_ESP32)
     portEXIT_CRITICAL(&mux);
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+    portEXIT_CRITICAL();
+#endif
 
     gpio_set_level(pin, 1);
 

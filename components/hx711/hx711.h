@@ -13,6 +13,7 @@
 #define __HX711_H__
 
 #include <driver/gpio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
