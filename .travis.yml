@@ -47,6 +47,7 @@ install:
   # Make toolchains available for all terminal sessions
   - export PATH=$PATH:$HOME/esp32/xtensa-esp32-elf/bin:$HOME/esp8266/xtensa-lx106-elf/bin
   # Get Python requirements
+  - python -m pip install --user --upgrade pyOpenSSL
   - python -m pip install --user -r ~/esp32/esp-idf/requirements.txt
   - python -m pip install --user -r ~/esp8266/ESP8266_RTOS_SDK/requirements.txt
 
@@ -55,7 +56,9 @@ script:
   # Set the path to ESP-IDF directory
   - export IDF_PATH=~/esp32/esp-idf
   - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
+
   - export IDF_PATH=~/esp8266/ESP8266_RTOS_SDK
+  - cd $PROJECT_PATH/examples
   # these drivers do not compile for ESP8266 yet
   - export EXCLUDE_COMPONENTS="onewire dht encoder ds18x20 max7219 mcp23x17"
   - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore-esp8266 ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
