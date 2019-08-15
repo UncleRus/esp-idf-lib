@@ -19,6 +19,7 @@ addons:
       - python
       - python-pip
       - gperf
+      - ccache
 
 before_install:
   # Save path to the git respository
@@ -44,8 +45,15 @@ install:
   # Get ESP8266_RTOS_SDK from github
   - git clone --recursive https://github.com/espressif/ESP8266_RTOS_SDK.git
 
+  # Setup ccache
+  - mkdir ~/ccache_bin
+  - (cd ~/ccache_bin && ln -s /usr/bin/ccache xtensa-lx106-elf-gcc)
+  - (cd ~/ccache_bin && ln -s /usr/bin/ccache xtensa-esp32-elf-gcc)
+  - export CCACHE_BASEDIR=$PROJECT_PATH
+
   # Make toolchains available for all terminal sessions
-  - export PATH=$PATH:$HOME/esp32/xtensa-esp32-elf/bin:$HOME/esp8266/xtensa-lx106-elf/bin
+  - export PATH=$HOME/ccache_bin:$PATH:$HOME/esp32/xtensa-esp32-elf/bin:$HOME/esp8266/xtensa-lx106-elf/bin
+
   # Get Python requirements
   - python -m pip install --user --upgrade pyOpenSSL
   - python -m pip install --user -r ~/esp32/esp-idf/requirements.txt
