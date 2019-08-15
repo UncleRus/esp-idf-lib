@@ -45,11 +45,15 @@ install:
   # Get ESP8266_RTOS_SDK from github
   - git clone --recursive https://github.com/espressif/ESP8266_RTOS_SDK.git
 
-  # Setup ccache
+  # Setup ccache to build faster
+  # XXX when the entire build process exceeds 50 min, th job will be killed
+  # https://docs.travis-ci.com/user/customizing-the-build/#build-timeouts
+  - ccache --version
   - mkdir ~/ccache_bin
   - (cd ~/ccache_bin && ln -s /usr/bin/ccache xtensa-lx106-elf-gcc)
   - (cd ~/ccache_bin && ln -s /usr/bin/ccache xtensa-esp32-elf-gcc)
   - export CCACHE_BASEDIR=$PROJECT_PATH
+  - export CCACHE_CPP2=true
 
   # Make toolchains available for all terminal sessions
   - export PATH=$HOME/ccache_bin:$PATH:$HOME/esp32/xtensa-esp32-elf/bin:$HOME/esp8266/xtensa-lx106-elf/bin
@@ -60,13 +64,41 @@ install:
   - python -m pip install --user -r ~/esp8266/ESP8266_RTOS_SDK/requirements.txt
 
 script:
-  - cd $PROJECT_PATH/examples
-  # Set the path to ESP-IDF directory
-  - export IDF_PATH=~/esp32/esp-idf
-  - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
+  - rm -f ~/build.log
+  # XXX surpress log output where possible. when the size exceeds 4 MB, the
+  # job will be killed.
+  - |
+    for TARGET in esp32 esp8266; do
+      IGNORE_FILE="travis-ignore"
+      export IDF_PATH=~/esp32/esp-idf
 
-  - export IDF_PATH=~/esp8266/ESP8266_RTOS_SDK
-  - cd $PROJECT_PATH/examples
-  # these drivers do not compile for ESP8266 yet
-  - export EXCLUDE_COMPONENTS="onewire dht encoder ds18x20 max7219 mcp23x17"
-  - for i in $(ls -d */); do [ ! -e $PROJECT_PATH/examples/$i/travis-ignore-esp8266 ] && cd $PROJECT_PATH/examples/$i && make defconfig && make -j2; done
+      case $TARGET in
+        esp32)
+          ;;
+        esp8266)
+          IGNORE_FILE="travis-ignore-esp8266"
+          export IDF_PATH=~/esp8266/ESP8266_RTOS_SDK
+          # these drivers do not compile for ESP8266 yet
+          export EXCLUDE_COMPONENTS="onewire dht encoder ds18x20 max7219 mcp23x17"
+          ;;
+      esac
+
+      cd $PROJECT_PATH/examples
+      for i in $(ls -d */); do
+        if [ ! -e $PROJECT_PATH/examples/$i/$IGNORE_FILE ]; then
+          cd $PROJECT_PATH/examples/$i
+          make defconfig
+          # use travis_wait to avoid timeout during the build
+          travis_wait make -j2 >> ~/build.log 2>&1
+          if [ $? -ne 0 ]; then
+            # when failed, show last 100 lines for debugging, and exit with
+            # non-zero exit code
+            tail -n 100 ~/build.log
+            exit 1
+          fi
+          make clean >/dev/null
+          # make sure the directory is clean
+          rm -rf sdkconfig build
+        fi
+      done
+    done
