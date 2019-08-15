@@ -44,7 +44,7 @@ void task(void *pvParameter)
     CHECK(max7219_init_desc(&dev, HOST, PIN_NUM_CS),
             "Could not initialize MAX7129 descriptor: %d");
 
-    char buf[9];
+    char buf[10];
 
     CHECK(max7219_init(&dev),
             "Could not initialize MAX7129: %d");
