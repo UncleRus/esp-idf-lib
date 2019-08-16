@@ -50,7 +50,9 @@ esp_err_t pcf8575_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
+#if defined(CONFIG_IDF_TARGET_ESP32)
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
+#endif
 
     CHECK(i2c_dev_create_mutex(dev));
 

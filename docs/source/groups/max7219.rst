@@ -1,5 +1,7 @@
 max7219 - Driver for 8-Digit LED display drivers, MAX7219/MAX7221
 =================================================================
 
+.. warning:: This component does not support (yet) ESP8266 RTOS SDK!
+
 .. doxygengroup:: max7219
 

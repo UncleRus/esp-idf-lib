@@ -13,7 +13,11 @@
 #include "ds1302.h"
 #include <freertos/FreeRTOS.h>
 #include <string.h>
+#if defined(CONFIG_IDF_TARGET_ESP32)
 #include <esp32/rom/ets_sys.h>
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#include <rom/ets_sys.h>
+#endif
 
 #define CH_REG   0x80
 #define WP_REG   0x8e
@@ -33,13 +37,22 @@
 #define HOUR12_MASK  0x1f
 #define HOUR24_MASK  0x3f
 
-static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
-
 #define GPIO_BIT(x) (1ULL << (x))
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define CHECK_MUX(x) do { esp_err_t __; if ((__ = (x)) != ESP_OK) { portEXIT_CRITICAL(&mux); return __; } } while (0)
+
+#if defined(CONFIG_IDF_TARGET_ESP32)
+static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#endif
+
+#define CHECK_MUX(x) do { esp_err_t __; if ((__ = (x)) != ESP_OK) { PORT_EXIT_CRITICAL; return __; } } while (0)
 
 static uint8_t bcd2dec(uint8_t val)
 {
@@ -102,45 +115,45 @@ static esp_err_t read_byte(ds1302_t *dev, uint8_t *b)
 
 static esp_err_t read_register(ds1302_t *dev, uint8_t reg, uint8_t *val)
 {
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     CHECK_MUX(prepare(dev, GPIO_MODE_OUTPUT));
     CHECK_MUX(write_byte(dev, reg | 0x01));
     CHECK_MUX(prepare(dev, GPIO_MODE_INPUT));
     CHECK_MUX(read_byte(dev, val));
-    portEXIT_CRITICAL(&mux);
+    PORT_EXIT_CRITICAL;
     return chip_disable(dev);
 }
 
 static esp_err_t write_register(ds1302_t *dev, uint8_t reg, uint8_t val)
 {
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     CHECK_MUX(prepare(dev, GPIO_MODE_OUTPUT));
     CHECK_MUX(write_byte(dev, reg));
     CHECK_MUX(write_byte(dev, val));
-    portEXIT_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     return chip_disable(dev);
 }
 
 static esp_err_t burst_read(ds1302_t *dev, uint8_t reg, uint8_t *dst, uint8_t len)
 {
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     CHECK_MUX(prepare(dev, GPIO_MODE_OUTPUT));
     CHECK_MUX(write_byte(dev, reg | 0x01));
     CHECK_MUX(prepare(dev, GPIO_MODE_INPUT));
     for (uint8_t i = 0; i < len; i++, dst++)
         CHECK_MUX(read_byte(dev, dst));
-    portEXIT_CRITICAL(&mux);
+    PORT_EXIT_CRITICAL;
     return chip_disable(dev);
 }
 
 static esp_err_t burst_write(ds1302_t *dev, uint8_t reg, uint8_t *src, uint8_t len)
 {
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     CHECK_MUX(prepare(dev, GPIO_MODE_OUTPUT));
     CHECK_MUX(write_byte(dev, reg));
     for (uint8_t i = 0; i < len; i++, src++)
         CHECK_MUX(write_byte(dev, *src));
-    portEXIT_CRITICAL(&mux);
+    PORT_EXIT_CRITICAL;
     return chip_disable(dev);
 }
 
