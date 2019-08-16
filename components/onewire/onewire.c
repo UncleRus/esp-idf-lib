@@ -60,7 +60,7 @@ static void setup_pin(gpio_num_t pin, bool open_drain)
     gpio_config_t io_conf;
     memset(&io_conf, 0, sizeof(gpio_config_t));
     io_conf.mode = open_drain ? OPEN_DRAIN_MODE : GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1 << pin);
+    io_conf.pin_bit_mask = (1ULL << pin);
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 }
@@ -100,24 +100,22 @@ static bool _onewire_write_bit(gpio_num_t pin, bool v)
 {
     if (!_onewire_wait_for_bus(pin, 10))
         return false;
+    PORT_ENTER_CRITICAL;
     if (v)
     {
-        PORT_ENTER_CRITICAL;
         gpio_set_level(pin, 0);  // drive output low
         ets_delay_us(10);
         gpio_set_level(pin, 1);  // allow output high
-        PORT_EXIT_CRITICAL;
         ets_delay_us(55);
     }
     else
     {
-        PORT_ENTER_CRITICAL;
         gpio_set_level(pin, 0);  // drive output low
         ets_delay_us(65);
         gpio_set_level(pin, 1); // allow output high
-        PORT_EXIT_CRITICAL;
     }
     ets_delay_us(1);
+    PORT_EXIT_CRITICAL;
 
     return true;
 }
