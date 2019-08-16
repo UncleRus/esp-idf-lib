@@ -28,10 +28,12 @@
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+#define OPEN_DRAIN_MODE GPIO_MODE_INPUT_OUTPUT_OD
 
 #elif defined(CONFIG_IDF_TARGET_ESP8266)
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#define OPEN_DRAIN_MODE GPIO_MODE_OUTPUT_OD
 #endif
 
 // Waits up to `max_wait` microseconds for the specified pin to go high.
@@ -57,7 +59,7 @@ static void setup_pin(gpio_num_t pin, bool open_drain)
 {
     gpio_config_t io_conf;
     memset(&io_conf, 0, sizeof(gpio_config_t));
-    io_conf.mode = open_drain ? GPIO_MODE_INPUT_OUTPUT_OD : GPIO_MODE_OUTPUT;
+    io_conf.mode = open_drain ? OPEN_DRAIN_MODE : GPIO_MODE_OUTPUT;
     io_conf.pin_bit_mask = (1 << pin);
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
