@@ -52,6 +52,12 @@ static const char *TAG = "DHTxx";
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+#define ENTER_CRITICAL portENTER_CRITICAL(&mux)
+#define EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#define ENTER_CRITICAL portENTER_CRITICAL()
+#define EXIT_CRITICAL portEXIT_CRITICAL()
 #endif
 
 #define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
@@ -74,6 +80,11 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 static esp_err_t dht_await_pin_state(gpio_num_t pin, uint32_t timeout,
        int expected_pin_state, uint32_t *duration)
 {
+    /* XXX dht_await_pin_state() should save pin direction and restore
+     * the direction before return. however, the SDK does not provide
+     * gpio_get_direction().
+     */
+    gpio_set_direction(pin, GPIO_MODE_INPUT);
     for (uint32_t i = 0; i < timeout; i += DHT_TIMER_INTERVAL)
     {
         // need to wait at least a single interval to prevent reading a jitter
@@ -100,6 +111,7 @@ static inline esp_err_t dht_fetch_data(dht_sensor_type_t sensor_type, gpio_num_t
     uint32_t high_duration;
 
     // Phase 'A' pulling signal low to initiate read sequence
+    gpio_set_direction(pin, GPIO_MODE_OUTPUT_OD);
     gpio_set_level(pin, 0);
     ets_delay_us(sensor_type == DHT_TYPE_SI7021 ? 500 : 20000);
     gpio_set_level(pin, 1);
@@ -159,21 +171,16 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     bool bits[DHT_DATA_BITS];
     uint8_t data[DHT_DATA_BITS / 8] = { 0 };
 
-    gpio_set_direction(pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    gpio_set_direction(pin, GPIO_MODE_OUTPUT_OD);
     gpio_set_level(pin, 1);
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
-    portENTER_CRITICAL(&mux);
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
-    portENTER_CRITICAL();
-#endif
+    ENTER_CRITICAL;
     esp_err_t result = dht_fetch_data(sensor_type, pin, bits);
-#if defined(CONFIG_IDF_TARGET_ESP32)
-    portEXIT_CRITICAL(&mux);
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
-    portEXIT_CRITICAL();
-#endif
+    EXIT_CRITICAL;
 
+    /* restore GPIO direction because, after calling dht_fetch_data(), the
+     * GPIO direction mode changes */
+    gpio_set_direction(pin, GPIO_MODE_OUTPUT_OD);
     gpio_set_level(pin, 1);
 
     if (result != ESP_OK)

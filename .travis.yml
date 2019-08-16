@@ -79,7 +79,7 @@ script:
           IGNORE_FILE="travis-ignore-esp8266"
           export IDF_PATH=~/esp8266/ESP8266_RTOS_SDK
           # these drivers do not compile for ESP8266 yet
-          export EXCLUDE_COMPONENTS="onewire dht encoder ds18x20 max7219 mcp23x17"
+          export EXCLUDE_COMPONENTS="onewire encoder ds18x20 max7219 mcp23x17"
           ;;
       esac
 
