@@ -52,12 +52,12 @@ static const char *TAG = "DHTxx";
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
-#define ENTER_CRITICAL portENTER_CRITICAL(&mux)
-#define EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 
 #elif defined(CONFIG_IDF_TARGET_ESP8266)
-#define ENTER_CRITICAL portENTER_CRITICAL()
-#define EXIT_CRITICAL portEXIT_CRITICAL()
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
 #endif
 
 #define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
@@ -174,9 +174,9 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     gpio_set_direction(pin, GPIO_MODE_OUTPUT_OD);
     gpio_set_level(pin, 1);
 
-    ENTER_CRITICAL;
+    PORT_ENTER_CRITICAL;
     esp_err_t result = dht_fetch_data(sensor_type, pin, bits);
-    EXIT_CRITICAL;
+    PORT_EXIT_CRITICAL;
 
     /* restore GPIO direction because, after calling dht_fetch_data(), the
      * GPIO direction mode changes */
