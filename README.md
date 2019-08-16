@@ -44,7 +44,7 @@ PROJECT_NAME := my-esp-project
 
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
 
-EXCLUDE_COMPONENTS := max7219 mcp23x17 onewire ds18x20 dht encoder
+EXCLUDE_COMPONENTS := max7219 mcp23x17 onewire ds18x20 encoder
 
 include $(IDF_PATH)/make/project.mk
 ```

@@ -4,7 +4,8 @@
 #include <dht.h>
 
 static const dht_sensor_type_t sensor_type = DHT_TYPE_AM2301;
-static const gpio_num_t dht_gpio = 17;
+// static const gpio_num_t dht_gpio = 17;
+static const gpio_num_t dht_gpio = 4;
 
 
 void dht_test(void *pvParameters)
