@@ -60,7 +60,7 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
 #endif
 
-#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 #define CHECK_LOGE(x, msg, ...) do { \
         esp_err_t __; \

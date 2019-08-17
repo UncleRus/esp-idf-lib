@@ -72,9 +72,7 @@ esp_err_t ds3231_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio,
 #if defined(CONFIG_IDF_TARGET_ESP32)
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
-    i2c_dev_create_mutex(dev);
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t ds3231_free_desc(i2c_dev_t *dev)

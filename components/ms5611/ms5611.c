@@ -15,6 +15,8 @@
 #include <stddef.h>
 #include <esp_system.h>
 #include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #define I2C_FREQ_HZ 400000 // 400 kHz
 
@@ -139,9 +141,7 @@ esp_err_t ms5611_init_desc(ms5611_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t ms5611_free_desc(ms5611_t *dev)
@@ -160,7 +160,7 @@ esp_err_t ms5611_init(ms5611_t *dev, ms5611_osr_t osr)
     // First of all we need to reset the chip
     CHECK(ms5611_reset(dev));
     // Wait a bit for the device to reset
-    ets_delay_us(10000);
+    vTaskDelay(pdMS_TO_TICKS(10));
     // Get the config
     CHECK(read_prom(dev));
 
@@ -169,19 +169,15 @@ esp_err_t ms5611_init(ms5611_t *dev, ms5611_osr_t osr)
 
 esp_err_t ms5611_get_sensor_data(ms5611_t *dev, int32_t *pressure, float *temperature)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(pressure);
-    CHECK_ARG(temperature);
-
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    CHECK_ARG(dev && pressure && temperature);
 
     // Second order temperature compensation see datasheet p8
     uint32_t raw_pressure = 0;
-    I2C_DEV_CHECK(&dev->i2c_dev, get_raw_pressure(dev, &raw_pressure));
-
     uint32_t raw_temperature = 0;
-    I2C_DEV_CHECK(&dev->i2c_dev, get_raw_temperature(dev, &raw_temperature));
 
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, get_raw_pressure(dev, &raw_pressure));
+    I2C_DEV_CHECK(&dev->i2c_dev, get_raw_temperature(dev, &raw_temperature));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     // dT = D2 - T_ref = D2 - C5 * 2^8

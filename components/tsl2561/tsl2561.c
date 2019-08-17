@@ -104,7 +104,7 @@ static const char *TAG = "TSL2561";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define SLEEP_MS(x) do { vTaskDelay((x) / portTICK_PERIOD_MS); } while (0)
+#define SLEEP_MS(x) do { vTaskDelay(pdMS_TO_TICKS(x)); } while (0)
 
 static inline esp_err_t write_register(tsl2561_t *dev, uint8_t reg, uint8_t value)
 {
@@ -185,9 +185,7 @@ esp_err_t tsl2561_init_desc(tsl2561_t *dev, uint8_t addr, i2c_port_t port, gpio_
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t tsl2561_free_desc(tsl2561_t *dev)
@@ -263,8 +261,7 @@ esp_err_t tsl2561_set_gain(tsl2561_t *dev, tsl2561_gain_t gain)
 
 esp_err_t tsl2561_read_lux(tsl2561_t *dev, uint32_t *lux)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(lux);
+    CHECK_ARG(dev && lux);
 
     uint32_t ch_scale, channel1, channel0;
 

@@ -61,8 +61,7 @@ esp_err_t mcp4725_free_desc(i2c_dev_t *dev)
 
 esp_err_t mcp4725_eeprom_busy(i2c_dev_t *dev, bool *busy)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(busy);
+    CHECK_ARG(dev && busy);
 
     uint8_t res;
     CHECK(read_data(dev, &res, 1));
@@ -74,8 +73,7 @@ esp_err_t mcp4725_eeprom_busy(i2c_dev_t *dev, bool *busy)
 
 esp_err_t mcp4725_get_power_mode(i2c_dev_t *dev, bool eeprom, mcp4725_power_mode_t *mode)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(mode);
+    CHECK_ARG(dev && mode);
 
     uint8_t buf[4];
     CHECK(read_data(dev, buf, eeprom ? 4 : 1));
@@ -107,8 +105,7 @@ esp_err_t mcp4725_set_power_mode(i2c_dev_t *dev, bool eeprom, mcp4725_power_mode
 
 esp_err_t mcp4725_get_raw_output(i2c_dev_t *dev, bool eeprom, uint16_t *value)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(value);
+    CHECK_ARG(dev && value);
 
     uint8_t buf[5];
     CHECK(read_data(dev, buf, eeprom ? 5 : 3));

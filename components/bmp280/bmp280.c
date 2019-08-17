@@ -140,9 +140,7 @@ esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t bmp280_free_desc(bmp280_t *dev)

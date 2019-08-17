@@ -100,9 +100,7 @@ esp_err_t si7021_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio,
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t si7021_free_desc(i2c_dev_t *dev)
@@ -121,7 +119,7 @@ esp_err_t si7021_reset(i2c_dev_t *dev)
     I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, &cmd, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
-    vTaskDelay(DELAY_MS / portTICK_RATE_MS);
+    vTaskDelay(pdMS_TO_TICKS(DELAY_MS));
 
     return ESP_OK;
 }
@@ -159,8 +157,7 @@ esp_err_t si7021_set_heater(i2c_dev_t *dev, bool on)
 
 esp_err_t si7021_get_heater_current(i2c_dev_t *dev, uint8_t *level)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(level);
+    CHECK_ARG(dev && level);
 
     uint8_t h;
 
@@ -175,8 +172,7 @@ esp_err_t si7021_get_heater_current(i2c_dev_t *dev, uint8_t *level)
 
 esp_err_t si7021_set_heater_current(i2c_dev_t *dev, uint8_t level)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(level <= SI7021_MAX_HEATER_CURRENT);
+    CHECK_ARG(dev && level <= SI7021_MAX_HEATER_CURRENT);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, CMD_WRITE_HEATER_REG, &level, 1));
@@ -187,8 +183,7 @@ esp_err_t si7021_set_heater_current(i2c_dev_t *dev, uint8_t level)
 
 esp_err_t si7021_get_resolution(i2c_dev_t *dev, si7021_resolution_t *r)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(r);
+    CHECK_ARG(dev && r);
 
     uint8_t u;
 
@@ -203,8 +198,7 @@ esp_err_t si7021_get_resolution(i2c_dev_t *dev, si7021_resolution_t *r)
 
 esp_err_t si7021_set_resolution(i2c_dev_t *dev, si7021_resolution_t r)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(r <= SI7021_RES_RH11_T11);
+    CHECK_ARG(dev && r <= SI7021_RES_RH11_T11);
 
     uint8_t u;
 
@@ -219,8 +213,7 @@ esp_err_t si7021_set_resolution(i2c_dev_t *dev, si7021_resolution_t r)
 
 esp_err_t si7021_measure_temperature(i2c_dev_t *dev, float *t)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(t);
+    CHECK_ARG(dev && t);
 
     uint16_t raw;
     CHECK(measure(dev, CMD_MEAS_T_NOHOLD, &raw));
@@ -231,8 +224,7 @@ esp_err_t si7021_measure_temperature(i2c_dev_t *dev, float *t)
 
 esp_err_t si7021_measure_humidity(i2c_dev_t *dev, float *rh)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(rh);
+    CHECK_ARG(dev && rh);
 
     uint16_t raw;
     CHECK(measure(dev, CMD_MEAS_RH_NOHOLD, &raw));
@@ -243,8 +235,7 @@ esp_err_t si7021_measure_humidity(i2c_dev_t *dev, float *rh)
 
 esp_err_t si7021_get_serial(i2c_dev_t *dev, uint64_t *serial, bool sht2x_mode)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(serial);
+    CHECK_ARG(dev && serial);
 
     uint8_t buf[8];
     uint16_t cmd;

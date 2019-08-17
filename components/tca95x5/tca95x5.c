@@ -21,8 +21,7 @@
 
 static esp_err_t read_reg_16(i2c_dev_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, val, 2));
@@ -57,9 +56,7 @@ esp_err_t pcf8574_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t pcf8574_free_desc(i2c_dev_t *dev)

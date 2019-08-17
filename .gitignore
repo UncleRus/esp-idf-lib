@@ -58,3 +58,4 @@ sdkconfig
 /.project
 /.settings/
 /.pydevproject
+/__garbage__/

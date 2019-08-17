@@ -42,7 +42,7 @@ static const char *TAG = "BMP180";
 #define BMP180_RESET_VALUE        0xB6
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
-#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 static esp_err_t bmp180_read_reg_16(i2c_dev_t *dev, uint8_t reg, int16_t *r)
 {
@@ -115,9 +115,7 @@ esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gp
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t bmp180_free_desc(bmp180_dev_t *dev)
@@ -181,9 +179,7 @@ bool bmp180_is_available(i2c_dev_t *i2c_dev)
 
 esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressure, bmp180_mode_t oss)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(temperature);
-    CHECK_ARG(pressure);
+    CHECK_ARG(dev && temperature && pressure);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 

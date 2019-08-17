@@ -52,8 +52,7 @@ static esp_err_t write_register(i2c_dev_t *dev, uint8_t reg, uint8_t value)
 
 static esp_err_t read_register(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, TSL4531_REG_COMMAND | reg, val, 1));
@@ -64,8 +63,7 @@ static esp_err_t read_register(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 
 static esp_err_t read_register_16(i2c_dev_t *dev, uint8_t low_register_addr, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     low_register_addr = TSL4531_REG_COMMAND | low_register_addr;
 

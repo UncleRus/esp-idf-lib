@@ -53,8 +53,7 @@ static const char *TAG = "MCP23x17";
 
 static esp_err_t read_reg_16(mcp23x17_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, val, 2));
@@ -91,8 +90,7 @@ static esp_err_t write_reg_bit_16(mcp23x17_t *dev, uint8_t reg, bool val, uint8_
 
 static esp_err_t read_reg_bit_8(mcp23x17_t *dev, uint8_t reg, bool *val, uint8_t bit)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t buf;
 
@@ -124,8 +122,7 @@ static esp_err_t write_reg_bit_8(mcp23x17_t *dev, uint8_t reg, bool val, uint8_t
 
 static esp_err_t read_reg_16(mcp23x17_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t rx[4] = { 0 };
     uint8_t tx[4] = { dev->addr, reg, 0, 0 };
@@ -171,8 +168,7 @@ static esp_err_t write_reg_bit_16(mcp23x17_t *dev, uint8_t reg, bool val, uint8_
 
 static esp_err_t read_reg_8(mcp23x17_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t rx[3] = { 0 };
     uint8_t tx[3] = { dev->addr, reg, 0 };
@@ -209,8 +205,7 @@ static esp_err_t write_reg_8(mcp23x17_t *dev, uint8_t reg, uint8_t val)
 
 static esp_err_t read_reg_bit_8(mcp23x17_t *dev, uint8_t reg, bool *val, uint8_t bit)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t buf;
 

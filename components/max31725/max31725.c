@@ -48,8 +48,7 @@ typedef union
 
 static esp_err_t read_temp(i2c_dev_t *dev, uint8_t reg, float *temp, max31725_data_format_t fmt)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(temp);
+    CHECK_ARG(dev && temp);
 
     temp_data_t buf;
 

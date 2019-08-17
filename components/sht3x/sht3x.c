@@ -227,8 +227,7 @@ esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_
 
 esp_err_t sht3x_get_raw_data(sht3x_t *dev, sht3x_raw_data_t raw_data)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(raw_data);
+    CHECK_ARG(dev && raw_data);
 
     if (!dev->meas_started)
     {

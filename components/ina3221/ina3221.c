@@ -85,9 +85,7 @@ esp_err_t ina3221_init_desc(ina3221_t *dev, uint8_t addr, i2c_port_t port, gpio_
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t ina3221_free_desc(ina3221_t *dev)
@@ -202,8 +200,7 @@ esp_err_t ina3221_reset(ina3221_t *dev)
 
 esp_err_t ina3221_get_bus_voltage(ina3221_t *dev, ina3221_channel_t channel, float *voltage)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(voltage);
+    CHECK_ARG(dev && voltage);
 
     int16_t raw;
 
@@ -238,8 +235,7 @@ esp_err_t ina3221_get_shunt_value(ina3221_t *dev, ina3221_channel_t channel, flo
 
 esp_err_t ina3221_get_sum_shunt_value(ina3221_t *dev, float *voltage)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(voltage);
+    CHECK_ARG(dev && voltage);
 
     int16_t raw;
 

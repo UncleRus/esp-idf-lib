@@ -97,9 +97,7 @@ esp_err_t pca9685_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t pca9685_free_desc(i2c_dev_t *dev)
@@ -156,8 +154,7 @@ esp_err_t pca9685_restart(i2c_dev_t *dev)
 
 esp_err_t pca9685_is_sleeping(i2c_dev_t *dev, bool *sleeping)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(sleeping);
+    CHECK_ARG(dev && sleeping);
 
     uint8_t v;
     I2C_DEV_TAKE_MUTEX(dev);
@@ -183,8 +180,7 @@ esp_err_t pca9685_sleep(i2c_dev_t *dev, bool sleep)
 
 esp_err_t pca9685_is_output_inverted(i2c_dev_t *dev, bool *inv)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(inv);
+    CHECK_ARG(dev && inv);
 
     uint8_t v;
     I2C_DEV_TAKE_MUTEX(dev);
@@ -208,8 +204,7 @@ esp_err_t pca9685_set_output_inverted(i2c_dev_t *dev, bool inverted)
 
 esp_err_t pca9685_get_output_open_drain(i2c_dev_t *dev, bool *od)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(od);
+    CHECK_ARG(dev && od);
 
     uint8_t v;
     I2C_DEV_TAKE_MUTEX(dev);
@@ -233,8 +228,7 @@ esp_err_t pca9685_set_output_open_drain(i2c_dev_t *dev, bool od)
 
 esp_err_t pca9685_get_prescaler(i2c_dev_t *dev, uint8_t *prescaler)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(prescaler);
+    CHECK_ARG(dev && prescaler);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_PRE_SCALE, prescaler));
@@ -249,11 +243,11 @@ esp_err_t pca9685_set_prescaler(i2c_dev_t *dev, uint8_t prescaler)
     CHECK_ARG_LOGE(prescaler >= MIN_PRESCALER,
             "Inavlid prescaler value: (%d), must be >= 3", prescaler);
 
-    pca9685_sleep(dev, true);
+    CHECK(pca9685_sleep(dev, true));
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, write_reg(dev, REG_PRE_SCALE, prescaler));
     I2C_DEV_GIVE_MUTEX(dev);
-    pca9685_sleep(dev, false);
+    CHECK(pca9685_sleep(dev, false));
 
     return ESP_OK;
 }

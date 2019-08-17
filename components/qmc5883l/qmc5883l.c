@@ -48,8 +48,7 @@ static esp_err_t write_register(qmc5883l_t *dev, uint8_t reg, uint8_t val)
 
 static esp_err_t read_register(qmc5883l_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     esp_err_t ret = i2c_dev_read_reg(&dev->i2c_dev, reg, val, 1);
@@ -72,9 +71,7 @@ esp_err_t qmc5883l_init_desc(qmc5883l_t *dev, i2c_port_t port, uint8_t addr, gpi
 #if defined(CONFIG_IDF_TARGET_ESP32)
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
-    i2c_dev_create_mutex(&dev->i2c_dev);
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t qmc5883l_free_desc(qmc5883l_t *dev)
@@ -126,9 +123,7 @@ esp_err_t qmc5883l_set_config(qmc5883l_t *dev, qmc5883l_odr_t odr, qmc5883l_osr_
 
 esp_err_t qmc5883l_get_config(qmc5883l_t *dev, qmc5883l_odr_t *odr, qmc5883l_osr_t *osr, qmc5883l_range_t *rng)
 {
-    CHECK_ARG(odr);
-    CHECK_ARG(osr);
-    CHECK_ARG(rng);
+    CHECK_ARG(odr && osr && rng);
 
     uint8_t v;
     CHECK(read_register(dev, REG_CTRL1, &v));
@@ -168,8 +163,7 @@ esp_err_t qmc5883l_data_ready(qmc5883l_t *dev, bool *ready)
 
 esp_err_t qmc5883l_get_raw_data(qmc5883l_t *dev, qmc5883l_raw_data_t *raw)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(raw);
+    CHECK_ARG(dev && raw);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     esp_err_t ret = i2c_dev_read_reg(&dev->i2c_dev, REG_XOUT_L, raw, 6);
@@ -181,9 +175,7 @@ esp_err_t qmc5883l_get_raw_data(qmc5883l_t *dev, qmc5883l_raw_data_t *raw)
 
 esp_err_t qmc5883l_raw_to_mg(qmc5883l_t *dev, qmc5883l_raw_data_t *raw, qmc5883l_data_t *data)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(raw);
-    CHECK_ARG(data);
+    CHECK_ARG(dev && raw && data);
 
     float f = (dev->range == QMC5883L_RNG_2 ? 2000.0 : 8000.0) / 32768;
 
@@ -203,8 +195,7 @@ esp_err_t qmc5883l_get_data(qmc5883l_t *dev, qmc5883l_data_t *data)
 
 esp_err_t qmc5883l_get_raw_temp(qmc5883l_t *dev, int16_t *temp)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(temp);
+    CHECK_ARG(dev && temp);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     esp_err_t ret = i2c_dev_read_reg(&dev->i2c_dev, REG_TOUT_L, temp, 2);

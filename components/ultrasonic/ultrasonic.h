@@ -36,8 +36,9 @@ typedef struct
 /**
  * Init ranging module
  * @param dev Pointer to the device descriptor
+ * @return `ESP_OK` on success
  */
-void ultrasonic_init(const ultrasonic_sensor_t *dev);
+esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev);
 
 /**
  * Measure distance

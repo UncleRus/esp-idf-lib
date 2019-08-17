@@ -60,8 +60,7 @@ esp_err_t pcf8591_free_desc(i2c_dev_t *dev)
 
 esp_err_t pcf8591_read(i2c_dev_t *dev, pcf8591_input_conf_t conf, uint8_t channel, uint8_t *value)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(value);
+    CHECK_ARG(dev && value);
     if (channel >= 4)
     {
         ESP_LOGE(TAG, "Invalid channel number %d", channel);
