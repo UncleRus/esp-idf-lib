@@ -21,7 +21,6 @@
 #include <sht3x.h>
 #include <string.h>
 #include <esp_err.h>
-#include <soc/soc.h>
 
 #define SDA_GPIO 16
 #define SCL_GPIO 17
@@ -104,7 +103,7 @@ void task(void *pvParamters)
     esp_err_t res;
 
     // Start periodic measurements with 1 measurement per second.
-    ESP_ERROR_CHECK(sht3x_start_measurement(dev, SHT3X_PERIODIC_1MPS, SHT3X_HIGH));
+    ESP_ERROR_CHECK(sht3x_start_measurement(&dev, SHT3X_PERIODIC_1MPS, SHT3X_HIGH));
 
     // Wait until first measurement is ready (constant time of at least 30 ms
     // or the duration returned from *sht3x_get_measurement_duration*).
@@ -115,7 +114,7 @@ void task(void *pvParamters)
     while (1)
     {
         // Get the values and do something with them.
-        if ((res = sht3x_get_results(dev, &temperature, &humidity)) == ESP_OK)
+        if ((res = sht3x_get_results(&dev, &temperature, &humidity)) == ESP_OK)
             printf("SHT3x Sensor: %.2f °C, %.2f %%\n", temperature, humidity);
         else
             printf("Could not get results: %d (%s)", res, esp_err_to_name(res));

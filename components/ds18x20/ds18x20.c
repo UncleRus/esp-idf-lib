@@ -35,7 +35,15 @@
 #define DS18B20_FAMILY_ID 0x28
 #define DS18S20_FAMILY_ID 0x10
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#endif
 
 static const char *TAG = "DS18x20";
 
@@ -49,12 +57,12 @@ esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait)
     else
         onewire_select(pin, addr);
 
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     onewire_write(pin, ds18x20_CONVERT_T);
     // For parasitic devices, power must be applied within 10us after issuing
     // the convert command.
     onewire_power(pin);
-    portEXIT_CRITICAL(&mux);
+    PORT_EXIT_CRITICAL;
 
     if (wait)
     {

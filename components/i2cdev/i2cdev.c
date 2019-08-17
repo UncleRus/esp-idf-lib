@@ -123,9 +123,11 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
 {
     return a->scl_io_num == b->scl_io_num
         && a->sda_io_num == b->sda_io_num
+#if defined(CONFIG_IDF_TARGET_ESP32)
+        && a->master.clk_speed == b->master.clk_speed
+#endif
         && a->scl_pullup_en == b->scl_pullup_en
-        && a->sda_pullup_en == b->sda_pullup_en
-        && a->master.clk_speed == b->master.clk_speed;
+        && a->sda_pullup_en == b->sda_pullup_en;
 }
 
 static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
@@ -140,15 +142,25 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
         memcpy(&temp, cfg, sizeof(i2c_config_t));
         temp.mode = I2C_MODE_MASTER;
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
         i2c_driver_delete(port);
         if ((res = i2c_param_config(port, &temp)) != ESP_OK)
             return res;
         if ((res = i2c_driver_install(port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+        /* i2c_driver_delete() cannot be called before i2c_driver_install() */
+        if ((res = i2c_driver_install(port, temp.mode)) != ESP_OK)
+            return res;
+        /* must be used after calling i2c_driver_install */
+        if ((res = i2c_param_config(port, &temp)) != ESP_OK)
+            return res;
+#endif
+
         memcpy(&configs[port], &temp, sizeof(i2c_config_t));
+        ESP_LOGD(TAG, "I2C driver successfully reconfigured on port %d", port);
     }
 
-    ESP_LOGD(TAG, "I2C driver successfully reconfigured on port %d", port);
     return ESP_OK;
 }
 

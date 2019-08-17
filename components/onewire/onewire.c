@@ -24,7 +24,17 @@
 #define ONEWIRE_SKIP_ROM   0xcc
 #define ONEWIRE_SEARCH     0xf0
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+#define OPEN_DRAIN_MODE GPIO_MODE_INPUT_OUTPUT_OD
+
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#define OPEN_DRAIN_MODE GPIO_MODE_OUTPUT_OD
+#endif
 
 // Waits up to `max_wait` microseconds for the specified pin to go high.
 // Returns true if successful, false if the bus never comes high (likely
@@ -49,8 +59,8 @@ static void setup_pin(gpio_num_t pin, bool open_drain)
 {
     gpio_config_t io_conf;
     memset(&io_conf, 0, sizeof(gpio_config_t));
-    io_conf.mode = open_drain ? GPIO_MODE_INPUT_OUTPUT_OD : GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1 << pin);
+    io_conf.mode = open_drain ? OPEN_DRAIN_MODE : GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = (1ULL << pin);
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 }
@@ -73,11 +83,11 @@ bool onewire_reset(gpio_num_t pin)
     gpio_set_level(pin, 0);
     ets_delay_us(480);
 
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     gpio_set_level(pin, 1); // allow it to float
     ets_delay_us(70);
     bool r = !gpio_get_level(pin);
-    portEXIT_CRITICAL(&mux);
+    PORT_EXIT_CRITICAL;
 
     // Wait for all devices to finish pulling the bus low before returning
     if (!_onewire_wait_for_bus(pin, 410))
@@ -90,24 +100,22 @@ static bool _onewire_write_bit(gpio_num_t pin, bool v)
 {
     if (!_onewire_wait_for_bus(pin, 10))
         return false;
+    PORT_ENTER_CRITICAL;
     if (v)
     {
-        portENTER_CRITICAL(&mux);
         gpio_set_level(pin, 0);  // drive output low
         ets_delay_us(10);
         gpio_set_level(pin, 1);  // allow output high
-        portEXIT_CRITICAL(&mux);
         ets_delay_us(55);
     }
     else
     {
-        portENTER_CRITICAL(&mux);
         gpio_set_level(pin, 0);  // drive output low
         ets_delay_us(65);
         gpio_set_level(pin, 1); // allow output high
-        portEXIT_CRITICAL(&mux);
     }
     ets_delay_us(1);
+    PORT_EXIT_CRITICAL;
 
     return true;
 }
@@ -117,14 +125,14 @@ static int _onewire_read_bit(gpio_num_t pin)
     if (!_onewire_wait_for_bus(pin, 10))
         return -1;
 
-    portENTER_CRITICAL(&mux);
+    PORT_ENTER_CRITICAL;
     gpio_set_level(pin, 0);
     ets_delay_us(2);
     gpio_set_level(pin, 1);  // let pin float, pull up will raise
     ets_delay_us(11);
     int r = gpio_get_level(pin);  // Must sample within 15us of start
     ets_delay_us(48);
-    portEXIT_CRITICAL(&mux);
+    PORT_EXIT_CRITICAL;
 
     return r;
 }

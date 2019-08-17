@@ -141,7 +141,9 @@ esp_err_t ads111x_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port,
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
+#if defined(CONFIG_IDF_TARGET_ESP32)
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
+#endif
     i2c_dev_create_mutex(dev);
 
     return ESP_OK;
