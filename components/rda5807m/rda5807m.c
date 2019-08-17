@@ -189,11 +189,10 @@ esp_err_t rda5807m_init_desc(rda5807m_t *dev, i2c_port_t port, gpio_num_t sda_gp
     dev->i2c_dev.addr = I2C_ADDR_IDX;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
+#if defined(CONFIG_IDF_TARGET_ESP32)
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
-
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+#endif
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t rda5807m_free_desc(rda5807m_t *dev)
