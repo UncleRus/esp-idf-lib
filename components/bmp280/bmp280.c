@@ -175,11 +175,13 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
 
     if (dev->id != BMP280_CHIP_ID && dev->id != BME280_CHIP_ID)
     {
-        CHECK_LOGE(dev, ESP_ERR_INVALID_VERSION, "Sensor wrong version");
+        CHECK_LOGE(dev, ESP_ERR_INVALID_VERSION,
+                "Invalid chip ID: expected: 0x%x (BME280) or 0x%x (BMP280) got: 0x%x",
+                BME280_CHIP_ID, BMP280_CHIP_ID, dev->id);
     }
 
     // Soft reset.
-    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_RESET, BMP280_RESET_VALUE), "Failed resetting sensor");
+    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_RESET, BMP280_RESET_VALUE), "Failed to reset sensor");
 
     // Wait until finished copying over the NVP data.
     while (1)
@@ -199,7 +201,7 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
     uint8_t config = (params->standby << 5) | (params->filter << 2);
     ESP_LOGD(TAG, "Writing config reg=%x", config);
 
-    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CONFIG, config), "Failed configuring sensor");
+    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CONFIG, config), "Failed to configure sensor");
 
     if (params->mode == BMP280_MODE_FORCED)
     {
@@ -213,11 +215,11 @@ esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
         // Write crtl hum reg first, only active after write to BMP280_REG_CTRL.
         uint8_t ctrl_hum = params->oversampling_humidity;
         ESP_LOGD(TAG, "Writing ctrl hum reg=%x", ctrl_hum);
-        CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL_HUM, ctrl_hum), "Failed controlling sensor");
+        CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL_HUM, ctrl_hum), "Failed to control sensor");
     }
 
     ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
-    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL, ctrl), "Failed controlling sensor");
+    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL, ctrl), "Failed to control sensor");
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -235,7 +237,7 @@ esp_err_t bmp280_force_measurement(bmp280_t *dev)
     ctrl &= ~0b11;  // clear two lower bits
     ctrl |= BMP280_MODE_FORCED;
     ESP_LOGD(TAG, "Writing ctrl reg=%x", ctrl);
-    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL, ctrl), "Failed starting forced mode");
+    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, BMP280_REG_CTRL, ctrl), "Failed to start forced mode");
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -251,7 +253,7 @@ esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy)
 
     const uint8_t regs[2] = { BMP280_REG_STATUS, BMP280_REG_CTRL };
     uint8_t status[2];
-    CHECK_LOGE(dev, i2c_dev_read(&dev->i2c_dev, regs, 2, status, 2), "Could not read status registers");
+    CHECK_LOGE(dev, i2c_dev_read(&dev->i2c_dev, regs, 2, status, 2), "Failed to read status registers");
 
     // Check mode - FORCED means BM280 is busy (it switches to SLEEP mode when finished)
     // Additionally, check 'measuring' bit in status register
@@ -349,7 +351,7 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
 
     // Need to read in one sequence to ensure they match.
     size_t size = humidity ? 8 : 6;
-    CHECK_LOGE(dev, i2c_dev_read_reg(&dev->i2c_dev, 0xf7, data, size), "Failed reading");
+    CHECK_LOGE(dev, i2c_dev_read_reg(&dev->i2c_dev, 0xf7, data, size), "Failed to read data");
 
     adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
     adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;
