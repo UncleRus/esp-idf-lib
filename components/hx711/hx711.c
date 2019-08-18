@@ -128,7 +128,7 @@ esp_err_t hx711_read_data(hx711_t *dev, int32_t *data)
     uint32_t raw = read_raw(dev->dout, dev->pd_sck, dev->gain);
     if (raw & 0x800000)
         raw |= 0xff000000;
-    *data = (int32_t)raw;
+    *data = *((int32_t *)&raw);
 
     return ESP_OK;
 }
