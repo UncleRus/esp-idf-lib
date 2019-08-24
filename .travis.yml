@@ -109,8 +109,7 @@ script:
         echo "Building ${i}..."
         cd ${PROJECT_EXAMPLE_DIR}/${i}
         make defconfig
-        # use travis_wait to avoid timeout during the build
-        travis_wait make -j2 >> ${PROJECT_LOG}
+        make -j2 >> ${PROJECT_LOG}
         if [ $? -ne 0 ]; then
           # when failed, show last 100 lines for debugging, and exit with
           # non-zero exit code
