@@ -1,11 +1,24 @@
 sudo: false
 language: bash
+
+# when you suspects issues in cache, use the following line to disable cache.
+# cache: false
+cache:
+  directories:
+    - ${HOME}/distfiles
+    - ${HOME}/.ccache
+    - ${HOME}/.cache/pip
 os:
   - linux
 
-env:
-  XTENSA_ESP32_TOOLCHAIN=xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-linux-amd64.tar.gz
-  XTENSA_ESP8266_TOOLCHAIN=xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+matrix:
+  include:
+    - env:
+      - PROJECT_TARGET="esp32"
+      - PROJECT_SDK_BRANCH="master"
+    - env:
+      - PROJECT_TARGET="esp8266"
+      - PROJECT_SDK_BRANCH="master"
 
 addons:
   apt:
@@ -26,79 +39,86 @@ before_install:
   - PROJECT_PATH=$(pwd)
 
 install:
+  - export TOOLCHAIN_DIR="${HOME}/${PROJECT_TARGET}"
+  - |
+    if [ ${PROJECT_TARGET} == "esp8266" ]; then
+      export PROJECT_GCC_PREFIX="xtensa-lx106-elf"
+      export PROJECT_TOOLCHAIN_FILE=xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+      export PROJECT_SDK_NAME="ESP8266_RTOS_SDK"
+    else
+      export PROJECT_GCC_PREFIX="xtensa-esp32-elf"
+      export PROJECT_TOOLCHAIN_FILE=xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-linux-amd64.tar.gz
+      export PROJECT_SDK_NAME="esp-idf"
+    fi
+  - export PROJECT_GCC_FILE="${PROJECT_GCC_PREFIX}-gcc"
+  - export PROJECT_DISTFILE_DIR="${HOME}/distfiles"
+  - export IDF_PATH=${TOOLCHAIN_DIR}/${PROJECT_SDK_NAME}
+  - export PROJECT_LOG="${HOME}/build.log"
+  - export PROJECT_EXAMPLE_DIR="${PROJECT_PATH}/examples"
   # Install ESP32 toochain following steps as desribed
   # in http://esp-idf.readthedocs.io/en/latest/linux-setup.html
 
   # Prepare directory for the toolchain
-  - mkdir -p ~/esp32 ~/esp8266
-  # Download binary toolchain for the ESP32
-  - cd ~/esp32
-  - wget https://dl.espressif.com/dl/$XTENSA_ESP32_TOOLCHAIN
-  - tar -xzf $XTENSA_ESP32_TOOLCHAIN
-  # Get ESP-IDF from github
-  - git clone --recursive https://github.com/espressif/esp-idf.git
-
-  # Download binary toolchain for the ESP8266
-  - cd ~/esp8266
-  - wget https://dl.espressif.com/dl/$XTENSA_ESP8266_TOOLCHAIN
-  - tar -xzf $XTENSA_ESP8266_TOOLCHAIN
-  # Get ESP8266_RTOS_SDK from github
-  - git clone --recursive https://github.com/espressif/ESP8266_RTOS_SDK.git
+  - mkdir -p ${TOOLCHAIN_DIR} ${PROJECT_DISTFILE_DIR}
+  # Get SDK from github
+  - git clone --branch ${PROJECT_SDK_BRANCH} --recursive https://github.com/espressif/${PROJECT_SDK_NAME}.git ${IDF_PATH}
 
   # Setup ccache to build faster
   # XXX when the entire build process exceeds 50 min, th job will be killed
   # https://docs.travis-ci.com/user/customizing-the-build/#build-timeouts
   - ccache --version
-  - mkdir ~/ccache_bin
-  - (cd ~/ccache_bin && ln -s /usr/bin/ccache xtensa-lx106-elf-gcc)
-  - (cd ~/ccache_bin && ln -s /usr/bin/ccache xtensa-esp32-elf-gcc)
+  - mkdir ${HOME}/ccache_bin
+  - (cd ${HOME}/ccache_bin && ln -s /usr/bin/ccache ${PROJECT_GCC_FILE})
   - export CCACHE_BASEDIR=$PROJECT_PATH
   - export CCACHE_CPP2=true
 
-  # Make toolchains available for all terminal sessions
-  - export PATH=$HOME/ccache_bin:$PATH:$HOME/esp32/xtensa-esp32-elf/bin:$HOME/esp8266/xtensa-lx106-elf/bin
-
   # Get Python requirements
   - python -m pip install --user --upgrade pyOpenSSL
-  - python -m pip install --user -r ~/esp32/esp-idf/requirements.txt
-  - python -m pip install --user -r ~/esp8266/ESP8266_RTOS_SDK/requirements.txt
+  - python -m pip install --user -r ${IDF_PATH}/requirements.txt
+
+  # Download binary toolchain if it does not exist
+  - |
+    if [ ! -f ${PROJECT_DISTFILE_DIR}/${PROJECT_TOOLCHAIN_FILE} ]; then
+      wget -O ${PROJECT_DISTFILE_DIR}/${PROJECT_TOOLCHAIN_FILE} https://dl.espressif.com/dl/${PROJECT_TOOLCHAIN_FILE}
+    fi
+  - tar -xz -C ${TOOLCHAIN_DIR} -f ${PROJECT_DISTFILE_DIR}/${PROJECT_TOOLCHAIN_FILE}
+
+  # Make toolchains available for all terminal sessions
+  - export PATH=$HOME/ccache_bin:$PATH:$HOME/${PROJECT_TARGET}/${PROJECT_GCC_PREFIX}/bin
 
 script:
-  - rm -f ~/build.log
+  - rm -f ${PROJECT_LOG}
   # XXX surpress log output where possible. when the size exceeds 4 MB, the
   # job will be killed.
   - |
-    for TARGET in esp32 esp8266; do
-      IGNORE_FILE="travis-ignore"
-      export IDF_PATH=~/esp32/esp-idf
+    IGNORE_FILE="travis-ignore"
 
-      case $TARGET in
-        esp32)
-          ;;
-        esp8266)
-          IGNORE_FILE="travis-ignore-esp8266"
-          export IDF_PATH=~/esp8266/ESP8266_RTOS_SDK
-          # these drivers do not compile for ESP8266 yet
-          export EXCLUDE_COMPONENTS="encoder max7219 mcp23x17"
-          ;;
-      esac
+    case ${PROJECT_TARGET} in
+      esp32)
+        ;;
+      esp8266)
+        IGNORE_FILE="travis-ignore-esp8266"
+        # these drivers do not compile for ESP8266 yet
+        export EXCLUDE_COMPONENTS="encoder max7219 mcp23x17"
+        ;;
+    esac
 
-      cd $PROJECT_PATH/examples
-      for i in $(ls -d */); do
-        if [ ! -e $PROJECT_PATH/examples/$i/$IGNORE_FILE ]; then
-          cd $PROJECT_PATH/examples/$i
-          make defconfig
-          # use travis_wait to avoid timeout during the build
-          travis_wait make -j2 >> ~/build.log 2>&1
-          if [ $? -ne 0 ]; then
-            # when failed, show last 100 lines for debugging, and exit with
-            # non-zero exit code
-            tail -n 100 ~/build.log
-            exit 1
-          fi
-          make clean >/dev/null
-          # make sure the directory is clean
-          rm -rf sdkconfig build
+    cd ${PROJECT_EXAMPLE_DIR}
+    for i in $(ls -d */); do
+      if [ ! -e ${PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE} ]; then
+        echo "Building ${i}..."
+        cd ${PROJECT_EXAMPLE_DIR}/${i}
+        make defconfig
+        # use travis_wait to avoid timeout during the build
+        travis_wait make -j2 >> ${PROJECT_LOG}
+        if [ $? -ne 0 ]; then
+          # when failed, show last 100 lines for debugging, and exit with
+          # non-zero exit code
+          tail -n 100 ${PROJECT_LOG}
+          exit 1
         fi
-      done
+        make clean >/dev/null
+        # make sure the directory is clean
+        rm -rf ${i}/sdkconfig ${i}/build
+      fi
     done
