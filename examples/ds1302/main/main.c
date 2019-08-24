@@ -3,9 +3,15 @@
 #include <freertos/task.h>
 #include <ds1302.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define CE_GPIO 5
+#define IO_GPIO 4
+#define SCLK_GPIO 0
+#else
 #define CE_GPIO 16
 #define IO_GPIO 17
 #define SCLK_GPIO 18
+#endif
 
 void ds1302_test(void *pvParameters)
 {

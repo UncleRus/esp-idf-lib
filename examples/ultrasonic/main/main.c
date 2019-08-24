@@ -40,7 +40,7 @@ void ultrasonic_test(void *pvParamters)
             }
         }
         else
-            printf("Distance: %d cm, %.02f m\n", distance, distance / 100.0);
+            printf("Distance: %d cm\n", distance);
 
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
