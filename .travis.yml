@@ -18,6 +18,10 @@ matrix:
       - PROJECT_SDK_BRANCH="master"
       - PROJECT_BUILD_METHOD="make"
     - env:
+      - PROJECT_TARGET="esp32"
+      - PROJECT_SDK_BRANCH="master"
+      - PROJECT_BUILD_METHOD="idf"
+    - env:
       - PROJECT_TARGET="esp8266"
       - PROJECT_SDK_BRANCH="master"
       - PROJECT_BUILD_METHOD="make"
