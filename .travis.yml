@@ -16,9 +16,11 @@ matrix:
     - env:
       - PROJECT_TARGET="esp32"
       - PROJECT_SDK_BRANCH="master"
+      - PROJECT_BUILD_METHOD="make"
     - env:
       - PROJECT_TARGET="esp8266"
       - PROJECT_SDK_BRANCH="master"
+      - PROJECT_BUILD_METHOD="make"
 
 addons:
   apt:
@@ -55,6 +57,17 @@ install:
   - export IDF_PATH=${TOOLCHAIN_DIR}/${PROJECT_SDK_NAME}
   - export PROJECT_LOG="${HOME}/build.log"
   - export PROJECT_EXAMPLE_DIR="${PROJECT_PATH}/examples"
+  - |
+    if [ ${PROJECT_BUILD_METHOD} == "idf" ]; then
+      export PROJECT_BUILD_COMMAND="python ${IDF_PATH}/tools/idf.py"
+      export PROJECT_BUILD_COMMAND_ARG="build"
+    elif [ ${PROJECT_BUILD_METHOD} == "make" ]; then
+      export PROJECT_BUILD_COMMAND="make"
+      export PROJECT_BUILD_COMMAND_ARG="-j2"
+    else
+      echo "Unknown PROJECT_BUILD_METHOD: `${PROJECT_BUILD_METHOD}`"
+      exit 1
+    fi
   # Install ESP32 toochain following steps as desribed
   # in http://esp-idf.readthedocs.io/en/latest/linux-setup.html
 
@@ -108,8 +121,9 @@ script:
       if [ ! -e ${PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE} ]; then
         echo "Building ${i}..."
         cd ${PROJECT_EXAMPLE_DIR}/${i}
-        make defconfig
-        make -j2 >> ${PROJECT_LOG}
+        # idf.py does not have defconfig
+        make defconfig || exit 1
+        ${PROJECT_BUILD_COMMAND} ${PROJECT_BUILD_COMMAND_ARG} >> ${PROJECT_LOG}
         if [ $? -ne 0 ]; then
           # when failed, show last 100 lines for debugging, and exit with
           # non-zero exit code
