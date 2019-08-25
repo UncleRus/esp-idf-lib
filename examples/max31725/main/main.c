@@ -8,8 +8,13 @@
 
 #define I2C_PORT 0
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 #define ADDRESS MAX31725_I2C_ADDR_BASE
 #define FORMAT MAX31725_FMT_NORMAL
@@ -48,6 +53,10 @@ void test(void *pvParamters)
     {
         float temp;
         if (max31725_one_shot(&dev, &temp, FORMAT) == ESP_OK)
+            /* float is used in printf(). you need non-default configuration in
+             * sdkconfig for ESP8266, which is enabled by default for this
+             * example. see sdkconfig.defaults.esp8266
+             */
             printf("Temperature: %.02f deg.C\n", temp);
         else
             printf("Could not read temperature\n");

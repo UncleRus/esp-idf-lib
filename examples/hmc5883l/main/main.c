@@ -4,8 +4,13 @@
 #include <hmc5883l.h>
 #include <string.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 void hmc5883l_test(void *pvParameters)
 {
@@ -28,6 +33,10 @@ void hmc5883l_test(void *pvParameters)
     {
         hmc5883l_data_t data;
         if (hmc5883l_get_data(&dev, &data) == ESP_OK)
+            /* float is used in printf(). you need non-default configuration in
+             * sdkconfig for ESP8266, which is enabled by default for this
+             * example. see sdkconfig.defaults.esp8266
+             */
             printf("Magnetic data: X:%.2f mG, Y:%.2f mG, Z:%.2f mG\n", data.x, data.y, data.z);
         else
             printf("Could not read HMC5883L data\n");

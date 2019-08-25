@@ -7,8 +7,13 @@
 #include <bmp280.h>
 #include <string.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 #define I2C_ADDR 0x27
 
 static i2c_dev_t pcf8574;
