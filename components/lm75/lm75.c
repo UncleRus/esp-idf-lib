@@ -213,16 +213,16 @@ esp_err_t lm75_wakeup(lm75_t *dev)
     return lm75_clear_bits_register8(dev, LM75_REG_CONF, LM75_MASK_SHUTDOWN);
 }
 
-esp_err_t lm75_set_os_polarity(lm75_t *dev, const uint8_t v)
+esp_err_t lm75_set_os_polarity(lm75_t *dev, const LM75_OS_Polarity v)
 {
     ESP_LOGV(TAG, "lm75_set_os_polarity(): v: %d", v);
     if (v > 1) {
         ESP_LOGE(TAG, "lm75_set_os_polarity(): second argument must be %d or %d",
-                LM75_OS_ACTIVE_LOW, LM75_OS_ACTIVE_HIGH);
+                LM75_OSP_LOW, LM75_OSP_HIGH);
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (v == LM75_OS_ACTIVE_HIGH) {
+    if (v == LM75_OSP_HIGH) {
         return lm75_set_bits_register8(dev, LM75_REG_CONF, LM75_MASK_OS_POL);
     } else {
         return lm75_clear_bits_register8(dev, LM75_REG_CONF, LM75_MASK_OS_POL);
@@ -242,16 +242,16 @@ esp_err_t lm75_get_os_polarity(lm75_t *dev, uint8_t *v)
     return ESP_OK;
 }
 
-esp_err_t lm75_set_os_mode(lm75_t *dev, const uint8_t v)
+esp_err_t lm75_set_os_mode(lm75_t *dev, LM75_OS_Mode v)
 {
     ESP_LOGV(TAG, "lm75_set_os_mode(): v: %d", v);
     if (v > 1) {
         ESP_LOGE(TAG, "lm75_set_os_mode(): second argument must be %d or %d",
-                LM75_OS_COMPARATOR, LM75_OS_INTERRUPT);
+                LM75_OS_MODE_COMP, LM75_OS_MODE_INT);
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (v == LM75_OS_INTERRUPT) {
+    if (v == LM75_OS_MODE_INT) {
         return lm75_set_bits_register8(dev, LM75_REG_CONF, LM75_MASK_OS_COMP_INT);
     } else {
         return lm75_clear_bits_register8(dev, LM75_REG_CONF, LM75_MASK_OS_COMP_INT);

@@ -71,18 +71,18 @@ void lm75_task(void *pvParamters)
         ESP_LOGE(TAG, "invalid OS temperature fonud: %.3f", os_temperature_in_reg);
     }
 
-    ESP_LOGI(TAG, "Set OS polarlity to LM75_OS_ACTIVE_HIGH");
-    ESP_ERROR_CHECK(lm75_set_os_polarity(&dev, LM75_OS_ACTIVE_HIGH));
+    ESP_LOGI(TAG, "Set OS polarlity to LM75_OSP_HIGH");
+    ESP_ERROR_CHECK(lm75_set_os_polarity(&dev, LM75_OSP_HIGH));
     ESP_ERROR_CHECK(lm75_get_os_polarity(&dev, &v));
-    if (v != LM75_OS_ACTIVE_HIGH) {
-        ESP_LOGE(TAG, "polarlity is not LM75_OS_ACTIVE_HIGH");
+    if (v != LM75_OSP_HIGH) {
+        ESP_LOGE(TAG, "polarlity is not LM75_OSP_HIGH");
     }
 
-    ESP_LOGI(TAG, "Set OS polarlity to LM75_OS_ACTIVE_LOW");
-    ESP_ERROR_CHECK(lm75_set_os_polarity(&dev, LM75_OS_ACTIVE_LOW));
+    ESP_LOGI(TAG, "Set OS polarlity to LM75_OSP_LOW");
+    ESP_ERROR_CHECK(lm75_set_os_polarity(&dev, LM75_OSP_LOW));
     ESP_ERROR_CHECK(lm75_get_os_polarity(&dev, &v));
-    if (v != LM75_OS_ACTIVE_LOW) {
-        ESP_LOGE(TAG, "polarlity is not LM75_OS_ACTIVE_LOW");
+    if (v != LM75_OSP_LOW) {
+        ESP_LOGE(TAG, "polarlity is not LM75_OSP_LOW");
     }
 
     ESP_LOGI(TAG, "Starting the loop");
