@@ -40,8 +40,8 @@ void lm75_task(void *pvParamters)
     float temperature;
     float os_temperature = 25.0;
     float os_temperature_in_reg;
-    lm75_t dev;
-    memset(&dev, 0, sizeof(lm75_t));
+    i2c_dev_t dev;
+    memset(&dev, 0, sizeof(i2c_dev_t));
 
     /* device operation mode: shutdown
      * overtemperature polarity: high

@@ -73,13 +73,6 @@ typedef enum {
 } lm75_os_mode_t;
 
 /*
- * LM75 device descriptor
- */
-typedef struct {
-    i2c_dev_t i2c_dev;
-} lm75_t;
-
-/*
  *  OS fault queue, the number of faults that must occur consecutively to
  *  activate the OS output
  */
@@ -112,7 +105,7 @@ typedef struct {
  * @param[in] scl_gpio GPIO number of SCL
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_init_desc(lm75_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t lm75_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /*
  * @brief Initialize LM75
@@ -122,13 +115,13 @@ esp_err_t lm75_init_desc(lm75_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t 
  * @param[in] dev pointer to LM75 device descriptior
  * @param[in] config configuration
  */
-esp_err_t lm75_init(lm75_t *dev, const lm75_config_t config);
+esp_err_t lm75_init(i2c_dev_t *dev, const lm75_config_t config);
 
 /*
  * @brief free LM75 device descriptior
  * @param dev Pointer to device descriptor
  */
-esp_err_t lm75_free_desc(lm75_t *dev);
+esp_err_t lm75_free_desc(i2c_dev_t *dev);
 
 /*
  * @brief Get the value of OS Polarity in the configuration register
@@ -136,7 +129,7 @@ esp_err_t lm75_free_desc(lm75_t *dev);
  * @param[out] v value of OS Polarity
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_get_os_polarity(lm75_t *dev, uint8_t *v);
+esp_err_t lm75_get_os_polarity(i2c_dev_t *dev, uint8_t *v);
 
 /*
  * @brief Get the value of OS threshold in the configuration register
@@ -144,7 +137,7 @@ esp_err_t lm75_get_os_polarity(lm75_t *dev, uint8_t *v);
  * @param[out] v value of OS threshold
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_get_os_threshold(lm75_t *dev, float *value);
+esp_err_t lm75_get_os_threshold(i2c_dev_t *dev, float *value);
 
 /*
  * @brief Read the temparature
@@ -152,7 +145,7 @@ esp_err_t lm75_get_os_threshold(lm75_t *dev, float *value);
  * @param[out] value temparature
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_read_temparature(lm75_t *dev, float *value);
+esp_err_t lm75_read_temparature(i2c_dev_t *dev, float *value);
 
 /*
  * @brief Set OS mode
@@ -160,7 +153,7 @@ esp_err_t lm75_read_temparature(lm75_t *dev, float *value);
  * @param[in] v OS mode
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_set_os_mode(lm75_t *dev, const lm75_os_mode_t v);
+esp_err_t lm75_set_os_mode(i2c_dev_t *dev, const lm75_os_mode_t v);
 
 /*
  * @brief Set the value of OS Polarity in the configuration register
@@ -169,7 +162,7 @@ esp_err_t lm75_set_os_mode(lm75_t *dev, const lm75_os_mode_t v);
  * @param[in] v value of OS Polarity
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_set_os_polarity(lm75_t *dev, const lm75_os_polarity_t v);
+esp_err_t lm75_set_os_polarity(i2c_dev_t *dev, const lm75_os_polarity_t v);
 
 /*
  * @brief Set the value of OS threshold in the configuration register
@@ -177,21 +170,21 @@ esp_err_t lm75_set_os_polarity(lm75_t *dev, const lm75_os_polarity_t v);
  * @param[in] v value of OS threshold
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_set_os_threshold(lm75_t *dev, const float value);
+esp_err_t lm75_set_os_threshold(i2c_dev_t *dev, const float value);
 
 /*
  * @brief Shutdown LM75
  * @param[in] dev pointer to LM75 device descriptior
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_shutdown(lm75_t *dev);
+esp_err_t lm75_shutdown(i2c_dev_t *dev);
 
 /*
  * @brief Wake LM75 up
  * @param[in] dev pointer to LM75 device descriptior
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_wakeup(lm75_t *dev);
+esp_err_t lm75_wakeup(i2c_dev_t *dev);
 
 #ifdef __cplusplus
 }

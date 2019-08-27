@@ -37,7 +37,7 @@
 #define CHECK_LOGE(dev, x, msg, ...) do { \
         esp_err_t __; \
         if ((__ = x) != ESP_OK) { \
-            I2C_DEV_GIVE_MUTEX(&dev->i2c_dev); \
+            I2C_DEV_GIVE_MUTEX(dev); \
             ESP_LOGE(TAG, msg, ## __VA_ARGS__); \
             return __; \
         } \
@@ -74,21 +74,21 @@ static esp_err_t write_register8(i2c_dev_t *dev, uint8_t reg, uint8_t value)
     return i2c_dev_write_reg(dev, reg, &value, 1);
 }
 
-esp_err_t lm75_read_temparature(lm75_t *dev, float *value)
+esp_err_t lm75_read_temparature(i2c_dev_t *dev, float *value)
 {
     CHECK_ARG(dev);
     uint16_t raw_data;
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, read_register16(&dev->i2c_dev, LM75_REG_TEMP, &raw_data),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, read_register16(dev, LM75_REG_TEMP, &raw_data),
             "lm75_read_temparature(): read_register16() failed: regsiter: 0x%x", LM75_REG_TEMP);
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
 
     *value = (raw_data >> 5) * 0.125;
     return ESP_OK;
 }
 
-esp_err_t lm75_init_desc(lm75_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t lm75_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     if (addr < LM75_I2C_ADDRESS_DEFAULT || addr > LM75_I2C_ADDRESS_MAX) {
@@ -97,17 +97,17 @@ esp_err_t lm75_init_desc(lm75_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t 
         return ESP_ERR_INVALID_ARG;
     }
 
-    dev->i2c_dev.port = port;
-    dev->i2c_dev.addr = addr;
-    dev->i2c_dev.cfg.sda_io_num = sda_gpio;
-    dev->i2c_dev.cfg.scl_io_num = scl_gpio;
+    dev->port = port;
+    dev->addr = addr;
+    dev->cfg.sda_io_num = sda_gpio;
+    dev->cfg.scl_io_num = scl_gpio;
 #if defined(CONFIG_IDF_TARGET_ESP32)
-    dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
+    dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
-    return i2c_dev_create_mutex(&dev->i2c_dev);
+    return i2c_dev_create_mutex(dev);
 }
 
-esp_err_t lm75_set_os_threshold(lm75_t *dev, const float value)
+esp_err_t lm75_set_os_threshold(i2c_dev_t *dev, const float value)
 {
     CHECK_ARG(dev);
     uint16_t reg_value;
@@ -126,25 +126,25 @@ esp_err_t lm75_set_os_threshold(lm75_t *dev, const float value)
     ESP_LOGV(TAG, "lm75_set_os_threshold(): reg_value: 0x%x 9 bit reg_value: 0x%x value: %f",
             reg_value, reg_value >> 7, value);
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, write_register16(&dev->i2c_dev, LM75_REG_TOS, reg_value),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, write_register16(dev, LM75_REG_TOS, reg_value),
             "lm75_set_os_threshold(): write_register16() failed: register 0x%x",
             LM75_REG_TOS);
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }
 
 
-esp_err_t lm75_get_os_threshold(lm75_t *dev, float *value)
+esp_err_t lm75_get_os_threshold(i2c_dev_t *dev, float *value)
 {
     CHECK_ARG(dev);
     uint16_t reg_value;
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, read_register16(&dev->i2c_dev, LM75_REG_TOS, &reg_value),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, read_register16(dev, LM75_REG_TOS, &reg_value),
             "lm75_get_os_threshold(): read_register16() failed: regsiter: 0x%x", LM75_REG_TOS);
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
 
     ESP_LOGV(TAG, "lm75_get_os_threshold(): reg_value: 0x%x 9 bit reg_value: 0x%x", reg_value, reg_value >> 7);
     reg_value = reg_value >> 7;
@@ -159,61 +159,61 @@ esp_err_t lm75_get_os_threshold(lm75_t *dev, float *value)
     return ESP_OK;
 }
 
-esp_err_t lm75_free_desc(lm75_t *dev)
+esp_err_t lm75_free_desc(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);
 
-    return i2c_dev_delete_mutex(&dev->i2c_dev);
+    return i2c_dev_delete_mutex(dev);
 }
 
 static
-esp_err_t lm75_set_bits_register8(lm75_t *dev, uint8_t reg, uint8_t mask)
+esp_err_t lm75_set_bits_register8(i2c_dev_t *dev, uint8_t reg, uint8_t mask)
 {
     CHECK_ARG(dev);
     uint8_t value;
     ESP_LOGV(TAG, "lm75_set_bits_register8(): reg: 0x%x, mask: 0x%x", reg, mask);
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, read_register8(&dev->i2c_dev, reg, &value),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, read_register8(dev, reg, &value),
             "lm75_set_bits_register8(): read_register8() failed reg: 0x%x", reg);
     ESP_LOGV(TAG, "lm75_set_bits_register8(): value in register: 0x%x", value);
     if ((value & mask) != mask) {
         value |= mask;
         ESP_LOGV(TAG, "lm75_set_bits_register8(): updating register with value: 0x%x", value);
-        CHECK_LOGE(dev, write_register8(&dev->i2c_dev, reg, value),
+        CHECK_LOGE(dev, write_register8(dev, reg, value),
                 "lm75_set_bits_register8(): write_register8() failed reg: 0x%x", reg);
     } else {
         ESP_LOGV(TAG, "lm75_set_bits_register8(): register unchanged");
     }
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
     return ESP_OK;
 
 }
 
 static
-esp_err_t lm75_clear_bits_register8(lm75_t *dev, uint8_t reg, uint8_t mask)
+esp_err_t lm75_clear_bits_register8(i2c_dev_t *dev, uint8_t reg, uint8_t mask)
 {
     CHECK_ARG(dev);
     uint8_t value;
     ESP_LOGV(TAG, "lm75_clear_bits_register8(): reg: 0x%x, mask: 0x%x", reg, mask);
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, read_register8(&dev->i2c_dev, reg, &value),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, read_register8(dev, reg, &value),
             "read_register8() failed: register: 0x%x", reg);
     if ((value & mask) == mask) {
         value ^= mask;
         ESP_LOGV(TAG, "lm75_clear_bits_register8(): updating register with value: 0x%x", value);
-        CHECK_LOGE(dev, write_register8(&dev->i2c_dev, reg, value),
+        CHECK_LOGE(dev, write_register8(dev, reg, value),
                 "write_register8() failed: regsiter 0x%x", reg);
     } else {
         ESP_LOGV(TAG, "lm75_clear_bits_register8(): register unchanged");
     }
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
     return ESP_OK;
 
 }
 
-esp_err_t lm75_shutdown(lm75_t *dev)
+esp_err_t lm75_shutdown(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);
     ESP_LOGV(TAG, "lm75_shutdown(): trying to set shutdown bit");
@@ -221,7 +221,7 @@ esp_err_t lm75_shutdown(lm75_t *dev)
     return lm75_set_bits_register8(dev, LM75_REG_CONF, LM75_MASK_SHUTDOWN);
 }
 
-esp_err_t lm75_wakeup(lm75_t *dev)
+esp_err_t lm75_wakeup(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);
     ESP_LOGV(TAG, "lm75_wakeup(): trying to clear shutdown bit");
@@ -229,7 +229,7 @@ esp_err_t lm75_wakeup(lm75_t *dev)
     return lm75_clear_bits_register8(dev, LM75_REG_CONF, LM75_MASK_SHUTDOWN);
 }
 
-esp_err_t lm75_set_os_polarity(lm75_t *dev, const lm75_os_polarity_t v)
+esp_err_t lm75_set_os_polarity(i2c_dev_t *dev, const lm75_os_polarity_t v)
 {
     ESP_LOGV(TAG, "lm75_set_os_polarity(): v: %d", v);
     if (v > 1) {
@@ -244,21 +244,21 @@ esp_err_t lm75_set_os_polarity(lm75_t *dev, const lm75_os_polarity_t v)
         return lm75_clear_bits_register8(dev, LM75_REG_CONF, LM75_MASK_OS_POL);
     }
 }
-esp_err_t lm75_get_os_polarity(lm75_t *dev, uint8_t *v)
+esp_err_t lm75_get_os_polarity(i2c_dev_t *dev, uint8_t *v)
 {
     CHECK_ARG(dev);
     uint8_t reg_value;
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, read_register8(&dev->i2c_dev, LM75_REG_CONF, &reg_value),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, read_register8(dev, LM75_REG_CONF, &reg_value),
             "lm75_get_os_polarity(): read_register8() failed: reg: 0x%x", LM75_REG_CONF);
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
 
     *v = (reg_value & LM75_MASK_OS_POL) == 0 ? 0 : 1;
     return ESP_OK;
 }
 
-esp_err_t lm75_set_os_mode(lm75_t *dev, lm75_os_mode_t v)
+esp_err_t lm75_set_os_mode(i2c_dev_t *dev, lm75_os_mode_t v)
 {
     ESP_LOGV(TAG, "lm75_set_os_mode(): v: %d", v);
     if (v > 1) {
@@ -278,7 +278,7 @@ esp_err_t lm75_set_os_mode(lm75_t *dev, lm75_os_mode_t v)
  * | [7:5]    |   4    |  3   |   2    |     1       |    0     |
  * | Reserved | OS_F_QUE[1:0] | PS_POL | OS_COMP_INT | SHUTDOWN |
  */
-esp_err_t lm75_init(lm75_t *dev, const lm75_config_t config)
+esp_err_t lm75_init(i2c_dev_t *dev, const lm75_config_t config)
 {
     CHECK_ARG(dev);
     uint8_t value = 0;
@@ -288,10 +288,10 @@ esp_err_t lm75_init(lm75_t *dev, const lm75_config_t config)
             (config.os_mode        << 2) |
             (config.os_fault_queue << 3);
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    CHECK_LOGE(dev, write_register8(&dev->i2c_dev, LM75_REG_CONF, value),
+    I2C_DEV_TAKE_MUTEX(dev);
+    CHECK_LOGE(dev, write_register8(dev, LM75_REG_CONF, value),
             "lm75_init(): write_register8() failed");
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }
