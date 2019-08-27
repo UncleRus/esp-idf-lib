@@ -229,7 +229,7 @@ esp_err_t lm75_wakeup(lm75_t *dev)
     return lm75_clear_bits_register8(dev, LM75_REG_CONF, LM75_MASK_SHUTDOWN);
 }
 
-esp_err_t lm75_set_os_polarity(lm75_t *dev, const LM75_OS_Polarity v)
+esp_err_t lm75_set_os_polarity(lm75_t *dev, const lm75_os_polarity_t v)
 {
     ESP_LOGV(TAG, "lm75_set_os_polarity(): v: %d", v);
     if (v > 1) {
@@ -258,7 +258,7 @@ esp_err_t lm75_get_os_polarity(lm75_t *dev, uint8_t *v)
     return ESP_OK;
 }
 
-esp_err_t lm75_set_os_mode(lm75_t *dev, LM75_OS_Mode v)
+esp_err_t lm75_set_os_mode(lm75_t *dev, lm75_os_mode_t v)
 {
     ESP_LOGV(TAG, "lm75_set_os_mode(): v: %d", v);
     if (v > 1) {
@@ -280,7 +280,9 @@ esp_err_t lm75_set_os_mode(lm75_t *dev, LM75_OS_Mode v)
  */
 esp_err_t lm75_init(lm75_t *dev, const lm75_config_t config)
 {
+    CHECK_ARG(dev);
     uint8_t value = 0;
+
     value = (config.mode           << 0) |
             (config.os_mode        << 1) |
             (config.os_mode        << 2) |

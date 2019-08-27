@@ -54,7 +54,7 @@ extern "C" {
 typedef enum {
     LM75_MODE_NORMAL = 0,  //!< Normal operation mode
     LM75_MODE_SHUTDOWN = 1 //!< Shutdown mode
-} LM75_Mode;
+} lm75_mode_t;
 
 /*
  * Overtemparature Shutdown Polarity
@@ -62,7 +62,7 @@ typedef enum {
 typedef enum {
     LM75_OSP_LOW  = 0, //!< Overtemparature Shutdown Polarity is active low
     LM75_OSP_HIGH = 1  //!< OSP is active high
-} LM75_OS_Polarity;
+} lm75_os_polarity_t;
 
 /*
  * Overtemparature Shutdown output mode
@@ -70,7 +70,7 @@ typedef enum {
 typedef enum {
     LM75_OS_MODE_COMP = 0, //!< OS output mode is comparator
     LM75_OS_MODE_INT  = 1  //!< OS output mode is interrupt
-} LM75_OS_Mode;
+} lm75_os_mode_t;
 
 /*
  * LM75 device descriptor
@@ -88,16 +88,16 @@ typedef enum {
     LM75_FAULT_QUEUE2 = 0b01, //!< 2
     LM75_FAULT_QUEUE4 = 0b10, //!< 4
     LM75_FAULT_QUEUE6 = 0b11  //!< 6
-} LM75_Fault_Queue;
+} lm75_fault_queue_t;
 
 /*
  * Device configuration
  */
 typedef struct {
-    LM75_Mode mode;                     //!< Operation mode of the device
-    LM75_OS_Polarity os_pol;            //!< OS Polarity
-    LM75_OS_Mode os_mode;               //!< OS mode
-    LM75_Fault_Queue os_fault_queue;    //!< OS fault queue
+    lm75_mode_t mode;                     //!< Operation mode of the device
+    lm75_os_polarity_t os_pol;            //!< OS Polarity
+    lm75_os_mode_t os_mode;               //!< OS mode
+    lm75_fault_queue_t os_fault_queue;    //!< OS fault queue
 } lm75_config_t;
 
 /*
@@ -160,7 +160,7 @@ esp_err_t lm75_read_temparature(lm75_t *dev, float *value);
  * @param[in] v OS mode
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_set_os_mode(lm75_t *dev, const LM75_OS_Mode v);
+esp_err_t lm75_set_os_mode(lm75_t *dev, const lm75_os_mode_t v);
 
 /*
  * @brief Set the value of OS Polarity in the configuration register
@@ -169,7 +169,7 @@ esp_err_t lm75_set_os_mode(lm75_t *dev, const LM75_OS_Mode v);
  * @param[in] v value of OS Polarity
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_set_os_polarity(lm75_t *dev, const LM75_OS_Polarity v);
+esp_err_t lm75_set_os_polarity(lm75_t *dev, const lm75_os_polarity_t v);
 
 /*
  * @brief Set the value of OS threshold in the configuration register
