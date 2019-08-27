@@ -6,8 +6,13 @@
 
 #define I2C_ADDR MS5611_ADDR_CSB_LOW
 #define I2C_PORT 0
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 #define OVERSAMPLING_RATIO MS5611_OSR_1024
 
 void ms5611_test(void *pvParamters)
@@ -33,6 +38,10 @@ void ms5611_test(void *pvParamters)
             continue;
         }
 
+        /* float is used in printf(). you need non-default configuration in
+         * sdkconfig for ESP8266, which is enabled by default for this
+         * example. see sdkconfig.defaults.esp8266
+         */
         printf("Pressure: %d Pa, Temperature: %.2f C\n", pressure, temperature);
     }
 }

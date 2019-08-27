@@ -108,6 +108,7 @@ Humidity & temperature sensors
    groups/si7021
    groups/ds18x20
    groups/max31725
+   groups/lm75
    groups/bme680
    
 Pressure sensors

@@ -3,14 +3,21 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <tsl2561.h>
+#include <string.h>
 
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
+#define SDA_GPIO 18
+#define SCL_GPIO 19
+#endif
 #define ADDR TSL2561_I2C_ADDR_FLOAT
 
 void tsl2561_test(void *pvParamters)
 {
     tsl2561_t dev;
+    memset(&dev, 0, sizeof(tsl2561_t));
 
     ESP_ERROR_CHECK(tsl2561_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
     ESP_ERROR_CHECK(tsl2561_init(&dev));

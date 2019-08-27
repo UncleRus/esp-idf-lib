@@ -3,7 +3,11 @@
 #include <freertos/task.h>
 #include <ds18x20.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+static const gpio_num_t SENSOR_GPIO = 4;
+#else
 static const gpio_num_t SENSOR_GPIO = 17;
+#endif
 static const uint32_t LOOP_DELAY_MS = 250;
 static const int MAX_SENSORS = 8;
 static const int RESCAN_INTERVAL = 8;
@@ -54,6 +58,10 @@ void ds18x20_test(void *pvParameter)
                     uint32_t addr1 = addrs[j];
                     float temp_c = temps[j];
                     float temp_f = (temp_c * 1.8) + 32;
+                    /* float is used in printf(). you need non-default configuration in
+                     * sdkconfig for ESP8266, which is enabled by default for this
+                     * example. see sdkconfig.defaults.esp8266
+                     */
                     printf("  Sensor %08x%08x reports %f deg C (%f deg F)\n", addr0, addr1, temp_c, temp_f);
                 }
                 printf("\n");

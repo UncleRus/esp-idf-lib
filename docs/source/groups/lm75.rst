@@ -1,0 +1,5 @@
+lm75 - Driver for for LM75, a digital temperature sensor and thermal watchdog
+=============================================================================
+
+.. doxygengroup:: lm75
+
