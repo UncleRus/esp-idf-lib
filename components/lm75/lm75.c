@@ -74,14 +74,14 @@ static esp_err_t write_register8(i2c_dev_t *dev, uint8_t reg, uint8_t value)
     return i2c_dev_write_reg(dev, reg, &value, 1);
 }
 
-esp_err_t lm75_read_temparature(i2c_dev_t *dev, float *value)
+esp_err_t lm75_read_temperature(i2c_dev_t *dev, float *value)
 {
     CHECK_ARG(dev);
     uint16_t raw_data;
 
     I2C_DEV_TAKE_MUTEX(dev);
     CHECK_LOGE(dev, read_register16(dev, LM75_REG_TEMP, &raw_data),
-            "lm75_read_temparature(): read_register16() failed: regsiter: 0x%x", LM75_REG_TEMP);
+            "lm75_read_temperature(): read_register16() failed: regsiter: 0x%x", LM75_REG_TEMP);
     I2C_DEV_GIVE_MUTEX(dev);
 
     *value = (raw_data >> 5) * 0.125;

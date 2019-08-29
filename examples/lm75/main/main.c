@@ -117,8 +117,8 @@ void lm75_task(void *pvParamters)
         printf("Operation mode: %s\n", shutdown ? "shutdown" : "normal");
         for (int i = 0; i < 10; i++) {
             vTaskDelay(1000 / portTICK_PERIOD_MS);
-            if (lm75_read_temparature(&dev, &temperature) != ESP_OK) {
-                ESP_LOGE(TAG, "failed to read_temparature()");
+            if (lm75_read_temperature(&dev, &temperature) != ESP_OK) {
+                ESP_LOGE(TAG, "failed to read_temperature()");
                 continue;
             }
             printf("Temperature: %.3f\n", temperature);

@@ -31,7 +31,7 @@
  * 2. Initialize I2C descriptior by i2cdev_init()
  * 3. Initialize LM75 descriptior by lm75_init_desc()
  * 4. Initialize LM75 by lm75_init()
- * 5. Read temperature by lm75_read_temparature()
+ * 5. Read temperature by lm75_read_temperature()
  *
  */
 #ifndef __LM75_H__
@@ -57,15 +57,15 @@ typedef enum {
 } lm75_mode_t;
 
 /**
- * Overtemparature Shutdown Polarity
+ * Overtemperature Shutdown Polarity
  */
 typedef enum {
-    LM75_OSP_LOW  = 0, //!< Overtemparature Shutdown Polarity is active low
+    LM75_OSP_LOW  = 0, //!< Overtemperature Shutdown Polarity is active low
     LM75_OSP_HIGH = 1  //!< OSP is active high
 } lm75_os_polarity_t;
 
 /**
- * Overtemparature Shutdown output mode
+ * Overtemperature Shutdown output mode
  */
 typedef enum {
     LM75_OS_MODE_COMP = 0, //!< OS output mode is comparator
@@ -140,12 +140,12 @@ esp_err_t lm75_get_os_polarity(i2c_dev_t *dev, uint8_t *v);
 esp_err_t lm75_get_os_threshold(i2c_dev_t *dev, float *value);
 
 /**
- * @brief Read the temparature
+ * @brief Read the temperature
  * @param[in] dev pointer to LM75 device descriptior
- * @param[out] value temparature
+ * @param[out] value temperature
  * @return `ESP_OK` on success
  */
-esp_err_t lm75_read_temparature(i2c_dev_t *dev, float *value);
+esp_err_t lm75_read_temperature(i2c_dev_t *dev, float *value);
 
 /**
  * @brief Set OS mode
