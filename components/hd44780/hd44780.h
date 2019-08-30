@@ -127,6 +127,20 @@ esp_err_t hd44780_switch_backlight(hd44780_t *lcd, bool on);
  */
 esp_err_t hd44780_upload_character(const hd44780_t *lcd, uint8_t num, const uint8_t *data);
 
+/**
+ * @brief Scroll the display content to left by one character
+ * @param lcd LCD descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t hd44780_scroll_left(const hd44780_t *lcd);
+
+/**
+ * @brief Scroll the display content to right by one character
+ * @param lcd LCD descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t hd44780_scroll_right(const hd44780_t *lcd);
+
 #ifdef __cplusplus
 }
 #endif
