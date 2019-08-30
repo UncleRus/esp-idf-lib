@@ -109,6 +109,7 @@ Humidity & temperature sensors
    groups/ds18x20
    groups/max31725
    groups/lm75
+   groups/bme680
    
 Pressure sensors
 ================
@@ -117,6 +118,7 @@ Pressure sensors
 
    groups/bmp180
    groups/bmp280
+   groups/bme680
    groups/ms5611
 
 ADC/DAC
