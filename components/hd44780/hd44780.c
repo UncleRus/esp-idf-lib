@@ -38,6 +38,11 @@
 #define CMD_CGRAM_ADDR   0x40
 #define CMD_DDRAM_ADDR   0x80
 
+#define ARG_MOVE_RIGHT 0x04
+#define ARG_MOVE_LEFT 0x00
+#define CMD_SHIFT_LEFT  (CMD_SHIFT | CMD_DISPLAY_CTRL | ARG_MOVE_LEFT)
+#define CMD_SHIFT_RIGHT (CMD_SHIFT | CMD_DISPLAY_CTRL | ARG_MOVE_RIGHT)
+
 // CMD_ENTRY_MODE
 #define ARG_EM_INCREMENT    BV(1)
 #define ARG_EM_SHIFT        (1)
@@ -243,6 +248,26 @@ esp_err_t hd44780_upload_character(const hd44780_t *lcd, uint8_t num, const uint
     }
 
     CHECK(hd44780_gotoxy(lcd, 0, 0));
+
+    return ESP_OK;
+}
+
+esp_err_t hd44780_scroll_left(const hd44780_t *lcd)
+{
+    CHECK_ARG(lcd);
+
+    CHECK(write_byte(lcd, CMD_SHIFT_LEFT, false));
+    short_delay();
+
+    return ESP_OK;
+}
+
+esp_err_t hd44780_scroll_right(const hd44780_t *lcd)
+{
+    CHECK_ARG(lcd);
+
+    CHECK(write_byte(lcd, CMD_SHIFT_RIGHT, false));
+    short_delay();
 
     return ESP_OK;
 }
