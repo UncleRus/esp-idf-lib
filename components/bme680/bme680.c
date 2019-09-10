@@ -881,7 +881,7 @@ esp_err_t bme680_set_filter_size(bme680_t *dev, bme680_filter_size_t size)
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
-    ESP_LOGE(TAG, "Setting filter size done: size=%d", dev->settings.filter_size);
+    ESP_LOGD(TAG, "Setting filter size done: size=%d", dev->settings.filter_size);
 
     return ESP_OK;
 }
