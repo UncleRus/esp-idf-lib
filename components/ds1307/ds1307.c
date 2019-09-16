@@ -30,7 +30,7 @@
 #define SECONDS_MASK 0x7f
 #define HOUR12_MASK  0x1f
 #define HOUR24_MASK  0x3f
-#define SQWEF_MASK   0x03
+#define SQWEF_MASK   0xfc
 #define SQWE_MASK    0xef
 #define OUT_MASK     0x7f
 
