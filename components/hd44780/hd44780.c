@@ -15,8 +15,10 @@
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #include <esp32/rom/ets_sys.h> // add by nopnop2002
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif defined(CONFIG_IDF_TARGET_ESP8266) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
 #include <rom/ets_sys.h>
+#else
+#error cannot locate ets_sys.h
 #endif
 
 #define MS 1000

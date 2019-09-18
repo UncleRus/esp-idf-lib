@@ -24,7 +24,7 @@ static inline uint32_t get_time_ms()
 
 static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
 {
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
 #elif defined(CONFIG_IDF_TARGET_ESP8266)
@@ -51,7 +51,7 @@ static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
         ets_delay_us(1);
     }
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
     portEXIT_CRITICAL(&mux);
 #elif defined(CONFIG_IDF_TARGET_ESP8266)
     portEXIT_CRITICAL();
