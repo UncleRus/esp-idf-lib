@@ -123,7 +123,7 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
 {
     return a->scl_io_num == b->scl_io_num
         && a->sda_io_num == b->sda_io_num
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
         && a->master.clk_speed == b->master.clk_speed
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
@@ -142,7 +142,7 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
         memcpy(&temp, cfg, sizeof(i2c_config_t));
         temp.mode = I2C_MODE_MASTER;
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
         i2c_driver_delete(port);
         if ((res = i2c_param_config(port, &temp)) != ESP_OK)
             return res;

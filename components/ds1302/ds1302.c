@@ -15,8 +15,10 @@
 #include <string.h>
 #if defined(CONFIG_IDF_TARGET_ESP32)
 #include <esp32/rom/ets_sys.h>
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif defined(CONFIG_IDF_TARGET_ESP8266) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
 #include <rom/ets_sys.h>
+#else
+#error cannot locate ets_sys.h
 #endif
 
 #define CH_REG   0x80
@@ -42,7 +44,7 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
