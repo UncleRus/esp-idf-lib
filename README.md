@@ -7,6 +7,25 @@ Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/
 
 Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
+## Supported versions
+
+### ESP-IDF
+
+* master
+* 3.2.2
+
+### ESP8266 RTOS SDK
+
+* master
+* 3.2
+
+Due to incompatibilities in ESP8266 RTOS SDK's SPI driver, the following
+libraries are not supported on ESP8266.
+
+* `max7219`
+* `mcp23x17`
+* `encoder`
+
 ## How to use
 
 ### ESP32
@@ -34,7 +53,7 @@ Clone this repository somewhere, e.g.:
 
 ```Shell
 cd ~/myprojects/esp
-git clone https://github.com/UncleRus/esp-idf-lib.git 
+git clone https://github.com/UncleRus/esp-idf-lib.git
 ```
 
 Add path to components in your project makefile, e.g:
