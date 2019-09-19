@@ -103,16 +103,6 @@ install:
     make)
       export PROJECT_BUILD_COMMAND="make"
       export PROJECT_BUILD_COMMAND_ARG="-j2"
-      if [ "${PROJECT_TARGET}" = "esp32" ]; then
-        # XXX define PROJECT_CONFIG_IDF_TARGET_ESP32 for esp-idf version 3.x as a
-        # workaround.
-        #
-        # recent esp-idf (and ESP8266 RTOS SDK) provides CONFIG_IDF_TARGET_ESP32
-        # and CONFIG_IDF_TARGET_ESP8266 for conditionals in C preprocessor.
-        # however, esp-idf 3.x does not. both 3.x and 4.x supports IDF_TARGET.
-        # however, ESP8266 RTOS SDK 3.2 does not define IDF_TARGET.
-        export CFLAGS="${CFLAGS} -DPROJECT_CONFIG_IDF_TARGET_ESP32"
-      fi
       ;;
     *)
       echo "Unknown PROJECT_BUILD_METHOD: ${PROJECT_BUILD_METHOD}"

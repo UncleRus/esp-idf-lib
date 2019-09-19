@@ -11,8 +11,9 @@
  *
  * MIT Licensed as described in the file LICENSE
  */
-#include "ds3231.h"
 #include <esp_err.h>
+#include "esp_idf_lib_helpers.h"
+#include "ds3231.h"
 
 #define I2C_FREQ_HZ 400000
 
@@ -69,7 +70,7 @@ esp_err_t ds3231_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio,
     dev->addr = DS3231_ADDR;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
     return i2c_dev_create_mutex(dev);

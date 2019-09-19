@@ -7,10 +7,11 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "hx711.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <sys/time.h>
+#include "esp_idf_lib_helpers.h"
+#include "hx711.h"
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -24,10 +25,10 @@ static inline uint32_t get_time_ms()
 
 static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
 {
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_IS_ESP32
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_IS_ESP8266
     portENTER_CRITICAL();
 #endif
 
@@ -51,9 +52,9 @@ static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
         ets_delay_us(1);
     }
 
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_IS_ESP32
     portEXIT_CRITICAL(&mux);
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_IS_ESP8266
     portEXIT_CRITICAL();
 #endif
 

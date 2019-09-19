@@ -7,8 +7,10 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "mcp23008.h"
+
 #include <esp_log.h>
+#include "esp_idf_lib_helpers.h"
+#include "mcp23008.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf, but device supports up to 1.7Mhz
 
@@ -103,7 +105,7 @@ esp_err_t mcp23008_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 

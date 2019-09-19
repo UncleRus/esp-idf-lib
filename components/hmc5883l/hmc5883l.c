@@ -9,11 +9,12 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "hmc5883l.h"
 
 #include <sys/time.h>
 #include <esp_log.h>
 #include <esp_err.h>
+#include "esp_idf_lib_helpers.h"
+#include "hmc5883l.h"
 
 #define REG_CR_A 0x00
 #define REG_CR_B 0x01
@@ -73,7 +74,7 @@ esp_err_t hmc5883l_init_desc(hmc5883l_dev_t *dev, i2c_port_t port, gpio_num_t sd
     dev->i2c_dev.addr = HMC5883L_ADDR;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
     return i2c_dev_create_mutex(&dev->i2c_dev);
