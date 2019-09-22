@@ -15,7 +15,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <sys/time.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "sht3x.h"
 
 #define I2C_FREQ_HZ 1000000 // 1MHz

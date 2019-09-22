@@ -11,7 +11,7 @@
  */
 
 #include <esp_log.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "ads111x.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp32

@@ -13,7 +13,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "bme680.h"
 
 #define I2C_FREQ_HZ 1000000 // Up to 3.4MHz, but esp-idf only supports 1MHz

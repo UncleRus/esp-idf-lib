@@ -11,7 +11,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "i2cdev.h"
 
 static const char *TAG = "I2C_DEV";

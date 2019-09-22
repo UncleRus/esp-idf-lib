@@ -11,7 +11,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "max31725.h"
 
 static const char *TAG = "MAX31725";

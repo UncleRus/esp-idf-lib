@@ -8,7 +8,7 @@
  * BSD Licensed as described in the file LICENSE
  */
 
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "tca95x5.h"
 
 #define I2C_FREQ_HZ 400000

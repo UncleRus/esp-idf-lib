@@ -9,7 +9,7 @@
  */
 
 #include <esp_log.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "tda74xx.h"
 
 #define I2C_FREQ_HZ 100000 // 100kHz

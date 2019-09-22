@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <esp_log.h>
 #include <esp_err.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "hmc5883l.h"
 
 #define REG_CR_A 0x00

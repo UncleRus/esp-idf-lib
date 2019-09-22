@@ -9,7 +9,7 @@
  */
 
 #include <esp_log.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "qmc5883l.h"
 
 #define I2C_FREQ_HZ 400000 // 400kHz

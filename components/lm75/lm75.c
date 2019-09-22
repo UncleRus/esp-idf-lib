@@ -16,7 +16,7 @@
 
 #include <esp_log.h>
 #include <esp_err.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "lm75.h"
 
 #define I2C_FREQ_HZ 1000000 // 1 Mhz

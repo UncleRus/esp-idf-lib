@@ -11,7 +11,7 @@
  * MIT Licensed as described in the file LICENSE
  */
 #include <esp_log.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "ina3221.h"
 
 static const char *TAG = "INA3221";

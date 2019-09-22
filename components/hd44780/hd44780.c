@@ -11,7 +11,7 @@
  */
 #include <string.h>
 #include <esp_system.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "hd44780.h"
 
 #if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4

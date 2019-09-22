@@ -14,7 +14,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "tsl4531.h"
 
 #define I2C_FREQ_HZ 400000

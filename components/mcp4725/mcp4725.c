@@ -11,7 +11,7 @@
  */
 
 #include <esp_log.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "mcp4725.h"
 
 static const char *TAG = "MCP4725";

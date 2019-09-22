@@ -10,7 +10,7 @@
 
 #include <esp_log.h>
 #include <string.h>
-#include "esp_idf_lib_helpers.h"
+#include <esp_idf_lib_helpers.h>
 #include "mcp23x17.h"
 
 static const char *TAG = "MCP23x17";
