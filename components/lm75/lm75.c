@@ -16,6 +16,7 @@
 
 #include <esp_log.h>
 #include <esp_err.h>
+#include <esp_idf_lib_helpers.h>
 #include "lm75.h"
 
 #define I2C_FREQ_HZ 1000000 // 1 Mhz
@@ -101,7 +102,7 @@ esp_err_t lm75_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
     return i2c_dev_create_mutex(dev);

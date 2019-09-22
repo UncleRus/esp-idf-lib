@@ -8,8 +8,9 @@
  * MIT Licensed as described in the file LICENSE
  */
 
-#include "tda74xx.h"
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "tda74xx.h"
 
 #define I2C_FREQ_HZ 100000 // 100kHz
 
@@ -37,7 +38,7 @@ esp_err_t tda74xx_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio
     dev->addr = TDA74XX_ADDR;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 

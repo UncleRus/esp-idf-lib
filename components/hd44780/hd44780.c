@@ -9,13 +9,14 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "hd44780.h"
 #include <string.h>
 #include <esp_system.h>
+#include <esp_idf_lib_helpers.h>
+#include "hd44780.h"
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
-#include <esp32/rom/ets_sys.h> // add by nopnop2002
-#elif defined(CONFIG_IDF_TARGET_ESP8266) || defined(PROJECT_CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4
+#include <esp32/rom/ets_sys.h>
+#elif HELPER_TARGET_IS_ESP8266 || HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V3_2
 #include <rom/ets_sys.h>
 #else
 #error cannot locate ets_sys.h
