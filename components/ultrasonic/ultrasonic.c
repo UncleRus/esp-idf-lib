@@ -28,6 +28,9 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #elif HELPER_TARGET_IS_ESP8266
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+
+#else
+#error cannot identify the target
 #endif
 
 static inline uint32_t get_time_us()

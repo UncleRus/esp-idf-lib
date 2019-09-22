@@ -54,6 +54,8 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #elif HELPER_TARGET_IS_ESP8266
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#else
+#error cannot identify the target
 #endif
 
 #define CHECK_MUX(x) do { esp_err_t __; if ((__ = (x)) != ESP_OK) { PORT_EXIT_CRITICAL; return __; } } while (0)
