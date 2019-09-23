@@ -9,24 +9,28 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ultrasonic.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <sys/time.h>
+#include <esp_idf_lib_helpers.h>
+#include "ultrasonic.h"
 
 #define TRIGGER_LOW_DELAY 4
 #define TRIGGER_HIGH_DELAY 10
 #define PING_TIMEOUT 6000
 #define ROUNDTRIP 58
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_TARGET_IS_ESP8266
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+
+#else
+#error cannot identify the target
 #endif
 
 static inline uint32_t get_time_us()
@@ -38,29 +42,32 @@ static inline uint32_t get_time_us()
 
 #define timeout_expired(start, len) ((uint32_t)(get_time_us() - (start)) >= (len))
 
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define RETURN_CRTCAL(RES) do { PORT_EXIT_CRITICAL; return RES; } while(0)
 
-void ultrasonic_init(const ultrasonic_sensor_t *dev)
+esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev)
 {
-    gpio_set_direction(dev->trigger_pin, GPIO_MODE_OUTPUT);
-    gpio_set_direction(dev->echo_pin, GPIO_MODE_INPUT);
+    CHECK_ARG(dev);
 
-    gpio_set_level(dev->trigger_pin, 0);
+    CHECK(gpio_set_direction(dev->trigger_pin, GPIO_MODE_OUTPUT));
+    CHECK(gpio_set_direction(dev->echo_pin, GPIO_MODE_INPUT));
+
+    return gpio_set_level(dev->trigger_pin, 0);
 }
 
 esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
 {
-    if (!distance)
-        return ESP_ERR_INVALID_ARG;
+    CHECK_ARG(dev && distance);
 
     PORT_ENTER_CRITICAL;
 
     // Ping: Low for 2..4 us, then high 10 us
-    gpio_set_level(dev->trigger_pin, 0);
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
     ets_delay_us(TRIGGER_LOW_DELAY);
-    gpio_set_level(dev->trigger_pin, 1);
+    CHECK(gpio_set_level(dev->trigger_pin, 1));
     ets_delay_us(TRIGGER_HIGH_DELAY);
-    gpio_set_level(dev->trigger_pin, 0);
+    CHECK(gpio_set_level(dev->trigger_pin, 0));
 
     // Previous ping isn't ended
     if (gpio_get_level(dev->echo_pin))

@@ -10,11 +10,13 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "sht3x.h"
+
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <sys/time.h>
+#include <esp_idf_lib_helpers.h>
+#include "sht3x.h"
 
 #define I2C_FREQ_HZ 1000000 // 1MHz
 
@@ -160,7 +162,7 @@ esp_err_t sht3x_init_desc(sht3x_t *dev, i2c_port_t port, uint8_t addr, gpio_num_
     dev->i2c_dev.addr = addr;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
@@ -227,8 +229,7 @@ esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_
 
 esp_err_t sht3x_get_raw_data(sht3x_t *dev, sht3x_raw_data_t raw_data)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(raw_data);
+    CHECK_ARG(dev && raw_data);
 
     if (!dev->meas_started)
     {

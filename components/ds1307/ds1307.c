@@ -9,8 +9,9 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ds1307.h"
 #include <esp_err.h>
+#include <esp_idf_lib_helpers.h>
+#include "ds1307.h"
 
 #define I2C_FREQ_HZ 400000
 
@@ -30,7 +31,7 @@
 #define SECONDS_MASK 0x7f
 #define HOUR12_MASK  0x1f
 #define HOUR24_MASK  0x3f
-#define SQWEF_MASK   0x03
+#define SQWEF_MASK   0xfc
 #define SQWE_MASK    0xef
 #define OUT_MASK     0x7f
 
@@ -69,12 +70,10 @@ esp_err_t ds1307_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio,
     dev->addr = DS1307_ADDR;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
-    i2c_dev_create_mutex(dev);
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t ds1307_free_desc(i2c_dev_t *dev)

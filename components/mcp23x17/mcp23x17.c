@@ -7,9 +7,11 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "mcp23x17.h"
+
 #include <esp_log.h>
 #include <string.h>
+#include <esp_idf_lib_helpers.h>
+#include "mcp23x17.h"
 
 static const char *TAG = "MCP23x17";
 
@@ -53,8 +55,7 @@ static const char *TAG = "MCP23x17";
 
 static esp_err_t read_reg_16(mcp23x17_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, val, 2));
@@ -91,8 +92,7 @@ static esp_err_t write_reg_bit_16(mcp23x17_t *dev, uint8_t reg, bool val, uint8_
 
 static esp_err_t read_reg_bit_8(mcp23x17_t *dev, uint8_t reg, bool *val, uint8_t bit)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t buf;
 
@@ -124,8 +124,7 @@ static esp_err_t write_reg_bit_8(mcp23x17_t *dev, uint8_t reg, bool val, uint8_t
 
 static esp_err_t read_reg_16(mcp23x17_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t rx[4] = { 0 };
     uint8_t tx[4] = { dev->addr, reg, 0, 0 };
@@ -171,8 +170,7 @@ static esp_err_t write_reg_bit_16(mcp23x17_t *dev, uint8_t reg, bool val, uint8_
 
 static esp_err_t read_reg_8(mcp23x17_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t rx[3] = { 0 };
     uint8_t tx[3] = { dev->addr, reg, 0 };
@@ -209,8 +207,7 @@ static esp_err_t write_reg_8(mcp23x17_t *dev, uint8_t reg, uint8_t val)
 
 static esp_err_t read_reg_bit_8(mcp23x17_t *dev, uint8_t reg, bool *val, uint8_t bit)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t buf;
 
@@ -260,7 +257,7 @@ esp_err_t mcp23x17_init_desc(mcp23x17_t *dev, i2c_port_t port, uint8_t addr, gpi
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 

@@ -7,10 +7,11 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "hx711.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <sys/time.h>
+#include <esp_idf_lib_helpers.h>
+#include "hx711.h"
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -24,10 +25,10 @@ static inline uint32_t get_time_ms()
 
 static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
 {
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_TARGET_IS_ESP8266
     portENTER_CRITICAL();
 #endif
 
@@ -51,9 +52,9 @@ static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
         ets_delay_us(1);
     }
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     portEXIT_CRITICAL(&mux);
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_TARGET_IS_ESP8266
     portEXIT_CRITICAL();
 #endif
 
@@ -128,7 +129,7 @@ esp_err_t hx711_read_data(hx711_t *dev, int32_t *data)
     uint32_t raw = read_raw(dev->dout, dev->pd_sck, dev->gain);
     if (raw & 0x800000)
         raw |= 0xff000000;
-    *data = (int32_t)raw;
+    *data = *((int32_t *)&raw);
 
     return ESP_OK;
 }

@@ -11,9 +11,10 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "pcf8591.h"
 #include <stddef.h>
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "pcf8591.h"
 
 static const char *TAG = "PCF8591";
 
@@ -43,7 +44,7 @@ esp_err_t pcf8591_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
     i2c_dev_create_mutex(dev);
@@ -60,8 +61,7 @@ esp_err_t pcf8591_free_desc(i2c_dev_t *dev)
 
 esp_err_t pcf8591_read(i2c_dev_t *dev, pcf8591_input_conf_t conf, uint8_t channel, uint8_t *value)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(value);
+    CHECK_ARG(dev && value);
     if (channel >= 4)
     {
         ESP_LOGE(TAG, "Invalid channel number %d", channel);

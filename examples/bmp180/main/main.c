@@ -5,8 +5,13 @@
 #include <bmp180.h>
 #include <string.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 void bmp180_test(void *pvParameters)
 {
@@ -27,6 +32,10 @@ void bmp180_test(void *pvParameters)
         if (res != ESP_OK)
             printf("Could not measure: %d\n", res);
         else
+            /* float is used in printf(). you need non-default configuration in
+             * sdkconfig for ESP8266, which is enabled by default for this
+             * example. see sdkconfig.defaults.esp8266
+             */
             printf("Temperature: %.2f degrees Celsius; Pressure: %d MPa\n", temp, pressure);
 
         vTaskDelay(500 / portTICK_PERIOD_MS);

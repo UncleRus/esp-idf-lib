@@ -10,10 +10,12 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "tsl4531.h"
+
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <esp_idf_lib_helpers.h>
+#include "tsl4531.h"
 
 #define I2C_FREQ_HZ 400000
 
@@ -52,8 +54,7 @@ static esp_err_t write_register(i2c_dev_t *dev, uint8_t reg, uint8_t value)
 
 static esp_err_t read_register(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, TSL4531_REG_COMMAND | reg, val, 1));
@@ -64,8 +65,7 @@ static esp_err_t read_register(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 
 static esp_err_t read_register_16(i2c_dev_t *dev, uint8_t low_register_addr, uint16_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     low_register_addr = TSL4531_REG_COMMAND | low_register_addr;
 
@@ -96,7 +96,7 @@ esp_err_t tsl4531_init_desc(tsl4531_t *dev, i2c_port_t port, gpio_num_t sda_gpio
     dev->i2c_dev.addr = TSL4531_I2C_ADDR;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 

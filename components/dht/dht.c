@@ -15,6 +15,7 @@
 #include <freertos/FreeRTOS.h>
 #include <string.h>
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
 
 // DHT timer precision in microseconds
 #define DHT_TIMER_INTERVAL 2
@@ -50,17 +51,17 @@
 
 static const char *TAG = "DHTxx";
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_TARGET_IS_ESP8266
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
 #endif
 
-#define CHECK_ARG(VAL) do { if (!VAL) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 #define CHECK_LOGE(x, msg, ...) do { \
         esp_err_t __; \
