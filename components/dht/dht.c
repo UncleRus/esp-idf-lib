@@ -20,6 +20,7 @@
 // DHT timer precision in microseconds
 #define DHT_TIMER_INTERVAL 2
 #define DHT_DATA_BITS 40
+#define DHT_DATA_BYTES (DHT_DATA_BITS / 8)
 
 /*
  *  Note:
@@ -106,7 +107,7 @@ static esp_err_t dht_await_pin_state(gpio_num_t pin, uint32_t timeout,
  * The function call should be protected from task switching.
  * Return false if error occurred.
  */
-static inline esp_err_t dht_fetch_data(dht_sensor_type_t sensor_type, gpio_num_t pin, bool bits[DHT_DATA_BITS])
+static inline esp_err_t dht_fetch_data(dht_sensor_type_t sensor_type, gpio_num_t pin, uint8_t data[DHT_DATA_BYTES])
 {
     uint32_t low_duration;
     uint32_t high_duration;
@@ -134,7 +135,13 @@ static inline esp_err_t dht_fetch_data(dht_sensor_type_t sensor_type, gpio_num_t
                 "LOW bit timeout");
         CHECK_LOGE(dht_await_pin_state(pin, 75, 0, &high_duration),
                 "HIGH bit timeout");
-        bits[i] = high_duration > low_duration;
+
+        uint8_t b = i / 8;
+        uint8_t m = i % 8;
+        if (!m)
+            data[b] = 0;
+
+        data[b] |= (high_duration > low_duration) << (7 - m);
     }
 
     return ESP_OK;
@@ -169,14 +176,13 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
     CHECK_ARG(humidity);
     CHECK_ARG(temperature);
 
-    bool bits[DHT_DATA_BITS];
-    uint8_t data[DHT_DATA_BITS / 8] = { 0 };
+    uint8_t data[DHT_DATA_BYTES] = { 0 };
 
     gpio_set_direction(pin, GPIO_MODE_OUTPUT_OD);
     gpio_set_level(pin, 1);
 
     PORT_ENTER_CRITICAL;
-    esp_err_t result = dht_fetch_data(sensor_type, pin, bits);
+    esp_err_t result = dht_fetch_data(sensor_type, pin, data);
     PORT_EXIT_CRITICAL;
 
     /* restore GPIO direction because, after calling dht_fetch_data(), the
@@ -186,13 +192,6 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
 
     if (result != ESP_OK)
         return result;
-
-    for (uint8_t i = 0; i < DHT_DATA_BITS; i++)
-    {
-        // Read each bit into 'result' byte array...
-        data[i / 8] <<= 1;
-        data[i / 8] |= bits[i];
-    }
 
     if (data[4] != ((data[0] + data[1] + data[2] + data[3]) & 0xFF))
     {
