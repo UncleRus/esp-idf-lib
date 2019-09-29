@@ -122,8 +122,7 @@ esp_err_t bh1750_set_measurement_time(i2c_dev_t *dev, uint8_t time)
 
 esp_err_t bh1750_read(i2c_dev_t *dev, uint16_t *level)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(level);
+    CHECK_ARG(dev && level);
 
     uint8_t buf[2];
 

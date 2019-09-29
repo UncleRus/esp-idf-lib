@@ -90,8 +90,7 @@ esp_err_t ds1307_start(i2c_dev_t *dev, bool start)
 
 esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(running);
+    CHECK_ARG(dev && running);
 
     uint8_t val;
 
@@ -106,8 +105,7 @@ esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running)
 
 esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[7];
 
@@ -136,8 +134,7 @@ esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time)
 
 esp_err_t ds1307_set_time(i2c_dev_t *dev, const struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[7] = {
         dec2bcd(time->tm_sec),
@@ -163,8 +160,7 @@ esp_err_t ds1307_enable_squarewave(i2c_dev_t *dev, bool enable)
 
 esp_err_t ds1307_is_squarewave_enabled(i2c_dev_t *dev, bool *sqw_en)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(sqw_en);
+    CHECK_ARG(dev && sqw_en);
 
     uint8_t val;
 
@@ -184,8 +180,7 @@ esp_err_t ds1307_set_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t fr
 
 esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *sqw_freq)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(sqw_freq);
+    CHECK_ARG(dev && sqw_freq);
 
     uint8_t val;
 
@@ -200,8 +195,7 @@ esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *s
 
 esp_err_t ds1307_get_output(i2c_dev_t *dev, bool *out)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(out);
+    CHECK_ARG(dev && out);
 
     uint8_t val;
 
@@ -221,8 +215,7 @@ esp_err_t ds1307_set_output(i2c_dev_t *dev, bool value)
 
 esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
+    CHECK_ARG(dev && buf);
 
     if (offset + len > RAM_SIZE)
         return ESP_ERR_NO_MEM;
@@ -236,8 +229,7 @@ esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t 
 
 esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
+    CHECK_ARG(dev && buf);
 
     if (offset + len > RAM_SIZE)
         return ESP_ERR_NO_MEM;

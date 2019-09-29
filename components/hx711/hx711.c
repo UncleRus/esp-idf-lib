@@ -87,8 +87,7 @@ esp_err_t hx711_power_down(hx711_t *dev, bool down)
 
 esp_err_t hx711_set_gain(hx711_t *dev, hx711_gain_t gain)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(gain <= HX711_GAIN_A_64);
+    CHECK_ARG(dev && gain <= HX711_GAIN_A_64);
 
     CHECK(hx711_wait(dev, 200)); // 200 ms timeout
 
@@ -100,8 +99,7 @@ esp_err_t hx711_set_gain(hx711_t *dev, hx711_gain_t gain)
 
 esp_err_t hx711_is_ready(hx711_t *dev, bool *ready)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(ready);
+    CHECK_ARG(dev && ready);
 
     *ready = !gpio_get_level(dev->dout);
 
@@ -123,8 +121,7 @@ esp_err_t hx711_wait(hx711_t *dev, size_t timeout_ms)
 
 esp_err_t hx711_read_data(hx711_t *dev, int32_t *data)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(data);
+    CHECK_ARG(dev && data);
 
     uint32_t raw = read_raw(dev->dout, dev->pd_sck, dev->gain);
     if (raw & 0x800000)

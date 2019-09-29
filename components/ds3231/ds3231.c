@@ -85,8 +85,7 @@ esp_err_t ds3231_free_desc(i2c_dev_t *dev)
 
 esp_err_t ds3231_set_time(i2c_dev_t *dev, struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t data[7];
 
@@ -192,8 +191,7 @@ static esp_err_t ds3231_set_flag(i2c_dev_t *dev, uint8_t addr, uint8_t bits, uin
 
 esp_err_t ds3231_get_oscillator_stop_flag(i2c_dev_t *dev, bool *flag)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(flag);
+    CHECK_ARG(dev && flag);
 
     uint8_t f;
 
@@ -219,8 +217,7 @@ esp_err_t ds3231_clear_oscillator_stop_flag(i2c_dev_t *dev)
 
 esp_err_t ds3231_get_alarm_flags(i2c_dev_t *dev, ds3231_alarm_t *alarms)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(alarms);
+    CHECK_ARG(dev && alarms);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, ds3231_get_flag(dev, DS3231_ADDR_STATUS, DS3231_ALARM_BOTH, (uint8_t *)alarms));
@@ -327,8 +324,7 @@ esp_err_t ds3231_set_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t freq)
 
 esp_err_t ds3231_get_raw_temp(i2c_dev_t *dev, int16_t *temp)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(temp);
+    CHECK_ARG(dev && temp);
 
     uint8_t data[2];
 
@@ -369,8 +365,7 @@ esp_err_t ds3231_get_temp_float(i2c_dev_t *dev, float *temp)
 
 esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t data[7];
 

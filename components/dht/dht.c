@@ -173,8 +173,7 @@ static inline int16_t dht_convert_data(dht_sensor_type_t sensor_type, uint8_t ms
 esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
         int16_t *humidity, int16_t *temperature)
 {
-    CHECK_ARG(humidity);
-    CHECK_ARG(temperature);
+    CHECK_ARG(humidity && temperature);
 
     uint8_t data[DHT_DATA_BYTES] = { 0 };
 
@@ -210,8 +209,7 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
 esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
         float *humidity, float *temperature)
 {
-    CHECK_ARG(humidity);
-    CHECK_ARG(temperature);
+    CHECK_ARG(humidity && temperature);
 
     int16_t i_humidity, i_temp;
 

@@ -168,8 +168,7 @@ esp_err_t ads111x_start_conversion(i2c_dev_t *dev)
 
 esp_err_t ads111x_get_value(i2c_dev_t *dev, int16_t *value)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(value);
+    CHECK_ARG(dev && value);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_CONVERSION, (uint16_t *)value));
@@ -260,8 +259,7 @@ esp_err_t ads111x_set_comp_queue(i2c_dev_t *dev, ads111x_comp_queue_t queue)
 
 esp_err_t ads111x_get_comp_low_thresh(i2c_dev_t *dev, int16_t *th)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(th);
+    CHECK_ARG(dev && th);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_THRESH_L, (uint16_t *)th));
@@ -283,8 +281,7 @@ esp_err_t ads111x_set_comp_low_thresh(i2c_dev_t *dev, int16_t th)
 
 esp_err_t ads111x_get_comp_high_thresh(i2c_dev_t *dev, int16_t *th)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(th);
+    CHECK_ARG(dev && th);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_THRESH_H, (uint16_t *)th));

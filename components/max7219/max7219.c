@@ -209,8 +209,7 @@ esp_err_t max7219_clear(max7219_t *dev)
 
 esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(s);
+    CHECK_ARG(dev && s);
 
     while (s && pos < dev->digits)
     {
@@ -230,8 +229,7 @@ esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s)
 
 esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(image);
+    CHECK_ARG(dev && image);
 
     for (uint8_t i = pos, offs = 0; i < dev->digits && offs < 8; i++, offs++)
         max7219_set_digit(dev, i, *((uint8_t *)image + offs));

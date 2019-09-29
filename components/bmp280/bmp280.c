@@ -167,8 +167,7 @@ esp_err_t bmp280_init_default_params(bmp280_params_t *params)
 
 esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(params);
+    CHECK_ARG(dev && params);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -247,8 +246,7 @@ esp_err_t bmp280_force_measurement(bmp280_t *dev)
 
 esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(busy);
+    CHECK_ARG(dev && busy);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -332,9 +330,7 @@ static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32
 
 esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *pressure, uint32_t *humidity)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(temperature);
-    CHECK_ARG(pressure);
+    CHECK_ARG(dev && temperature && pressure);
 
     int32_t adc_pressure;
     int32_t adc_temp;

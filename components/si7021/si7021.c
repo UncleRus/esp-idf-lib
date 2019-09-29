@@ -127,8 +127,7 @@ esp_err_t si7021_reset(i2c_dev_t *dev)
 
 esp_err_t si7021_get_heater(i2c_dev_t *dev, bool *on)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(on);
+    CHECK_ARG(dev && on);
 
     uint8_t u;
 

@@ -204,8 +204,7 @@ esp_err_t ds1302_start(ds1302_t *dev, bool start)
 
 esp_err_t ds1302_is_running(ds1302_t *dev, bool *running)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(running);
+    CHECK_ARG(dev && running);
 
     uint8_t r;
     CHECK(read_register(dev, CH_REG, &r));
@@ -224,8 +223,7 @@ esp_err_t ds1302_set_write_protect(ds1302_t *dev, bool wp)
 
 esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(wp);
+    CHECK_ARG(dev && wp);
 
     uint8_t r;
     CHECK(read_register(dev, WP_REG, &r));
@@ -236,8 +234,7 @@ esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp)
 
 esp_err_t ds1302_get_time(ds1302_t *dev, struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[7];
     CHECK(burst_read(dev, CLOCK_BURST, buf, 7));
@@ -262,8 +259,7 @@ esp_err_t ds1302_get_time(ds1302_t *dev, struct tm *time)
 
 esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[8] = {
         dec2bcd(time->tm_sec) | (dev->ch ? CH_BIT : 0),
@@ -280,9 +276,7 @@ esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time)
 
 esp_err_t ds1302_read_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
-    CHECK_ARG(len);
+    CHECK_ARG(dev && buf && len);
     CHECK_ARG(offset + len <= DS1302_RAM_SIZE);
 
     return burst_read(dev, RAM_BURST, (uint8_t *)buf, len);
@@ -290,9 +284,7 @@ esp_err_t ds1302_read_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len
 
 esp_err_t ds1302_write_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
-    CHECK_ARG(len);
+    CHECK_ARG(dev && buf && len);
     CHECK_ARG(offset + len <= DS1302_RAM_SIZE);
 
     return burst_write(dev, RAM_BURST, (uint8_t *)buf, len);
