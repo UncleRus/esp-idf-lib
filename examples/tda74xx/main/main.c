@@ -4,8 +4,13 @@
 #include <tda74xx.h>
 #include <string.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 #define INPUT 0 // 0..3
 #define INPUT_GAIN 28 // 0dB..30dB

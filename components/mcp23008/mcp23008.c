@@ -7,8 +7,10 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "mcp23008.h"
+
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "mcp23008.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf, but device supports up to 1.7Mhz
 
@@ -38,8 +40,7 @@ static const char *TAG = "MCP23008";
 
 static esp_err_t read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, val, 1));
@@ -61,8 +62,7 @@ static esp_err_t write_reg(i2c_dev_t *dev, uint8_t reg, uint8_t val)
 
 static esp_err_t read_reg_bit(i2c_dev_t *dev, uint8_t reg, bool *val, uint8_t bit)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(val);
+    CHECK_ARG(dev && val);
 
     uint8_t buf;
 
@@ -105,7 +105,7 @@ esp_err_t mcp23008_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
@@ -176,8 +176,7 @@ esp_err_t mcp23008_port_write(i2c_dev_t *dev, uint8_t val)
 
 esp_err_t mcp23008_get_mode(i2c_dev_t *dev, uint8_t pin, mcp23008_gpio_mode_t *mode)
 {
-    CHECK_ARG(mode);
-    CHECK_ARG(pin < 8);
+    CHECK_ARG(mode && pin < 8);
 
     bool buf;
     CHECK(read_reg_bit(dev, REG_IODIR, &buf, pin));
@@ -209,8 +208,7 @@ esp_err_t mcp23008_set_pullup(i2c_dev_t *dev, uint8_t pin, bool enable)
 
 esp_err_t mcp23008_get_level(i2c_dev_t *dev, uint8_t pin, uint32_t *val)
 {
-    CHECK_ARG(val);
-    CHECK_ARG(pin < 8);
+    CHECK_ARG(val && pin < 8);
 
     bool buf;
     CHECK(read_reg_bit(dev, REG_GPIO, &buf, pin));

@@ -4,8 +4,13 @@
 #include <ds3231.h>
 #include <string.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 void ds3231_test(void *pvParameters)
 {
@@ -43,6 +48,10 @@ void ds3231_test(void *pvParameters)
             continue;
         }
 
+        /* float is used in printf(). you need non-default configuration in
+         * sdkconfig for ESP8266, which is enabled by default for this
+         * example. see sdkconfig.defaults.esp8266
+         */
         printf("%04d-%02d-%02d %02d:%02d:%02d, %.2f deg Cel\n", time.tm_year, time.tm_mon + 1,
             time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec, temp);
     }

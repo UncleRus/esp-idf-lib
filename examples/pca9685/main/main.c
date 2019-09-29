@@ -5,8 +5,13 @@
 #include <string.h>
 
 #define ADDR PCA9685_ADDR_BASE
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 void pca9685_test(void *pvParamters)
 {

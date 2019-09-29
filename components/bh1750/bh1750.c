@@ -14,10 +14,12 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "bh1750.h"
+
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "bh1750.h"
 
 
 #define OPCODE_HIGH  0x0
@@ -62,12 +64,10 @@ esp_err_t bh1750_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_n
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
-    CHECK(i2c_dev_create_mutex(dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t bh1750_free_desc(i2c_dev_t *dev)
@@ -122,8 +122,7 @@ esp_err_t bh1750_set_measurement_time(i2c_dev_t *dev, uint8_t time)
 
 esp_err_t bh1750_read(i2c_dev_t *dev, uint16_t *level)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(level);
+    CHECK_ARG(dev && level);
 
     uint8_t buf[2];
 

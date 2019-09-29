@@ -3,8 +3,13 @@
 #include <freertos/task.h>
 #include <hx711.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define PD_SCK_GPIO 4
+#define DOUT_GPIO   5
+#else
 #define PD_SCK_GPIO 18
 #define DOUT_GPIO   19
+#endif
 
 void test(void *pvParameters)
 {

@@ -4,8 +4,13 @@
 #include <pcf8591.h>
 #include <string.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 #define ADDR PCF8591_DEFAULT_ADDRESS
 
 void pcf8591_test(void *pvParamters)

@@ -9,14 +9,17 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "hd44780.h"
 #include <string.h>
 #include <esp_system.h>
+#include <esp_idf_lib_helpers.h>
+#include "hd44780.h"
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
-#include <esp32/rom/ets_sys.h> // add by nopnop2002
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4
+#include <esp32/rom/ets_sys.h>
+#elif HELPER_TARGET_IS_ESP8266 || HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V3_2
 #include <rom/ets_sys.h>
+#else
+#error cannot locate ets_sys.h
 #endif
 
 #define MS 1000
@@ -37,6 +40,11 @@
 #define CMD_FUNC_SET     0x20
 #define CMD_CGRAM_ADDR   0x40
 #define CMD_DDRAM_ADDR   0x80
+
+#define ARG_MOVE_RIGHT 0x04
+#define ARG_MOVE_LEFT 0x00
+#define CMD_SHIFT_LEFT  (CMD_SHIFT | CMD_DISPLAY_CTRL | ARG_MOVE_LEFT)
+#define CMD_SHIFT_RIGHT (CMD_SHIFT | CMD_DISPLAY_CTRL | ARG_MOVE_RIGHT)
 
 // CMD_ENTRY_MODE
 #define ARG_EM_INCREMENT    BV(1)
@@ -243,6 +251,26 @@ esp_err_t hd44780_upload_character(const hd44780_t *lcd, uint8_t num, const uint
     }
 
     CHECK(hd44780_gotoxy(lcd, 0, 0));
+
+    return ESP_OK;
+}
+
+esp_err_t hd44780_scroll_left(const hd44780_t *lcd)
+{
+    CHECK_ARG(lcd);
+
+    CHECK(write_byte(lcd, CMD_SHIFT_LEFT, false));
+    short_delay();
+
+    return ESP_OK;
+}
+
+esp_err_t hd44780_scroll_right(const hd44780_t *lcd)
+{
+    CHECK_ARG(lcd);
+
+    CHECK(write_byte(lcd, CMD_SHIFT_RIGHT, false));
+    short_delay();
 
     return ESP_OK;
 }

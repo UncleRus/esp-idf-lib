@@ -9,8 +9,10 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ads111x.h"
+
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "ads111x.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp32
 
@@ -141,12 +143,10 @@ esp_err_t ads111x_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port,
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
-    i2c_dev_create_mutex(dev);
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(dev);
 }
 
 esp_err_t ads111x_free_desc(i2c_dev_t *dev)
@@ -168,8 +168,7 @@ esp_err_t ads111x_start_conversion(i2c_dev_t *dev)
 
 esp_err_t ads111x_get_value(i2c_dev_t *dev, int16_t *value)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(value);
+    CHECK_ARG(dev && value);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_CONVERSION, (uint16_t *)value));
@@ -260,8 +259,7 @@ esp_err_t ads111x_set_comp_queue(i2c_dev_t *dev, ads111x_comp_queue_t queue)
 
 esp_err_t ads111x_get_comp_low_thresh(i2c_dev_t *dev, int16_t *th)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(th);
+    CHECK_ARG(dev && th);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_THRESH_L, (uint16_t *)th));
@@ -283,8 +281,7 @@ esp_err_t ads111x_set_comp_low_thresh(i2c_dev_t *dev, int16_t th)
 
 esp_err_t ads111x_get_comp_high_thresh(i2c_dev_t *dev, int16_t *th)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(th);
+    CHECK_ARG(dev && th);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_THRESH_H, (uint16_t *)th));

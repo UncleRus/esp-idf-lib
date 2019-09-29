@@ -17,23 +17,27 @@
  * of the Dallas Semiconductor name).  See the accompanying LICENSE file for
  * details.
  */
-#include "onewire.h"
+
 #include <string.h>
+#include <esp_idf_lib_helpers.h>
+#include "onewire.h"
 
 #define ONEWIRE_SELECT_ROM 0x55
 #define ONEWIRE_SKIP_ROM   0xcc
 #define ONEWIRE_SEARCH     0xf0
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP8266
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#define OPEN_DRAIN_MODE GPIO_MODE_OUTPUT_OD
+
+#elif HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 #define OPEN_DRAIN_MODE GPIO_MODE_INPUT_OUTPUT_OD
-
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
-#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
-#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
-#define OPEN_DRAIN_MODE GPIO_MODE_OUTPUT_OD
+#else
+#error BUG: Unknown target
 #endif
 
 // Waits up to `max_wait` microseconds for the specified pin to go high.

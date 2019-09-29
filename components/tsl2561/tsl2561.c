@@ -14,6 +14,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
 #include "tsl2561.h"
 
 #define I2C_FREQ_HZ 400000 // 400kHz
@@ -43,7 +44,7 @@ static const char *TAG = "TSL2561";
 // Integration times in useconds
 #define TSL2561_INTEGRATION_TIME_13MS  20
 #define TSL2561_INTEGRATION_TIME_101MS 110
-#define TSL2561_INTEGRATION_TIME_402MS 410 // Default
+#define TSL2561_INTEGRATION_TIME_402MS 420 // Default
 
 // Calculation constants
 #define LUX_SCALE     14
@@ -104,7 +105,7 @@ static const char *TAG = "TSL2561";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define SLEEP_MS(x) do { vTaskDelay((x) / portTICK_PERIOD_MS); } while (0)
+#define SLEEP_MS(x) do { vTaskDelay(pdMS_TO_TICKS(x)); } while (0)
 
 static inline esp_err_t write_register(tsl2561_t *dev, uint8_t reg, uint8_t value)
 {
@@ -138,6 +139,8 @@ static inline esp_err_t disable(tsl2561_t *dev)
 
 static inline esp_err_t get_channel_data(tsl2561_t *dev, uint16_t *channel0, uint16_t *channel1)
 {
+    int sleep_ms;
+
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, enable(dev));
 
@@ -146,21 +149,23 @@ static inline esp_err_t get_channel_data(tsl2561_t *dev, uint16_t *channel0, uin
     switch (dev->integration_time)
     {
         case TSL2561_INTEGRATION_13MS:
-            SLEEP_MS(TSL2561_INTEGRATION_TIME_13MS);
+            sleep_ms = TSL2561_INTEGRATION_TIME_13MS;
             break;
         case TSL2561_INTEGRATION_101MS:
-            SLEEP_MS(TSL2561_INTEGRATION_TIME_101MS);
+            sleep_ms = TSL2561_INTEGRATION_TIME_101MS;
             break;
         default:
-            SLEEP_MS(TSL2561_INTEGRATION_TIME_402MS);
+            sleep_ms = TSL2561_INTEGRATION_TIME_402MS;
             break;
     }
+    SLEEP_MS(sleep_ms);
 
     I2C_DEV_CHECK(&dev->i2c_dev, read_register_16(dev, TSL2561_REG_CHANNEL_0_LOW, channel0));
     I2C_DEV_CHECK(&dev->i2c_dev, read_register_16(dev, TSL2561_REG_CHANNEL_1_LOW, channel1));
 
     I2C_DEV_CHECK(&dev->i2c_dev, disable(dev));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_LOGD(TAG, "integration time: %d ms channel0: 0x%x channel1: 0x%x", sleep_ms, *channel0, *channel1);
 
     return ESP_OK;
 }
@@ -173,7 +178,8 @@ esp_err_t tsl2561_init_desc(tsl2561_t *dev, uint8_t addr, i2c_port_t port, gpio_
 
     if (addr != TSL2561_I2C_ADDR_GND && addr != TSL2561_I2C_ADDR_FLOAT && addr != TSL2561_I2C_ADDR_VCC)
     {
-        ESP_LOGE(TAG, "Invalid I2C address");
+        ESP_LOGE(TAG, "Invalid I2C address `0x%x`: must be one of 0x%x, 0x%x, 0x%x",
+                addr, TSL2561_I2C_ADDR_GND, TSL2561_I2C_ADDR_FLOAT, TSL2561_I2C_ADDR_VCC);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -181,13 +187,11 @@ esp_err_t tsl2561_init_desc(tsl2561_t *dev, uint8_t addr, i2c_port_t port, gpio_
     dev->i2c_dev.addr = addr;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t tsl2561_free_desc(tsl2561_t *dev)
@@ -263,8 +267,7 @@ esp_err_t tsl2561_set_gain(tsl2561_t *dev, tsl2561_gain_t gain)
 
 esp_err_t tsl2561_read_lux(tsl2561_t *dev, uint32_t *lux)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(lux);
+    CHECK_ARG(dev && lux);
 
     uint32_t ch_scale, channel1, channel0;
 

@@ -8,9 +8,10 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ina219.h"
 #include <esp_log.h>
 #include <math.h>
+#include <esp_idf_lib_helpers.h>
+#include "ina219.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1 MHz for esp-idf, but supports up to 2.56 MHz
 
@@ -74,8 +75,7 @@ static esp_err_t write_reg_16(ina219_t *dev, uint8_t reg, uint16_t val)
 
 static esp_err_t read_conf_bits(ina219_t *dev, uint16_t mask, uint8_t bit, uint16_t *res)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(res);
+    CHECK_ARG(dev && res);
 
     uint16_t raw;
     CHECK(read_reg_16(dev, REG_CONFIG, &raw));
@@ -101,13 +101,11 @@ esp_err_t ina219_init_desc(ina219_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
     dev->i2c_dev.addr = addr;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    CHECK(i2c_dev_create_mutex(&dev->i2c_dev));
-
-    return ESP_OK;
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
 esp_err_t ina219_free_desc(ina219_t *dev)
@@ -225,8 +223,7 @@ esp_err_t ina219_trigger(ina219_t *dev)
 
 esp_err_t ina219_get_bus_voltage(ina219_t *dev, float *voltage)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(voltage);
+    CHECK_ARG(dev && voltage);
 
     int16_t raw;
     CHECK(read_reg_16(dev, REG_BUS_U, (uint16_t *)&raw));
@@ -238,8 +235,7 @@ esp_err_t ina219_get_bus_voltage(ina219_t *dev, float *voltage)
 
 esp_err_t ina219_get_shunt_voltage(ina219_t *dev, float *voltage)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(voltage);
+    CHECK_ARG(dev && voltage);
 
     int16_t raw;
     CHECK(read_reg_16(dev, REG_SHUNT_U, (uint16_t *)&raw));
@@ -251,8 +247,7 @@ esp_err_t ina219_get_shunt_voltage(ina219_t *dev, float *voltage)
 
 esp_err_t ina219_get_current(ina219_t *dev, float *current)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(current);
+    CHECK_ARG(dev && current);
 
     int16_t raw;
     CHECK(read_reg_16(dev, REG_CURRENT, (uint16_t *)&raw));
@@ -264,8 +259,7 @@ esp_err_t ina219_get_current(ina219_t *dev, float *current)
 
 esp_err_t ina219_get_power(ina219_t *dev, float *power)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(power);
+    CHECK_ARG(dev && power);
 
     int16_t raw;
     CHECK(read_reg_16(dev, REG_POWER, (uint16_t *)&raw));
