@@ -3,12 +3,18 @@
 #include <freertos/task.h>
 #include <string.h>
 #include <encoder.h>
+#include <esp_idf_lib_helpers.h>
 
 // Connect common encoder pin to ground
-
-#define RE_A_GPIO   22
-#define RE_B_GPIO   23
-#define RE_BTN_GPIO 25
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define RE_A_GPIO   14
+#define RE_B_GPIO   12
+#define RE_BTN_GPIO 13
+#else
+#define RE_A_GPIO   16
+#define RE_B_GPIO   17
+#define RE_BTN_GPIO 5
+#endif
 
 #define EV_QUEUE_LEN 5
 

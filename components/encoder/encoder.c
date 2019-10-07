@@ -9,38 +9,16 @@
  */
 #include "encoder.h"
 #include <esp_log.h>
-#include <soc/timer_group_struct.h>
-#include <driver/periph_ctrl.h>
-#include <driver/timer.h>
 #include <string.h>
 #include <freertos/semphr.h>
+#include <esp_timer.h>
 
 #define MUTEX_TIMEOUT 10
-
-#define TIMER_DIVIDER (APB_CLK_FREQ / 1000000)
 
 #ifdef CONFIG_RE_BTN_PRESSED_LEVEL_0
     #define CONFIG_RE_BTN_PRESSED_LEVEL 0
 #else
     #define CONFIG_RE_BTN_PRESSED_LEVEL 1
-#endif
-
-#ifdef CONFIG_RE_TGROUP_0
-    #define CONFIG_RE_TGROUP 0
-#else
-    #define CONFIG_RE_TGROUP 1
-#endif
-
-#ifdef CONFIG_RE_TIMER_0
-    #define CONFIG_RE_TIMER 0
-#else
-    #define CONFIG_RE_TIMER 1
-#endif
-
-#if (CONFIG_RE_TGROUP == 0)
-    #define TIMERG TIMERG0
-#else
-    #define TIMERG TIMERG1
 #endif
 
 static const char *TAG = "ENCODER";
@@ -78,7 +56,7 @@ inline static void read_encoder(rotary_encoder_t *re)
                 re->btn_state = RE_BTN_PRESSED;
                 re->btn_pressed_time_us = 0;
                 ev.type = RE_ET_BTN_PRESSED;
-                xQueueSendFromISR(_queue, &ev, NULL);
+                xQueueSendToBack(_queue, &ev, 0);
                 break;
             }
 
@@ -89,7 +67,7 @@ inline static void read_encoder(rotary_encoder_t *re)
                 // Long press
                 re->btn_state = RE_BTN_LONG_PRESSED;
                 ev.type = RE_ET_BTN_LONG_PRESSED;
-                xQueueSendFromISR(_queue, &ev, NULL);
+                xQueueSendToBack(_queue, &ev, 0);
             }
         }
         else if (re->btn_state != RE_BTN_RELEASED)
@@ -97,7 +75,7 @@ inline static void read_encoder(rotary_encoder_t *re)
             // released
             re->btn_state = RE_BTN_RELEASED;
             ev.type = RE_ET_BTN_RELEASED;
-            xQueueSendFromISR(_queue, &ev, NULL);
+            xQueueSendToBack(_queue, &ev, 0);
         }
     } while(0);
 
@@ -125,28 +103,30 @@ inline static void read_encoder(rotary_encoder_t *re)
     {
         ev.type = RE_ET_CHANGED;
         ev.diff = inc;
-        xQueueSendFromISR(_queue, &ev, NULL);
+        xQueueSendToBack(_queue, &ev, 0);
     }
 }
 
-static void timer_isr(void *arg)
+static void timer_handler(void *arg)
 {
-    timer_set_alarm(CONFIG_RE_TGROUP, CONFIG_RE_TIMER, TIMER_ALARM_EN);
-#if (CONFIG_RE_TIMER == 0)
-    TIMERG.int_clr_timers.t0 = 1;
-#else
-    TIMERG.int_clr_timers.t1 = 1;
-#endif
-
-    if (!xSemaphoreTakeFromISR(mutex, NULL))
+    if (!xSemaphoreTake(mutex, 0))
         return;
 
     for (size_t i = 0; i < CONFIG_RE_MAX; i++)
         if (encs[i])
             read_encoder(encs[i]);
 
-    xSemaphoreGiveFromISR(mutex, NULL);
+    xSemaphoreGive(mutex);
 }
+
+static const esp_timer_create_args_t timer_args = {
+        .name = "__encoder__",
+        .arg = NULL,
+        .callback = timer_handler,
+        .dispatch_method = ESP_TIMER_TASK
+};
+
+static esp_timer_handle_t timer;
 
 esp_err_t rotary_encoder_init(QueueHandle_t queue)
 {
@@ -160,23 +140,10 @@ esp_err_t rotary_encoder_init(QueueHandle_t queue)
         return ESP_ERR_NO_MEM;
     }
 
-    timer_config_t config;
-    config.divider = TIMER_DIVIDER;
-    config.counter_dir = TIMER_COUNT_UP;
-    config.counter_en = TIMER_PAUSE;
-    config.alarm_en = TIMER_ALARM_EN;
-    config.intr_type = TIMER_INTR_LEVEL;
-    config.auto_reload = 1;
-    CHECK(timer_init(CONFIG_RE_TGROUP, CONFIG_RE_TIMER, &config));
+    CHECK(esp_timer_create(&timer_args, &timer));
+    CHECK(esp_timer_start_periodic(timer, CONFIG_RE_INTERVAL_US));
 
-    CHECK(timer_set_counter_value(CONFIG_RE_TGROUP, CONFIG_RE_TIMER, 0));
-    CHECK(timer_set_alarm_value(CONFIG_RE_TGROUP, CONFIG_RE_TIMER, CONFIG_RE_INTERVAL_US));
-    CHECK(timer_enable_intr(CONFIG_RE_TGROUP, CONFIG_RE_TIMER));
-    CHECK(timer_isr_register(CONFIG_RE_TGROUP, CONFIG_RE_TIMER, timer_isr, NULL, 0, NULL));
-    CHECK(timer_start(CONFIG_RE_TGROUP, CONFIG_RE_TIMER));
-
-    ESP_LOGI(TAG, "Initialization complete, timer %d:%d, interval: %dms", CONFIG_RE_TGROUP, CONFIG_RE_TIMER,
-            CONFIG_RE_INTERVAL_US / 1000);
+    ESP_LOGI(TAG, "Initialization complete, timer interval: %dms", CONFIG_RE_INTERVAL_US / 1000);
     return ESP_OK;
 }
 

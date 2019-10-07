@@ -24,7 +24,6 @@ libraries are not supported on ESP8266.
 
 * `max7219`
 * `mcp23x17`
-* `encoder`
 
 ## How to use
 
@@ -63,7 +62,7 @@ PROJECT_NAME := my-esp-project
 
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
 
-EXCLUDE_COMPONENTS := max7219 mcp23x17 encoder
+EXCLUDE_COMPONENTS := max7219 mcp23x17
 
 include $(IDF_PATH)/make/project.mk
 ```

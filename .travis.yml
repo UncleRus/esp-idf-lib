@@ -159,7 +159,7 @@ script:
       esp8266)
         IGNORE_FILE="travis-ignore-esp8266"
         # these drivers do not compile for ESP8266 yet
-        export EXCLUDE_COMPONENTS="encoder max7219 mcp23x17"
+        export EXCLUDE_COMPONENTS="max7219 mcp23x17"
         ;;
     esac
 
