@@ -6,14 +6,18 @@
 #include <esp_idf_lib_helpers.h>
 
 // Connect common encoder pin to ground
-#if defined(CONFIG_IDF_TARGET_ESP8266)
+#if HELPER_TARGET_IS_ESP8266
 #define RE_A_GPIO   14
 #define RE_B_GPIO   12
 #define RE_BTN_GPIO 13
-#else
+
+#elif HELPER_TARGET_IS_ESP32
 #define RE_A_GPIO   16
 #define RE_B_GPIO   17
 #define RE_BTN_GPIO 5
+
+#else
+#error Unknown platform
 #endif
 
 #define EV_QUEUE_LEN 5
@@ -49,19 +53,19 @@ void test(void *arg)
         switch (e.type)
         {
             case RE_ET_BTN_PRESSED:
-                printf("Button was pressed\n");
+                printf("Button pressed\n");
                 break;
             case RE_ET_BTN_RELEASED:
-                printf("Button was released\n");
+                printf("Button released\n");
+                break;
+            case RE_ET_BTN_CLICKED:
+                printf("Button clicked\n");
                 break;
             case RE_ET_BTN_LONG_PRESSED:
                 printf("Looooong pressed button\n");
                 break;
             case RE_ET_CHANGED:
-                if (e.diff < 0)
-                    vol--;
-                else if (e.diff > 0)
-                    vol++;
+                vol += e.diff;
                 printf("Volume was changed to %d\n", vol);
                 break;
             default:

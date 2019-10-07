@@ -72,10 +72,16 @@ inline static void read_encoder(rotary_encoder_t *re)
         }
         else if (re->btn_state != RE_BTN_RELEASED)
         {
+            bool clicked = re->btn_state == RE_BTN_PRESSED;
             // released
             re->btn_state = RE_BTN_RELEASED;
             ev.type = RE_ET_BTN_RELEASED;
             xQueueSendToBack(_queue, &ev, 0);
+            if (clicked)
+            {
+                ev.type = RE_ET_BTN_CLICKED;
+                xQueueSendToBack(_queue, &ev, 0);
+            }
         }
     } while(0);
 
@@ -90,15 +96,10 @@ inline static void read_encoder(rotary_encoder_t *re)
     int8_t inc = 0;
 
     re->store = (re->store << 4) | re->code;
-//    if (re->store == 0x2b || re->store == 0xd4) inc = -re->step;
-//    if (re->store == 0x17 || re->store == 0xe8) inc = re->step;
-    if (re->store == 0x2b || re->store == 0xd4) inc = -1;
-    if (re->store == 0x17 || re->store == 0xe8) inc = 1;
 
-//    if ((re->min != re->max) && ((re->value <= re->min && inc < 0) || (re->value >= re->max && inc > 0)))
-//        return;
+    if (re->store == 0xe817) inc = 1;
+    if (re->store == 0xd42b) inc = -1;
 
-//    re->value += inc;
     if (inc)
     {
         ev.type = RE_ET_CHANGED;
@@ -136,7 +137,7 @@ esp_err_t rotary_encoder_init(QueueHandle_t queue)
     mutex = xSemaphoreCreateMutex();
     if (!mutex)
     {
-        ESP_LOGE(TAG, "Could not create mutex");
+        ESP_LOGE(TAG, "Failed to create mutex");
         return ESP_ERR_NO_MEM;
     }
 
@@ -152,7 +153,7 @@ esp_err_t rotary_encoder_add(rotary_encoder_t *re)
     CHECK_ARG(re);
     if (!xSemaphoreTake(mutex, MUTEX_TIMEOUT))
     {
-        ESP_LOGE(TAG, "Could not take mutex");
+        ESP_LOGE(TAG, "Failed to take mutex");
         return ESP_ERR_INVALID_STATE;
     }
 
@@ -197,7 +198,7 @@ esp_err_t rotary_encoder_remove(rotary_encoder_t *re)
     CHECK_ARG(re);
     if (!xSemaphoreTake(mutex, MUTEX_TIMEOUT))
     {
-        ESP_LOGE(TAG, "Could not take mutex");
+        ESP_LOGE(TAG, "Failed to take mutex");
         return ESP_ERR_INVALID_STATE;
     }
 
