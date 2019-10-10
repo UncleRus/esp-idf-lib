@@ -20,67 +20,61 @@
 #error Unknown platform
 #endif
 
-// input loop
-static esp_event_loop_handle_t input_loop;
+#define EV_QUEUE_LEN 5
 
-// Encoder handler must be static
+static QueueHandle_t event_queue;
 static rotary_encoder_t re;
 
-// something to change
-static int32_t vol = 0;
-
-static void input_handler(void *event_handler_arg, esp_event_base_t event_base,
-        int32_t event_id, void *event_data)
+void test(void *arg)
 {
-    rotary_encoder_t *e = *((rotary_encoder_t **)(event_data));
-
-    printf("Got encoder event, diff = %d, btn = %d\n", e->diff, e->btn_state);
-
-    switch (event_id)
-    {
-        case RE_EVENT_BTN_PRESSED:
-            printf("Button pressed\n");
-            break;
-        case RE_EVENT_BTN_RELEASED:
-            printf("Button released\n");
-            break;
-        case RE_EVENT_BTN_CLICKED:
-            printf("Button clicked\n");
-            break;
-        case RE_EVENT_BTN_LONG_PRESSED:
-            printf("Looooong pressed button\n");
-            break;
-        case RE_EVENT_CHANGED:
-            vol += e->diff;
-            printf("Volume: %d\n", vol);
-            break;
-        default:
-            break;
-    }
-}
-
-void app_main()
-{
-    // Create custom event loop for input events
-    esp_event_loop_args_t loop_args = {
-         .queue_size = 10,
-         .task_name = "INPUT",
-         .task_priority = 5,
-         .task_stack_size = configMINIMAL_STACK_SIZE * 2,
-         .task_core_id = APP_CPU_NUM
-    };
-    ESP_ERROR_CHECK(esp_event_loop_create(&loop_args, &input_loop));
-
-    // Register handler
-    ESP_ERROR_CHECK(esp_event_handler_register_with(input_loop, RE_EVENT, ESP_EVENT_ANY_ID, input_handler, NULL));
+    event_queue = xQueueCreate(EV_QUEUE_LEN, sizeof(rotary_encoder_event_t));
 
     // Setup rotary encoder library
-    ESP_ERROR_CHECK(rotary_encoder_init(input_loop));
+    ESP_ERROR_CHECK(rotary_encoder_init(event_queue));
 
-    // Add one encoder
+    // Add one
     memset(&re, 0, sizeof(rotary_encoder_t));
     re.pin_a = RE_A_GPIO;
     re.pin_b = RE_B_GPIO;
     re.pin_btn = RE_BTN_GPIO;
     ESP_ERROR_CHECK(rotary_encoder_add(&re));
+
+    rotary_encoder_event_t e;
+    int32_t vol = 0;
+
+    printf("Initial volume level: %d\n", vol);
+
+    while (1)
+    {
+        xQueueReceive(event_queue, &e, portMAX_DELAY);
+
+        printf("Got encoder event. type = %d, sender = 0x%08x, diff = %d\n", e.type, (uint32_t)e.sender, e.diff);
+
+        switch (e.type)
+        {
+            case RE_ET_BTN_PRESSED:
+                printf("Button pressed\n");
+                break;
+            case RE_ET_BTN_RELEASED:
+                printf("Button released\n");
+                break;
+            case RE_ET_BTN_CLICKED:
+                printf("Button clicked\n");
+                break;
+            case RE_ET_BTN_LONG_PRESSED:
+                printf("Looooong pressed button\n");
+                break;
+            case RE_ET_CHANGED:
+                vol += e.diff;
+                printf("Volume was changed to %d\n", vol);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void app_main()
+{
+    xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }

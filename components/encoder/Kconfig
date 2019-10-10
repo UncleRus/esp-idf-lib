@@ -22,6 +22,6 @@ menu "Rotary encoders"
 	
 	config RE_BTN_LONG_PRESS_TIME_US
 		int "Long press timeout, us"
-		default 1000000
+		default 500000
 
 endmenu

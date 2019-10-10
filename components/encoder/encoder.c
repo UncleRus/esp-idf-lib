@@ -10,11 +10,8 @@
 #include "encoder.h"
 #include <esp_log.h>
 #include <string.h>
-#include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <esp_timer.h>
-
-ESP_EVENT_DEFINE_BASE(RE_EVENT);
 
 #define MUTEX_TIMEOUT 10
 
@@ -28,7 +25,7 @@ static const char *TAG = "ENCODER";
 static rotary_encoder_t *encs[CONFIG_RE_MAX] = { 0 };
 static const int8_t valid_states[] = { 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 };
 static SemaphoreHandle_t mutex;
-static esp_event_loop_handle_t loop;
+static QueueHandle_t _queue;
 
 #define GPIO_BIT(x) ((x) < 32 ? BIT(x) : ((uint64_t)(((uint64_t)1)<<(x))))
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
@@ -36,6 +33,10 @@ static esp_event_loop_handle_t loop;
 
 inline static void read_encoder(rotary_encoder_t *re)
 {
+    rotary_encoder_event_t ev = {
+        .sender = re
+    };
+
     if (re->pin_btn < GPIO_NUM_MAX)
     do
     {
@@ -54,7 +55,8 @@ inline static void read_encoder(rotary_encoder_t *re)
                 // first press
                 re->btn_state = RE_BTN_PRESSED;
                 re->btn_pressed_time_us = 0;
-                esp_event_post_to(loop, RE_EVENT, RE_EVENT_BTN_PRESSED, &re, sizeof(re), 0);
+                ev.type = RE_ET_BTN_PRESSED;
+                xQueueSendToBack(_queue, &ev, 0);
                 break;
             }
 
@@ -64,7 +66,8 @@ inline static void read_encoder(rotary_encoder_t *re)
             {
                 // Long press
                 re->btn_state = RE_BTN_LONG_PRESSED;
-                esp_event_post_to(loop, RE_EVENT, RE_EVENT_BTN_LONG_PRESSED, &re, sizeof(re), 0);
+                ev.type = RE_ET_BTN_LONG_PRESSED;
+                xQueueSendToBack(_queue, &ev, 0);
             }
         }
         else if (re->btn_state != RE_BTN_RELEASED)
@@ -72,9 +75,13 @@ inline static void read_encoder(rotary_encoder_t *re)
             bool clicked = re->btn_state == RE_BTN_PRESSED;
             // released
             re->btn_state = RE_BTN_RELEASED;
-            esp_event_post_to(loop, RE_EVENT, RE_EVENT_BTN_RELEASED, &re, sizeof(re), 0);
+            ev.type = RE_ET_BTN_RELEASED;
+            xQueueSendToBack(_queue, &ev, 0);
             if (clicked)
-                esp_event_post_to(loop, RE_EVENT, RE_EVENT_BTN_CLICKED, &re, sizeof(re), 0);
+            {
+                ev.type = RE_ET_BTN_CLICKED;
+                xQueueSendToBack(_queue, &ev, 0);
+            }
         }
     } while(0);
 
@@ -86,21 +93,19 @@ inline static void read_encoder(rotary_encoder_t *re)
     if (!valid_states[re->code])
         return;
 
+    int8_t inc = 0;
+
     re->store = (re->store << 4) | re->code;
 
-    switch (re->store)
+    if (re->store == 0xe817) inc = 1;
+    if (re->store == 0xd42b) inc = -1;
+
+    if (inc)
     {
-        case 0xe817:
-            re->diff = 1;
-            break;
-        case 0xd42b:
-            re->diff = -1;
-            break;
-        default:
-            re->diff = 0;
+        ev.type = RE_ET_CHANGED;
+        ev.diff = inc;
+        xQueueSendToBack(_queue, &ev, 0);
     }
-    if (re->diff)
-        esp_event_post_to(loop, RE_EVENT, RE_EVENT_CHANGED, &re, sizeof(re), 0);
 }
 
 static void timer_handler(void *arg)
@@ -124,10 +129,10 @@ static const esp_timer_create_args_t timer_args = {
 
 static esp_timer_handle_t timer;
 
-esp_err_t rotary_encoder_init(esp_event_loop_handle_t event_loop)
+esp_err_t rotary_encoder_init(QueueHandle_t queue)
 {
-    CHECK_ARG(event_loop);
-    loop = event_loop;
+    CHECK_ARG(queue);
+    _queue = queue;
 
     mutex = xSemaphoreCreateMutex();
     if (!mutex)

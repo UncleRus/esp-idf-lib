@@ -14,7 +14,8 @@
 
 #include <esp_err.h>
 #include <driver/gpio.h>
-#include <esp_event.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +36,6 @@ typedef enum {
 typedef struct
 {
     gpio_num_t pin_a, pin_b, pin_btn; //!< Encoder pins. pin_btn can be >= GPIO_NUM_MAX if no button used
-    int8_t diff;                      //!< -1 .. +1, for use in RE_ET_CHANGED handler
     uint8_t code;
     uint16_t store;
     size_t index;
@@ -43,25 +43,33 @@ typedef struct
     rotary_encoder_btn_state_t btn_state;
 } rotary_encoder_t;
 
-ESP_EVENT_DECLARE_BASE(RE_EVENT);
-
 /**
  * Event type
  */
 typedef enum {
-    RE_EVENT_CHANGED = 0,      //!< Encoder turned
-    RE_EVENT_BTN_RELEASED,     //!< Button released
-    RE_EVENT_BTN_PRESSED,      //!< Button pressed
-    RE_EVENT_BTN_LONG_PRESSED, //!< Button long pressed (press time (us) > RE_BTN_LONG_PRESS_TIME_US)
-    RE_EVENT_BTN_CLICKED       //!< Button was clicked
-} rotary_encoder_event_id_t;
+    RE_ET_CHANGED = 0,      //!< Encoder turned
+    RE_ET_BTN_RELEASED,     //!< Button released
+    RE_ET_BTN_PRESSED,      //!< Button pressed
+    RE_ET_BTN_LONG_PRESSED, //!< Button long pressed (press time (us) > RE_BTN_LONG_PRESS_TIME_US)
+    RE_ET_BTN_CLICKED       //!< Button was clicked
+} rotary_encoder_event_type_t;
+
+/**
+ * Event
+ */
+typedef struct
+{
+    rotary_encoder_event_type_t type;  //!< Event type
+    rotary_encoder_t *sender;          //!< Pointer to descriptor
+    int32_t diff;                      //!< Difference between new and old positions (only if type == RE_ET_CHANGED)
+} rotary_encoder_event_t;
 
 /**
  * Initialize library
  * @param queue Event queue
  * @return `ESP_OK` on success
  */
-esp_err_t rotary_encoder_init(esp_event_loop_handle_t event_loop);
+esp_err_t rotary_encoder_init(QueueHandle_t queue);
 
 /**
  * Add new rotary encoder
