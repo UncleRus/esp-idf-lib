@@ -15,6 +15,7 @@
 
 #include <stdbool.h>
 #include <i2cdev.h>
+#include <esp_err.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include <driver/spi_master.h>
 #include <driver/gpio.h> // add by nopnop2002
+#include <esp_err.h>
 
 #ifdef __cplusplus
 extern "C" {
