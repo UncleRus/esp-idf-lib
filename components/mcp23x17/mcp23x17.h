@@ -17,6 +17,7 @@
 #include <i2cdev.h>
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
+#include <esp_err.h>
 
 #define MCP23X17_ADDR_BASE 0x20
 

@@ -15,6 +15,7 @@
 #define __ADS111X_H__
 
 #include <stdbool.h>
+#include <esp_err.h>
 #include <i2cdev.h>
 
 #ifdef __cplusplus

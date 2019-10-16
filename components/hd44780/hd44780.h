@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <driver/gpio.h>
+#include <esp_err.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -17,6 +17,7 @@
 
 #include <stdbool.h>
 #include <i2cdev.h>
+#include <esp_err.h>
 
 #define BMP180_DEVICE_ADDRESS 0x77 //!< I2C address
 
