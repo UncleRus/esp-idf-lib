@@ -18,6 +18,7 @@ static const char *TAG = "I2C_DEV";
 
 static SemaphoreHandle_t locks[I2C_NUM_MAX] = { 0 };
 static i2c_config_t configs[I2C_NUM_MAX];
+static bool installed = false;
 
 #define SEMAPHORE_TAKE(port) do { \
         if (!xSemaphoreTake(locks[port], CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS)) \
@@ -145,11 +146,13 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
         temp.mode = I2C_MODE_MASTER;
 
 #if HELPER_TARGET_IS_ESP32
-        i2c_driver_delete(port);
+        if (installed)
+            i2c_driver_delete(port);
         if ((res = i2c_param_config(port, &temp)) != ESP_OK)
             return res;
         if ((res = i2c_driver_install(port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
+        installed = true;
 #elif HELPER_TARGET_IS_ESP8266
         /* i2c_driver_delete() cannot be called before i2c_driver_install() */
         if ((res = i2c_driver_install(port, temp.mode)) != ESP_OK)
