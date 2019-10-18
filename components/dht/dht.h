@@ -19,6 +19,7 @@
 #define __DHT_H__
 
 #include <driver/gpio.h>
+#include <esp_err.h>
 
 #ifdef __cplusplus
 extern "C" {
