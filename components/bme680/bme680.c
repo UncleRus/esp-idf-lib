@@ -612,17 +612,17 @@ esp_err_t bme680_init_sensor(bme680_t *dev)
     dev->calib_data.res_heat_val = (lsb_to_type(int8_t, buf, BME680_CDM_RHV));
     dev->calib_data.range_sw_err = (lsb_to_type(int8_t, buf, BME680_CDM_RSWE) & BME680_RSWE_BITS) >> BME680_RSWE_SHIFT;
 
-    CHECK(bme680_set_oversampling_rates(dev, BME680_OSR_1X, BME680_OSR_1X, BME680_OSR_1X));
-    CHECK(bme680_set_filter_size(dev, BME680_IIR_SIZE_3));
-
     // Set ambient temperature of sensor to default value (25 degree C)
     dev->settings.ambient_temperature = 25;
+
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+
+    CHECK(bme680_set_oversampling_rates(dev, BME680_OSR_1X, BME680_OSR_1X, BME680_OSR_1X));
+    CHECK(bme680_set_filter_size(dev, BME680_IIR_SIZE_3));
 
     // Set heater default profile 0 to 320 degree Celcius for 150 ms
     CHECK(bme680_set_heater_profile(dev, 0, 320, 150));
     CHECK(bme680_use_heater_profile(dev, 0));
-
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
 }
