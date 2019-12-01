@@ -76,7 +76,7 @@ install:
         export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz"
         ;;
       master)
-        export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-linux-amd64.tar.gz"
+        export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz"
         ;;
       *)
         echo "Unknown PROJECT_SDK_BRANCH: ${PROJECT_SDK_BRANCH}"
