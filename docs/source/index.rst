@@ -178,6 +178,7 @@ Other
    groups/ultrasonic
    groups/encoder
    groups/tda74xx
+   groups/ccs811
    
 
 ==================
