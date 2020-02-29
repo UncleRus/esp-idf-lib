@@ -17,7 +17,7 @@
 
 static i2c_dev_t pcf8574;
 
-static esp_err_t write_lcd_data(uint8_t data)
+static esp_err_t write_lcd_data(const hd44780_t *lcd, uint8_t data)
 {
     return pcf8574_port_write(&pcf8574, data);
 }

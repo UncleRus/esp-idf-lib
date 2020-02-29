@@ -95,7 +95,7 @@ bool bmp180_is_available(i2c_dev_t *i2c_dev);
  * Measure temperature and pressure
  * @param dev Pointer to BMP180 device descriptor
  * @param temperature Temperature in degrees Celsius
- * @param pressure Pressure in MPa
+ * @param pressure Pressure in Pa
  * @param oss Measurement mode
  * @return ESP_OK on success
  */
