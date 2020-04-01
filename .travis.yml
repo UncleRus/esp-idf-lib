@@ -1,5 +1,4 @@
-sudo: false
-language: bash
+language: shell
 
 # when you suspects issues in cache, use the following line to disable cache.
 # cache: false
@@ -11,7 +10,7 @@ cache:
 os:
   - linux
 
-matrix:
+jobs:
   include:
     # in version esp-idf 4.x, both idf.py and make are officially supported
     # build method by espressif.
