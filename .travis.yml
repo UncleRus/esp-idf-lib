@@ -32,6 +32,10 @@ jobs:
       - PROJECT_SDK_BRANCH="v3.2.2"
       - PROJECT_BUILD_METHOD="make"
     - env:
+      - PROJECT_TARGET="esp32"
+      - PROJECT_SDK_BRANCH="v3.3.1"
+      - PROJECT_BUILD_METHOD="make"
+    - env:
       - PROJECT_TARGET="esp8266"
       - PROJECT_SDK_BRANCH="master"
       - PROJECT_BUILD_METHOD="make"

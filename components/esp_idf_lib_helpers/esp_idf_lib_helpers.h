@@ -21,6 +21,7 @@
  */
 #define HELPER_TARGET_VERSION_ESP32_V0        (32000000)
 #define HELPER_TARGET_VERSION_ESP32_V3_2      (32030200)
+#define HELPER_TARGET_VERSION_ESP32_V3_3      (32030300)
 #define HELPER_TARGET_VERSION_ESP32_V4        (32040000)
 #define HELPER_TARGET_VERSION_ESP32_V_MAX     (32999999)
 #define HELPER_TARGET_VERSION_ESP8266_V0    (8266000000)
@@ -34,21 +35,22 @@
  * branch code flow.
  */
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
-/* esp32 and esp-idf 4.x */
+/* ESP32 4.x */
+#if defined(CONFIG_IDF_TARGET_ESP32) && defined(ESP_IDF_VERSION_MAJOR)
 #define HELPER_TARGET_VERSION HELPER_TARGET_VERSION_ESP32_V4
 
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
-
 /* ESP8266 RTOS SDK 3.2 */
+#elif defined(CONFIG_IDF_TARGET_ESP8266)
 #define HELPER_TARGET_VERSION HELPER_TARGET_VERSION_ESP8266_V3_2
 
-#elif !defined(CONFIG_IDF_TARGET_ESP32) && !defined(IDF_VERSION_MAJOR)
-/* esp-idf 3.2 does not define CONFIG_IDF_TARGET_*, nor IDF_VERSION_MAJOR.
- *
- * use this guestimation until ESP_IDF_VERSION_VAL is ported to all SDKs
- */
+/* ESP32 v3.2.x */
+#elif !defined(CONFIG_IDF_TARGET_ESP32) && !defined(PROJECT_VER)
 #define HELPER_TARGET_VERSION HELPER_TARGET_VERSION_ESP32_V3_2
+
+/* ESP32 v3.3.x */
+#elif defined(CONFIG_IDF_TARGET_ESP32)
+#define HELPER_TARGET_VERSION HELPER_TARGET_VERSION_ESP32_V3_3
+
 #else
 #error BUG: Cannot guess target version
 #endif
@@ -110,6 +112,7 @@
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP8266))
 #pragma message(VAR_NAME_VALUE(HELPER_TARGET_VERSION))
+#pragma message(VAR_NAME_VALUE(ESP_IDF_VERSION_MAJOR))
 #endif
 
 #endif
