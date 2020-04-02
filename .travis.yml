@@ -19,6 +19,10 @@ jobs:
     #
     # in the latest ESP8266 RTOS SDK (3.2), idf.py is included but not
     # officially supported by espressif.
+    #
+    # PROJECT_TARGET:         the target. "esp32" or "esp8266"
+    # PROJECT_SDK_BRANCH:     git branch name of SDK
+    # PROJECT_BUILD_METHOD:   "idf" for idf.py or "make" for GNU make
     - env:
       - PROJECT_TARGET="esp32"
       - PROJECT_SDK_BRANCH="master"
