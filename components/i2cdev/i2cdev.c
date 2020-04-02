@@ -16,12 +16,16 @@
 
 static const char *TAG = "I2C_DEV";
 
-static SemaphoreHandle_t locks[I2C_NUM_MAX] = { 0 };
-static i2c_config_t configs[I2C_NUM_MAX];
-static bool installed = false;
+typedef struct {
+    SemaphoreHandle_t lock;
+    i2c_config_t config;
+    bool installed;
+} i2c_port_state_t;
+
+static i2c_port_state_t states[I2C_NUM_MAX];
 
 #define SEMAPHORE_TAKE(port) do { \
-        if (!xSemaphoreTake(locks[port], CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS)) \
+        if (!xSemaphoreTake(states[port].lock, CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS)) \
         { \
             ESP_LOGE(TAG, "Could not take port mutex %d", port); \
             return ESP_ERR_TIMEOUT; \
@@ -29,7 +33,7 @@ static bool installed = false;
         } while (0)
 
 #define SEMAPHORE_GIVE(port) do { \
-        if (!xSemaphoreGive(locks[port])) \
+        if (!xSemaphoreGive(states[port].lock)) \
         { \
             ESP_LOGE(TAG, "Could not give port mutex %d", port); \
             return ESP_FAIL; \
@@ -38,12 +42,12 @@ static bool installed = false;
 
 esp_err_t i2cdev_init()
 {
+    memset(states, 0, sizeof(states));
+
     for (int i = 0; i < I2C_NUM_MAX; i++)
     {
-        if (locks[i]) continue;
-
-        locks[i] = xSemaphoreCreateMutex();
-        if (!locks[i])
+        states[i].lock = xSemaphoreCreateMutex();
+        if (!states[i].lock)
         {
             ESP_LOGE(TAG, "Could not create port mutex %d", i);
             return ESP_FAIL;
@@ -57,13 +61,17 @@ esp_err_t i2cdev_done()
 {
     for (int i = 0; i < I2C_NUM_MAX; i++)
     {
-        if (!locks[i]) continue;
+        if (!states[i].lock) continue;
 
-        SEMAPHORE_TAKE(i);
-        i2c_driver_delete(i);
-        SEMAPHORE_GIVE(i);
-        vSemaphoreDelete(locks[i]);
-        locks[i] = NULL;
+        if (states[i].installed)
+        {
+            SEMAPHORE_TAKE(i);
+            i2c_driver_delete(i);
+            states[i].installed = false;
+            SEMAPHORE_GIVE(i);
+        }
+        vSemaphoreDelete(states[i].lock);
+        states[i].lock = NULL;
     }
     return ESP_OK;
 }
@@ -138,14 +146,15 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
     if (!cfg) return ESP_ERR_INVALID_ARG;
 
     esp_err_t res;
-    if (!cfg_equal(cfg, &configs[port]))
+    if (!cfg_equal(cfg, &states[port].config))
     {
         ESP_LOGD(TAG, "Reconfiguring I2C driver on port %d", port);
         i2c_config_t temp;
         memcpy(&temp, cfg, sizeof(i2c_config_t));
         temp.mode = I2C_MODE_MASTER;
 
-        if (installed)
+        // Driver reinstallation
+        if (states[port].installed)
             i2c_driver_delete(port);
         if ((res = i2c_param_config(port, &temp)) != ESP_OK)
             return res;
@@ -156,9 +165,9 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
         if ((res = i2c_driver_install(port, temp.mode)) != ESP_OK)
             return res;
 #endif
-        installed = true;
+        states[port].installed = true;
 
-        memcpy(&configs[port], &temp, sizeof(i2c_config_t));
+        memcpy(&states[port].config, &temp, sizeof(i2c_config_t));
         ESP_LOGD(TAG, "I2C driver successfully reconfigured on port %d", port);
     }
 
