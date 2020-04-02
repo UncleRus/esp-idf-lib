@@ -17,6 +17,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 ### ESP8266 RTOS SDK
 
 * master
+* 3.3
 * 3.2
 
 Due to incompatibilities in ESP8266 RTOS SDK's SPI driver, the following
