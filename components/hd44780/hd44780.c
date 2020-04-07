@@ -16,10 +16,8 @@
 
 #if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4
 #include <esp32/rom/ets_sys.h>
-#elif HELPER_TARGET_IS_ESP8266 || HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V3_2
-#include <rom/ets_sys.h>
 #else
-#error cannot locate ets_sys.h
+#include <rom/ets_sys.h>
 #endif
 
 #define MS 1000
@@ -80,9 +78,9 @@ static esp_err_t write_nibble(const hd44780_t *lcd, uint8_t b, bool rs)
                      | ((b & 1) << lcd->pins.d4)
                      | (rs ? 1 << lcd->pins.rs : 0)
                      | (lcd->backlight ? 1 << lcd->pins.bl : 0);
-        CHECK(lcd->write_cb(data | (1 << lcd->pins.e)));
+        CHECK(lcd->write_cb(lcd, data | (1 << lcd->pins.e)));
         toggle_delay();
-        CHECK(lcd->write_cb(data));
+        CHECK(lcd->write_cb(lcd, data));
     }
     else
     {
@@ -110,8 +108,7 @@ static esp_err_t write_byte(const hd44780_t *lcd, uint8_t b, bool rs)
 
 esp_err_t hd44780_init(const hd44780_t *lcd)
 {
-    CHECK_ARG(lcd);
-    CHECK_ARG(lcd->lines > 0 && lcd->lines < 5);
+    CHECK_ARG(lcd && lcd->lines > 0 && lcd->lines < 5);
 
     if (!lcd->write_cb)
     {
@@ -186,8 +183,7 @@ esp_err_t hd44780_clear(const hd44780_t *lcd)
 
 esp_err_t hd44780_gotoxy(const hd44780_t *lcd, uint8_t col, uint8_t line)
 {
-    CHECK_ARG(lcd);
-    CHECK_ARG(line < lcd->lines && line < sizeof(line_addr));
+    CHECK_ARG(lcd && line < lcd->lines && line < sizeof(line_addr));
 
     CHECK(write_byte(lcd, CMD_DDRAM_ADDR + line_addr[line] + col, false));
     short_delay();
@@ -207,8 +203,7 @@ esp_err_t hd44780_putc(const hd44780_t *lcd, char c)
 
 esp_err_t hd44780_puts(const hd44780_t *lcd, const char *s)
 {
-    CHECK_ARG(lcd);
-    CHECK_ARG(s);
+    CHECK_ARG(lcd && s);
 
     while (*s)
     {
@@ -228,7 +223,7 @@ esp_err_t hd44780_switch_backlight(hd44780_t *lcd, bool on)
     if (!lcd->write_cb)
         CHECK(gpio_set_level(lcd->pins.bl, on));
     else
-        CHECK(lcd->write_cb(on ? BV(lcd->pins.bl) : 0));
+        CHECK(lcd->write_cb(lcd, on ? BV(lcd->pins.bl) : 0));
 
     lcd->backlight = on;
 
@@ -237,9 +232,7 @@ esp_err_t hd44780_switch_backlight(hd44780_t *lcd, bool on)
 
 esp_err_t hd44780_upload_character(const hd44780_t *lcd, uint8_t num, const uint8_t *data)
 {
-    CHECK_ARG(lcd);
-    CHECK_ARG(num < 8);
-    CHECK_ARG(data);
+    CHECK_ARG(lcd && data && num < 8);
 
     uint8_t bytes = lcd->font == HD44780_FONT_5X8 ? 8 : 10;
     CHECK(write_byte(lcd, CMD_CGRAM_ADDR + num * bytes, false));

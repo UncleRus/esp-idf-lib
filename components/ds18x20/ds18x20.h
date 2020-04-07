@@ -16,6 +16,7 @@
 #ifndef __DS18X20_H__
 #define __DS18X20_H__
 
+#include <esp_err.h>
 #include <onewire.h>
 
 #ifdef __cplusplus

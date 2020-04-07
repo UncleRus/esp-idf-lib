@@ -14,6 +14,7 @@
 
 #include <stdbool.h>
 #include <i2cdev.h>
+#include <esp_err.h>
 
 #define MCP23008_I2C_ADDR_BASE 0x20
 

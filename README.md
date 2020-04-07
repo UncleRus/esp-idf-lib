@@ -17,6 +17,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 ### ESP8266 RTOS SDK
 
 * master
+* 3.3
 * 3.2
 
 Due to incompatibilities in ESP8266 RTOS SDK's SPI driver, the following
@@ -24,7 +25,6 @@ libraries are not supported on ESP8266.
 
 * `max7219`
 * `mcp23x17`
-* `encoder`
 
 ## How to use
 
@@ -63,12 +63,42 @@ PROJECT_NAME := my-esp-project
 
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
 
-EXCLUDE_COMPONENTS := max7219 mcp23x17 encoder
+EXCLUDE_COMPONENTS := max7219 mcp23x17
 
 include $(IDF_PATH)/make/project.mk
 ```
 
 See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples) or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/examples).
+
+## How to debug I2C-based drivers
+
+Common causes of I2C issues are:
+
+* wrong wiring
+* wrong pull-up registers
+* wrong I2C address
+* broken I2C module
+* the driver has a bug
+
+When any of I2C-based drivers does not work, follow the steps below.
+
+Build an _I2C scanner_ device. The device is not necessarily an ESP device.
+There are many examples for various platforms. Search by keyword `i2c scanner`.
+
+Connect the I2C module to the I2C scanner device. Make sure appropriate
+pull-up registers are connected to `SCL` and `SDA` lines.
+
+Scan devices on the I2C bus. If the scanner does not find the I2C device, then
+your wiring might have issues. If the scanner finds the I2C device, make sure
+the address found is what the driver expects. If you have more than one same
+I2C modules, try them all.
+
+If the scanner finds the I2C device and you are sure that the wiring is
+correct, see the signals on the wire using an oscilloscope. Most oscilloscopes
+can decode I2C signals and display I2C transactions in human-readable way.
+
+If the driver does not work after these steps, please [let us
+know](https://github.com/UncleRus/esp-idf-lib/issues).
 
 ## Documentation
 
