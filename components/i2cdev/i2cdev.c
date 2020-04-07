@@ -143,7 +143,7 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
 
 static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
 {
-    if (!cfg) return ESP_ERR_INVALID_ARG;
+    if (!cfg || port >= I2C_NUM_MAX) return ESP_ERR_INVALID_ARG;
 
     esp_err_t res;
     if (!cfg_equal(cfg, &states[port].config))
