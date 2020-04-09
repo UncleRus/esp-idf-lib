@@ -41,10 +41,17 @@ Add path to components in your project makefile, e.g:
 
 ```Makefile
 PROJECT_NAME := my-esp-project
-
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
-
 include $(IDF_PATH)/make/project.mk
+```
+
+or in CMakeLists.txt:
+
+```CMake
+cmake_minimum_required(VERSION 3.5)
+set(EXTRA_COMPONENT_DIRS /home/user/myprojects/esp/esp-idf-lib/components)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(my-esp-project)
 ```
 
 ### ESP8266 RTOS SDK
@@ -60,11 +67,8 @@ Add path to components in your project makefile, e.g:
 
 ```Makefile
 PROJECT_NAME := my-esp-project
-
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
-
 EXCLUDE_COMPONENTS := max7219 mcp23x17
-
 include $(IDF_PATH)/make/project.mk
 ```
 
