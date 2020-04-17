@@ -18,7 +18,7 @@ static const char *TAG = "MCP9808";
 #define I2C_FREQ_HZ 400000 // 400 kHz
 
 #define MANUFACTURER_ID 0x0054
-#define DEVICE_ID 0x0400
+#define DEVICE_ID 0x04
 
 #define REG_CONFIG  1
 #define REG_T_UPPER 2
@@ -104,7 +104,7 @@ static esp_err_t read_temp(i2c_dev_t *dev, uint8_t reg, float *t)
     CHECK(read_reg_16(dev, reg, &v));
 
     *t = (v & 0x0fff) / 16.0;
-    if (v & BV(BIT_T_SIGN)) *t -= 256;
+    if (v & BV(BIT_T_SIGN)) *t = 256 - *t;
 
     return ESP_OK;
 }
@@ -149,11 +149,12 @@ esp_err_t mcp9808_init(i2c_dev_t *dev)
     }
 
     CHECK(read_reg_16(dev, REG_ID, &v));
-    if (v != DEVICE_ID)
+    if ((v >> 8) != DEVICE_ID)
     {
-        ESP_LOGE(TAG, "Inavlid device ID 0x%04x", v);
+        ESP_LOGE(TAG, "Inavlid device ID 0x%02x", v);
         return ESP_ERR_INVALID_RESPONSE;
     }
+    ESP_LOGD(TAG, "Device revision: 0x%02x", v & 0xff);
 
     // clear all lock bits
     return write_reg_16(dev, REG_CONFIG, 0);
