@@ -110,6 +110,7 @@ Humidity & temperature sensors
    groups/max31725
    groups/lm75
    groups/bme680
+   groups/mcp9808
    
 Pressure sensors
 ================
