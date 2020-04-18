@@ -226,9 +226,12 @@ esp_err_t mcp9808_clear_interrupt(i2c_dev_t *dev);
  *
  * @param dev Device descriptor
  * @param[out] t Ambient temperature
+ * @param[out] lower True if T a < T lower, can be NULL
+ * @param[out] upper True if T a > T upper, can be NULL
+ * @param[out] crit True if T a >= T critical, can be NULL
  * @return `ESP_OK` on success
  */
-esp_err_t mcp9808_get_temperature(i2c_dev_t *dev, float *t);
+esp_err_t mcp9808_get_temperature(i2c_dev_t *dev, float *t, bool *lower, bool *upper, bool *crit);
 
 #ifdef __cplusplus
 }

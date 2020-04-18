@@ -42,6 +42,10 @@ static const char *TAG = "MCP9808";
 
 #define BIT_T_SIGN 12
 
+#define BIT_T_A_LOWER 13
+#define BIT_T_A_UPPER 14
+#define BIT_T_A_CRIT  15
+
 #define BV(x) (1 << (x))
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
@@ -101,13 +105,15 @@ static esp_err_t write_temp(i2c_dev_t *dev, uint8_t reg, float t)
     return write_reg_16(dev, reg, v);
 }
 
-static esp_err_t read_temp(i2c_dev_t *dev, uint8_t reg, float *t)
+static esp_err_t read_temp(i2c_dev_t *dev, uint8_t reg, float *t, uint16_t *raw)
 {
     uint16_t v;
     CHECK(read_reg_16(dev, reg, &v));
 
     *t = (v & 0x0fff) / 16.0;
     if (v & BV(BIT_T_SIGN)) *t -= 256;
+
+    if (raw) *raw = v;
 
     return ESP_OK;
 }
@@ -249,9 +255,9 @@ esp_err_t mcp9808_get_limits(i2c_dev_t *dev, float *t_upper, float *t_lower, flo
 {
     CHECK_ARG(dev && t_upper && t_lower && t_crit);
 
-    CHECK(read_temp(dev, REG_T_UPPER, t_upper));
-    CHECK(read_temp(dev, REG_T_LOWER, t_lower));
-    CHECK(read_temp(dev, REG_T_CRIT, t_crit));
+    CHECK(read_temp(dev, REG_T_UPPER, t_upper, NULL));
+    CHECK(read_temp(dev, REG_T_LOWER, t_lower, NULL));
+    CHECK(read_temp(dev, REG_T_CRIT, t_crit, NULL));
 
     return ESP_OK;
 }
@@ -282,10 +288,17 @@ esp_err_t mcp9808_clear_interrupt(i2c_dev_t *dev)
     return update_reg_16(dev, REG_CONFIG, ~BV(BIT_CONFIG_INT_CLR), BV(BIT_CONFIG_INT_CLR));
 }
 
-esp_err_t mcp9808_get_temperature(i2c_dev_t *dev, float *t)
+esp_err_t mcp9808_get_temperature(i2c_dev_t *dev, float *t, bool *lower, bool *upper, bool *crit)
 {
     CHECK_ARG(dev && t);
 
-    return read_temp(dev, REG_T_A, t);
+    uint16_t v;
+
+    CHECK(read_temp(dev, REG_T_A, t, &v));
+    if (lower) *lower = v & BV(BIT_T_A_LOWER) ? true : false;
+    if (upper) *upper = v & BV(BIT_T_A_UPPER) ? true : false;
+    if (crit) *crit = v & BV(BIT_T_A_CRIT) ? true : false;
+
+    return ESP_OK;
 }
 
