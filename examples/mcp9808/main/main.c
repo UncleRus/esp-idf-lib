@@ -35,7 +35,7 @@ void task(void *pvParamters)
     while (1)
     {
         // Get the values and do something with them.
-        if ((res = mcp9808_get_temperature(&dev, &temperature)) == ESP_OK)
+        if ((res = mcp9808_get_temperature(&dev, &temperature, NULL, NULL, NULL)) == ESP_OK)
             printf("Temperature: %.2f °C\n", temperature);
         else
             printf("Could not get results: %d (%s)", res, esp_err_to_name(res));
