@@ -92,8 +92,11 @@ static esp_err_t update_reg_16(i2c_dev_t *dev, uint8_t reg, uint16_t mask, uint1
 
 static esp_err_t write_temp(i2c_dev_t *dev, uint8_t reg, float t)
 {
-    uint16_t v = ((uint16_t)(fabsf(t) * 16)) & 0x0fff;
-    if (t < 0) v |= BV(BIT_T_SIGN);
+    uint16_t v;
+    if (t < 0)
+        v = (((1023 - ((uint16_t)(fabsf(t) * 4.0)) + 1) << 2) & 0x0fff) | BV(BIT_T_SIGN);
+    else
+        v = ((uint16_t)(t * 4.0) << 2) & 0x0fff;
 
     return write_reg_16(dev, reg, v);
 }
@@ -104,7 +107,7 @@ static esp_err_t read_temp(i2c_dev_t *dev, uint8_t reg, float *t)
     CHECK(read_reg_16(dev, reg, &v));
 
     *t = (v & 0x0fff) / 16.0;
-    if (v & BV(BIT_T_SIGN)) *t = 256 - *t;
+    if (v & BV(BIT_T_SIGN)) *t -= 256;
 
     return ESP_OK;
 }
