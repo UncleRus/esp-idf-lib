@@ -21,7 +21,7 @@ void ds1307_test(void *pvParameters)
 
     // setup datetime: 2018-04-11 00:52:10
     struct tm time = {
-        .tm_year = 2018,
+        .tm_year = 118, //since 1900 (2018 - 1900)
         .tm_mon  = 3,  // 0-based
         .tm_mday = 11,
         .tm_hour = 0,
@@ -34,7 +34,7 @@ void ds1307_test(void *pvParameters)
     {
         ds1307_get_time(&dev, &time);
 
-        printf("%04d-%02d-%02d %02d:%02d:%02d\n", time.tm_year, time.tm_mon + 1,
+        printf("%04d-%02d-%02d %02d:%02d:%02d\n", time.tm_year + 1900 /*Add 1900 for better readability*/, time.tm_mon + 1,
             time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
 
         vTaskDelay(500 / portTICK_PERIOD_MS);
