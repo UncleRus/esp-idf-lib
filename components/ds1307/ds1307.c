@@ -127,7 +127,7 @@ esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time)
     time->tm_wday = bcd2dec(buf[3]) - 1;
     time->tm_mday = bcd2dec(buf[4]);
     time->tm_mon  = bcd2dec(buf[5]) - 1;
-    time->tm_year = bcd2dec(buf[6]) + 2000;
+    time->tm_year = bcd2dec(buf[6]) + 100;
 
     return ESP_OK;
 }
@@ -143,7 +143,7 @@ esp_err_t ds1307_set_time(i2c_dev_t *dev, const struct tm *time)
         dec2bcd(time->tm_wday + 1),
         dec2bcd(time->tm_mday),
         dec2bcd(time->tm_mon + 1),
-        dec2bcd(time->tm_year - 2000)
+        dec2bcd(time->tm_year - 100)
     };
 
     I2C_DEV_TAKE_MUTEX(dev);
