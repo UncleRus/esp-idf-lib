@@ -44,7 +44,7 @@
 #define DS3231_PM_FLAG      0x20
 #define DS3231_MONTH_MASK   0x1f
 
-#define CHECK_ARG(ARG) do { if (!ARG) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(ARG) do { if (!(ARG)) return ESP_ERR_INVALID_ARG; } while (0)
 
 enum {
     DS3231_SET = 0,

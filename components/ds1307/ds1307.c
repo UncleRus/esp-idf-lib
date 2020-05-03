@@ -35,7 +35,7 @@
 #define SQWE_MASK    0xef
 #define OUT_MASK     0x7f
 
-#define CHECK_ARG(ARG) do { if (!ARG) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_ARG(ARG) do { if (!(ARG)) return ESP_ERR_INVALID_ARG; } while (0)
 
 static uint8_t bcd2dec(uint8_t val)
 {
