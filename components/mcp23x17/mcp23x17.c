@@ -7,9 +7,11 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "mcp23x17.h"
+
 #include <esp_log.h>
 #include <string.h>
+#include <esp_idf_lib_helpers.h>
+#include "mcp23x17.h"
 
 static const char *TAG = "MCP23x17";
 
@@ -125,7 +127,7 @@ static esp_err_t read_reg_16(mcp23x17_t *dev, uint8_t reg, uint16_t *val)
     CHECK_ARG(dev && val);
 
     uint8_t rx[4] = { 0 };
-    uint8_t tx[4] = { dev->addr, reg, 0, 0 };
+    uint8_t tx[4] = { (dev->addr << 1) | 0x01, reg, 0, 0 };
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
@@ -144,7 +146,7 @@ static esp_err_t write_reg_16(mcp23x17_t *dev, uint8_t reg, uint16_t val)
 {
     CHECK_ARG(dev);
 
-    uint8_t tx[4] = { dev->addr, reg, val, val >> 8 };
+    uint8_t tx[4] = { dev->addr << 1, reg, val, val >> 8 };
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
@@ -171,7 +173,7 @@ static esp_err_t read_reg_8(mcp23x17_t *dev, uint8_t reg, uint8_t *val)
     CHECK_ARG(dev && val);
 
     uint8_t rx[3] = { 0 };
-    uint8_t tx[3] = { dev->addr, reg, 0 };
+    uint8_t tx[3] = { (dev->addr << 1) | 0x01, reg, 0 };
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
@@ -190,7 +192,7 @@ static esp_err_t write_reg_8(mcp23x17_t *dev, uint8_t reg, uint8_t val)
 {
     CHECK_ARG(dev);
 
-    uint8_t tx[3] = { dev->addr, reg, val };
+    uint8_t tx[3] = { dev->addr << 1, reg, val };
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(spi_transaction_t));
@@ -255,7 +257,7 @@ esp_err_t mcp23x17_init_desc(mcp23x17_t *dev, i2c_port_t port, uint8_t addr, gpi
     dev->addr = addr;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 

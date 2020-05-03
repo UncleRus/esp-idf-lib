@@ -10,10 +10,12 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "tsl4531.h"
+
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <esp_idf_lib_helpers.h>
+#include "tsl4531.h"
 
 #define I2C_FREQ_HZ 400000
 
@@ -94,7 +96,7 @@ esp_err_t tsl4531_init_desc(tsl4531_t *dev, i2c_port_t port, gpio_num_t sda_gpio
     dev->i2c_dev.addr = TSL4531_I2C_ADDR;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 

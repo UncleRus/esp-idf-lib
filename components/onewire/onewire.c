@@ -17,23 +17,27 @@
  * of the Dallas Semiconductor name).  See the accompanying LICENSE file for
  * details.
  */
-#include "onewire.h"
+
 #include <string.h>
+#include <esp_idf_lib_helpers.h>
+#include "onewire.h"
 
 #define ONEWIRE_SELECT_ROM 0x55
 #define ONEWIRE_SKIP_ROM   0xcc
 #define ONEWIRE_SEARCH     0xf0
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP8266
+#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#define OPEN_DRAIN_MODE GPIO_MODE_OUTPUT_OD
+
+#elif HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 #define OPEN_DRAIN_MODE GPIO_MODE_INPUT_OUTPUT_OD
-
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
-#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
-#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
-#define OPEN_DRAIN_MODE GPIO_MODE_OUTPUT_OD
+#else
+#error BUG: Unknown target
 #endif
 
 // Waits up to `max_wait` microseconds for the specified pin to go high.
@@ -57,12 +61,8 @@ static inline bool _onewire_wait_for_bus(gpio_num_t pin, int max_wait)
 
 static void setup_pin(gpio_num_t pin, bool open_drain)
 {
-    gpio_config_t io_conf;
-    memset(&io_conf, 0, sizeof(gpio_config_t));
-    io_conf.mode = open_drain ? OPEN_DRAIN_MODE : GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1ULL << pin);
-    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-    gpio_config(&io_conf);
+    gpio_set_direction(pin, open_drain ? OPEN_DRAIN_MODE : GPIO_MODE_OUTPUT);
+    gpio_set_pull_mode(pin, GPIO_PULLUP_ONLY);
 }
 
 // Perform the onewire reset function.  We will wait up to 250uS for

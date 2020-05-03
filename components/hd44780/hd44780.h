@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <driver/gpio.h>
+#include <esp_err.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,12 +35,14 @@ typedef enum
     HD44780_FONT_5X10
 } hd44780_font_t;
 
-typedef esp_err_t (*hd44780_write_cb_t)(uint8_t data);
+typedef struct hd44780 hd44780_t;
+
+typedef esp_err_t (*hd44780_write_cb_t)(const hd44780_t *lcd, uint8_t data);
 
 /**
  * LCD descriptor. Fill it before use.
  */
-typedef struct
+struct hd44780
 {
     hd44780_write_cb_t write_cb; //!< Data write callback. Set it to NULL in case of direct LCD connection to GPIO
     struct
@@ -55,7 +58,7 @@ typedef struct
     hd44780_font_t font;   //!< LCD Font type
     uint8_t lines;         //!< Number of lines for LCD. Many 16x1 LCD has two lines (like 8x2)
     bool backlight;        //!< Current backlight state
-} hd44780_t;
+};
 
 /**
  * @brief Init LCD

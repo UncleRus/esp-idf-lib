@@ -10,9 +10,10 @@
  *
  * MIT Licensed as described in the file LICENSE
  */
-#include "bmp280.h"
 
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "bmp280.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
@@ -136,7 +137,7 @@ esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
     dev->i2c_dev.addr = addr;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
@@ -166,8 +167,7 @@ esp_err_t bmp280_init_default_params(bmp280_params_t *params)
 
 esp_err_t bmp280_init(bmp280_t *dev, bmp280_params_t *params)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(params);
+    CHECK_ARG(dev && params);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -246,8 +246,7 @@ esp_err_t bmp280_force_measurement(bmp280_t *dev)
 
 esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(busy);
+    CHECK_ARG(dev && busy);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
@@ -331,9 +330,7 @@ static inline uint32_t compensate_humidity(bmp280_t *dev, int32_t adc_hum, int32
 
 esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *pressure, uint32_t *humidity)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(temperature);
-    CHECK_ARG(pressure);
+    CHECK_ARG(dev && temperature && pressure);
 
     int32_t adc_pressure;
     int32_t adc_temp;

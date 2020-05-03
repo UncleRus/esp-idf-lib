@@ -9,8 +9,9 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ds1307.h"
 #include <esp_err.h>
+#include <esp_idf_lib_helpers.h>
+#include "ds1307.h"
 
 #define I2C_FREQ_HZ 400000
 
@@ -30,7 +31,7 @@
 #define SECONDS_MASK 0x7f
 #define HOUR12_MASK  0x1f
 #define HOUR24_MASK  0x3f
-#define SQWEF_MASK   0x03
+#define SQWEF_MASK   0xfc
 #define SQWE_MASK    0xef
 #define OUT_MASK     0x7f
 
@@ -69,7 +70,7 @@ esp_err_t ds1307_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio,
     dev->addr = DS1307_ADDR;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
     return i2c_dev_create_mutex(dev);
@@ -89,8 +90,7 @@ esp_err_t ds1307_start(i2c_dev_t *dev, bool start)
 
 esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(running);
+    CHECK_ARG(dev && running);
 
     uint8_t val;
 
@@ -105,8 +105,7 @@ esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running)
 
 esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[7];
 
@@ -128,15 +127,14 @@ esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time)
     time->tm_wday = bcd2dec(buf[3]) - 1;
     time->tm_mday = bcd2dec(buf[4]);
     time->tm_mon  = bcd2dec(buf[5]) - 1;
-    time->tm_year = bcd2dec(buf[6]) + 2000;
+    time->tm_year = bcd2dec(buf[6]) + 100;
 
     return ESP_OK;
 }
 
 esp_err_t ds1307_set_time(i2c_dev_t *dev, const struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[7] = {
         dec2bcd(time->tm_sec),
@@ -145,7 +143,7 @@ esp_err_t ds1307_set_time(i2c_dev_t *dev, const struct tm *time)
         dec2bcd(time->tm_wday + 1),
         dec2bcd(time->tm_mday),
         dec2bcd(time->tm_mon + 1),
-        dec2bcd(time->tm_year - 2000)
+        dec2bcd(time->tm_year - 100)
     };
 
     I2C_DEV_TAKE_MUTEX(dev);
@@ -162,8 +160,7 @@ esp_err_t ds1307_enable_squarewave(i2c_dev_t *dev, bool enable)
 
 esp_err_t ds1307_is_squarewave_enabled(i2c_dev_t *dev, bool *sqw_en)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(sqw_en);
+    CHECK_ARG(dev && sqw_en);
 
     uint8_t val;
 
@@ -183,8 +180,7 @@ esp_err_t ds1307_set_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t fr
 
 esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *sqw_freq)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(sqw_freq);
+    CHECK_ARG(dev && sqw_freq);
 
     uint8_t val;
 
@@ -199,8 +195,7 @@ esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *s
 
 esp_err_t ds1307_get_output(i2c_dev_t *dev, bool *out)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(out);
+    CHECK_ARG(dev && out);
 
     uint8_t val;
 
@@ -220,8 +215,7 @@ esp_err_t ds1307_set_output(i2c_dev_t *dev, bool value)
 
 esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
+    CHECK_ARG(dev && buf);
 
     if (offset + len > RAM_SIZE)
         return ESP_ERR_NO_MEM;
@@ -235,8 +229,7 @@ esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t 
 
 esp_err_t ds1307_write_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
+    CHECK_ARG(dev && buf);
 
     if (offset + len > RAM_SIZE)
         return ESP_ERR_NO_MEM;

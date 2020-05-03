@@ -11,10 +11,11 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ds18x20.h"
 
 #include <math.h>
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include "ds18x20.h"
 
 #define ds18x20_WRITE_SCRATCHPAD 0x4E
 #define ds18x20_READ_SCRATCHPAD  0xBE
@@ -35,12 +36,12 @@
 #define DS18B20_FAMILY_ID 0x28
 #define DS18S20_FAMILY_ID 0x10
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_TARGET_IS_ESP8266
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
 #endif

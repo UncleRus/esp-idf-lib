@@ -10,12 +10,14 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include "ds1302.h"
 #include <freertos/FreeRTOS.h>
 #include <string.h>
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#include <esp_idf_lib_helpers.h>
+#include "ds1302.h"
+
+#if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4
 #include <esp32/rom/ets_sys.h>
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#else
 #include <rom/ets_sys.h>
 #endif
 
@@ -42,14 +44,16 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-#if defined(CONFIG_IDF_TARGET_ESP32)
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
 
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#elif HELPER_TARGET_IS_ESP8266
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#else
+#error cannot identify the target
 #endif
 
 #define CHECK_MUX(x) do { esp_err_t __; if ((__ = (x)) != ESP_OK) { PORT_EXIT_CRITICAL; return __; } } while (0)
@@ -198,8 +202,7 @@ esp_err_t ds1302_start(ds1302_t *dev, bool start)
 
 esp_err_t ds1302_is_running(ds1302_t *dev, bool *running)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(running);
+    CHECK_ARG(dev && running);
 
     uint8_t r;
     CHECK(read_register(dev, CH_REG, &r));
@@ -218,8 +221,7 @@ esp_err_t ds1302_set_write_protect(ds1302_t *dev, bool wp)
 
 esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(wp);
+    CHECK_ARG(dev && wp);
 
     uint8_t r;
     CHECK(read_register(dev, WP_REG, &r));
@@ -230,8 +232,7 @@ esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp)
 
 esp_err_t ds1302_get_time(ds1302_t *dev, struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[7];
     CHECK(burst_read(dev, CLOCK_BURST, buf, 7));
@@ -249,15 +250,14 @@ esp_err_t ds1302_get_time(ds1302_t *dev, struct tm *time)
     time->tm_mday = bcd2dec(buf[3]);
     time->tm_mon  = bcd2dec(buf[4]) - 1;
     time->tm_wday = bcd2dec(buf[5]) - 1;
-    time->tm_year = bcd2dec(buf[6]) + 2000;
+    time->tm_year = bcd2dec(buf[6]) + 100;
 
     return ESP_OK;
 }
 
 esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(time);
+    CHECK_ARG(dev && time);
 
     uint8_t buf[8] = {
         dec2bcd(time->tm_sec) | (dev->ch ? CH_BIT : 0),
@@ -266,7 +266,7 @@ esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time)
         dec2bcd(time->tm_mday),
         dec2bcd(time->tm_mon  + 1),
         dec2bcd(time->tm_wday + 1),
-        dec2bcd(time->tm_year - 2000),
+        dec2bcd(time->tm_year - 100),
         0
     };
     return burst_write(dev, CLOCK_BURST, buf, 8);
@@ -274,9 +274,7 @@ esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time)
 
 esp_err_t ds1302_read_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
-    CHECK_ARG(len);
+    CHECK_ARG(dev && buf && len);
     CHECK_ARG(offset + len <= DS1302_RAM_SIZE);
 
     return burst_read(dev, RAM_BURST, (uint8_t *)buf, len);
@@ -284,9 +282,7 @@ esp_err_t ds1302_read_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len
 
 esp_err_t ds1302_write_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(buf);
-    CHECK_ARG(len);
+    CHECK_ARG(dev && buf && len);
     CHECK_ARG(offset + len <= DS1302_RAM_SIZE);
 
     return burst_write(dev, RAM_BURST, (uint8_t *)buf, len);

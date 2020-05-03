@@ -1,21 +1,5 @@
 menu "Rotary encoders"
 
-	choice RE_TGROUP
-		prompt "Timer group"
-		config RE_TGROUP_0
-			bool "0"
-		config RE_TGROUP_1
-			bool "1"
-	endchoice
-	
-	choice RE_TIMER
-		prompt "Timer"
-		config RE_TIMER_0
-			bool "0"
-		config RE_TIMER_1
-			bool "1"
-	endchoice
-	
 	config RE_MAX
 		int "Maximum number of rotary encoders"
 		default 1

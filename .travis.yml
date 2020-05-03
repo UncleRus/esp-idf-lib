@@ -1,5 +1,4 @@
-sudo: false
-language: bash
+language: shell
 
 # when you suspects issues in cache, use the following line to disable cache.
 # cache: false
@@ -11,8 +10,19 @@ cache:
 os:
   - linux
 
-matrix:
+jobs:
   include:
+    # in version esp-idf 4.x, both idf.py and make are officially supported
+    # build method by espressif.
+    #
+    # in version 3.x, make is the supported build method.
+    #
+    # in the latest ESP8266 RTOS SDK (3.2), idf.py is included but not
+    # officially supported by espressif.
+    #
+    # PROJECT_TARGET:         the target. "esp32" or "esp8266"
+    # PROJECT_SDK_BRANCH:     git branch name of SDK
+    # PROJECT_BUILD_METHOD:   "idf" for idf.py or "make" for GNU make
     - env:
       - PROJECT_TARGET="esp32"
       - PROJECT_SDK_BRANCH="master"
@@ -22,8 +32,20 @@ matrix:
       - PROJECT_SDK_BRANCH="master"
       - PROJECT_BUILD_METHOD="idf"
     - env:
+      - PROJECT_TARGET="esp32"
+      - PROJECT_SDK_BRANCH="v3.2.2"
+      - PROJECT_BUILD_METHOD="make"
+    - env:
+      - PROJECT_TARGET="esp32"
+      - PROJECT_SDK_BRANCH="v3.3.1"
+      - PROJECT_BUILD_METHOD="make"
+    - env:
       - PROJECT_TARGET="esp8266"
       - PROJECT_SDK_BRANCH="master"
+      - PROJECT_BUILD_METHOD="make"
+    - env:
+      - PROJECT_TARGET="esp8266"
+      - PROJECT_SDK_BRANCH="v3.2"
       - PROJECT_BUILD_METHOD="make"
 
 addons:
@@ -47,31 +69,54 @@ before_install:
 install:
   - export TOOLCHAIN_DIR="${HOME}/${PROJECT_TARGET}"
   - |
-    if [ ${PROJECT_TARGET} == "esp8266" ]; then
+    case ${PROJECT_TARGET} in
+    esp8266)
       export PROJECT_GCC_PREFIX="xtensa-lx106-elf"
-      export PROJECT_TOOLCHAIN_FILE=xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz
+      export PROJECT_TOOLCHAIN_FILE="xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz"
       export PROJECT_SDK_NAME="ESP8266_RTOS_SDK"
-    else
+      ;;
+    esp32)
       export PROJECT_GCC_PREFIX="xtensa-esp32-elf"
-      export PROJECT_TOOLCHAIN_FILE=xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-linux-amd64.tar.gz
       export PROJECT_SDK_NAME="esp-idf"
-    fi
+      case ${PROJECT_SDK_BRANCH} in
+      v3.*)
+        export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz"
+        ;;
+      master)
+        export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-gcc8_2_0-esp-2020r1-linux-amd64.tar.gz"
+        ;;
+      *)
+        echo "Unknown PROJECT_SDK_BRANCH: ${PROJECT_SDK_BRANCH}"
+        exit 1
+        ;;
+      esac
+      ;;
+    *)
+      echo "Unknown PROJECT_TARGET: ${PROJECT_TARGET}"
+      exit 1
+      ;;
+    esac
   - export PROJECT_GCC_FILE="${PROJECT_GCC_PREFIX}-gcc"
   - export PROJECT_DISTFILE_DIR="${HOME}/distfiles"
   - export IDF_PATH=${TOOLCHAIN_DIR}/${PROJECT_SDK_NAME}
   - export PROJECT_LOG="${HOME}/build.log"
   - export PROJECT_EXAMPLE_DIR="${PROJECT_PATH}/examples"
   - |
-    if [ ${PROJECT_BUILD_METHOD} == "idf" ]; then
+    case ${PROJECT_BUILD_METHOD} in
+    idf)
       export PROJECT_BUILD_COMMAND="python ${IDF_PATH}/tools/idf.py"
       export PROJECT_BUILD_COMMAND_ARG="build"
-    elif [ ${PROJECT_BUILD_METHOD} == "make" ]; then
+      ;;
+    make)
       export PROJECT_BUILD_COMMAND="make"
       export PROJECT_BUILD_COMMAND_ARG="-j2"
-    else
-      echo "Unknown PROJECT_BUILD_METHOD: `${PROJECT_BUILD_METHOD}`"
+      ;;
+    *)
+      echo "Unknown PROJECT_BUILD_METHOD: ${PROJECT_BUILD_METHOD}"
       exit 1
-    fi
+      ;;
+    esac
+  - echo ${PROJECT_CONFIG_IDF_TARGET_ESP32}
   # Install ESP32 toochain following steps as desribed
   # in http://esp-idf.readthedocs.io/en/latest/linux-setup.html
 
@@ -105,6 +150,11 @@ install:
 
 script:
   - rm -f ${PROJECT_LOG}
+
+  # show what is actually executed because travis does not show expanded
+  # variables in logs.
+  - echo "build command ${PROJECT_BUILD_COMMAND} ${PROJECT_BUILD_COMMAND_ARG}"
+
   # XXX surpress log output where possible. when the size exceeds 4 MB, the
   # job will be killed.
   - |
@@ -116,7 +166,7 @@ script:
       esp8266)
         IGNORE_FILE="travis-ignore-esp8266"
         # these drivers do not compile for ESP8266 yet
-        export EXCLUDE_COMPONENTS="encoder max7219 mcp23x17"
+        export EXCLUDE_COMPONENTS="max7219 mcp23x17"
         ;;
     esac
 
