@@ -218,7 +218,7 @@ esp_err_t pcf8563_get_timer_settings(i2c_dev_t *dev, bool *int_enabled, pcf8563_
     I2C_DEV_GIVE_MUTEX(dev);
 
     *int_enabled = s & BV(BIT_CTRL_STATUS2_TIE) ? true : false;
-    *clock = s & 0x03;
+    *clock = t & MASK_TIMER_CTRL_TD;
 
     return ESP_OK;
 }
