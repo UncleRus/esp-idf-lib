@@ -97,6 +97,7 @@ Real-time clocks
    groups/ds1302
    groups/ds1307
    groups/ds3231
+   groups/pcf8563
 
 Humidity & temperature sensors
 ==============================
