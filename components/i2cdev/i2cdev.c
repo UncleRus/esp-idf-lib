@@ -136,42 +136,54 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
         && a->sda_io_num == b->sda_io_num
 #if HELPER_TARGET_IS_ESP32
         && a->master.clk_speed == b->master.clk_speed
+#elif HELPER_TARGET_IS_ESP8266
+        && a->master.clk_stretch_tick == b->master.clk_stretch_tick
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
         && a->sda_pullup_en == b->sda_pullup_en;
 }
 
-static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
+static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
 {
-    if (!cfg || port >= I2C_NUM_MAX) return ESP_ERR_INVALID_ARG;
+    if (dev->port >= I2C_NUM_MAX) return ESP_ERR_INVALID_ARG;
 
     esp_err_t res;
-    if (!cfg_equal(cfg, &states[port].config))
+    if (!cfg_equal(&dev->cfg, &states[dev->port].config))
     {
-        ESP_LOGD(TAG, "Reconfiguring I2C driver on port %d", port);
+        ESP_LOGD(TAG, "Reconfiguring I2C driver on port %d", dev->port);
         i2c_config_t temp;
-        memcpy(&temp, cfg, sizeof(i2c_config_t));
+        memcpy(&temp, &dev->cfg, sizeof(i2c_config_t));
         temp.mode = I2C_MODE_MASTER;
 
         // Driver reinstallation
-        if (states[port].installed)
-            i2c_driver_delete(port);
+        if (states[dev->port].installed)
+            i2c_driver_delete(dev->port);
 #if HELPER_TARGET_IS_ESP32
-        if ((res = i2c_param_config(port, &temp)) != ESP_OK)
+        if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
             return res;
-        if ((res = i2c_driver_install(port, temp.mode, 0, 0, 0)) != ESP_OK)
+        if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
 #elif HELPER_TARGET_IS_ESP8266
-        if ((res = i2c_driver_install(port, temp.mode)) != ESP_OK)
+        // Clock Stretch time, depending on CPU frequency
+        temp.clk_stretch_tick = dev->timeout_ticks;
+        if ((res = i2c_driver_install(dev->port, temp.mode)) != ESP_OK)
             return res;
-        if ((res = i2c_param_config(port, &temp)) != ESP_OK)
+        if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
             return res;
 #endif
-        states[port].installed = true;
+        states[dev->port].installed = true;
 
-        memcpy(&states[port].config, &temp, sizeof(i2c_config_t));
-        ESP_LOGD(TAG, "I2C driver successfully reconfigured on port %d", port);
+        memcpy(&states[dev->port].config, &temp, sizeof(i2c_config_t));
+        ESP_LOGD(TAG, "I2C driver successfully reconfigured on port %d", dev->port);
     }
+#if HELPER_TARGET_IS_ESP32
+    int t;
+    if ((res = i2c_get_timeout(dev->port, &t)) != ESP_OK)
+        return res;
+    if (dev->timeout_ticks != t && (res = i2c_set_timeout(dev->port, dev->timeout_ticks)) != ESP_OK)
+        return res;
+    ESP_LOGD(TAG, "Timeout: ticks = %d (%d usec) on port %d", dev->timeout_ticks, dev->timeout_ticks / 80, dev->port);
+#endif
 
     return ESP_OK;
 }
@@ -182,7 +194,7 @@ esp_err_t i2c_dev_read(const i2c_dev_t *dev, const void *out_data, size_t out_si
 
     SEMAPHORE_TAKE(dev->port);
 
-    esp_err_t res = i2c_setup_port(dev->port, &dev->cfg);
+    esp_err_t res = i2c_setup_port(dev);
     if (res == ESP_OK)
     {
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -214,7 +226,7 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_re
 
     SEMAPHORE_TAKE(dev->port);
 
-    esp_err_t res = i2c_setup_port(dev->port, &dev->cfg);
+    esp_err_t res = i2c_setup_port(dev);
     if (res == ESP_OK)
     {
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();

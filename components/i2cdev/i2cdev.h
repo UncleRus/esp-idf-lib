@@ -26,10 +26,12 @@ extern "C" {
  */
 typedef struct
 {
-    i2c_port_t port;         //!< I2C port number, 0 or 1
+    i2c_port_t port;         //!< I2C port number
     i2c_config_t cfg;        //!< I2C driver configuration
     uint8_t addr;            //!< Unshifted address
     SemaphoreHandle_t mutex; //!< Device mutex
+    uint32_t timeout_ticks;  /*!< HW I2C bus timeout, in ticks. 80MHz APB clock ticks for ESP-IDF,
+                                  CPU ticks for ESP8266. Useful when clock stretching is needed */
 } i2c_dev_t;
 
 /**
