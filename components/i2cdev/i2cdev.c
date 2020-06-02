@@ -163,9 +163,12 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
             return res;
         if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
-#elif HELPER_TARGET_IS_ESP8266
+#endif
+#if HELPER_TARGET_IS_ESP8266
+#if HELPER_TARGET_VERSION > HELPER_TARGET_VERSION_ESP8266_V3_2
         // Clock Stretch time, depending on CPU frequency
         temp.clk_stretch_tick = dev->timeout_ticks;
+#endif
         if ((res = i2c_driver_install(dev->port, temp.mode)) != ESP_OK)
             return res;
         if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
