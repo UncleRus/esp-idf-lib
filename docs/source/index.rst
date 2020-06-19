@@ -180,6 +180,7 @@ Other
    groups/ultrasonic
    groups/encoder
    groups/tda74xx
+   groups/tca9548
    
 
 ==================
