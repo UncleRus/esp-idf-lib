@@ -156,13 +156,15 @@ static esp_err_t i2c_setup_port(i2c_port_t port, const i2c_config_t *cfg)
         // Driver reinstallation
         if (states[port].installed)
             i2c_driver_delete(port);
+#if HELPER_TARGET_IS_ESP32
         if ((res = i2c_param_config(port, &temp)) != ESP_OK)
             return res;
-#if HELPER_TARGET_IS_ESP32
         if ((res = i2c_driver_install(port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
 #elif HELPER_TARGET_IS_ESP8266
         if ((res = i2c_driver_install(port, temp.mode)) != ESP_OK)
+            return res;
+        if ((res = i2c_param_config(port, &temp)) != ESP_OK)
             return res;
 #endif
         states[port].installed = true;

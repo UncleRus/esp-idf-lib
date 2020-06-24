@@ -97,6 +97,7 @@ Real-time clocks
    groups/ds1302
    groups/ds1307
    groups/ds3231
+   groups/pcf8563
 
 Humidity & temperature sensors
 ==============================
@@ -110,6 +111,7 @@ Humidity & temperature sensors
    groups/max31725
    groups/lm75
    groups/bme680
+   groups/mcp9808
    
 Pressure sensors
 ================
@@ -179,6 +181,7 @@ Other
    groups/encoder
    groups/tda74xx
    groups/rda5807m
+   groups/tca9548
    
 
 ==================

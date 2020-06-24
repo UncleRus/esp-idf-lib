@@ -9,7 +9,7 @@ assignees: ''
 
 <!-- Please erase any parts of this template not applicable to your Issue. -->
 
-**Devcie type**
+**Device type**
 - [x] ESP32
 - [x] ESP8226
 

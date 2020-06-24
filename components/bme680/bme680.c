@@ -131,7 +131,7 @@
 
 // commands
 #define BME680_RESET_CMD            0xb6    // BME680_REG_RESET<7:0>
-#define BME680_RESET_PERIOD         5       // reset time in ms
+#define BME680_RESET_PERIOD         10      // reset time in ms
 
 #define BME680_RHR_BITS             0x30    // BME680_REG_RES_HEAT_RANGE<5:4>
 #define BME680_RHR_SHIFT            4       // BME680_REG_RES_HEAT_RANGE<5:4>
