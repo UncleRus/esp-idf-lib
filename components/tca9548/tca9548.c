@@ -1,7 +1,7 @@
 /**
  * @file tca9548.c
  *
- * ESP-IDF driver for low-voltage 8-channel I2C switch TCA9548
+ * ESP-IDF driver for low-voltage 8-channel I2C switch TCA9548/PCA9548
  *
  * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -30,7 +30,7 @@ static const char *TAG = "TCA9548";
 
 esp_err_t tca9548_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    CHECK_ARG(dev);
+    CHECK_ARG(dev && addr >= TCA9548_ADDR_0 && addr <= TCA9548_ADDR_7);
 
     dev->port = port;
     dev->addr = addr;
@@ -57,8 +57,8 @@ esp_err_t tca9548_set_channels(i2c_dev_t *dev, uint8_t channels)
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, &channels, 1));
     I2C_DEV_GIVE_MUTEX(dev);
-    ESP_LOGD(TAG, "Channels set to 0x%02x (0b" BYTE_TO_BINARY_PATTERN ")",
-            channels, BYTE_TO_BINARY(channels));
+    ESP_LOGD(TAG, "[0x%02x at %d] Channels set to 0x%02x (0b" BYTE_TO_BINARY_PATTERN ")",
+            dev->addr, dev->port, channels, BYTE_TO_BINARY(channels));
 
     return ESP_OK;
 }
