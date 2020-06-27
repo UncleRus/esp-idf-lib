@@ -132,6 +132,7 @@ ADC/DAC
    groups/hx711
    groups/pcf8591
    groups/mcp4725
+   groups/mcp342x
 
 Power/Current monitors
 ======================
