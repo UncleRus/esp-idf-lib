@@ -12,6 +12,7 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 ### ESP-IDF
 
 * master
+* 4.x
 * 3.2.2
 
 ### ESP8266 RTOS SDK
