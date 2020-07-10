@@ -55,6 +55,21 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(my-esp-project)
 ```
 
+or with CMake [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html)
+
+```CMake
+cmake_minimum_required(VERSION 3.11)
+include(FetchContent)
+FetchContent_Declare(
+  espidflib
+  GIT_REPOSITORY https://github.com/UncleRus/esp-idf-lib.git
+)
+FetchContent_MakeAvailable(espidflib)
+set(EXTRA_COMPONENT_DIRS ${espidflib_SOURCE_DIR}/components)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(my-esp-project)
+```
+
 ### ESP8266 RTOS SDK
 
 Clone this repository somewhere, e.g.:
