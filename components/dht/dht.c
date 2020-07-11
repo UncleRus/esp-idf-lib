@@ -67,6 +67,7 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define CHECK_LOGE(x, msg, ...) do { \
         esp_err_t __; \
         if ((__ = x) != ESP_OK) { \
+            PORT_EXIT_CRITICAL; \
             ESP_LOGE(TAG, msg, ## __VA_ARGS__); \
             return __; \
         } \
@@ -182,7 +183,9 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
 
     PORT_ENTER_CRITICAL;
     esp_err_t result = dht_fetch_data(sensor_type, pin, data);
-    PORT_EXIT_CRITICAL;
+    if(result == ESP_OK){
+        PORT_EXIT_CRITICAL;
+    }
 
     /* restore GPIO direction because, after calling dht_fetch_data(), the
      * GPIO direction mode changes */

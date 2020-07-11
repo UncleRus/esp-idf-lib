@@ -29,7 +29,7 @@ static const uint8_t char_data[] = {
     0x1f, 0x11, 0x0a, 0x04, 0x0a, 0x11, 0x1f, 0x00
 };
 
-static esp_err_t write_lcd_data(uint8_t data)
+static esp_err_t write_lcd_data(const hd44780_t *lcd, uint8_t data)
 {
     return pcf8574_port_write(&pcf8574, data);
 }

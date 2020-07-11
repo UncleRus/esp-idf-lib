@@ -17,10 +17,8 @@
 
 #if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4
 #include <esp32/rom/ets_sys.h>
-#elif HELPER_TARGET_IS_ESP8266 || HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V3_2
-#include <rom/ets_sys.h>
 #else
-#error cannot locate ets_sys.h
+#include <rom/ets_sys.h>
 #endif
 
 #define CH_REG   0x80
@@ -252,7 +250,7 @@ esp_err_t ds1302_get_time(ds1302_t *dev, struct tm *time)
     time->tm_mday = bcd2dec(buf[3]);
     time->tm_mon  = bcd2dec(buf[4]) - 1;
     time->tm_wday = bcd2dec(buf[5]) - 1;
-    time->tm_year = bcd2dec(buf[6]) + 2000;
+    time->tm_year = bcd2dec(buf[6]) + 100;
 
     return ESP_OK;
 }
@@ -268,7 +266,7 @@ esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time)
         dec2bcd(time->tm_mday),
         dec2bcd(time->tm_mon  + 1),
         dec2bcd(time->tm_wday + 1),
-        dec2bcd(time->tm_year - 2000),
+        dec2bcd(time->tm_year - 100),
         0
     };
     return burst_write(dev, CLOCK_BURST, buf, 8);

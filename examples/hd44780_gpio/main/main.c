@@ -19,6 +19,7 @@ static const uint8_t char_data[] = {
 void lcd_test(void *pvParameters)
 {
     hd44780_t lcd = {
+        .write_cb = NULL,
         .font = HD44780_FONT_5X8,
         .lines = 2,
         .pins = {

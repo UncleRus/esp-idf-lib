@@ -68,7 +68,7 @@ static uint32_t get_time_us()
 {
     struct timeval time;
     gettimeofday(&time, 0);
-    return time.tv_sec * 1e6 + time.tv_usec;
+    return (uint32_t)(time.tv_sec * 1e6) + (uint32_t)time.tv_usec;
 }
 
 #define G_POLYNOM 0x31

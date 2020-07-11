@@ -1,6 +1,5 @@
-set(COMPONENT_SRCDIRS .)
-set(COMPONENT_ADD_INCLUDEDIRS .)
-
-set(COMPONENT_REQUIRES onewire freertos log esp_idf_lib_helpers)
-
-register_component()
+idf_component_register(
+    SRCS "ds18x20.c"
+    INCLUDE_DIRS .
+    REQUIRES onewire freertos log esp_idf_lib_helpers
+)

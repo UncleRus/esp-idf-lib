@@ -26,8 +26,6 @@ void bmp180_test(void *pvParameters)
         float temp;
         uint32_t pressure;
 
-        printf("Current core: %d\n", xPortGetCoreID());
-
         esp_err_t res = bmp180_measure(&dev, &temp, &pressure, BMP180_MODE_STANDARD);
         if (res != ESP_OK)
             printf("Could not measure: %d\n", res);
@@ -36,7 +34,7 @@ void bmp180_test(void *pvParameters)
              * sdkconfig for ESP8266, which is enabled by default for this
              * example. see sdkconfig.defaults.esp8266
              */
-            printf("Temperature: %.2f degrees Celsius; Pressure: %d MPa\n", temp, pressure);
+            printf("Temperature: %.2f degrees Celsius; Pressure: %d Pa\n", temp, pressure);
 
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
@@ -47,4 +45,3 @@ void app_main()
     ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreatePinnedToCore(bmp180_test, "bmp180_test", configMINIMAL_STACK_SIZE * 15, NULL, 5, NULL, APP_CPU_NUM);
 }
-

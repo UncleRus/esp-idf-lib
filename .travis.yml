@@ -1,5 +1,4 @@
-sudo: false
-language: bash
+language: shell
 
 # when you suspects issues in cache, use the following line to disable cache.
 # cache: false
@@ -11,7 +10,7 @@ cache:
 os:
   - linux
 
-matrix:
+jobs:
   include:
     # in version esp-idf 4.x, both idf.py and make are officially supported
     # build method by espressif.
@@ -20,6 +19,10 @@ matrix:
     #
     # in the latest ESP8266 RTOS SDK (3.2), idf.py is included but not
     # officially supported by espressif.
+    #
+    # PROJECT_TARGET:         the target. "esp32" or "esp8266"
+    # PROJECT_SDK_BRANCH:     git branch name of SDK
+    # PROJECT_BUILD_METHOD:   "idf" for idf.py or "make" for GNU make
     - env:
       - PROJECT_TARGET="esp32"
       - PROJECT_SDK_BRANCH="master"
@@ -31,6 +34,10 @@ matrix:
     - env:
       - PROJECT_TARGET="esp32"
       - PROJECT_SDK_BRANCH="v3.2.2"
+      - PROJECT_BUILD_METHOD="make"
+    - env:
+      - PROJECT_TARGET="esp32"
+      - PROJECT_SDK_BRANCH="v3.3.1"
       - PROJECT_BUILD_METHOD="make"
     - env:
       - PROJECT_TARGET="esp8266"
@@ -76,7 +83,7 @@ install:
         export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz"
         ;;
       master)
-        export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-gcc8_2_0-esp-2019r2-linux-amd64.tar.gz"
+        export PROJECT_TOOLCHAIN_FILE="xtensa-esp32-elf-gcc8_2_0-esp-2020r1-linux-amd64.tar.gz"
         ;;
       *)
         echo "Unknown PROJECT_SDK_BRANCH: ${PROJECT_SDK_BRANCH}"
