@@ -177,6 +177,23 @@ esp_err_t ads111x_get_value(i2c_dev_t *dev, int16_t *value)
     return ESP_OK;
 }
 
+esp_err_t ads101x_get_value(i2c_dev_t *dev,int16_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, read_reg(dev, REG_CONVERSION, (uint16_t *)value));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *value = *value >> 4;
+    if (*value > 0x07FF)
+	{
+		// negative number - extend the sign to 16th bit
+		*value |= 0xF000;
+	}
+	return ESP_OK;
+}
+
 esp_err_t ads111x_get_gain(i2c_dev_t *dev, ads111x_gain_t *gain)
 {
     READ_CONFIG(PGA_OFFSET, PGA_MASK, gain);

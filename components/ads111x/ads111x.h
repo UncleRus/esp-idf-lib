@@ -28,6 +28,16 @@ extern "C" {
 #define ADS111X_ADDR_SCL 0x4b //!< I2C device address with ADDR pin connected to SCL
 
 #define ADS111X_MAX_VALUE 0x7fff //!< Maximum ADC value
+#define ADS101X_MAX_VALUE 0x7ff
+
+// ADS101X overrides
+#define ADS101X_DATA_RATE_128  	ADS111X_DATA_RATE_8
+#define ADS101X_DATA_RATE_250  	ADS111X_DATA_RATE_16
+#define ADS101X_DATA_RATE_490  	ADS111X_DATA_RATE_32
+#define ADS101X_DATA_RATE_920  	ADS111X_DATA_RATE_64
+#define ADS101X_DATA_RATE_1600	ADS111X_DATA_RATE_128
+#define ADS101X_DATA_RATE_2400	ADS111X_DATA_RATE_250
+#define ADS101X_DATA_RATE_3300	ADS111X_DATA_RATE_475
 
 /**
  * Gain amplifier
@@ -167,6 +177,15 @@ esp_err_t ads111x_start_conversion(i2c_dev_t *dev);
  * @return `ESP_OK` on success
  */
 esp_err_t ads111x_get_value(i2c_dev_t *dev, int16_t *value);
+
+/**
+ * Read last conversion result for 101x
+ * @param addr
+ * @param value Last conversion result
+ * @return `ESP_OK` on success
+ */
+esp_err_t ads101x_get_value(i2c_dev_t *dev, int16_t *value);
+
 
 /**
  * Read the programmable gain amplifier configuration
