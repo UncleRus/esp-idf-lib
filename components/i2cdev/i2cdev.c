@@ -234,3 +234,14 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_re
     return res;
 }
 
+esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
+        void *in_data, size_t in_size)
+{
+    return i2c_dev_read(dev, &reg, 1, in_data, in_size);
+}
+
+esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
+        const void *out_data, size_t out_size)
+{
+    return i2c_dev_write(dev, &reg, 1, out_data, out_size);
+}

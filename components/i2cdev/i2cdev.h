@@ -118,11 +118,8 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg,
  * @param[in] in_size Number of byte to read
  * @return ESP_OK on success
  */
-inline esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
-        void *in_data, size_t in_size)
-{
-    return i2c_dev_read(dev, &reg, 1, in_data, in_size);
-}
+esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
+        void *in_data, size_t in_size);
 
 /**
  * @brief Write to register with an 8-bit address
@@ -134,11 +131,8 @@ inline esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
  * @param[in] out_size Size of data to send
  * @return ESP_OK on success
  */
-inline esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
-        const void *out_data, size_t out_size)
-{
-    return i2c_dev_write(dev, &reg, 1, out_data, out_size);
-}
+esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
+        const void *out_data, size_t out_size);
 
 #define I2C_DEV_TAKE_MUTEX(dev) do { \
         esp_err_t __ = i2c_dev_take_mutex(dev); \
