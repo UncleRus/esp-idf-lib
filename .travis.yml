@@ -57,8 +57,10 @@ addons:
       - libncurses-dev
       - flex
       - bison
-      - python
-      - python-pip
+      - python3
+      - python3-pip
+      - python3-setuptools
+      - python3-wheel
       - gperf
       - ccache
 
@@ -104,7 +106,7 @@ install:
   - |
     case ${PROJECT_BUILD_METHOD} in
     idf)
-      export PROJECT_BUILD_COMMAND="python ${IDF_PATH}/tools/idf.py"
+      export PROJECT_BUILD_COMMAND="python3 ${IDF_PATH}/tools/idf.py"
       export PROJECT_BUILD_COMMAND_ARG="build"
       ;;
     make)
@@ -124,6 +126,13 @@ install:
   - mkdir -p ${TOOLCHAIN_DIR} ${PROJECT_DISTFILE_DIR}
   # Get SDK from github
   - git clone --branch ${PROJECT_SDK_BRANCH} --recursive https://github.com/espressif/${PROJECT_SDK_NAME}.git ${IDF_PATH}
+  # XXX workaround removed option, --no-site-packages, from virtualenv. should
+  # be removed when the commit is merged
+  # https://github.com/espressif/esp-idf/commit/7a18f02acd7005f7c56e62175a8d1968a1a9019d
+  - |
+    if [ ${PROJECT_SDK_BRANCH} == "v3.3.1" ]; then
+      sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
+    fi
 
   # Setup ccache to build faster
   # XXX when the entire build process exceeds 50 min, th job will be killed
@@ -135,8 +144,23 @@ install:
   - export CCACHE_CPP2=true
 
   # Get Python requirements
-  - python -m pip install --user --upgrade pyOpenSSL
-  - python -m pip install --user -r ${IDF_PATH}/requirements.txt
+  - python3 -m pip install --user --upgrade pyOpenSSL
+  - python3 -m pip install --user -r ${IDF_PATH}/requirements.txt
+  # XXX install.sh in esp-idf assumes `python`, not `python3`
+  - sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+  # Run install.sh if and only if install.sh exists.
+  - |
+    (
+      cd $IDF_PATH;
+      if [ -f ./install.sh ]; then
+        ./install.sh
+      fi
+    )
+  # Source export.sh if and only if export.sh exists.
+  - |
+    if [ -f ${IDF_PATH}/export.sh ]; then
+      . ${IDF_PATH}/export.sh
+    fi
 
   # Download binary toolchain if it does not exist
   - |
