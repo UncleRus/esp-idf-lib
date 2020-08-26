@@ -98,7 +98,7 @@ esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running)
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, TIME_REG, &val, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
-    *running = val & CH_BIT;
+    *running = val & CH_BIT ? false : true;
 
     return ESP_OK;
 }
@@ -188,7 +188,7 @@ esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *s
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, CONTROL_REG, &val, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
-    *sqw_freq = val & SQWEF_MASK;
+    *sqw_freq = val & ~SQWEF_MASK;
 
     return ESP_OK;
 }
