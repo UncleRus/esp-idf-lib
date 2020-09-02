@@ -149,8 +149,8 @@ Go to the [`doc`](doc) directory for documents and photo's.
 
 ## Battery power mods (only the HC-SR501 model)
 
-Instructions @ [https://forum.mysensors.org/topic/1088/battery-powered-pir]
-(https://forum.mysensors.org/topic/1088/battery-powered-pir).
+Instructions @
+[https://forum.mysensors.org/topic/1088/battery-powered-pir](https://forum.mysensors.org/topic/1088/battery-powered-pir).
 
 ## Reference: the ESP32 MJD Starter Kit SDK
 
@@ -163,5 +163,5 @@ development of your IoT projects for ESP32 hardware using the ESP-IDF
 framework from Espressif and get inspired what kind of apps you can build for
 ESP32 using various hardware modules.
 
-Go to [https://github.com/pantaluna/esp32-mjd-starter-kit]
-(https://github.com/pantaluna/esp32-mjd-starter-kit).
+Go to
+[https://github.com/pantaluna/esp32-mjd-starter-kit](https://github.com/pantaluna/esp32-mjd-starter-kit).
