@@ -28,13 +28,24 @@
  */
 
 // Component header file(s)
-#include "mjd.h"
-#include "mjd_hcsr501.h"
+#include <FreeRTOS.h>
+#include <freertos/task.h>
+#include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
+#include <pir.h>
+
+#define RTOS_DELAY_1SEC (1000 / portTICK_PERIOD_MS)
+#define RTOS_DELAY_5SEC (5000 / portTICK_PERIOD_MS)
+
+#if defined(HELPER_TARGET_IS_ESP8266)
+#define ESP_INTR_FLAG_LEVEL1 (0)
+#endif
+
 
 /*
  * Logging
  */
-static const char TAG[] = "mjd_hcsr501";
+static const char TAG[] = "pir";
 
 /*
  * INTERRUPT
@@ -57,14 +68,14 @@ void sensor_gpio_isr_handler(void* arg) {
  *
  *
  */
-esp_err_t mjd_hcsr501_init(mjd_hcsr501_config_t* param_ptr_config) {
+esp_err_t pir_init(pir_config_t* param_ptr_config) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
 
     if (param_ptr_config->is_init == true) {
         f_retval = ESP_FAIL;
-        ESP_LOGE(TAG, "ABORT. mjd_hcsr501_init() component is already init'd | err %i %s", f_retval,
+        ESP_LOGE(TAG, "ABORT. pir_init() component is already init'd | err %i %s", f_retval,
                 esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;
@@ -128,14 +139,14 @@ esp_err_t mjd_hcsr501_init(mjd_hcsr501_config_t* param_ptr_config) {
     return f_retval;
 }
 
-esp_err_t mjd_hcsr501_deinit(mjd_hcsr501_config_t* param_ptr_config) {
+esp_err_t pir_deinit(pir_config_t* param_ptr_config) {
     ESP_LOGD(TAG, "%s()", __FUNCTION__);
 
     esp_err_t f_retval = ESP_OK;
 
     if (param_ptr_config->is_init == false) {
         f_retval = ESP_FAIL;
-        ESP_LOGE(TAG, "ABORT. mjd_hcsr501_deinit() component was not init'd | err %i %s", f_retval,
+        ESP_LOGE(TAG, "ABORT. pir_deinit() component was not init'd | err %i %s", f_retval,
                 esp_err_to_name(f_retval));
         // GOTO
         goto cleanup;

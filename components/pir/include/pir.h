@@ -25,6 +25,10 @@
 #ifndef __MJD_HCSR501_H__
 #define __MJD_HCSR501_H__
 
+#include <FreeRTOS.h>
+#include <driver/gpio.h>
+#include <freertos/semphr.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +43,7 @@ typedef struct {
         bool is_init;
         gpio_num_t data_gpio_num;
         SemaphoreHandle_t isr_semaphore;
-} mjd_hcsr501_config_t;
+} pir_config_t;
 
 #define MJD_HCSR501_CONFIG_DEFAULT() { \
     .is_init = false, \
@@ -50,8 +54,8 @@ typedef struct {
 /**
  * Function declarations
  */
-esp_err_t mjd_hcsr501_init(mjd_hcsr501_config_t* ptr_param_config);
-esp_err_t mjd_hcsr501_deinit(mjd_hcsr501_config_t* ptr_param_config);
+esp_err_t pir_init(pir_config_t* ptr_param_config);
+esp_err_t pir_deinit(pir_config_t* ptr_param_config);
 
 #ifdef __cplusplus
 }
