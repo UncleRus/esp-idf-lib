@@ -215,13 +215,15 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes     | Yes
 | **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes     | Yes
 | **wiegand**    | Wiegand protocol receiver                                               | BSD     | Yes     | *No*
+| **pir**        | Driver for generic PIR modules, such as `HC-SR501`                      | MIT     | TBD     | TBD
 
 
 ## Credits
 
-- [Tomoyuki Sakurai](https://github.com/trombik), developer of the LM75 driver, 
-  author of the RTOS SDK ESP82666 support, master CI
-- [Gunar Schorcht](https://github.com/gschorcht), developer of SHT3x, BME680 and CCS811 drivers
+- [Nocluna](https://github.com/pantaluna) the original author of `pir` driver.
+- [Tomoyuki Sakurai](https://github.com/trombik) developer of the LM75 driver, 
+  author of the RTOS SDK ESP82666 support, master of Travis CI
+- [Gunar Schorcht](https://github.com/gschorcht), developer of SHT3x and BME680 drivers
 - [Brian Schwind](https://github.com/bschwind), developer of TS2561 and TSL4531 drivers
 - [Andrej Krutak](https://github.com/andree182), developer of BH1750 driver
 - Frank Bargstedt, developer of BMP180 driver
