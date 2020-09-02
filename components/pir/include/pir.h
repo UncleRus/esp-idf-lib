@@ -25,7 +25,7 @@
 #ifndef __MJD_HCSR501_H__
 #define __MJD_HCSR501_H__
 
-#include <FreeRTOS.h>
+#include <freertos/FreeRTOS.h>
 #include <driver/gpio.h>
 #include <freertos/semphr.h>
 
