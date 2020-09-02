@@ -1,9 +1,8 @@
 # Example for `pir` driver
 
-The example is based on the original work by [Nocluna]
-(https://github.com/pantaluna), which can be found at [https:
-//github.com/pantaluna/esp32_hcsr501_pir_sensor_using_lib]
-(https://github.com/pantaluna/esp32_hcsr501_pir_sensor_using_lib).
+The example is based on the original work by [Nocluna](https://github.com/pantaluna),
+which can be found at
+[https://github.com/pantaluna/esp32_hcsr501_pir_sensor_using_lib](https://github.com/pantaluna/esp32_hcsr501_pir_sensor_using_lib).
 
 ## What it does
 
