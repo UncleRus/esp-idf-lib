@@ -5,8 +5,8 @@ motion sensor module by Nocluna. The driver should work with most of generic
 PIR modules.
 
 The code was ported to `esp-idf-lib` so that it works on ESP8266. The original
-code an be found at [pantaluna/esp32_hcsr501_pir_sensor_using_lib]
-(https://github.com/pantaluna/esp32_hcsr501_pir_sensor_using_lib).
+code an be found at
+[pantaluna/esp32_hcsr501_pir_sensor_using_lib](https://github.com/pantaluna/esp32_hcsr501_pir_sensor_using_lib).
 
 The driver supports the following PIR motion sensor models:
 
