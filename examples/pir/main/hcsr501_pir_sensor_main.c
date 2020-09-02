@@ -7,7 +7,17 @@
 #include <pir.h>
 
 #define RTOS_DELAY_1SEC (1000 / portTICK_PERIOD_MS)
+#define RTOS_DELAY_60SEC (60 * 1000 / portTICK_PERIOD_MS)
 #define RTOS_TASK_PRIORITY_NORMAL (5)
+#define GPIO_LED_PIN_SEL (1ULL << CONFIG_MY_LED_ON_DEVBOARD_GPIO_NUM)
+
+#if CONFIG_MY_LED_ON_DEVBOARD_WIRING_TYPE == 1
+#define LED_ON_LEVEL 0
+#define LED_OFF_LEVEL 1
+#elif CONFIG_MY_LED_ON_DEVBOARD_WIRING_TYPE == 2
+#define LED_ON_LEVEL 1
+#define LED_OFF_LEVEL 0
+#endif
 
 /*
  * Logging
@@ -27,6 +37,31 @@ static const int MY_SENSOR_DATA_GPIO_NUM = CONFIG_MY_SENSOR_DATA_GPIO_NUM;
  */
 #define MYAPP_RTOS_TASK_STACK_SIZE_8K (8192)
 #define MYAPP_RTOS_TASK_PRIORITY_NORMAL (RTOS_TASK_PRIORITY_NORMAL)
+
+/**
+ * @brief Initialize LED GPIO
+ */
+
+static esp_err_t init_led_pin() {
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = GPIO_LED_PIN_SEL;
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    return gpio_config(&io_conf);
+}
+
+static void timer_task(void *pvParameter) {
+    while (1) {
+        vTaskDelay(RTOS_DELAY_60SEC);
+        ESP_LOGI(TAG, "60 sec passed from the startup. the sensor should be ready.");
+        goto finish;
+    }
+
+finish:
+    vTaskDelete(NULL);
+}
 
 /**
  * TASKS
@@ -54,6 +89,12 @@ void sensor_task(void *pvParameter) {
     ESP_LOGI(TAG, "\n\n***SECTION: LED***");
     ESP_LOGI(TAG, "  MY_LED_ON_DEVBOARD_GPIO_NUM:    %i", MY_LED_ON_DEVBOARD_GPIO_NUM);
     ESP_LOGI(TAG, "  MY_LED_ON_DEVBOARD_WIRING_TYPE: %i", MY_LED_ON_DEVBOARD_WIRING_TYPE);
+    f_retval = init_led_pin();
+    if (f_retval != ESP_OK) {
+        ESP_LOGE(TAG, "init_led_pin() err %i %s", f_retval, esp_err_to_name(f_retval));
+        // GOTO
+        goto cleanup;
+    }
 
     /********************************************************************************
      * SENSOR
@@ -101,11 +142,15 @@ void sensor_task(void *pvParameter) {
  *
  */
 void other_task(void *pvParameter) {
+    int level;
     ESP_LOGI(TAG, "%s()", __FUNCTION__);
 
     while (true) {
-        ESP_LOGI(TAG, "Task other_task: every 1 second - INPUT GPIO#%i: Actual value=%i", MY_SENSOR_DATA_GPIO_NUM,
-                gpio_get_level(MY_SENSOR_DATA_GPIO_NUM));
+        level = gpio_get_level(MY_SENSOR_DATA_GPIO_NUM);
+        ESP_LOGI(TAG, "Task other_task: every 1 second - INPUT GPIO#%i: Actual value=%i",
+                MY_SENSOR_DATA_GPIO_NUM,
+                level);
+        gpio_set_level(CONFIG_MY_LED_ON_DEVBOARD_GPIO_NUM, level == 1 ? LED_ON_LEVEL : LED_OFF_LEVEL);
         vTaskDelay(RTOS_DELAY_1SEC);
     }
 }
@@ -157,6 +202,19 @@ void app_main() {
                                         APP_CPU_NUM);
     if (xReturned == pdPASS) {
         ESP_LOGI(TAG, "OK Task other_task has been created, and is running right now");
+    }
+    /*
+     * Create a task that simply tells 60 sec passed.
+     */
+    xReturned = xTaskCreatePinnedToCore(&timer_task,
+                                        "othertask (name)",
+                                        MYAPP_RTOS_TASK_STACK_SIZE_8K,
+                                        NULL,
+                                        MYAPP_RTOS_TASK_PRIORITY_NORMAL,
+                                        NULL,
+                                        APP_CPU_NUM);
+    if (xReturned == pdPASS) {
+        ESP_LOGI(TAG, "OK Task timer_task has been created, and is running right now");
     }
 
     /**********
