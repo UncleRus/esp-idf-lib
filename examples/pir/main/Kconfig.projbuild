@@ -1,0 +1,49 @@
+menu "MY PROJECT configuration"
+
+##
+## LED On-devboard
+choice MY_LED_ON_DEVBOARD_GPIO_NUM
+    prompt "On-devboard LED GPIO#"
+    default MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    help
+        The on-devboard LED GPIO# to be used.
+config MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    bool "HUZZAH32 GPIO#13"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIN32LITE_22
+    bool "LOLIN32LITE GPIO#22"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIND32_5
+    bool "LOLIND32 GPIO#5"
+config MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+    bool "Other GPIO#"
+endchoice
+config MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER_VAL
+    int "Other on-devboard LED GPIO#" if MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+    default 99
+config MY_LED_ON_DEVBOARD_GPIO_NUM
+    int
+    default 13 if MY_LED_ON_DEVBOARD_GPIO_NUM_HUZZAH32_13
+    default 22 if MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIN32LITE_22
+    default  5 if MY_LED_ON_DEVBOARD_GPIO_NUM_LOLIND32_5
+    default MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER_VAL if MY_LED_ON_DEVBOARD_GPIO_NUM_OTHER
+
+choice MY_LED_ON_DEVBOARD_WIRING_TYPE
+    prompt "LED on-board wiring type"
+    default MY_LED_ON_DEVBOARD_WIRING_TYPE_LED_LOW_SIDE
+    help
+        The LED on-board wiring type to be used.
+config MY_LED_ON_DEVBOARD_WIRING_TYPE_LED_LOW_SIDE
+    bool "LED_LOW_SIDE (HUZZAH32)"
+config MY_LED_ON_DEVBOARD_WIRING_TYPE_LED_HIGH_SIDE
+    bool "LED_HIGH_SIDE (LOLIN32LITE, LOLIND32)"
+endchoice
+config MY_LED_ON_DEVBOARD_WIRING_TYPE
+    int
+    default 1 if MY_LED_ON_DEVBOARD_WIRING_TYPE_LED_LOW_SIDE
+    default 2 if MY_LED_ON_DEVBOARD_WIRING_TYPE_LED_HIGH_SIDE
+
+
+config MY_SENSOR_DATA_GPIO_NUM
+    int "MY_SENSOR_DATA_GPIO_NUM (Huzzah32 #14 bottomright-2)(LOLIN D32 #13 bottomleft-3)"
+	default 14
+
+endmenu
