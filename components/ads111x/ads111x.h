@@ -3,11 +3,12 @@
  * @defgroup ads111x ads111x
  * @{
  *
- * ESP-IDF driver for ADS1113/ADS1114/ADS1115 I2C ADC
+ * ESP-IDF driver for ADS1113/ADS1114/ADS1115, ADS1013/ADS1014/ADS1015 I2C ADC
  *
  * Ported from esp-open-rtos
  *
  * Copyright (C) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (C) 2020 Lucio Tarantino (https://github.com/dianlight)
  *
  * BSD Licensed as described in the file LICENSE
  */
@@ -179,13 +180,12 @@ esp_err_t ads111x_start_conversion(i2c_dev_t *dev);
 esp_err_t ads111x_get_value(i2c_dev_t *dev, int16_t *value);
 
 /**
- * Read last conversion result for 101x
+ * Read last conversion result for ADS101x
  * @param addr
  * @param value Last conversion result
  * @return `ESP_OK` on success
  */
 esp_err_t ads101x_get_value(i2c_dev_t *dev, int16_t *value);
-
 
 /**
  * Read the programmable gain amplifier configuration
