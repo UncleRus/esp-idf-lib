@@ -414,4 +414,6 @@ esp_err_t bme680_set_ambient_temperature(bme680_t *dev, int16_t temperature);
 }
 #endif
 
+/**@}*/
+
 #endif /* __BME680_H__ */
