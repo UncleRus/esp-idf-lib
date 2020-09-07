@@ -181,7 +181,7 @@ esp_err_t ads111x_get_value(i2c_dev_t *dev, int16_t *value);
 
 /**
  * Read last conversion result for ADS101x
- * @param addr
+ * @param dev Device descriptor
  * @param value Last conversion result
  * @return `ESP_OK` on success
  */
