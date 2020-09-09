@@ -64,7 +64,7 @@ typedef struct
     sht3x_repeat_t repeatability; //!< used repeatability
 
     bool meas_started;            //!< indicates whether measurement started
-    uint32_t meas_start_time;     //!< measurement start time in us
+    uint64_t meas_start_time;     //!< measurement start time in us
     bool meas_first;              //!< first measurement in periodic mode
 } sht3x_t;
 
