@@ -428,7 +428,7 @@ jobs:
           IGNORE_FILE="travis-ignore-esp8266"
 
           # these drivers do not compile for ESP8266 yet
-          export EXCLUDE_COMPONENTS="max7219 mcp23x17"
+          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip"
           cd "${__PROJECT_EXAMPLE_DIR}"
           for i in $(ls -d *); do
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then

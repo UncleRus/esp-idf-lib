@@ -23,11 +23,12 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 * 3.3
 * 3.2
 
-Due to incompatibilities in ESP8266 RTOS SDK's SPI driver, the following
+Due to incompatibilities in ESP8266 RTOS SDK's SPI driver and hardware, the following
 libraries are not supported on ESP8266.
 
 * `max7219`
 * `mcp23x17`
+* `led_strip`
 
 ## How to use
 
@@ -86,7 +87,7 @@ Add path to components in your project makefile, e.g:
 ```Makefile
 PROJECT_NAME := my-esp-project
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
-EXCLUDE_COMPONENTS := max7219 mcp23x17
+EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip
 include $(IDF_PATH)/make/project.mk
 ```
 
