@@ -10,9 +10,9 @@
  * BSD Licensed as described in the file LICENSE
  */
 
-#include <sys/time.h>
 #include <esp_log.h>
 #include <esp_err.h>
+#include <esp_timer.h>
 #include <esp_idf_lib_helpers.h>
 #include "hmc5883l.h"
 
@@ -56,14 +56,7 @@ static const float gain_values [] = {
     [HMC5883L_GAIN_230]  = 4.35
 };
 
-static inline uint32_t get_time_us()
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_usec;
-}
-
-#define timeout_expired(start, len) ((uint32_t)(get_time_us() - (start)) >= (len))
+#define timeout_expired(start, len) ((uint64_t)(esp_timer_get_time() - (start)) >= (len))
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 esp_err_t hmc5883l_init_desc(hmc5883l_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -291,7 +284,7 @@ esp_err_t hmc5883l_get_raw_data(hmc5883l_dev_t *dev, hmc5883l_raw_data_t *data)
         // overwrite mode register for measurement
         CHECK(hmc5883l_set_opmode(dev, dev->opmode));
         // wait for data
-        uint32_t start = get_time_us();
+        uint64_t start = esp_timer_get_time();
         bool dready = false;
         do
         {

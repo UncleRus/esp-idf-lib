@@ -9,19 +9,12 @@
  */
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <sys/time.h>
+#include <esp_timer.h>
 #include <esp_idf_lib_helpers.h>
 #include "hx711.h"
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-
-static inline uint32_t get_time_ms()
-{
-    struct timeval time;
-    gettimeofday(&time, 0);
-    return time.tv_sec * 1000 + time.tv_usec / 1000;
-}
 
 static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
 {
@@ -108,8 +101,8 @@ esp_err_t hx711_is_ready(hx711_t *dev, bool *ready)
 
 esp_err_t hx711_wait(hx711_t *dev, size_t timeout_ms)
 {
-    uint32_t started = get_time_ms();
-    while (get_time_ms() - started < timeout_ms)
+    uint64_t started = esp_timer_get_time() / 1000;
+    while (esp_timer_get_time() / 1000 - started < timeout_ms)
     {
         if (!gpio_get_level(dev->dout))
             return ESP_OK;
