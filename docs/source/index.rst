@@ -182,6 +182,7 @@ Other
    groups/encoder
    groups/tda74xx
    groups/tca9548
+   groups/led_strip
    
 
 ==================
