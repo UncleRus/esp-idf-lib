@@ -16,7 +16,6 @@
         .gpio_num = gpio,                            \
         .clk_div = 80,                               \
         .mem_block_num = 1,                          \
-        .flags = 0,                                  \
         .tx_config = {                               \
             .carrier_freq_hz = 38000,                \
             .carrier_level = RMT_CARRIER_LEVEL_HIGH, \
