@@ -20,6 +20,9 @@
 extern "C" {
 #endif
 
+/**
+ * RGB color representation
+ */
 typedef struct
 {
     union {
@@ -30,12 +33,18 @@ typedef struct
     };
 } rgb_t;
 
+/**
+ * LED type
+ */
 typedef enum {
     LED_STRIP_WS2812 = 0,
     LED_STRIP_SK6812,
     LED_STRIP_APA106
 } led_strip_type_t;
 
+/**
+ * LED strip descriptor
+ */
 typedef struct
 {
     led_strip_type_t type;
