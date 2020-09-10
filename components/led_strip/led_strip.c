@@ -1,3 +1,12 @@
+/**
+ * @file led_strip.c
+ *
+ * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106 LED strips
+ *
+ * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
+ *
+ * MIT Licensed as described in the file LICENSE
+ */
 #include "led_strip.h"
 #include <esp_log.h>
 #include <esp_attr.h>
