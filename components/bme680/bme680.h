@@ -26,6 +26,8 @@ extern "C" {
 #define BME680_I2C_ADDR_0 0x76
 #define BME680_I2C_ADDR_1 0x77
 
+#define BME680_MAX_OVERFLOW_VAL      INT32_C(0x40000000) // overflow value used in pressure calculation (bme680_convert_pressure)
+
 #define BME680_HEATER_TEMP_MIN         200  //!< min. 200 degree Celsius
 #define BME680_HEATER_TEMP_MAX         400  //!< max. 200 degree Celsius
 #define BME680_HEATER_PROFILES         10   //!< max. 10 heater profiles 0 ... 9
