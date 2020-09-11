@@ -75,8 +75,6 @@ static esp_err_t write_reg_16(ina219_t *dev, uint8_t reg, uint16_t val)
 
 static esp_err_t read_conf_bits(ina219_t *dev, uint16_t mask, uint8_t bit, uint16_t *res)
 {
-    CHECK_ARG(dev && res);
-
     uint16_t raw;
     CHECK(read_reg_16(dev, REG_CONFIG, &raw));
 
@@ -162,26 +160,36 @@ esp_err_t ina219_configure(ina219_t *dev, ina219_bus_voltage_range_t u_range,
 
 esp_err_t ina219_get_bus_voltage_range(ina219_t *dev, ina219_bus_voltage_range_t *range)
 {
+    CHECK_ARG(dev && range);
+    *range = 0;
     return read_conf_bits(dev, MASK_BRNG, BIT_BRNG, (uint16_t *)range);
 }
 
 esp_err_t ina219_get_gain(ina219_t *dev, ina219_gain_t *gain)
 {
+    CHECK_ARG(dev && gain);
+    *gain = 0;
     return read_conf_bits(dev, MASK_PG, BIT_PG0, (uint16_t *)gain);
 }
 
 esp_err_t ina219_get_bus_voltage_resolution(ina219_t *dev, ina219_resolution_t *res)
 {
+    CHECK_ARG(dev && res);
+    *res = 0;
     return read_conf_bits(dev, MASK_BADC, BIT_BADC0, (uint16_t *)res);
 }
 
 esp_err_t ina219_get_shunt_voltage_resolution(ina219_t *dev, ina219_resolution_t *res)
 {
+    CHECK_ARG(dev && res);
+    *res = 0;
     return read_conf_bits(dev, MASK_SADC, BIT_SADC0, (uint16_t *)res);
 }
 
 esp_err_t ina219_get_mode(ina219_t *dev, ina219_mode_t *mode)
 {
+    CHECK_ARG(dev && mode);
+    *mode = 0;
     return read_conf_bits(dev, MASK_MODE, BIT_MODE, (uint16_t *)mode);
 }
 
