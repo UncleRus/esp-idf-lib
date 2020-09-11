@@ -134,7 +134,7 @@ static esp_err_t write_register(ds1302_t *dev, uint8_t reg, uint8_t val)
     CHECK_MUX(prepare(dev, GPIO_MODE_OUTPUT));
     CHECK_MUX(write_byte(dev, reg));
     CHECK_MUX(write_byte(dev, val));
-    PORT_ENTER_CRITICAL;
+    PORT_EXIT_CRITICAL;
     return chip_disable(dev);
 }
 

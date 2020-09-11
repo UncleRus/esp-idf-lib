@@ -1,0 +1,6 @@
+menu "LED strip"
+
+config LED_STRIP_FLUSH_TIMEOUT
+    int "Measurement timeout, ms"
+    default 1000
+endmenu

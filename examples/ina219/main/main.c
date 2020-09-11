@@ -7,8 +7,13 @@
 
 #define I2C_PORT 0
 #define I2C_ADDR INA219_ADDR_GND_GND
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define SDA_GPIO 4
+#define SCL_GPIO 5
+#else
 #define SDA_GPIO 16
 #define SCL_GPIO 17
+#endif
 
 const static char *TAG = "INA219_example";
 

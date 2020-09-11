@@ -1,6 +1,5 @@
-set(COMPONENT_SRCDIRS .)
-set(COMPONENT_ADD_INCLUDEDIRS .)
-
-set(COMPONENT_REQUIRES log)
-
-register_component()
+idf_component_register(
+    SRCS "encoder.c"
+    INCLUDE_DIRS .
+    REQUIRES log
+)

@@ -3,7 +3,7 @@
  * @defgroup tca9548 tca9548
  * @{
  *
- * ESP-IDF driver for low-voltage 8-channel I2C switch TCA9548
+ * ESP-IDF driver for low-voltage 8-channel I2C switch TCA9548/PCA9548
  *
  * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -19,6 +19,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define TCA9548_ADDR_0 0x70
+#define TCA9548_ADDR_1 0x71
+#define TCA9548_ADDR_2 0x72
+#define TCA9548_ADDR_3 0x73
+#define TCA9548_ADDR_4 0x74
+#define TCA9548_ADDR_5 0x75
+#define TCA9548_ADDR_6 0x76
+#define TCA9548_ADDR_7 0x77
 
 #ifndef BV
 #define BV(x) (1 << (x))

@@ -1,10 +1,11 @@
-set(COMPONENT_SRCDIRS .)
-set(COMPONENT_ADD_INCLUDEDIRS .)
-
 if(${IDF_TARGET} STREQUAL esp8266)
-    set(COMPONENT_REQUIRES esp8266 log)
+    set(req esp8266 log)
 else()
-    set(COMPONENT_REQUIRES driver log)
+    set(req driver log)
 endif()
 
-register_component()
+idf_component_register(
+    SRCS "max7219.c"
+    INCLUDE_DIRS .
+    REQUIRES ${req}
+)

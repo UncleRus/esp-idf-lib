@@ -1,0 +1,440 @@
+---
+name: Build examples
+on:
+  - pull_request
+  - push
+jobs:
+
+  # XXX create multiple jobs for major versions
+  #
+  # for those who want to _refactor_ the jobs:
+  #
+  # in the previous CI implementation, all builds share a single build
+  # process. that way, you can remove duplications. however, every time a
+  # version changes the build process, the change affects all other build
+  # processes. I am tired of tracking changes and workarounds in the build
+  # process. the result is many `if`s. assuming major version does not change
+  # (a lot) its build process, creating multiple jobs, and using matrix is the
+  # only sane way. as GitHub Actions does not support reusable steps, there
+  # are many duplications. but no need to modify the entire build process to
+  # adopt changes in master.
+  build_esp32_v4_x:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_method:
+          - idf
+          - make
+        branch:
+          - master
+          - v4.1
+          - v4.0.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+
+          # XXX install python 3.8 because the official python package
+          # segfaults when installing modules in the runner.
+          #
+          # 2020-09-03T02:29:58.2517141Z Successfully installed cffi-1.14.2 cryptography-3.1 future-0.18.2 pycparser-2.20 pyparsing-2.3.1 pyserial-3.4 setuptools-50.1.0 six-1.15.0
+          # 2020-09-03T02:30:09.0409148Z /home/runner/work/_temp/66c91304-eef8-456d-84a1-7299428a62f7.sh: line 5:  4140 Segmentation fault      (core dumped) python3 -m pip install --user -r ${IDF_PATH}/requirements.txt
+          # 2020-09-03T02:30:09.0414254Z ##[error]Process completed with exit code 139.
+          #
+          # possibly related issue:
+          # https://github.com/actions/virtual-environments/issues/159
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          SDK_NAME="esp-idf"
+          GCC_PREFIX="xtensa-esp32-elf"
+          GCC_FILE="${GCC_PREFIX}-gcc"
+          # /home/runner/.espressif/tools/xtensa-esp32-elf/esp-2020r2-8.2.0/xtensa-esp32-elf/bin
+          TOOLCHAIN_DIR="${HOME}/.espressif/tools"
+          case "${{ matrix.branch }}" in
+          v4.0.1)
+            TOOLCHAIN_VERSION="esp-2019r2-8.2.0"
+            ;;
+          v4.1*|master)
+            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
+            ;;
+          esac
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          DISTFILE_DIR="${HOME}/distfiles"
+          __PROJECT_PATH=`pwd`
+
+          # XXX actions/checkout does not allow to checkout a repository other
+          # than under __PROJECT_PATH
+          IDF_PATH="${__PROJECT_PATH}/idf"
+
+          echo "::set-env name=IDF_PATH::${IDF_PATH}"
+
+          # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
+          echo "::set-env name=__PROJECT_EXAMPLE_DIR::${EXAMPLE_DIR}"
+          echo "::set-env name=__PROJECT_GCC_FILE::${GCC_FILE}"
+          echo "::set-env name=__PROJECT_GCC_PREFIX::${GCC_PREFIX}"
+          echo "::set-env name=__PROJECT_SDK_NAME::${SDK_NAME}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_FILE::${TOOLCHAIN_FILE}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_VERSION::${TOOLCHAIN_VERSION}"
+          echo "::set-env name=__PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+          echo "::set-env name=__PROJECT_PATH::${__PROJECT_PATH}"
+          echo "::set-env name=__PROJECT_BUILD_COMMAND::${__PROJECT_BUILD_COMMAND}"
+          echo "::set-env name=__PROJECT_BUILD_COMMAND_ARG::${__PROJECT_BUILD_COMMAND_ARG}"
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/esp-idf
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+
+      - name: Fixup the SDK
+        run: |
+
+          # XXX workaround removed option, --no-site-packages, from virtualenv. should
+          # be removed when the following commit is merged
+          # https://github.com/espressif/esp-idf/commit/7a18f02acd7005f7c56e62175a8d1968a1a9019d
+          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
+
+          # XXX remove some modules
+          # gdbgui cannot be installed successfully with python 3.8
+          sed -i -e "s/^gdbgui.*//" -e "s/^pygdbmi.*//" ${IDF_PATH}/requirements.txt
+
+      - name: Install python requirements
+        run: |
+          cd "${IDF_PATH}"
+          ./install.sh
+
+      - name: Build (idf.py)
+        if: ${{ matrix.build_method == 'idf' }}
+        run: |
+          IGNORE_FILE="travis-ignore"
+          . ${IDF_PATH}/export.sh
+
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              idf.py --ccache build
+            fi
+          done
+
+      - name: Setup ccache (make)
+
+        # XXX ccache needs to be configured here
+        # unlike idf.py, esp-idf does nothing to setup ccache for make.
+        # IDF_CCACHE_ENABLE does not work either.
+        if: ${{ matrix.build_method == 'make' }}
+        run: |
+          ccache --version
+          GCC_BIN_DIR="${__PROJECT_TOOLCHAIN_DIR}/${__PROJECT_GCC_PREFIX}/${__PROJECT_TOOLCHAIN_VERSION}/${__PROJECT_GCC_PREFIX}/bin"
+          CCACHE_BIN_DIR="${HOME}/ccache_bin"
+          mkdir -p "${CCACHE_BIN_DIR}"
+          (cd "${CCACHE_BIN_DIR}" && ln -s /usr/bin/ccache "${__PROJECT_GCC_FILE}")
+          export PATH="${CCACHE_BIN_DIR}:$PATH:${GCC_BIN_DIR}"
+          ${CCACHE_BIN_DIR}/${__PROJECT_GCC_FILE} --version
+          echo "::set-env name=PATH::${PATH}"
+          echo "::set-env name=CCACHE_BASEDIR::${__PROJECT_EXAMPLE_DIR}"
+          echo "::set-env name=CCACHE_NOHASHDIR::true"
+
+      - name: Build (make)
+        if: ${{ matrix.build_method == 'make' }}
+        run: |
+          IGNORE_FILE="travis-ignore"
+          . ${IDF_PATH}/export.sh
+
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              make defconfig
+              make
+            fi
+          done
+  build_esp32_v3_x:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_method:
+
+          # XXX build examples with make only
+          # idf.py is supported build system in 3.x. however, CMake command
+          # syntax has changed in 4.x. it is possible to port all
+          # CMakelist.txt to 3.x, but not practical.
+          - make
+        branch:
+          - v3.1.7
+          - v3.2.3
+          - v3.3.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          SDK_NAME="esp-idf"
+          GCC_PREFIX="xtensa-esp32-elf"
+          GCC_FILE="${GCC_PREFIX}-gcc"
+          TOOLCHAIN_DIR="${HOME}/esp32"
+          TOOLCHAIN_FILE="xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0.tar.gz"
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          DISTFILE_DIR="${HOME}/distfiles"
+          __PROJECT_PATH=`pwd`
+
+          # XXX actions/checkout does not allow to checkout a repository other
+          # than under __PROJECT_PATH
+          IDF_PATH="${__PROJECT_PATH}/idf"
+
+          echo "::set-env name=IDF_PATH::${IDF_PATH}"
+
+          # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
+          echo "::set-env name=__PROJECT_EXAMPLE_DIR::${EXAMPLE_DIR}"
+          echo "::set-env name=__PROJECT_GCC_FILE::${GCC_FILE}"
+          echo "::set-env name=__PROJECT_GCC_PREFIX::${GCC_PREFIX}"
+          echo "::set-env name=__PROJECT_SDK_NAME::${SDK_NAME}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_FILE::${TOOLCHAIN_FILE}"
+          echo "::set-env name=__PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+          echo "::set-env name=__PROJECT_PATH::${__PROJECT_PATH}"
+          echo "::set-env name=__PROJECT_BUILD_COMMAND::${__PROJECT_BUILD_COMMAND}"
+          echo "::set-env name=__PROJECT_BUILD_COMMAND_ARG::${__PROJECT_BUILD_COMMAND_ARG}"
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/esp-idf
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+
+      - name: Install python requirements (pip)
+        if: ${{ ! startsWith(matrix.branch, 'v3.3') }}
+        run: |
+
+          # XXX upgrade pyOpenSSL because older pyOpenSSL caused issues in
+          # the past. this might not be true anymore.
+          python -m pip install --user --upgrade pyOpenSSL
+          python -m pip install --user -r ${IDF_PATH}/requirements.txt
+
+      - name: Install python requirements (install.sh)
+        if: ${{ startsWith(matrix.branch, 'v3.3') }}
+        run: |
+          cd "${IDF_PATH}" && ./install.sh
+
+      - name: Download toolchain if it does not exist
+        run: |
+          mkdir -p "${__PROJECT_DISTFILE_DIR}"
+          if [ ! -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" ]; then
+            wget -O "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" "https://dl.espressif.com/dl/${__PROJECT_TOOLCHAIN_FILE}"
+          fi
+
+      - name: Extract the toolchain
+        run: |
+          mkdir -p "${__PROJECT_TOOLCHAIN_DIR}"
+          tar -xz -C "${__PROJECT_TOOLCHAIN_DIR}" -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}"
+
+      - name: Setup ccache
+        run: |
+          ccache --version
+          CCACHE_BIN_DIR="${HOME}/ccache_bin"
+          mkdir -p "${CCACHE_BIN_DIR}"
+          (cd "${CCACHE_BIN_DIR}" && ln -s /usr/bin/ccache "${__PROJECT_GCC_FILE}")
+          echo "::set-env name=PATH::${CCACHE_BIN_DIR}:$PATH:${__PROJECT_TOOLCHAIN_DIR}/${__PROJECT_GCC_PREFIX}/bin"
+          echo "::set-env name=CCACHE_BASEDIR::${__PROJECT_EXAMPLE_DIR}"
+          echo "::set-env name=CCACHE_NOHASHDIR::true"
+
+      - name: Build (make)
+        if: ${{ matrix.build_method == 'make' }}
+        run: |
+          IGNORE_FILE="travis-ignore"
+
+          # XXX only v3.3.x has export.sh
+          if [ -f "${IDF_PATH}/export.sh" ]; then
+            . "${IDF_PATH}/export.sh"
+          fi
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              make defconfig
+              make
+            fi
+          done
+
+  build_esp8266:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_method:
+
+          # XXX build examples with make only
+          # idf.py in ESP8266 RTOS SDK is broken in many ways.
+          - make
+        branch:
+          - master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          SDK_NAME="ESP8266_RTOS_SDK"
+          GCC_PREFIX="xtensa-lx106-elf"
+          GCC_FILE="${GCC_PREFIX}-gcc"
+          TOOLCHAIN_DIR="${HOME}/esp32"
+          TOOLCHAIN_FILE="xtensa-lx106-elf-linux64-1.22.0-92-g8facf4c-5.2.0.tar.gz"
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          DISTFILE_DIR="${HOME}/distfiles"
+          __PROJECT_PATH=`pwd`
+
+          # XXX actions/checkout does not allow to checkout a repository other
+          # than under __PROJECT_PATH
+          IDF_PATH="${__PROJECT_PATH}/idf"
+          echo "::set-env name=IDF_PATH::${IDF_PATH}"
+
+          # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
+          echo "::set-env name=__PROJECT_EXAMPLE_DIR::${EXAMPLE_DIR}"
+          echo "::set-env name=__PROJECT_GCC_FILE::${GCC_FILE}"
+          echo "::set-env name=__PROJECT_GCC_PREFIX::${GCC_PREFIX}"
+          echo "::set-env name=__PROJECT_SDK_NAME::${SDK_NAME}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "::set-env name=__PROJECT_TOOLCHAIN_FILE::${TOOLCHAIN_FILE}"
+          echo "::set-env name=__PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+          echo "::set-env name=__PROJECT_PATH::${__PROJECT_PATH}"
+          echo "::set-env name=__PROJECT_BUILD_COMMAND::${__PROJECT_BUILD_COMMAND}"
+          echo "::set-env name=__PROJECT_BUILD_COMMAND_ARG::${__PROJECT_BUILD_COMMAND_ARG}"
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/ESP8266_RTOS_SDK
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+
+      - name: Install python requirements (pip)
+        if: ${{ ! startsWith(matrix.branch, 'v3.3') }}
+        run: |
+
+          # XXX upgrade pyOpenSSL because older pyOpenSSL caused issues in
+          # the past. this might not be true anymore.
+          python -m pip install --user --upgrade pyOpenSSL
+          python -m pip install --user -r ${IDF_PATH}/requirements.txt
+
+      - name: Download toolchain if it does not exist
+        run: |
+          mkdir -p "${__PROJECT_DISTFILE_DIR}"
+          if [ ! -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" ]; then
+            wget -O "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" "https://dl.espressif.com/dl/${__PROJECT_TOOLCHAIN_FILE}"
+          fi
+
+      - name: Extract the toolchain
+        run: |
+          mkdir -p "${__PROJECT_TOOLCHAIN_DIR}"
+          tar -xz -C "${__PROJECT_TOOLCHAIN_DIR}" -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}"
+
+      - name: Setup ccache
+        run: |
+          ccache --version
+          __PROJECT_CCACHE_BIN_DIR="${HOME}/ccache_bin"
+          mkdir -p "${__PROJECT_CCACHE_BIN_DIR}"
+          (cd "${__PROJECT_CCACHE_BIN_DIR}" && ln -s /usr/bin/ccache "${__PROJECT_GCC_FILE}")
+          echo "::set-env name=PATH::${__PROJECT_CCACHE_BIN_DIR}:$PATH:${__PROJECT_TOOLCHAIN_DIR}/${__PROJECT_GCC_PREFIX}/bin"
+          echo "::set-env name=CCACHE_BASEDIR::${__PROJECT_EXAMPLE_DIR}"
+          echo "::set-env name=CCACHE_NOHASHDIR::true"
+
+      - name: Build (make)
+        if: ${{ matrix.build_method == 'make' }}
+        run: |
+          IGNORE_FILE="travis-ignore-esp8266"
+
+          # these drivers do not compile for ESP8266 yet
+          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip"
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              make defconfig
+              make
+            fi
+          done
