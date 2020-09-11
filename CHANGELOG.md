@@ -4,7 +4,8 @@
 
 #### Bugfixes
 
-- (bme680) #121 pressure calculation for bme680 gives wrong results
+- (ina219) #100 Potential error in ina219_get_gain
+- (bme680) #121 Pressure calculation for bme680 gives wrong results
 
 ## v.0.6
 
