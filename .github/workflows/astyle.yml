@@ -1,0 +1,25 @@
+---
+
+# TODO more linting? possible candidates: markdownlint, yamllint
+name: Lint
+on:
+  - pull_request
+  - push
+
+jobs:
+  astyle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install astyle
+        run: |
+          sudo apt-get install astyle
+
+      - name: Run astyle
+        run: |
+          if find . -name '*.[ch]' | xargs astyle --options=.astylerc | grep "^Formatted"; then
+            git diff
+            exit 1
+          fi
