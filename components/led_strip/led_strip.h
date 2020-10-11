@@ -27,9 +27,9 @@ typedef struct
 {
     union {
         struct {
-            uint8_t r, g, b;
+            uint8_t r, g, b, w;
         };
-        uint8_t raw[3];
+        uint8_t raw[4];
     };
 } rgb_t;
 
@@ -48,6 +48,7 @@ typedef enum {
 typedef struct
 {
     led_strip_type_t type;
+    bool is_rgbw;
     size_t length;
     gpio_num_t gpio;
     rmt_channel_t channel;
