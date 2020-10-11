@@ -25,8 +25,10 @@ extern "C" {
  */
 typedef struct
 {
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             uint8_t r, g, b, w;
         };
         uint8_t raw[4];
@@ -36,7 +38,8 @@ typedef struct
 /**
  * LED type
  */
-typedef enum {
+typedef enum
+{
     LED_STRIP_WS2812 = 0,
     LED_STRIP_SK6812,
     LED_STRIP_APA106

@@ -170,18 +170,18 @@ esp_err_t led_strip_init(led_strip_t *strip)
     sample_to_rmt_t f = NULL;
     switch (strip->type)
     {
-    case LED_STRIP_WS2812:
-        f = ws2812_rmt_adapter;
-        break;
-    case LED_STRIP_SK6812:
-        f = sk6812_rmt_adapter;
-        break;
-    case LED_STRIP_APA106:
-        f = apa106_rmt_adapter;
-        break;
-    default:
-        ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-        return ESP_ERR_NOT_SUPPORTED;
+        case LED_STRIP_WS2812:
+            f = ws2812_rmt_adapter;
+            break;
+        case LED_STRIP_SK6812:
+            f = sk6812_rmt_adapter;
+            break;
+        case LED_STRIP_APA106:
+            f = apa106_rmt_adapter;
+            break;
+        default:
+            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
+            return ESP_ERR_NOT_SUPPORTED;
     }
     CHECK(rmt_translator_init(config.channel, f));
 
@@ -225,26 +225,26 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
     CHECK_ARG(strip && strip->buf && num <= strip->length);
     switch (strip->type)
     {
-    case LED_STRIP_WS2812:
-    case LED_STRIP_SK6812:
-        // GRB
-        ((uint8_t *)strip->buf)[num * COLOR_SIZE] = color.g;
-        ((uint8_t *)strip->buf)[num * COLOR_SIZE + 1] = color.r;
-        ((uint8_t *)strip->buf)[num * COLOR_SIZE + 2] = color.b;
-        if(strip->is_rgbw)
-            ((uint8_t *)strip->buf)[num * COLOR_SIZE + 3] = color.w;
-        break;
-    case LED_STRIP_APA106:
-        // RGB
-        ((uint8_t *)strip->buf)[num * COLOR_SIZE] = color.r;
-        ((uint8_t *)strip->buf)[num * COLOR_SIZE + 1] = color.g;
-        ((uint8_t *)strip->buf)[num * COLOR_SIZE + 2] = color.b;
-        if(strip->is_rgbw)
-            ((uint8_t *)strip->buf)[num * COLOR_SIZE + 3] = color.w;
-        break;
-    default:
-        ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-        return ESP_ERR_NOT_SUPPORTED;
+        case LED_STRIP_WS2812:
+        case LED_STRIP_SK6812:
+            // GRB
+            ((uint8_t *)strip->buf)[num * COLOR_SIZE] = color.g;
+            ((uint8_t *)strip->buf)[num * COLOR_SIZE + 1] = color.r;
+            ((uint8_t *)strip->buf)[num * COLOR_SIZE + 2] = color.b;
+            if (strip->is_rgbw)
+                ((uint8_t *)strip->buf)[num * COLOR_SIZE + 3] = color.w;
+            break;
+        case LED_STRIP_APA106:
+            // RGB
+            ((uint8_t *)strip->buf)[num * COLOR_SIZE] = color.r;
+            ((uint8_t *)strip->buf)[num * COLOR_SIZE + 1] = color.g;
+            ((uint8_t *)strip->buf)[num * COLOR_SIZE + 2] = color.b;
+            if (strip->is_rgbw)
+                ((uint8_t *)strip->buf)[num * COLOR_SIZE + 3] = color.w;
+            break;
+        default:
+            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
+            return ESP_ERR_NOT_SUPPORTED;
     }
     return ESP_OK;
 }
@@ -254,25 +254,25 @@ esp_err_t led_strip_set_pixels(led_strip_t *strip, size_t start, size_t len, rgb
     CHECK_ARG(strip && strip->buf && len && start + len <= strip->length);
     switch (strip->type)
     {
-    case LED_STRIP_WS2812:
-    case LED_STRIP_SK6812:
-        // GRB
-        for (size_t i = 0; i < len; i++, data++)
-        {
-            ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE] = data->g;
-            ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE + 1] = data->r;
-            ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE + 2] = data->b;
-            if(strip->is_rgbw)
-                ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE + 3] = data->w;
-        }
-        break;
-    case LED_STRIP_APA106:
-        // RGB, direct copy
-        memcpy(strip->buf, data, len * (COLOR_SIZE + strip->is_rgbw));
-        break;
-    default:
-        ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-        return ESP_ERR_NOT_SUPPORTED;
+        case LED_STRIP_WS2812:
+        case LED_STRIP_SK6812:
+            // GRB
+            for (size_t i = 0; i < len; i++, data++)
+            {
+                ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE] = data->g;
+                ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE + 1] = data->r;
+                ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE + 2] = data->b;
+                if (strip->is_rgbw)
+                    ((uint8_t *)strip->buf)[(start + i) * COLOR_SIZE + 3] = data->w;
+            }
+            break;
+        case LED_STRIP_APA106:
+            // RGB, direct copy
+            memcpy(strip->buf, data, len * (COLOR_SIZE + strip->is_rgbw));
+            break;
+        default:
+            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
+            return ESP_ERR_NOT_SUPPORTED;
     }
     return ESP_OK;
 }
