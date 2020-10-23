@@ -17,6 +17,13 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 * 4.x
 * 3.2.2
 
+### ESP32 Chip Support
+
+ * ESP32
+ * ESP32S2
+
+Use "idf.py set-target esp32s2" before "idf.py menuconfig" to change the chip type.
+
 ### ESP8266 RTOS SDK
 
 * master
