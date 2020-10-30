@@ -77,7 +77,7 @@ esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_dis
     // got echo, measuring
     int64_t echo_start = esp_timer_get_time();
     int64_t time = echo_start;
-    int64_t meas_timeout = echo_start + max_distance * ROUNDTRIP;
+    int64_t meas_timeout = max_distance * ROUNDTRIP;
     while (gpio_get_level(dev->echo_pin))
     {
         time = esp_timer_get_time();
