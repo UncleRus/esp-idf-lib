@@ -7,7 +7,7 @@
 
 Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf) and [ESP8266 RTOS SDK](https://github.com/espressif/ESP8266_RTOS_SDK).
 
-Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
+Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
 ## Supported versions
 
@@ -16,6 +16,13 @@ Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 * master
 * 4.x
 * 3.2.2
+
+### ESP32 Chip Support
+
+ * ESP32
+ * ESP32S2
+
+Use "idf.py set-target esp32s2" before "idf.py menuconfig" to change the chip type.
 
 ### ESP8266 RTOS SDK
 
