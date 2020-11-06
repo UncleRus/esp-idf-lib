@@ -153,13 +153,13 @@ esp_err_t led_strip_init(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->length > 0);
 
-    strip->buf = malloc(strip->length * (COLOR_SIZE + strip->is_rgbw));
+    strip->buf = malloc(strip->length * (COLOR_SIZE + (strip->is_rgbw > 0)));
     if (!strip->buf)
     {
         ESP_LOGE(TAG, "Not enough memory");
         return ESP_ERR_NO_MEM;
     }
-    memset(strip->buf, 0, strip->length * (COLOR_SIZE + strip->is_rgbw));
+    memset(strip->buf, 0, strip->length * (COLOR_SIZE + (strip->is_rgbw > 0)));
 
     rmt_config_t config = RMT_DEFAULT_CONFIG_TX(strip->gpio, strip->channel);
     config.clk_div = LED_STRIP_RMT_CLK_DIV;
@@ -204,7 +204,7 @@ esp_err_t led_strip_flush(led_strip_t *strip)
 
     CHECK(rmt_wait_tx_done(strip->channel, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
     return rmt_write_sample(strip->channel, strip->buf,
-                            strip->length * (COLOR_SIZE + strip->is_rgbw), false);
+                            strip->length * (COLOR_SIZE + (strip->is_rgbw > 0)), false);
 }
 
 bool led_strip_busy(led_strip_t *strip)
@@ -268,7 +268,7 @@ esp_err_t led_strip_set_pixels(led_strip_t *strip, size_t start, size_t len, rgb
             break;
         case LED_STRIP_APA106:
             // RGB, direct copy
-            memcpy(strip->buf, data, len * (COLOR_SIZE + strip->is_rgbw));
+            memcpy(strip->buf, data, len * (COLOR_SIZE + (strip->is_rgbw > 0)));
             break;
         default:
             ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
