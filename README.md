@@ -7,7 +7,7 @@
 
 Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf) and [ESP8266 RTOS SDK](https://github.com/espressif/ESP8266_RTOS_SDK).
 
-Most of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
+Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
 ## Supported versions
 
