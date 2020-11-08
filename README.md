@@ -249,15 +249,20 @@ the same device is used in several tasks:
 ```C
 static i2c_dev_t some_dev;
 
-void task1 (void * arg)
+void task1(void *arg)
 {
      // some_dev used here
 }
 
-void task2 (void * arg)
+void task2(void *arg)
 {
      // and here some_dev used too
 }
+
+...
+xTaskCreate(task1, "task1", ....);
+xTaskCreate(task2, "task2", ....);
+
 ```
 
 These mutexes are used when single device operation requires several I2C
@@ -279,6 +284,27 @@ are free GPIOs, then you can directly connect these sensors to individual GPIO
 outputs instead of using the I2C multiplexer. i2cdev will take care of
 reconfiguring I2C driver to the according outputs when you exchange data
 with these devices.
+
+### How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.
+
+You can change the frequency after initializing the device handler, like this:
+
+```C
+#include <esp_idf_lib_helpers.h>
+
+...
+
+ESP_ERROR_CHECK(ads111x_init_desc(&dev, addr, I2C_PORT, SDA_GPIO, SCL_GPIO));
+
+#if HELPER_TARGET_IS_ESP32
+    dev.cfg.master.clk_speed = 100000; // Hz
+#endif
+
+ESP_ERROR_CHECK(ads111x_set_mode(&dev, ADS111X_MODE_CONTINUOS));    // Continuous conversion mode
+ESP_ERROR_CHECK(ads111x_set_data_rate(&dev, ADS111X_DATA_RATE_32)); // 32 samples per second
+...
+```
+
 
 ## Credits
 
