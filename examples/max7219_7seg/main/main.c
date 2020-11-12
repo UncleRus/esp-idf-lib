@@ -3,6 +3,10 @@
 #include <freertos/task.h>
 #include <max7219.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define DELAY 2000
 
 #define HOST HSPI_HOST

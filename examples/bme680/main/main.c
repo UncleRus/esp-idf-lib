@@ -10,6 +10,10 @@
 #define PORT 0
 #define ADDR BME680_I2C_ADDR_0
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 void bme680_test(void *pvParamters)
 {
     bme680_t sensor;

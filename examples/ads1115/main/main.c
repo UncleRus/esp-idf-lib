@@ -16,6 +16,10 @@
 #define SCL_GPIO 17
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define GAIN ADS111X_GAIN_4V096 // +-4.096V
 
 // I2C addresses

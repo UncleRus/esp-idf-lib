@@ -31,6 +31,10 @@
 #endif
 #define I2C_PORT 0
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 static const char *TAG = "lm75_example";
 
 void lm75_task(void *pvParamters)

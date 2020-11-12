@@ -14,6 +14,10 @@
 #define SCL_GPIO 17
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 void task(void *pvParamters)
 {
     i2c_dev_t dev;
