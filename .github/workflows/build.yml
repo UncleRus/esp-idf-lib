@@ -30,6 +30,8 @@ jobs:
           - v4.0.2
           - v4.1
           - v4.2-beta1
+        target:
+          - esp32
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -68,7 +70,7 @@ jobs:
         id: set_env
         run: |
           SDK_NAME="esp-idf"
-          GCC_PREFIX="xtensa-esp32-elf"
+          GCC_PREFIX="xtensa-${{ matrix.target }}-elf"
           GCC_FILE="${GCC_PREFIX}-gcc"
           TOOLCHAIN_DIR="${HOME}/.espressif/tools"
           case "${{ matrix.branch }}" in
@@ -99,6 +101,7 @@ jobs:
           IDF_PATH="${__PROJECT_PATH}/idf"
 
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
 
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
@@ -453,5 +456,136 @@ jobs:
               echo "Building ${i}..."
               make defconfig
               make
+            fi
+          done
+
+  # XXX esp32s2 support was introduced in v4.2. older esp-idf does not install
+  # toolchains for esp32s2. thus, you cannot add `esp32s2` target to
+  # build_esp32_v4_x.
+  #
+  # this job can be removed when either one of the followings are met:
+  #
+  # * GitHub Actions supports "early exit" (successfully exit if a condition is
+  #   true).
+  # * all branches in build_esp32_v4_x supports esp32s2
+  #
+  # additionally, esp32s2 build requires idf.py. make is not supported.
+  build_esp32s2_v4_x:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_method:
+          - idf
+        branch:
+          - master
+          - v4.2-beta1
+        target:
+          - esp32s2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          SDK_NAME="esp-idf"
+          GCC_PREFIX="xtensa-${{ matrix.target }}-elf"
+          GCC_FILE="${GCC_PREFIX}-gcc"
+          TOOLCHAIN_DIR="${HOME}/.espressif/tools"
+          case "${{ matrix.branch }}" in
+          v4.0.2)
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
+            ;;
+          v4.1)
+            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
+            ;;
+          v4.2.*|v4.2-*)
+            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
+            ;;
+          master)
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
+            ;;
+          *)
+            echo "Unknown matrix.branch: ${{ matrix.branch }}"
+            exit 1
+            ;;
+          esac
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          DISTFILE_DIR="${HOME}/distfiles"
+          __PROJECT_PATH=`pwd`
+
+          IDF_PATH="${__PROJECT_PATH}/idf"
+
+          echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
+
+          echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
+          echo "__PROJECT_GCC_PREFIX=${GCC_PREFIX}" >> ${GITHUB_ENV}
+          echo "__PROJECT_SDK_NAME=${SDK_NAME}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION}" >> ${GITHUB_ENV}
+          echo "__PROJECT_DISTFILE_DIR=${DISTFILE_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_PATH=${__PROJECT_PATH}" >> ${GITHUB_ENV}
+          echo "__PROJECT_BUILD_COMMAND=${__PROJECT_BUILD_COMMAND}" >> ${GITHUB_ENV}
+          echo "__PROJECT_BUILD_COMMAND_ARG=${__PROJECT_BUILD_COMMAND_ARG}" >> ${GITHUB_ENV}
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/esp-idf
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+
+      - name: Fixup the SDK
+        run: |
+
+          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
+
+          sed -i -e "s/^gdbgui.*//" -e "s/^pygdbmi.*//" ${IDF_PATH}/requirements.txt
+
+      - name: Install python requirements
+        run: |
+          cd "${IDF_PATH}"
+          ./install.sh
+
+      - name: Build (idf.py)
+        if: ${{ matrix.build_method == 'idf' }}
+        run: |
+          IGNORE_FILE="travis-ignore"
+          . ${IDF_PATH}/export.sh
+
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              idf.py --ccache build
             fi
           done
