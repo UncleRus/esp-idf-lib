@@ -12,6 +12,10 @@
 #define SCL_GPIO 17
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 static void wait_for_data(qmc5883l_t *dev)
 {
     while (true)

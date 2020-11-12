@@ -13,6 +13,10 @@
 #endif
 #define ADDR PCF8591_DEFAULT_ADDRESS
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 void pcf8591_test(void *pvParamters)
 {
     i2c_dev_t dev;

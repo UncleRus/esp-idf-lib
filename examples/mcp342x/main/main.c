@@ -15,6 +15,10 @@
 #define SCL_GPIO 17
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define GAIN  MCP342X_GAIN1       // +-2.048
 #define CHANNEL MCP342X_CHANNEL1
 #define RESOLUTION MCP342X_RES_16 // 16-bit, 15 sps
