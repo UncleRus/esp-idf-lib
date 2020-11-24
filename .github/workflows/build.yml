@@ -403,6 +403,9 @@ jobs:
           path: idf
           submodules: recursive
           ref: ${{ matrix.branch }}
+          # XXX git.eclipse.org does not allow to fetch a commit. fetch all
+          # the commits.
+          fetch-depth: 0
 
       - name: Install python requirements (pip)
         if: ${{ ! startsWith(matrix.branch, 'v3.3') }}
