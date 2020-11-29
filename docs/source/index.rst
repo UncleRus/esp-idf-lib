@@ -140,6 +140,7 @@ Power/Current monitors
    :maxdepth: 1
    
    groups/ina219
+   groups/ina260
    groups/ina3221
 
 Magnetic sensors
