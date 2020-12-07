@@ -14,6 +14,10 @@
 #endif
 #define ADDR BH1750_ADDR_LO
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 void test(void *pvParameters)
 {
     i2c_dev_t dev;

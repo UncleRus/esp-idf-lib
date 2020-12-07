@@ -10,6 +10,10 @@
 #define PORT 0
 #define ADDR BME680_I2C_ADDR_0
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 void bme680_test(void *pvParamters)
 {
     bme680_t sensor;
@@ -50,7 +54,7 @@ void bme680_test(void *pvParamters)
             vTaskDelay(duration);
 
             // get the results and do something with them
-            if (bme680_get_results_float(&sensor, &values))
+            if (bme680_get_results_float(&sensor, &values) == ESP_OK)
                 printf("BME680 Sensor: %.2f °C, %.2f %%, %.2f hPa, %.2f Ohm\n",
                         values.temperature, values.humidity, values.pressure, values.gas_resistance);
         }

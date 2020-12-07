@@ -19,6 +19,10 @@
 #define SCL_GPIO 17
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define ADDR MCP9808_I2C_ADDR_000
 
 void task(void *pvParamters)

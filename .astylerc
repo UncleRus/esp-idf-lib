@@ -1,0 +1,12 @@
+--style=bsd
+--indent=spaces=4
+--attach-extern-c
+--indent-classes
+--indent-switches
+--indent-cases
+--indent-col1-comments
+--min-conditional-indent=0
+--pad-oper
+--pad-header
+--align-pointer=name
+--lineend=linux

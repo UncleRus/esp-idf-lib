@@ -16,6 +16,10 @@
 #define SCL_GPIO 17
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define ADDRESS MAX31725_I2C_ADDR_BASE
 #define FORMAT MAX31725_FMT_NORMAL
 

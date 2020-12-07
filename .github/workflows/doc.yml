@@ -1,0 +1,19 @@
+name: "Build the documentation"
+on:
+  - pull_request
+  - push
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install python3-sphinx python3-sphinx-rtd-theme python3-breathe doxygen
+
+      - name: Build docs
+        run: |
+          make -C docs

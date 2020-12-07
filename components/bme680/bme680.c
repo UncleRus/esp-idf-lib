@@ -131,7 +131,7 @@
 
 // commands
 #define BME680_RESET_CMD            0xb6    // BME680_REG_RESET<7:0>
-#define BME680_RESET_PERIOD         5       // reset time in ms
+#define BME680_RESET_PERIOD         10      // reset time in ms
 
 #define BME680_RHR_BITS             0x30    // BME680_REG_RES_HEAT_RANGE<5:4>
 #define BME680_RHR_SHIFT            4       // BME680_REG_RES_HEAT_RANGE<5:4>
@@ -346,28 +346,36 @@ static uint32_t bme680_convert_pressure(bme680_t *dev, uint32_t raw_pressure)
     int32_t var1;
     int32_t var2;
     int32_t var3;
-    int32_t var4;
-    int32_t pressure;
+    int32_t pressure_comp;
 
-    var1 = (((int32_t) cd->t_fine) >> 1) - 64000;
-    var2 = ((((var1 >> 2) * (var1 >> 2)) >> 11) * (int32_t) cd->par_p6) >> 2;
-    var2 = ((var2) * (int32_t) cd->par_p6) >> 2;
-    var2 = var2 + ((var1 * (int32_t) cd->par_p5) << 1);
-    var2 = (var2 >> 2) + ((int32_t) cd->par_p4 << 16);
-    var1 = (((var1 >> 2) * (var1 >> 2)) >> 13);
-    var1 = (((var1) * ((int32_t) cd->par_p3 << 5)) >> 3) + (((int32_t) cd->par_p2 * var1) >> 1);
+    var1 = (((int32_t)cd->t_fine) >> 1) - 64000;
+    var2 = ((((var1 >> 2) * (var1 >> 2)) >> 11) *
+            (int32_t)cd->par_p6) >> 2;
+    var2 = var2 + ((var1 * (int32_t)cd->par_p5) << 1);
+    var2 = (var2 >> 2) + ((int32_t)cd->par_p4 << 16);
+    var1 = (((((var1 >> 2) * (var1 >> 2)) >> 13) *
+             ((int32_t)cd->par_p3 << 5)) >> 3) +
+           (((int32_t)cd->par_p2 * var1) >> 1);
     var1 = var1 >> 18;
-    var1 = ((32768 + var1) * (int32_t) cd->par_p1) >> 15;
-    pressure = 1048576 - raw_pressure;
-    pressure = (int32_t) ((pressure - (var2 >> 12)) * ((uint32_t) 3125));
-    var4 = (1 << 31);
-    pressure = (pressure >= var4) ? ((pressure / (uint32_t) var1) << 1) : ((pressure << 1) / (uint32_t) var1);
-    var1 = ((int32_t) cd->par_p9 * (int32_t) (((pressure >> 3) * (pressure >> 3)) >> 13)) >> 12;
-    var2 = ((int32_t) (pressure >> 2) * (int32_t) cd->par_p8) >> 13;
-    var3 = ((int32_t) (pressure >> 8) * (int32_t) (pressure >> 8) * (int32_t) (pressure >> 8) * (int32_t) cd->par_p10) >> 17;
-    pressure = (int32_t) (pressure) + ((var1 + var2 + var3 + ((int32_t) cd->par_p7 << 7)) >> 4);
+    var1 = ((32768 + var1) * (int32_t)cd->par_p1) >> 15;
+    pressure_comp = 1048576 - raw_pressure;
+    pressure_comp = (int32_t)((pressure_comp - (var2 >> 12)) * ((uint32_t)3125));
+    if (pressure_comp >= BME680_MAX_OVERFLOW_VAL)
+        pressure_comp = ((pressure_comp / var1) << 1);
+    else
+        pressure_comp = ((pressure_comp << 1) / var1);
+    var1 = ((int32_t)cd->par_p9 * (int32_t)(((pressure_comp >> 3) *
+                                            (pressure_comp >> 3)) >> 13)) >> 12;
+    var2 = ((int32_t)(pressure_comp >> 2) *
+            (int32_t)cd->par_p8) >> 13;
+    var3 = ((int32_t)(pressure_comp >> 8) * (int32_t)(pressure_comp >> 8) *
+            (int32_t)(pressure_comp >> 8) *
+            (int32_t)cd->par_p10) >> 17;
 
-    return (uint32_t) pressure;
+    pressure_comp = (int32_t)(pressure_comp) + ((var1 + var2 + var3 +
+                    ((int32_t)cd->par_p7 << 7)) >> 4);
+
+    return (uint32_t)pressure_comp;
 }
 
 /**
