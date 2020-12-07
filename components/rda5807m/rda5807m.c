@@ -158,8 +158,6 @@ static esp_err_t update_register_nolock(rda5807m_t *dev, uint8_t reg, uint16_t m
 
 static esp_err_t update_register(rda5807m_t *dev, uint8_t reg, uint16_t mask, uint16_t val)
 {
-    uint16_t old;
-
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, update_register_nolock(dev, reg, mask, val));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
