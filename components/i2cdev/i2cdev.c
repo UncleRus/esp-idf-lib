@@ -14,7 +14,7 @@
 #include <esp_idf_lib_helpers.h>
 #include "i2cdev.h"
 
-static const char *TAG = "I2C_DEV";
+static const char *TAG = "I2CDEV";
 
 typedef struct {
     SemaphoreHandle_t lock;
@@ -23,6 +23,14 @@ typedef struct {
 } i2c_port_state_t;
 
 static i2c_port_state_t states[I2C_NUM_MAX];
+
+
+#if HELPER_TARGET_IS_ESP32
+#define MAX_TIMEOUT 0x00ffffff
+#elif HELPER_TARGET_IS_ESP8266
+#define MAX_TIMEOUT 0xffffffff
+#endif
+
 
 #define SEMAPHORE_TAKE(port) do { \
         if (!xSemaphoreTake(states[port].lock, CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS)) \
@@ -136,7 +144,7 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
         && a->sda_io_num == b->sda_io_num
 #if HELPER_TARGET_IS_ESP32
         && a->master.clk_speed == b->master.clk_speed
-#elif HELPER_TARGET_IS_ESP8266
+#elif HELPER_TARGET_IS_ESP8266 && HELPER_TARGET_VERSION > HELPER_TARGET_VERSION_ESP8266_V3_2
         && a->clk_stretch_tick == b->clk_stretch_tick
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
@@ -183,7 +191,9 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
     int t;
     if ((res = i2c_get_timeout(dev->port, &t)) != ESP_OK)
         return res;
-    if (dev->timeout_ticks != t && (res = i2c_set_timeout(dev->port, dev->timeout_ticks)) != ESP_OK)
+    // Timeout cannot be 0
+    uint32_t ticks = dev->timeout_ticks ? dev->timeout_ticks : MAX_TIMEOUT;
+    if ((ticks != t) && (res = i2c_set_timeout(dev->port, ticks)) != ESP_OK)
         return res;
     ESP_LOGD(TAG, "Timeout: ticks = %d (%d usec) on port %d", dev->timeout_ticks, dev->timeout_ticks / 80, dev->port);
 #endif
