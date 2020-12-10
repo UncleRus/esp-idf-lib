@@ -16,10 +16,13 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
+#if HELPER_TARGET_IS_ESP32
+static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+#endif
+
 static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
 {
 #if HELPER_TARGET_IS_ESP32
-    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
 #elif HELPER_TARGET_IS_ESP8266
     portENTER_CRITICAL();
