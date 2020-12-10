@@ -11,7 +11,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
-#include <esp_idf_lib_helpers.h>
 #include "i2cdev.h"
 
 static const char *TAG = "I2CDEV";
@@ -23,14 +22,6 @@ typedef struct {
 } i2c_port_state_t;
 
 static i2c_port_state_t states[I2C_NUM_MAX];
-
-
-#if HELPER_TARGET_IS_ESP32
-#define MAX_TIMEOUT 0x00ffffff
-#elif HELPER_TARGET_IS_ESP8266
-#define MAX_TIMEOUT 0xffffffff
-#endif
-
 
 #define SEMAPHORE_TAKE(port) do { \
         if (!xSemaphoreTake(states[port].lock, CONFIG_I2CDEV_TIMEOUT / portTICK_RATE_MS)) \
@@ -175,7 +166,7 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
 #if HELPER_TARGET_IS_ESP8266
 #if HELPER_TARGET_VERSION > HELPER_TARGET_VERSION_ESP8266_V3_2
         // Clock Stretch time, depending on CPU frequency
-        temp.clk_stretch_tick = dev->timeout_ticks;
+        temp.clk_stretch_tick = dev->timeout_ticks ? dev->timeout_ticks : I2CDEV_MAX_STRETCH_TIME;
 #endif
         if ((res = i2c_driver_install(dev->port, temp.mode)) != ESP_OK)
             return res;
@@ -192,7 +183,7 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
     if ((res = i2c_get_timeout(dev->port, &t)) != ESP_OK)
         return res;
     // Timeout cannot be 0
-    uint32_t ticks = dev->timeout_ticks ? dev->timeout_ticks : MAX_TIMEOUT;
+    uint32_t ticks = dev->timeout_ticks ? dev->timeout_ticks : I2CDEV_MAX_STRETCH_TIME;
     if ((ticks != t) && (res = i2c_set_timeout(dev->port, ticks)) != ESP_OK)
         return res;
     ESP_LOGD(TAG, "Timeout: ticks = %d (%d usec) on port %d", dev->timeout_ticks, dev->timeout_ticks / 80, dev->port);
