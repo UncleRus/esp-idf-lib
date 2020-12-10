@@ -16,9 +16,16 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <esp_err.h>
+#include <esp_idf_lib_helpers.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if HELPER_TARGET_IS_ESP32
+#define I2CDEV_MAX_STRETCH_TIME 0x00ffffff
+#elif HELPER_TARGET_IS_ESP8266
+#define I2CDEV_MAX_STRETCH_TIME 0xffffffff
 #endif
 
 /**
@@ -26,10 +33,13 @@ extern "C" {
  */
 typedef struct
 {
-    i2c_port_t port;         //!< I2C port number, 0 or 1
+    i2c_port_t port;         //!< I2C port number
     i2c_config_t cfg;        //!< I2C driver configuration
     uint8_t addr;            //!< Unshifted address
     SemaphoreHandle_t mutex; //!< Device mutex
+    uint32_t timeout_ticks;  /*!< HW I2C bus timeout (stretch time), in ticks. 80MHz APB clock
+                                  ticks for ESP-IDF, CPU ticks for ESP8266.
+                                  When this value is 0, I2CDEV_MAX_STRETCH_TIME will be used */
 } i2c_dev_t;
 
 /**
