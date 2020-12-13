@@ -22,10 +22,15 @@
 extern "C" {
 #endif
 
-#if HELPER_TARGET_IS_ESP32
-#define I2CDEV_MAX_STRETCH_TIME 0x00ffffff
-#elif HELPER_TARGET_IS_ESP8266
+#if HELPER_TARGET_IS_ESP8266
 #define I2CDEV_MAX_STRETCH_TIME 0xffffffff
+#else
+#include <soc/i2c_reg.h>
+#ifdef I2C_TIME_OUT_REG_V
+#define I2CDEV_MAX_STRETCH_TIME I2C_TIME_OUT_REG_V
+#else
+#define I2CDEV_MAX_STRETCH_TIME 0x00ffffff
+#endif
 #endif
 
 /**
