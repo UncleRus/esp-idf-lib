@@ -132,7 +132,7 @@ esp_err_t mcp342x_get_data(mcp342x_t *dev, int32_t *data, bool *ready);
 /**
  * @brief Get ADC voltage
  * @param dev Device descriptor
- * @param[out] data ADC voltage, volts
+ * @param[out] volts ADC voltage, volts
  * @param[out] ready Data validity flag
  * @return `ESP_OK` on success
  */

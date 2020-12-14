@@ -290,7 +290,7 @@ esp_err_t pca9685_set_pwm_value(i2c_dev_t *dev, uint8_t channel, uint16_t val)
     I2C_DEV_TAKE_MUTEX(dev);
     if (val == 0)
     {
-        // Full off
+        // Full off, takes precedence over full on.
         I2C_DEV_CHECK(dev, write_reg(dev, reg + OFFS_REG_LED_OFF, LED_FULL_ON_OFF));
     }
     else if (val < 4096)
@@ -301,6 +301,8 @@ esp_err_t pca9685_set_pwm_value(i2c_dev_t *dev, uint8_t channel, uint16_t val)
     }
     else
     {
+        // Clear full off, as it takes precedence over full on.
+        I2C_DEV_CHECK(dev, write_reg(dev, reg + OFFS_REG_LED_OFF, 0));
         // Full on
         I2C_DEV_CHECK(dev, write_reg(dev, reg + OFFS_REG_LED_ON, LED_FULL_ON_OFF));
     }

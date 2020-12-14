@@ -17,6 +17,8 @@
 
 #if HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32_V4
 #include <esp32/rom/ets_sys.h>
+#elif HELPER_TARGET_VERSION == HELPER_TARGET_VERSION_ESP32S2_V4
+#include <esp32s2/rom/ets_sys.h>
 #else
 #include <rom/ets_sys.h>
 #endif
@@ -134,7 +136,7 @@ static esp_err_t write_register(ds1302_t *dev, uint8_t reg, uint8_t val)
     CHECK_MUX(prepare(dev, GPIO_MODE_OUTPUT));
     CHECK_MUX(write_byte(dev, reg));
     CHECK_MUX(write_byte(dev, val));
-    PORT_ENTER_CRITICAL;
+    PORT_EXIT_CRITICAL;
     return chip_disable(dev);
 }
 

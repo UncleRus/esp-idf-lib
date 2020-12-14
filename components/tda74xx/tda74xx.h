@@ -5,7 +5,7 @@
  *
  * ESP-IDF driver for TDA7439/TDA7439DS/TDA7440 audioprocessors
  *
- * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (C) 2018, 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
@@ -77,12 +77,28 @@ esp_err_t tda74xx_free_desc(i2c_dev_t *dev);
 esp_err_t tda74xx_set_input(i2c_dev_t *dev, uint8_t input);
 
 /**
- * Set input gain
+ * Get current input
+ * @param dev Device descriptor
+ * @param[out] input Input #, 0..3
+ * @return `ESP_OK` on success
+ */
+esp_err_t tda74xx_get_input(i2c_dev_t *dev, uint8_t *input);
+
+/**
+ * Set input gain, dB
  * @param dev Device descriptor
  * @param gain_db Gain, 0..30 dB
  * @return `ESP_OK` on success
  */
 esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db);
+
+/**
+ * Get input gain
+ * @param dev Device descriptor
+ * @param[out] gain_db Gain, 0..30 dB
+ * @return `ESP_OK` on success
+ */
+esp_err_t tda74xx_get_input_gain(i2c_dev_t *dev, uint8_t *gain_db);
 
 /**
  * Set master volume
@@ -91,6 +107,14 @@ esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db);
  * @return `ESP_OK` on success
  */
 esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db);
+
+/**
+ * Get master volume
+ * @param dev Device descriptor
+ * @param[out] volume_db Volume, -48..0 dB
+ * @return `ESP_OK` on success
+ */
+esp_err_t tda74xx_get_volume(i2c_dev_t *dev, int8_t *volume_db);
 
 /**
  * Set equalizer gain
@@ -102,6 +126,15 @@ esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db);
 esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t gain_db);
 
 /**
+ * Get equlizer gain
+ * @param dev Device descriptor
+ * @param band Band
+ * @param[out] gain_db Gain, -14..14 dB in 2 dB step
+ * @return `ESP_OK` on success
+ */
+esp_err_t tda74xx_get_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t *gain_db);
+
+/**
  * Attenuate speaker
  * @param dev Device descriptor
  * @param channel Audio channel
@@ -109,6 +142,15 @@ esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t
  * @return `ESP_OK` on success
  */
 esp_err_t tda74xx_set_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t channel, uint8_t atten_db);
+
+/**
+ * Get speaker attenuation
+ * @param dev Device descriptor
+ * @param channel Audio channel
+ * @param atten_db Attenuation, 0..56 dB
+ * @return `ESP_OK` on success
+ */
+esp_err_t tda74xx_get_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t channel, uint8_t *atten_db);
 
 #ifdef __cplusplus
 }

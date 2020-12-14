@@ -14,7 +14,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <sys/time.h>
+#include <esp_timer.h>
 #include <esp_idf_lib_helpers.h>
 #include "sht3x.h"
 
@@ -63,13 +63,6 @@ static const uint8_t SHT3X_MEAS_DURATION_TICKS[3] = {
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-
-static uint32_t get_time_us()
-{
-    struct timeval time;
-    gettimeofday(&time, 0);
-    return (uint32_t)(time.tv_sec * 1e6) + (uint32_t)time.tv_usec;
-}
 
 #define G_POLYNOM 0x31
 
@@ -147,7 +140,7 @@ static inline bool sht3x_is_measuring(sht3x_t *dev)
       return false;
 
     // not running if time elapsed is greater than duration
-    uint32_t elapsed = get_time_us() - dev->meas_start_time;
+    uint64_t elapsed = esp_timer_get_time() - dev->meas_start_time;
 
     return elapsed < SHT3X_MEAS_DURATION_US[dev->repeatability];
 }
@@ -165,6 +158,7 @@ esp_err_t sht3x_init_desc(sht3x_t *dev, i2c_port_t port, uint8_t addr, gpio_num_
 #if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
+    dev->i2c_dev.timeout_ticks = 0xfffff;
 
     return i2c_dev_create_mutex(&dev->i2c_dev);
 }
@@ -220,7 +214,7 @@ esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_
 
     CHECK(sht3x_send_command(dev, SHT3X_MEASURE_CMD[mode][repeat]));
 
-    dev->meas_start_time = get_time_us();
+    dev->meas_start_time = esp_timer_get_time();
     dev->meas_started = true;
     dev->meas_first = true;
 

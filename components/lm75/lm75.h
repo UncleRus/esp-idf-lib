@@ -135,7 +135,7 @@ esp_err_t lm75_get_os_polarity(i2c_dev_t *dev, uint8_t *v);
 /**
  * @brief Get the value of OS threshold in the configuration register
  * @param[in] dev pointer to LM75 device descriptior
- * @param[out] v value of OS threshold
+ * @param[out] value value of OS threshold
  * @return `ESP_OK` on success
  */
 esp_err_t lm75_get_os_threshold(i2c_dev_t *dev, float *value);
@@ -168,7 +168,7 @@ esp_err_t lm75_set_os_polarity(i2c_dev_t *dev, const lm75_os_polarity_t v);
 /**
  * @brief Set the value of OS threshold in the configuration register
  * @param[in] dev pointer to LM75 device descriptior
- * @param[in] v value of OS threshold
+ * @param[in] value value of OS threshold
  * @return `ESP_OK` on success
  */
 esp_err_t lm75_set_os_threshold(i2c_dev_t *dev, const float value);

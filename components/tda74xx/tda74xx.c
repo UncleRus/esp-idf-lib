@@ -3,7 +3,7 @@
  *
  * ESP-IDF driver for TDA7439/TDA7439DS/TDA7440 audioprocessors
  *
- * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (C) 2018, 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
@@ -29,6 +29,28 @@ static const char *TAG = "TDA74xx";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+
+static esp_err_t write_reg(i2c_dev_t *dev, uint8_t reg, uint8_t val)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, &val, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    ESP_LOGD(TAG, "%02x -> %02x", val, reg);
+
+    return ESP_OK;
+}
+
+static esp_err_t read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, val, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    ESP_LOGD(TAG, "%02x <- %02x", *val, reg);
+
+    return ESP_OK;
+}
 
 esp_err_t tda74xx_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
@@ -56,26 +78,29 @@ esp_err_t tda74xx_set_input(i2c_dev_t *dev, uint8_t input)
 {
     CHECK_ARG(dev && input <= TDA74XX_MAX_INPUT);
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_INPUT_SELECTOR, &input, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
+    return write_reg(dev, REG_INPUT_SELECTOR, input);
+}
 
-    ESP_LOGD(TAG, "Input: %d", input);
+esp_err_t tda74xx_get_input(i2c_dev_t *dev, uint8_t *input)
+{
+    CHECK_ARG(dev && input);
 
-    return ESP_OK;
+    return read_reg(dev, REG_INPUT_SELECTOR, input);
 }
 
 esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db)
 {
     CHECK_ARG(dev && gain_db <= TDA74XX_MAX_INPUT_GAIN);
 
-    uint8_t gain = gain_db / 2;
+    return write_reg(dev, REG_INPUT_GAIN, gain_db / 2);
+}
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_INPUT_GAIN, &gain, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
+esp_err_t tda74xx_get_input_gain(i2c_dev_t *dev, uint8_t *gain_db)
+{
+    CHECK_ARG(dev && gain_db);
 
-    ESP_LOGD(TAG, "Input gain: %d dB", gain * 2);
+    CHECK(read_reg(dev, REG_INPUT_GAIN, gain_db));
+    *gain_db *= 2;
 
     return ESP_OK;
 }
@@ -84,14 +109,15 @@ esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db)
 {
     CHECK_ARG(dev && volume_db <= TDA74XX_MAX_VOLUME && volume_db >= TDA74XX_MIN_VOLUME);
 
-    uint8_t volume = volume_db == TDA74XX_MIN_VOLUME ? MUTE_VALUE : -volume_db;
+    return write_reg(dev, REG_VOLUME, volume_db == TDA74XX_MIN_VOLUME ? MUTE_VALUE : -volume_db);
+}
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_VOLUME, &volume, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
+esp_err_t tda74xx_get_volume(i2c_dev_t *dev, int8_t *volume_db)
+{
+    CHECK_ARG(dev && volume_db);
 
-    ESP_LOGD(TAG, "Volume: %d dB", volume_db);
-
+    CHECK(read_reg(dev, REG_VOLUME, (uint8_t *)volume_db));
+    *volume_db = -*volume_db;
     return ESP_OK;
 }
 
@@ -99,31 +125,41 @@ esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t
 {
     CHECK_ARG(dev && gain_db >= TDA74XX_MIN_EQ_GAIN && gain_db <= TDA74XX_MAX_EQ_GAIN);
 
-    uint8_t gain = (gain_db + 14) / 2;
-
-    const char *name;
     uint8_t reg;
     switch(band)
     {
         case TDA74XX_BAND_BASS:
-            name = "Bass";
             reg = REG_BASS_GAIN;
             break;
         case TDA74XX_BAND_MIDDLE:
-            name = "Middle";
             reg = REG_MID_GAIN;
             break;
         default:
-            name = "Treble";
             reg = REG_TREBLE_GAIN;
     }
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, &gain, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
+    return write_reg(dev, reg, (gain_db + 14) / 2);
+}
 
-    ESP_LOGD(TAG, "%s gain: %d dB", name, gain * 2 - 14);
+esp_err_t tda74xx_get_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t *gain_db)
+{
+    CHECK_ARG(dev && gain_db);
 
+    uint8_t reg;
+    switch(band)
+    {
+        case TDA74XX_BAND_BASS:
+            reg = REG_BASS_GAIN;
+            break;
+        case TDA74XX_BAND_MIDDLE:
+            reg = REG_MID_GAIN;
+            break;
+        default:
+            reg = REG_TREBLE_GAIN;
+    }
+
+    CHECK(read_reg(dev, reg, (uint8_t *)gain_db));
+    *gain_db = *gain_db * 2 - 14;
     return ESP_OK;
 }
 
@@ -131,12 +167,12 @@ esp_err_t tda74xx_set_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t chan
 {
     CHECK_ARG(dev && atten_db <= TDA74XX_MAX_ATTEN);
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, channel == TDA74XX_CHANNEL_LEFT ? REG_ATTEN_L : REG_ATTEN_R, &atten_db, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    ESP_LOGD(TAG, "Speaker attenuation (%c): %d dB", channel == TDA74XX_CHANNEL_LEFT ? 'L': 'R', atten_db);
-
-    return ESP_OK;
+    return write_reg(dev, channel == TDA74XX_CHANNEL_LEFT ? REG_ATTEN_L : REG_ATTEN_R, atten_db);
 }
 
+esp_err_t tda74xx_get_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t channel, uint8_t *atten_db)
+{
+    CHECK_ARG(dev && atten_db);
+
+    return read_reg(dev, channel == TDA74XX_CHANNEL_LEFT ? REG_ATTEN_L : REG_ATTEN_R, atten_db);
+}

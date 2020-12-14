@@ -3,6 +3,10 @@
 #include <freertos/task.h>
 #include <max7219.h>
 
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define SCROLL_DELAY 50
 #define CASCADE_SIZE 1
 

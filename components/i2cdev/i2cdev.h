@@ -16,9 +16,21 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <esp_err.h>
+#include <esp_idf_lib_helpers.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if HELPER_TARGET_IS_ESP8266
+#define I2CDEV_MAX_STRETCH_TIME 0xffffffff
+#else
+#include <soc/i2c_reg.h>
+#ifdef I2C_TIME_OUT_REG_V
+#define I2CDEV_MAX_STRETCH_TIME I2C_TIME_OUT_REG_V
+#else
+#define I2CDEV_MAX_STRETCH_TIME 0x00ffffff
+#endif
 #endif
 
 /**
@@ -26,10 +38,13 @@ extern "C" {
  */
 typedef struct
 {
-    i2c_port_t port;         //!< I2C port number, 0 or 1
+    i2c_port_t port;         //!< I2C port number
     i2c_config_t cfg;        //!< I2C driver configuration
     uint8_t addr;            //!< Unshifted address
     SemaphoreHandle_t mutex; //!< Device mutex
+    uint32_t timeout_ticks;  /*!< HW I2C bus timeout (stretch time), in ticks. 80MHz APB clock
+                                  ticks for ESP-IDF, CPU ticks for ESP8266.
+                                  When this value is 0, I2CDEV_MAX_STRETCH_TIME will be used */
 } i2c_dev_t;
 
 /**
@@ -118,11 +133,8 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg,
  * @param[in] in_size Number of byte to read
  * @return ESP_OK on success
  */
-inline esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
-        void *in_data, size_t in_size)
-{
-    return i2c_dev_read(dev, &reg, 1, in_data, in_size);
-}
+esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
+        void *in_data, size_t in_size);
 
 /**
  * @brief Write to register with an 8-bit address
@@ -134,11 +146,8 @@ inline esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
  * @param[in] out_size Size of data to send
  * @return ESP_OK on success
  */
-inline esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
-        const void *out_data, size_t out_size)
-{
-    return i2c_dev_write(dev, &reg, 1, out_data, out_size);
-}
+esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
+        const void *out_data, size_t out_size);
 
 #define I2C_DEV_TAKE_MUTEX(dev) do { \
         esp_err_t __ = i2c_dev_take_mutex(dev); \

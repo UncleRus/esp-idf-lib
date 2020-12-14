@@ -12,6 +12,11 @@
 #define SDA_GPIO 18
 #define SCL_GPIO 19
 #endif
+
+#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 #define ADDR TSL2561_I2C_ADDR_FLOAT
 
 void tsl2561_test(void *pvParamters)
