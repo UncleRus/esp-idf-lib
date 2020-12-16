@@ -31,7 +31,7 @@ void task(void *arg)
     {
         vTaskDelay(pdMS_TO_TICKS(500));
 
-        ESP_ERROR_CHECK(tsys01_get_temperature(&dev, &t));
+        ESP_ERROR_CHECK(tsys01_measure(&dev, &t));
         printf("Temperature: %.02f deg.C\n", t);
     }
 }

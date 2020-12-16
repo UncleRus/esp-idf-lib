@@ -71,7 +71,25 @@ esp_err_t tsys01_init(tsys01_t *dev);
 esp_err_t tsys01_reset(tsys01_t *dev);
 
 /**
- * @brief Read temperature from sensor.
+ * @brief Start temperature conversion.
+ *
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t tsys01_start(tsys01_t *dev);
+
+/**
+ * @brief Read converted temperature from sensor.
+ *
+ * @param dev Device descriptor
+ * @param[out] raw Raw ADC value, NULL-able
+ * @param[out] t Temperature, degrees Celsius, NULL-able
+ * @return `ESP_OK` on success
+ */
+esp_err_t tsys01_get_temp(tsys01_t *dev, uint32_t *raw, float *t);
+
+/**
+ * @brief Perform temperature convertion
  *
  * This function starts temperature conversion,
  * waits 10 ms and reads result.
@@ -80,7 +98,7 @@ esp_err_t tsys01_reset(tsys01_t *dev);
  * @param[out] t Temperature, degrees Celsius
  * @return `ESP_OK` on success
  */
-esp_err_t tsys01_get_temperature(tsys01_t *dev, float *t);
+esp_err_t tsys01_measure(tsys01_t *dev, float *t);
 
 #ifdef __cplusplus
 }
