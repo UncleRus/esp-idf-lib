@@ -28,7 +28,8 @@ extern "C" {
 typedef struct
 {
     i2c_dev_t i2c_dev; //!< I2C device descriptor
-    uint16_t cal[8];    //!< Calibration values
+    uint16_t cal[8];   //!< Calibration values
+    uint32_t serial;   //!< Serial number
 } tsys01_t;
 
 /**

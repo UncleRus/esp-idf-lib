@@ -24,6 +24,9 @@ void task(void *arg)
 
     ESP_ERROR_CHECK(tsys01_init_desc(&dev, TSYS01_I2C_ADDR1, I2C_PORT, SDA_GPIO, SCL_GPIO));
     ESP_ERROR_CHECK(tsys01_init(&dev));
+
+    printf("Device serial number: 0x%06x\n", dev.serial);
+
     ESP_ERROR_CHECK(tsys01_reset(&dev));
 
     float t;

@@ -1,7 +1,7 @@
 /**
  * @file tsys01.c
  *
- * ESP-IDF driver for INA260 precision digital current and power monitor
+ * ESP-IDF driver for Digital Temperature Sensors TSYS01
  *
  * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -13,14 +13,15 @@
 #include <freertos/task.h>
 #include "tsys01.h"
 
-#define I2C_FREQ_HZ 400000 // no more than 400 kHz, otherwise enabling HS mode on the chip is required
+#define I2C_FREQ_HZ 1000000 // 1MHz (max
 
 static const char *TAG = "TSYS01";
 
-#define CMD_RESET 0x1e
-#define CMD_START 0x48
-#define CMD_READ  0x00
-#define CMD_PROM  0xa0
+#define CMD_RESET  0x1e
+#define CMD_START  0x48
+#define CMD_READ   0x00
+#define CMD_PROM   0xa0
+#define CMD_SERIAL 0xac
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -101,6 +102,10 @@ esp_err_t tsys01_init(tsys01_t *dev)
         I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, CMD_PROM + i * 2, dev->cal + i, 2));
         dev->cal[i] = (dev->cal[i] >> 8) | (dev->cal[i] << 8);
     }
+    uint8_t r[4];
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, CMD_SERIAL, r, 2));
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, CMD_SERIAL + 2, r + 2, 2));
+    dev->serial = ((uint32_t)r[0] << 16) | ((uint32_t)r[1] << 8) | r[2];
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
