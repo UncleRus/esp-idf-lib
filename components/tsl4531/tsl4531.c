@@ -41,49 +41,29 @@ static const char *TAG = "TSL4531";
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-static esp_err_t write_register(i2c_dev_t *dev, uint8_t reg, uint8_t value)
+inline static esp_err_t write_register(tsl4531_t *dev, uint8_t reg, uint8_t val)
 {
-    CHECK_ARG(dev);
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, TSL4531_REG_COMMAND | reg, &value, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
+    return i2c_dev_write_reg(&dev->i2c_dev, TSL4531_REG_COMMAND | reg, &val, 1);
 }
 
-static esp_err_t read_register(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
+inline static esp_err_t read_register(tsl4531_t *dev, uint8_t reg, uint8_t *val)
 {
-    CHECK_ARG(dev && val);
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, TSL4531_REG_COMMAND | reg, val, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
+    return i2c_dev_read_reg(&dev->i2c_dev, TSL4531_REG_COMMAND | reg, val, 1);
 }
 
-static esp_err_t read_register_16(i2c_dev_t *dev, uint8_t low_register_addr, uint16_t *val)
+inline static esp_err_t read_register_16(tsl4531_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev && val);
-
-    low_register_addr = TSL4531_REG_COMMAND | low_register_addr;
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read(dev, &low_register_addr, 1, val, 2));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
+    return i2c_dev_read_reg(&dev->i2c_dev, TSL4531_REG_COMMAND | reg, val, 2);
 }
 
-static inline esp_err_t enable(tsl4531_t *device)
+inline static esp_err_t enable(tsl4531_t *dev)
 {
-    return write_register(&device->i2c_dev, TSL4531_REG_CONTROL, TSL4531_ON);
+    return write_register(dev, TSL4531_REG_CONTROL, TSL4531_ON);
 }
 
-static inline esp_err_t disable(tsl4531_t *device)
+inline static esp_err_t disable(tsl4531_t *dev)
 {
-    return write_register(&device->i2c_dev, TSL4531_REG_CONTROL, TSL4531_OFF);
+    return write_register(dev, TSL4531_REG_CONTROL, TSL4531_OFF);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,20 +90,24 @@ esp_err_t tsl4531_free_desc(tsl4531_t *dev)
     return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
-esp_err_t tsl4531_init(tsl4531_t *device)
+esp_err_t tsl4531_init(tsl4531_t *dev)
 {
-    CHECK(enable(device));
+    CHECK_ARG(dev);
+
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, enable(dev));
 
     uint8_t control_reg;
-    CHECK(read_register(&device->i2c_dev, TSL4531_REG_CONTROL, &control_reg));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, TSL4531_REG_CONTROL, &control_reg));
     if (control_reg != TSL4531_ON)
     {
-        ESP_LOGE(TAG, "Error initializing tsl4531, control register wasn't set to ON");
+        I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+        ESP_LOGE(TAG, "Error initializing TSL4531, control register wasn't set to ON");
         return ESP_ERR_INVALID_RESPONSE;
     }
 
     uint8_t id;
-    CHECK(read_register(&device->i2c_dev, TSL4531_REG_DEVICE_ID, &id));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, TSL4531_REG_DEVICE_ID, &id));
     id >>= 4;
     switch (id)
     {
@@ -131,53 +115,62 @@ esp_err_t tsl4531_init(tsl4531_t *device)
         case TSL4531_PART_TSL45313:
         case TSL4531_PART_TSL45315:
         case TSL4531_PART_TSL45311:
-            device->part_id = id;
+            dev->part_id = id;
             break;
         default:
             ESP_LOGW(TAG, "Unknown part id for TSL4531 sensor: %u", id);
     }
 
-    return disable(device);
-}
-
-esp_err_t tsl4531_config(tsl4531_t *device, tsl4531_integration_time_t integration_time, bool skip_power_save)
-{
-    CHECK(enable(device));
-    CHECK(write_register(&device->i2c_dev, TSL4531_REG_CONFIG, (skip_power_save ? 0x08 : 0x00) | (0x03 & integration_time)));
-    CHECK(disable(device));
-
-    device->integration_time = integration_time;
-    device->skip_power_save = skip_power_save;
+    I2C_DEV_CHECK(&dev->i2c_dev, disable(dev));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
 }
 
-esp_err_t tsl4531_read_lux(tsl4531_t *device, uint16_t *lux)
+esp_err_t tsl4531_config(tsl4531_t *dev, tsl4531_integration_time_t integration_time, bool skip_power_save)
 {
-    CHECK_ARG(lux);
+    CHECK_ARG(dev);
 
-    CHECK(enable(device));
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, enable(dev));
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, TSL4531_REG_CONFIG,
+            (skip_power_save ? 0x08 : 0x00) | (0x03 & integration_time)));
+    I2C_DEV_CHECK(&dev->i2c_dev, disable(dev));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+
+    dev->integration_time = integration_time;
+    dev->skip_power_save = skip_power_save;
+
+    return ESP_OK;
+}
+
+esp_err_t tsl4531_read_lux(tsl4531_t *dev, uint16_t *lux)
+{
+    CHECK_ARG(dev && lux);
+
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, enable(dev));
 
     uint16_t multiplier;
-    switch (device->integration_time)
+    switch (dev->integration_time)
     {
         case TSL4531_INTEGRATION_100MS:
             multiplier = 4;
-            vTaskDelay(TSL4531_INTEGRATION_TIME_100MS / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(TSL4531_INTEGRATION_TIME_100MS));
             break;
         case TSL4531_INTEGRATION_200MS:
             multiplier = 2;
-            vTaskDelay(TSL4531_INTEGRATION_TIME_200MS / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(TSL4531_INTEGRATION_TIME_200MS));
             break;
         default:
             multiplier = 1;
-            vTaskDelay(TSL4531_INTEGRATION_TIME_400MS / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(TSL4531_INTEGRATION_TIME_400MS));
     }
 
     uint16_t lux_data;
-
-    CHECK(read_register_16(&device->i2c_dev, TSL4531_REG_DATA_LOW, &lux_data));
-    CHECK(disable(device));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register_16(dev, TSL4531_REG_DATA_LOW, &lux_data));
+    I2C_DEV_CHECK(&dev->i2c_dev, disable(dev));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     *lux = multiplier * lux_data;
 

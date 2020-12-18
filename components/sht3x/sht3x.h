@@ -218,7 +218,7 @@ esp_err_t sht3x_compute_values(sht3x_raw_data_t raw_data, float *temperature, fl
  * @param humidity    Humidity in percent
  * @return            `ESP_OK` on success
  */
-esp_err_t sht3x_get_results (sht3x_t *dev, float *temperature, float *humidity);
+esp_err_t sht3x_get_results(sht3x_t *dev, float *temperature, float *humidity);
 
 #ifdef __cplusplus
 }
