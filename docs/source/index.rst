@@ -113,6 +113,7 @@ Humidity & temperature sensors
    groups/bme680
    groups/mcp9808
    groups/mcp960x
+   groups/tsys01
    
 Pressure sensors
 ================
