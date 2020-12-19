@@ -1,7 +1,7 @@
 /**
  * @file tsys01.c
  *
- * ESP-IDF driver for Digital Temperature Sensors TSYS01
+ * ESP-IDF driver for digital temperature sensor TSYS01
  *
  * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
