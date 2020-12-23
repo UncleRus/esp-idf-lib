@@ -13,7 +13,7 @@
 
 /* {{{ pre-tests */
 #if defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S2)
-#error BUG: defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S
+#error BUG: defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S2)
 #endif
 /* }}} */
 
