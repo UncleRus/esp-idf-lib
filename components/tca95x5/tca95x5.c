@@ -45,10 +45,9 @@ static esp_err_t write_reg_16(i2c_dev_t *dev, uint8_t reg, uint16_t val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t pcf8574_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t tca95x5_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(addr & TCA95X5_I2C_ADDR_BASE);
+    CHECK_ARG(dev && (addr & TCA95X5_I2C_ADDR_BASE));
 
     dev->port = port;
     dev->addr = addr;
@@ -61,7 +60,7 @@ esp_err_t pcf8574_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_
     return i2c_dev_create_mutex(dev);
 }
 
-esp_err_t pcf8574_free_desc(i2c_dev_t *dev)
+esp_err_t tca95x5_free_desc(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);
 
@@ -100,8 +99,13 @@ esp_err_t tca95x5_get_level(i2c_dev_t *dev, uint8_t pin, uint32_t *val)
 esp_err_t tca95x5_set_level(i2c_dev_t *dev, uint8_t pin, uint32_t val)
 {
     uint16_t v;
-    CHECK(read_reg_16(dev, REG_OUT0, &v));
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_OUT0, &v, 2));
     v = (v & ~BV(pin)) | (val ? BV(pin) : 0);
-    return write_reg_16(dev, REG_OUT0, v);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_OUT0, &v, 2));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
 }
 
