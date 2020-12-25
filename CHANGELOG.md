@@ -9,7 +9,8 @@
 
 #### Bugfixes
 
-- (qmc5883l) dd17522 Fix possible race condition- (tca95x5) #144 Copy-paste error, add example
+- (qmc5883l) dd17522 Fix possible race condition
+- (tca95x5) #144 Copy-paste error, add example
 - (esp_idf_lib_helpers) #143 Invalid error message
 - (tsl4531) c2e835d Fix possible race condition
 - (sht3x) 8289262 Fix possible race confition in SS measurement, refactoring
