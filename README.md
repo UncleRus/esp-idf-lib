@@ -309,7 +309,7 @@ ESP_ERROR_CHECK(ads111x_set_data_rate(&dev, ADS111X_DATA_RATE_32)); // 32 sample
 ...
 ```
 
-### How to use internal pull-up resistors
+### How to use internal pull-up resistors?
 
 Just enable them in `i2c_dev_t` config. For example:
 
