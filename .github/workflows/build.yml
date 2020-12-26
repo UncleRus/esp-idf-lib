@@ -587,6 +587,9 @@ jobs:
 
           IDF_PATH="${__PROJECT_PATH}/idf"
 
+          # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
+          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
 
@@ -617,10 +620,26 @@ jobs:
 
           sed -i -e "s/^gdbgui.*//" -e "s/^pygdbmi.*//" ${IDF_PATH}/requirements.txt
 
-      - name: Install python requirements
+      - name: Cache esp-idf tools
+
+        # cache esp-idf tools. each tagged branch has fixed versions of tools.
+        # the versions do not change. the master is an exception as it is a
+        # moving target. do NOT cache tools if the branch is master.
+        uses: actions/cache@v2
+        id: cache-tools
+        if: ${{ matrix.branch != 'master' }}
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools
+
+      - name: Run idf_tools.py install
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
         run: |
-          cd "${IDF_PATH}"
-          ./install.sh
+          ${IDF_PATH}/tools/idf_tools.py install
+
+      - name: Run idf_tools.py install-python-env
+        run: |
+          ${IDF_PATH}/tools/idf_tools.py install-python-env
 
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
