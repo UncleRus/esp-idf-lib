@@ -103,6 +103,9 @@ jobs:
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
 
+          # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
+          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
           echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
@@ -136,10 +139,26 @@ jobs:
           # gdbgui cannot be installed successfully with python 3.8
           sed -i -e "s/^gdbgui.*//" -e "s/^pygdbmi.*//" ${IDF_PATH}/requirements.txt
 
-      - name: Install python requirements
+      - name: Cache esp-idf tools
+
+        # cache esp-idf tools. each tagged branch has fixed versions of tools.
+        # the versions do not change. the master is an exception as it is a
+        # moving target. do NOT cache tools if the branch is master.
+        uses: actions/cache@v2
+        id: cache-tools
+        if: ${{ matrix.branch != 'master' }}
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools
+
+      - name: Run idf_tools.py install
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
         run: |
-          cd "${IDF_PATH}"
-          ./install.sh
+          ${IDF_PATH}/tools/idf_tools.py install
+
+      - name: Run idf_tools.py install-python-env
+        run: |
+          ${IDF_PATH}/tools/idf_tools.py install-python-env
 
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
@@ -258,6 +277,9 @@ jobs:
 
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
 
+          # cache-idf-tools needs PROJECT_DISTFILE_DIR
+          echo "::set-output name=PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
           echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
@@ -292,9 +314,21 @@ jobs:
         run: |
           cd "${IDF_PATH}" && ./install.sh
 
-      - name: Download toolchain if it does not exist
+      - name: Create __PROJECT_DISTFILE_DIR
         run: |
           mkdir -p "${__PROJECT_DISTFILE_DIR}"
+
+      - name: Cache toolchain
+        id: cache-idf-tools
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_DISTFILE_DIR }}
+
+          # XXX simply use `esp32` here. v3.x will not support ESP32S2
+          key: ${{ runner.os }}-${{ matrix.branch }}-esp32-cache-tools
+
+      - name: Download toolchain if it does not exist
+        run: |
           if [ ! -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" ]; then
             wget -O "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" "https://dl.espressif.com/dl/${__PROJECT_TOOLCHAIN_FILE}"
           fi
@@ -387,6 +421,9 @@ jobs:
           IDF_PATH="${__PROJECT_PATH}/idf"
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
 
+          # cache-idf-tools needs PROJECT_DISTFILE_DIR
+          echo "::set-output name=PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
           echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
@@ -419,9 +456,19 @@ jobs:
           python -m pip install --user --upgrade pyOpenSSL
           python -m pip install --user -r ${IDF_PATH}/requirements.txt
 
-      - name: Download toolchain if it does not exist
+      - name: Create __PROJECT_DISTFILE_DIR
         run: |
           mkdir -p "${__PROJECT_DISTFILE_DIR}"
+
+      - name: Cache toolchain
+        id: cache-idf-tools
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_DISTFILE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-esp8266-cache-tools
+
+      - name: Download toolchain if it does not exist
+        run: |
           if [ ! -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" ]; then
             wget -O "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" "https://dl.espressif.com/dl/${__PROJECT_TOOLCHAIN_FILE}"
           fi
@@ -540,6 +587,9 @@ jobs:
 
           IDF_PATH="${__PROJECT_PATH}/idf"
 
+          # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
+          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
 
@@ -570,10 +620,26 @@ jobs:
 
           sed -i -e "s/^gdbgui.*//" -e "s/^pygdbmi.*//" ${IDF_PATH}/requirements.txt
 
-      - name: Install python requirements
+      - name: Cache esp-idf tools
+
+        # cache esp-idf tools. each tagged branch has fixed versions of tools.
+        # the versions do not change. the master is an exception as it is a
+        # moving target. do NOT cache tools if the branch is master.
+        uses: actions/cache@v2
+        id: cache-tools
+        if: ${{ matrix.branch != 'master' }}
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools
+
+      - name: Run idf_tools.py install
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
         run: |
-          cd "${IDF_PATH}"
-          ./install.sh
+          ${IDF_PATH}/tools/idf_tools.py install
+
+      - name: Run idf_tools.py install-python-env
+        run: |
+          ${IDF_PATH}/tools/idf_tools.py install-python-env
 
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
