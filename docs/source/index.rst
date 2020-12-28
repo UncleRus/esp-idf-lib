@@ -161,6 +161,7 @@ Light sensors
    groups/bh1750
    groups/tsl2561
    groups/tsl4531
+   groups/tsl2591
 
 GPIO expanders
 ==============
