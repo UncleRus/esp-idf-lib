@@ -178,6 +178,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **bh1750**     | Driver for BH1750 light sensor                                          | BSD     | Yes
 | **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes
 | **tsl4531**    | Driver for digital ambient light sensor TSL4531                         | BSD     | Yes
+| **tsl2591**    | Driver for light-to-digital converter TSL2591                           | MIT     | Yes
 
 ### GPIO expanders
 
@@ -222,3 +223,4 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 - [Bernhard Guillon](https://gitlab.com/mrnice), developer of MS5611-01BA03 driver
 - [Pham Ngoc Thanh](https://github.com/panoti), developer of PCF8591 driver
 - [Lucio Tarantino](https://github.com/dianlight), developer of ADS111x driver
+- [Julian Dörner](https://github.com/juliandoerner), developer of TSL2591 driver
