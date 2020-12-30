@@ -257,7 +257,7 @@ esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_
     CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, start_nolock(dev, SHT3X_SINGLE_SHOT, SHT3X_HIGH));
+    I2C_DEV_CHECK(&dev->i2c_dev, start_nolock(dev, mode, repeat));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;
