@@ -34,7 +34,7 @@ static const uint16_t SHT3X_MEASURE_CMD[6][3] = {
         {0x2032, 0x2024, 0x202f}, // [PERIODIC_05][H,M,L]
         {0x2130, 0x2126, 0x212d}, // [PERIODIC_1 ][H,M,L]
         {0x2236, 0x2220, 0x222b}, // [PERIODIC_2 ][H,M,L]
-        {0x2234, 0x2322, 0x2329}, // [PERIODIC_4 ][H,M,L]
+        {0x2334, 0x2322, 0x2329}, // [PERIODIC_4 ][H,M,L]
         {0x2737, 0x2721, 0x272a}  // [PERIODIC_10][H,M,L]
 };
 
