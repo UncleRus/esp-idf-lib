@@ -26,6 +26,7 @@ const char *TAG = "SHT3x";
 #define SHT3X_CLEAR_STATUS_CMD         0x3041
 #define SHT3X_RESET_CMD                0x30A2
 #define SHT3X_FETCH_DATA_CMD           0xE000
+#define SHT3X_STOP_PERIODIC_MEAS_CMD   0x3093
 #define SHT3X_HEATER_ON_CMD            0x306D
 #define SHT3X_HEATER_OFF_CMD           0x3066
 
@@ -259,6 +260,19 @@ esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, start_nolock(dev, mode, repeat));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+
+    return ESP_OK;
+}
+
+esp_err_t sht3x_stop_periodic_measurement(sht3x_t *dev)
+{
+    CHECK_ARG(dev);
+
+    CHECK(send_cmd(dev, SHT3X_STOP_PERIODIC_MEAS_CMD));
+    dev->mode = SHT3X_SINGLE_SHOT;
+    dev->meas_start_time = 0;
+    dev->meas_started = false;
+    dev->meas_first = false;
 
     return ESP_OK;
 }

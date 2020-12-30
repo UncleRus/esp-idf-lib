@@ -175,6 +175,17 @@ uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
 esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_t repeat);
 
 /**
+ * @brief Stop the periodic mode measurements
+ *
+ * The function stops the measurements  in *periodic mode*
+ * (periodic measurements) and the sensor returns in *single shot mode*
+ *
+ * @param dev       Device descriptor
+ * @return          `ESP_OK` on success
+ */
+esp_err_t sht3x_stop_periodic_measurement(sht3x_t *dev);
+
+/**
  * @brief Read measurement results from sensor as raw data
  *
  * The function read measurement results from the sensor, checks the CRC
