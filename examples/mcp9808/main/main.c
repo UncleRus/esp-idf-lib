@@ -25,7 +25,7 @@
 
 #define ADDR MCP9808_I2C_ADDR_000
 
-void task(void *pvParamters)
+void task(void *pvParameters)
 {
     float temperature;
     esp_err_t res;

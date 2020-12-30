@@ -3,7 +3,7 @@
  * @defgroup hd44780 hd44780
  * @{
  *
- * ESP-IDF driver for HD44780 compartible LCD text displays
+ * ESP-IDF driver for HD44780 compatible LCD text displays
  *
  * Ported from esp-open-rtos
  *

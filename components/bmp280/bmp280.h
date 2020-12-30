@@ -116,7 +116,7 @@ typedef struct {
 } bmp280_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param[out] dev Pointer to device descriptor
  * @param[in] addr BMP280 address
  * @param[in] port I2C port number
@@ -136,7 +136,7 @@ esp_err_t bmp280_free_desc(bmp280_t *dev);
 /**
  * Initialize default parameters.
  * Default configuration:
- *      mode: NORAML
+ *      mode: NORMAL
  *      filter: OFF
  *      oversampling: x4
  *      standby time: 250ms
@@ -173,7 +173,7 @@ esp_err_t bmp280_is_measuring(bmp280_t *dev, bool *busy);
  *  Pressure in Pascals in fixed point 24 bit integer 8 bit fraction format.
  *
  *  Humidity is optional and only read for the BME280, in percent relative
- *  humidity as a fixed point 22 bit interger and 10 bit fraction format.
+ *  humidity as a fixed point 22 bit integer and 10 bit fraction format.
  */
 esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature,
                             uint32_t *pressure, uint32_t *humidity);

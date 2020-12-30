@@ -17,7 +17,7 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-void pcf8591_test(void *pvParamters)
+void pcf8591_test(void *pvParameters)
 {
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));

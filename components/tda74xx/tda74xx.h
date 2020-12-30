@@ -126,7 +126,7 @@ esp_err_t tda74xx_get_volume(i2c_dev_t *dev, int8_t *volume_db);
 esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t gain_db);
 
 /**
- * Get equlizer gain
+ * Get equalizer gain
  * @param dev Device descriptor
  * @param band Band
  * @param[out] gain_db Gain, -14..14 dB in 2 dB step

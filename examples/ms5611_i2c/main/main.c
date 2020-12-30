@@ -20,7 +20,7 @@
 
 #define OVERSAMPLING_RATIO MS5611_OSR_1024
 
-void ms5611_test(void *pvParamters)
+void ms5611_test(void *pvParameters)
 {
     ms5611_t dev;
     memset(&dev, 0, sizeof(ms5611_t));

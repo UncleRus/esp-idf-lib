@@ -24,7 +24,7 @@ void test(void *pvParameters)
     memset(&dev, 0, sizeof(i2c_dev_t)); // Zero descriptor
 
     ESP_ERROR_CHECK(bh1750_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
-    ESP_ERROR_CHECK(bh1750_setup(&dev, BH1750_MODE_CONTINIOUS, BH1750_RES_HIGH));
+    ESP_ERROR_CHECK(bh1750_setup(&dev, BH1750_MODE_CONTINUOUS, BH1750_RES_HIGH));
 
     while (1)
     {

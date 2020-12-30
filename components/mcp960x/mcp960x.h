@@ -65,7 +65,7 @@ typedef enum {
 } mcp960x_burst_samples_t;
 
 /**
- * Operational mdoe
+ * Operational mode
  */
 typedef enum {
     MCP960X_MODE_NORMAL = 0, /**< default */
@@ -118,7 +118,7 @@ typedef enum {
 } mcp960x_alert_level_t;
 
 /**
- * Alert temperature directon
+ * Alert temperature direction
  */
 typedef enum {
     MCP960X_FALLING = 0, /**< Alert limit for falling or cooling temperatures */

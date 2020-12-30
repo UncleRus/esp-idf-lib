@@ -106,7 +106,7 @@ ESP_ERROR_CHECK(ads111x_init_desc(&dev, addr, I2C_PORT, SDA_GPIO, SCL_GPIO));
     dev.cfg.master.clk_speed = 100000; // Hz
 #endif
 
-ESP_ERROR_CHECK(ads111x_set_mode(&dev, ADS111X_MODE_CONTINUOS));    // Continuous conversion mode
+ESP_ERROR_CHECK(ads111x_set_mode(&dev, ADS111X_MODE_CONTINUOUS));    // Continuous conversion mode
 ESP_ERROR_CHECK(ads111x_set_data_rate(&dev, ADS111X_DATA_RATE_32)); // 32 samples per second
 ...
 ```

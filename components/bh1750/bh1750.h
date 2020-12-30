@@ -35,7 +35,7 @@ extern "C" {
 typedef enum
 {
     BH1750_MODE_ONE_TIME = 0, //!< One time measurement
-    BH1750_MODE_CONTINIOUS    //!< Continious measurement
+    BH1750_MODE_CONTINUOUS    //!< Continuous measurement
 } bh1750_mode_t;
 
 /**
@@ -49,7 +49,7 @@ typedef enum
 } bh1750_resolution_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param[out] dev Pointer to device descriptor
  * @param[in] addr I2C address, BH1750_ADDR_LO or BH1750_ADDR_HI
  * @param[in] port I2C port number

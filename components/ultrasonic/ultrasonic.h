@@ -45,7 +45,7 @@ esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev);
  * Measure distance
  * @param dev Pointer to the device descriptor
  * @param max_distance Maximal distance to measure, centimeters
- * @param distance Distance in centimeters or ULTRASONIC_ERROR_xxx if error occured
+ * @param distance Distance in centimeters or ULTRASONIC_ERROR_xxx if error occurred
  * @return `ESP_OK` on success
  */
 esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);

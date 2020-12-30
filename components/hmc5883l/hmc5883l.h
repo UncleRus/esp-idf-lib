@@ -117,7 +117,7 @@ typedef struct
 } hmc5883l_data_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param dev Pointer to device descriptor
  * @param port I2C port number
  * @param sda_gpio GPIO pin number for SDA

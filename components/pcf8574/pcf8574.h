@@ -3,7 +3,7 @@
  * @defgroup pcf8574 pcf8574
  * @{
  *
- * ESP-IDF driver for PCF8574 compartible remote 8-bit I/O expanders for I2C-bus
+ * ESP-IDF driver for PCF8574 compatible remote 8-bit I/O expanders for I2C-bus
  *
  * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
  *
@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * SCL frequency is 100kHz
  * @param dev Pointer to I2C device descriptor
  * @param port I2C port number

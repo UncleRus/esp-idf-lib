@@ -8,7 +8,7 @@
 #define TRIGGER_GPIO 17
 #define ECHO_GPIO 16
 
-void ultrasonic_test(void *pvParamters)
+void ultrasonic_test(void *pvParameters)
 {
     ultrasonic_sensor_t sensor = {
         .trigger_pin = TRIGGER_GPIO,

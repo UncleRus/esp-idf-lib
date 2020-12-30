@@ -56,7 +56,7 @@ static void measure(size_t n)
 }
 
 // Main task
-void ads111x_test(void *pvParamters)
+void ads111x_test(void *pvParameters)
 {
     gain_val = ads111x_gain_values[GAIN];
 
@@ -65,7 +65,7 @@ void ads111x_test(void *pvParamters)
     {
         ESP_ERROR_CHECK(ads111x_init_desc(&devices[i], addr[i], I2C_PORT, SDA_GPIO, SCL_GPIO));
 
-        ESP_ERROR_CHECK(ads111x_set_mode(&devices[i], ADS111X_MODE_CONTINUOS));    // Continuous conversion mode
+        ESP_ERROR_CHECK(ads111x_set_mode(&devices[i], ADS111X_MODE_CONTINUOUS));    // Continuous conversion mode
         ESP_ERROR_CHECK(ads111x_set_data_rate(&devices[i], ADS111X_DATA_RATE_32)); // 32 samples per second
         ESP_ERROR_CHECK(ads111x_set_input_mux(&devices[i], ADS111X_MUX_0_GND));    // positive = AIN0, negative = GND
         ESP_ERROR_CHECK(ads111x_set_gain(&devices[i], GAIN));

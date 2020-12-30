@@ -22,14 +22,14 @@ static const char *TAG = "TSL2591";
 #define TSL2591_REG_COMMAND 0x80
 #define TSL2591_REG_ENABLE  0x00
 #define TSL2591_REG_CONTROL 0x01
-#define TSL2591_REG_AILTL   0x04    // ALS interrupt low treshold low byte
-#define TSL2591_REG_AILTH   0x05    // ALS interrupt low treshold high byte
-#define TSL2591_REG_AIHTL   0x06    // ALS interrupt high treshold low byte
-#define TSL2591_REG_AIHTH   0x07    // ALS interrupt high treshold high byte
-#define TSL2591_REG_NPAILTL 0x08    // No ALS persist interrupt low treshold low byte
-#define TSL2591_REG_NPAILTH 0x09    // No ALS persist interrupt low treshold high byte
-#define TSL2591_REG_NPAIHTL 0x0A    // No ALS persist interrupt high treshold low byte
-#define TSL2591_REG_NPAIHTH 0x0B    // No ALS persist interrupt high treshold high byte
+#define TSL2591_REG_AILTL   0x04    // ALS interrupt low threshold low byte
+#define TSL2591_REG_AILTH   0x05    // ALS interrupt low threshold high byte
+#define TSL2591_REG_AIHTL   0x06    // ALS interrupt high threshold low byte
+#define TSL2591_REG_AIHTH   0x07    // ALS interrupt high threshold high byte
+#define TSL2591_REG_NPAILTL 0x08    // No ALS persist interrupt low threshold low byte
+#define TSL2591_REG_NPAILTH 0x09    // No ALS persist interrupt low threshold high byte
+#define TSL2591_REG_NPAIHTL 0x0A    // No ALS persist interrupt high threshold low byte
+#define TSL2591_REG_NPAIHTH 0x0B    // No ALS persist interrupt high threshold high byte
 #define TSL2591_REG_PERSIST 0x0C    // Interrupt persistence filter
 #define TSL2591_REG_C0DATAL 0x14
 #define TSL2591_REG_C0DATAH 0x15
@@ -45,7 +45,7 @@ static const char *TAG = "TSL2591";
 #define TSL2591_SPECIAL_SET_INTR        0x04    // Forces interrupt
 #define TSL2591_SPECIAL_CLEAR_INTR      0x06    // Clear ALS interrupt
 #define TSL2591_SPECIAL_CLEAR_BOTH      0x07    // Clear ALS and no persist ALS interrupt
-#define TSL2591_SEPCIAL_CLEAR_NP_INTR   0x0A    // Clear no persist ALS interrupt
+#define TSL2591_SPECIAL_CLEAR_NP_INTR   0x0A    // Clear no persist ALS interrupt
 
 // TSL2591 integration times in useconds.
 #define TSL2591_INTEGRATION_TIME_100MS  110
@@ -559,7 +559,7 @@ esp_err_t tsl2591_clear_als_np_intr(tsl2591_t *dev)
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     I2C_DEV_CHECK(&dev->i2c_dev,
-        write_special_function(dev, TSL2591_SEPCIAL_CLEAR_NP_INTR));
+        write_special_function(dev, TSL2591_SPECIAL_CLEAR_NP_INTR));
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 

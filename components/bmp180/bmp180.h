@@ -61,7 +61,7 @@ typedef enum
 
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  *
  * @param[out] dev Pointer to device descriptor
  * @param port I2C port number
