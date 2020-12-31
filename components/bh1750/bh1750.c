@@ -100,7 +100,7 @@ esp_err_t bh1750_setup(i2c_dev_t *dev, bh1750_mode_t mode, bh1750_resolution_t r
 {
     CHECK_ARG(dev);
 
-    uint8_t opcode = mode == BH1750_MODE_CONTINIOUS ? OPCODE_CONT : OPCODE_OT;
+    uint8_t opcode = mode == BH1750_MODE_CONTINUOUS ? OPCODE_CONT : OPCODE_OT;
     switch (resolution)
     {
         case BH1750_RES_LOW:  opcode |= OPCODE_LOW;   break;

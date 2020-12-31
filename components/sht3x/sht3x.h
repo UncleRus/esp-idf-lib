@@ -69,7 +69,7 @@ typedef struct
 } sht3x_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  *
  * @param dev       Device descriptor
  * @param port      I2C port
@@ -139,7 +139,7 @@ esp_err_t sht3x_measure(sht3x_t *dev, float *temperature, float *humidity);
  * the measurement results can be fetched.
  *
  * Please note: The duration only depends on repeatability level. Therefore,
- * it can be considered as constant for a repeatibility.
+ * it can be considered as constant for a repeatability.
  *
  * @param repeat    Repeatability, see type *sht3x_repeat_t*
  * @return          Measurement duration given in RTOS ticks
@@ -151,7 +151,7 @@ uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
  *
  * The function starts the measurement either in *single shot mode*
  * (exactly one measurement) or *periodic mode* (periodic measurements)
- * with given repeatabilty.
+ * with given repeatability.
  *
  * In the *single shot mode*, this function has to be called for each
  * measurement. The measurement duration has to be waited every time
@@ -173,6 +173,17 @@ uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
  * @return          `ESP_OK` on success
  */
 esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_t repeat);
+
+/**
+ * @brief Stop the periodic mode measurements
+ *
+ * The function stops the measurements  in *periodic mode*
+ * (periodic measurements) and the sensor returns in *single shot mode*
+ *
+ * @param dev       Device descriptor
+ * @return          `ESP_OK` on success
+ */
+esp_err_t sht3x_stop_periodic_measurement(sht3x_t *dev);
 
 /**
  * @brief Read measurement results from sensor as raw data

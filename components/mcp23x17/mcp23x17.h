@@ -75,7 +75,7 @@ typedef enum
 #ifdef CONFIG_MCP23X17_IFACE_I2C
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * SCL frequency is 1MHz
  * @param dev Pointer to device descriptor
  * @param port I2C port number

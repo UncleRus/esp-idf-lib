@@ -53,7 +53,7 @@ typedef enum
 } mcp23008_gpio_intr_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * SCL frequency is 1MHz
  * @param dev Pointer to I2C device descriptor
  * @param port I2C port number

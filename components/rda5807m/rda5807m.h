@@ -275,7 +275,7 @@ esp_err_t rda5807m_set_afc(rda5807m_t *dev, bool afc);
  * @param up Seeking direction: true - up, false - down
  * @param wrap If true, wrap at the upper or lower band limit and
  *             continue seeking, else stop seeking at bounds
- * @param threshold Seeking SNR treshold, 0..`RDA5807M_SEEK_TH_MAX`.
+ * @param threshold Seeking SNR threshold, 0..`RDA5807M_SEEK_TH_MAX`.
  *                  Usually it's `RDA5807M_SEEK_TH_DEF`
  * @return `ESP_OK` on success
  */

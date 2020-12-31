@@ -31,12 +31,12 @@ extern "C" {
 typedef enum {
     PCF8591_IC_4_SINGLES = 0,   //!< Four single-ended inputs
     PCF8591_IC_DIFF,            //!< Three differential inputs
-    PCF8591_IC_2_SINGLES_DIFF,  //!< Two single-ended and differnetial mixed
+    PCF8591_IC_2_SINGLES_DIFF,  //!< Two single-ended and differential mixed
     PCF8591_IC_2_DIFFS          //!< Two differential inputs
 } pcf8591_input_conf_t;
 
 /**
- * Initialize device descriptior
+ * Initialize device descriptor
  * @param dev Device descriptor
  * @param addr I2C device address
  * @param port I2C port number

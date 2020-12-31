@@ -35,7 +35,7 @@ void test(void *pvParameters)
 
     // Setup PORTB0 as output
     mcp23x17_set_mode(&dev, 8, MCP23X17_GPIO_OUTPUT);
-    // do some blinkning
+    // do some blinking
     bool on = true;
     while (1)
     {

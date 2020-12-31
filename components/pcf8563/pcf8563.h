@@ -48,10 +48,10 @@ typedef enum {
  * Flags to setup alarm
  */
 typedef enum {
-    PCF8563_ALARM_MATCH_MIN     = 0x01, //!< Alaram when minute matched
-    PCF8563_ALARM_MATCH_HOUR    = 0x02, //!< Alaram when hour matched
-    PCF8563_ALARM_MATCH_DAY     = 0x04, //!< Alaram when day matched
-    PCF8563_ALARM_MATCH_WEEKDAY = 0x08  //!< Alaram when weekday matched
+    PCF8563_ALARM_MATCH_MIN     = 0x01, //!< Alarm when minute matched
+    PCF8563_ALARM_MATCH_HOUR    = 0x02, //!< Alarm when hour matched
+    PCF8563_ALARM_MATCH_DAY     = 0x04, //!< Alarm when day matched
+    PCF8563_ALARM_MATCH_WEEKDAY = 0x08  //!< Alarm when weekday matched
 } pcf8563_alarm_flags_t;
 
 /**
@@ -155,7 +155,7 @@ esp_err_t pcf8563_stop_timer(i2c_dev_t *dev);
 /**
  * @brief Get state of the timer flag
  * @param dev I2C device descriptor
- * @param timer true when flasg is set
+ * @param timer true when flag is set
  * @return `ESP_OK` on success
  */
 esp_err_t pcf8563_get_timer_flag(i2c_dev_t *dev, bool *timer);
@@ -171,7 +171,7 @@ esp_err_t pcf8563_clear_timer_flag(i2c_dev_t *dev);
  * @brief Setup alarm
  * @param dev I2C device descriptor
  * @param int_enable true to enable alarm interrupt
- * @param flags Alaram types, combination of pcf8563_alarm_flags_t values
+ * @param flags Alarm types, combination of pcf8563_alarm_flags_t values
  * @param time Alarm time. Only tm_min, tm_hour, tm_mday and tm_wday are used
  * @return `ESP_OK` on success
  */
@@ -180,7 +180,7 @@ esp_err_t pcf8563_set_alarm(i2c_dev_t *dev, bool int_enable, uint32_t flags, str
 /**
  * @brief Get alarm settings
  * @param dev I2C device descriptor
- * @param[out] int_enabled true if alaram interrupt is enabled
+ * @param[out] int_enabled true if alarm interrupt is enabled
  * @param[out] flags Selected alarm types, combination of pcf8563_alarm_flags_t values
  * @param[out] time Alarm time. Only tm_min, tm_hour, tm_mday and tm_wday are used
  * @return `ESP_OK` on success
@@ -190,7 +190,7 @@ esp_err_t pcf8563_get_alarm(i2c_dev_t *dev, bool *int_enabled, uint32_t *flags, 
 /**
  * @brief Get alarm flag
  * @param dev I2C device descriptor
- * @param[out] alarm true if alarm occured
+ * @param[out] alarm true if alarm occurred
  * @return `ESP_OK` on success
  */
 esp_err_t pcf8563_get_alarm_flag(i2c_dev_t *dev, bool *alarm);

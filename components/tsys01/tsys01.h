@@ -90,7 +90,7 @@ esp_err_t tsys01_start(tsys01_t *dev);
 esp_err_t tsys01_get_temp(tsys01_t *dev, uint32_t *raw, float *t);
 
 /**
- * @brief Perform temperature convertion
+ * @brief Perform temperature conversion
  *
  * This function starts temperature conversion,
  * waits 10 ms and reads result.

@@ -116,7 +116,7 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time);
  * and you can set both alarms at the same time (pass `DS3231_ALARM_1`/`DS3231_ALARM_2`/`DS3231_ALARM_BOTH`).
  *
  * If only setting one alarm just pass 0 for `tm` struct and `option` field for the other alarm.
- * If using `DS3231_ALARM1_EVERY_SECOND`/`DS3231_ALARM2_EVERY_MIN` you can pass 0 for `tm` stuct.
+ * If using `DS3231_ALARM1_EVERY_SECOND`/`DS3231_ALARM2_EVERY_MIN` you can pass 0 for `tm` struct.
  *
  * If you want to enable interrupts for the alarms you need to do that separately.
  *

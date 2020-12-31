@@ -64,7 +64,7 @@ typedef struct
 } tsl2561_t;
 
 /**
- * Initialize device descriptior
+ * Initialize device descriptor
  * @param dev Device descriptor
  * @param addr I2C device address, `TSL2561_I2C_ADDR_...` const
  * @param port I2C port

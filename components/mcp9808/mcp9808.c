@@ -153,14 +153,14 @@ esp_err_t mcp9808_init(i2c_dev_t *dev)
     CHECK(read_reg_16(dev, REG_MANUF, &v));
     if (v != MANUFACTURER_ID)
     {
-        ESP_LOGE(TAG, "Inavlid manufacturer ID 0x%04x", v);
+        ESP_LOGE(TAG, "Invalid manufacturer ID 0x%04x", v);
         return ESP_ERR_INVALID_RESPONSE;
     }
 
     CHECK(read_reg_16(dev, REG_ID, &v));
     if ((v >> 8) != DEVICE_ID)
     {
-        ESP_LOGE(TAG, "Inavlid device ID 0x%02x", v);
+        ESP_LOGE(TAG, "Invalid device ID 0x%02x", v);
         return ESP_ERR_INVALID_RESPONSE;
     }
     ESP_LOGD(TAG, "Device revision: 0x%02x", v & 0xff);

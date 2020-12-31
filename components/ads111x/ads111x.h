@@ -95,7 +95,7 @@ typedef enum
  */
 typedef enum
 {
-    ADS111X_MODE_CONTINUOS = 0, //!< Continuous conversion mode
+    ADS111X_MODE_CONTINUOUS = 0, //!< Continuous conversion mode
     ADS111X_MODE_SINGLE_SHOT    //!< Power-down single-shot mode (default)
 } ads111x_mode_t;
 
@@ -138,7 +138,7 @@ typedef enum
 } ads111x_comp_queue_t;
 
 /**
- * Initialize device descriptior
+ * Initialize device descriptor
  * @param dev Device descriptor
  * @param addr Device address
  * @param port I2C port number

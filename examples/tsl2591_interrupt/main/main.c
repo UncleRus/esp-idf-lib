@@ -32,7 +32,7 @@ static xQueueHandle isr_evt_queue = NULL;
 
 static void IRAM_ATTR isr_handler(void *arg)
 {
-    // Be carfull to pass a address to a  pointer.
+    // Be careful to pass a address to a  pointer.
     xQueueSendFromISR(isr_evt_queue, &arg, NULL);
 }
 
@@ -75,10 +75,10 @@ static void isr_task(void *arg)
     }
 }
 
-void tsl2591_task(void *pvParamters)
+void tsl2591_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "tsl2591 task started.");
-    tsl2591_t *dev = (tsl2591_t*) pvParamters;
+    tsl2591_t *dev = (tsl2591_t*) pvParameters;
     uint16_t channel0, channel1;
     float lux;
 
@@ -100,7 +100,7 @@ void app_main()
     // i2cdev initialisation
     ESP_ERROR_CHECK(i2cdev_init());
 
-    // tsl2591 intialisation
+    // tsl2591 initialisation
     tsl2591_t* dev = malloc(sizeof(tsl2591_t));
     memset(dev, 0, sizeof(tsl2591_t));
 

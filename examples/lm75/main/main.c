@@ -37,7 +37,7 @@
 
 static const char *TAG = "lm75_example";
 
-void lm75_task(void *pvParamters)
+void lm75_task(void *pvParameters)
 {
     uint8_t v;
     int shutdown = 0;
@@ -88,21 +88,21 @@ void lm75_task(void *pvParamters)
     ESP_LOGI(TAG, "Read Overtemperature Shutdown temperature");
     ESP_ERROR_CHECK(lm75_get_os_threshold(&dev, &os_temperature_in_reg));
     if (os_temperature_in_reg != os_temperature) {
-        ESP_LOGE(TAG, "invalid OS temperature fonud: %.3f", os_temperature_in_reg);
+        ESP_LOGE(TAG, "invalid OS temperature found: %.3f", os_temperature_in_reg);
     }
 
-    ESP_LOGI(TAG, "Set OS polarlity to LM75_OSP_HIGH");
+    ESP_LOGI(TAG, "Set OS polarity to LM75_OSP_HIGH");
     ESP_ERROR_CHECK(lm75_set_os_polarity(&dev, LM75_OSP_HIGH));
     ESP_ERROR_CHECK(lm75_get_os_polarity(&dev, &v));
     if (v != LM75_OSP_HIGH) {
-        ESP_LOGE(TAG, "polarlity is not LM75_OSP_HIGH");
+        ESP_LOGE(TAG, "polarity is not LM75_OSP_HIGH");
     }
 
-    ESP_LOGI(TAG, "Set OS polarlity to LM75_OSP_LOW");
+    ESP_LOGI(TAG, "Set OS polarity to LM75_OSP_LOW");
     ESP_ERROR_CHECK(lm75_set_os_polarity(&dev, LM75_OSP_LOW));
     ESP_ERROR_CHECK(lm75_get_os_polarity(&dev, &v));
     if (v != LM75_OSP_LOW) {
-        ESP_LOGE(TAG, "polarlity is not LM75_OSP_LOW");
+        ESP_LOGE(TAG, "polarity is not LM75_OSP_LOW");
     }
 
     ESP_LOGI(TAG, "Starting the loop");

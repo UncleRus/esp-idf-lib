@@ -71,7 +71,7 @@ bool onewire_reset(gpio_num_t pin);
  * @param[in] pin   The GPIO pin connected to the 1-Wire bus.
  * @param[in] addr  The ROM address of the device to select
  *
- * @return `true` if the "ROM select" command could be succesfully issued,
+ * @return `true` if the "ROM select" command could be successfully issued,
  *         `false` if there was an error.
  */
 bool onewire_select(gpio_num_t pin, const onewire_addr_t addr);
@@ -83,7 +83,7 @@ bool onewire_select(gpio_num_t pin, const onewire_addr_t addr);
  *
  * @param[in] pin   The GPIO pin connected to the 1-Wire bus.
  *
- * @return `true` if the "skip ROM" command could be succesfully issued,
+ * @return `true` if the "skip ROM" command could be successfully issued,
  *         `false` if there was an error.
  */
 bool onewire_skip_rom(gpio_num_t pin);

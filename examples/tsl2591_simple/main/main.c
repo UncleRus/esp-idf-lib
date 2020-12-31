@@ -17,7 +17,7 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-void tsl2591_test(void *pvParamters)
+void tsl2591_test(void *pvParameters)
 {
     tsl2591_t dev;
     memset(&dev, 0, sizeof(tsl2591_t));

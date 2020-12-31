@@ -82,7 +82,7 @@ esp_err_t lm75_read_temperature(i2c_dev_t *dev, float *value)
 
     I2C_DEV_TAKE_MUTEX(dev);
     CHECK_LOGE(dev, read_register16(dev, LM75_REG_TEMP, &raw_data),
-            "lm75_read_temperature(): read_register16() failed: regsiter: 0x%x", LM75_REG_TEMP);
+            "lm75_read_temperature(): read_register16() failed: register: 0x%x", LM75_REG_TEMP);
     I2C_DEV_GIVE_MUTEX(dev);
 
     *value = (raw_data >> 5) * 0.125;
@@ -144,7 +144,7 @@ esp_err_t lm75_get_os_threshold(i2c_dev_t *dev, float *value)
 
     I2C_DEV_TAKE_MUTEX(dev);
     CHECK_LOGE(dev, read_register16(dev, LM75_REG_TOS, &reg_value),
-            "lm75_get_os_threshold(): read_register16() failed: regsiter: 0x%x", LM75_REG_TOS);
+            "lm75_get_os_threshold(): read_register16() failed: register: 0x%x", LM75_REG_TOS);
     I2C_DEV_GIVE_MUTEX(dev);
 
     ESP_LOGV(TAG, "lm75_get_os_threshold(): reg_value: 0x%x 9 bit reg_value: 0x%x", reg_value, reg_value >> 7);
@@ -205,7 +205,7 @@ esp_err_t lm75_clear_bits_register8(i2c_dev_t *dev, uint8_t reg, uint8_t mask)
         value ^= mask;
         ESP_LOGV(TAG, "lm75_clear_bits_register8(): updating register with value: 0x%x", value);
         CHECK_LOGE(dev, write_register8(dev, reg, value),
-                "write_register8() failed: regsiter 0x%x", reg);
+                "write_register8() failed: register 0x%x", reg);
     } else {
         ESP_LOGV(TAG, "lm75_clear_bits_register8(): register unchanged");
     }

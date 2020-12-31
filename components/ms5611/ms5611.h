@@ -3,7 +3,7 @@
  * @defgroup ms5611 ms5611
  * @{
  *
- * ESP-IDF driver for barometic pressure sensor MS5611-01BA03
+ * ESP-IDF driver for barometric pressure sensor MS5611-01BA03
  *
  * Ported from esp-open-rtos
  *
@@ -46,7 +46,7 @@ typedef struct
     uint16_t sens;       //!< C1 Pressure sensitivity                             | SENS_t1
     uint16_t off;        //!< C2 Pressure offset                                  | OFF_t1
     uint16_t tcs;        //!< C3 Temperature coefficient of pressure sensitivity  | TCS
-    uint16_t tco;        //!< C4 Temperature coefficient of pressuer offset       | TCO
+    uint16_t tco;        //!< C4 Temperature coefficient of pressure offset       | TCO
     uint16_t t_ref;      //!< C5 Reference temperature                            | T_ref
     uint16_t tempsens;   //!< C6 Temperature coefficient of the temperature       | TEMPSENSE
 } ms5611_config_data_t;
@@ -58,11 +58,11 @@ typedef struct
 {
     i2c_dev_t i2c_dev;                //!< I2C device settings
     ms5611_osr_t osr;                 //!< Oversampling setting
-    ms5611_config_data_t config_data; //!< Device configuration, filled upon initalize
+    ms5611_config_data_t config_data; //!< Device configuration, filled upon initialize
 } ms5611_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param dev Device descriptor
  * @param addr I2C address, `MS5611_ADDR_CSB_HIGH` or `MS5611_ADDR_CSB_LOW`
  * @param port I2C port

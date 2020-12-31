@@ -55,7 +55,7 @@ static esp_err_t bmp180_read_reg_16(i2c_dev_t *dev, uint8_t reg, int16_t *r)
     return ESP_OK;
 }
 
-static inline esp_err_t bmp180_start_messurement(i2c_dev_t *dev, uint8_t cmd)
+static inline esp_err_t bmp180_start_measurement(i2c_dev_t *dev, uint8_t cmd)
 {
     return i2c_dev_write_reg(dev, BMP180_CONTROL_REG, &cmd, 1);
 }
@@ -63,7 +63,7 @@ static inline esp_err_t bmp180_start_messurement(i2c_dev_t *dev, uint8_t cmd)
 static esp_err_t bmp180_get_uncompensated_temperature(i2c_dev_t *dev, int32_t *ut)
 {
     // Write Start Code into reg 0xF4.
-    CHECK(bmp180_start_messurement(dev, BMP180_MEASURE_TEMP));
+    CHECK(bmp180_start_measurement(dev, BMP180_MEASURE_TEMP));
 
     // Wait 5ms, datasheet states 4.5ms
     ets_delay_us(5000);
@@ -89,7 +89,7 @@ static esp_err_t bmp180_get_uncompensated_pressure(i2c_dev_t *dev, bmp180_mode_t
     }
 
     // Write Start Code into reg 0xF4
-    CHECK(bmp180_start_messurement(dev, BMP180_MEASURE_PRESS | (oss << 6)));
+    CHECK(bmp180_start_measurement(dev, BMP180_MEASURE_PRESS | (oss << 6)));
 
     ets_delay_us(us);
 
