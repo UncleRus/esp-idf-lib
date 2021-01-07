@@ -1,3 +1,5 @@
+.. _bme680:
+
 bme680 - Driver for BME680 digital environmental sensor
 =======================================================
 

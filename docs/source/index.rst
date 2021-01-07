@@ -194,5 +194,6 @@ Other
 Indices and tables
 ==================
 
+* :ref:`chips`
 * :ref:`genindex`
 * :ref:`search`
