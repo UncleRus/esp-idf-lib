@@ -109,6 +109,8 @@ static esp_err_t send_cmd(sht3x_t *dev, uint16_t cmd)
 
 static esp_err_t start_nolock(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_t repeat)
 {
+    dev->mode = mode;
+    dev->repeatability = repeat;
     CHECK(send_cmd_nolock(dev, SHT3X_MEASURE_CMD[mode][repeat]));
     dev->meas_start_time = esp_timer_get_time();
     dev->meas_started = true;
