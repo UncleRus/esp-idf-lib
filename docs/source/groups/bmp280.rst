@@ -1,3 +1,5 @@
+.. _bmp280:
+
 bmp280 - Driver for BMP280/BME280 digital pressure sensor
 =========================================================
 

@@ -3,7 +3,7 @@
  * @defgroup tsl4531 tsl4531
  * @{
  *
- * ESP-IDF driver for I2C 16 bit GPIO expander MCP23017
+ * ESP-IDF driver for digital ambient light sensor TSL4531
  *
  * Ported from esp-open-rtos
  *

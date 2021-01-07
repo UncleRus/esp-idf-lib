@@ -1,3 +1,5 @@
+.. _pcf8563:
+
 pcf8563 - Driver for PCF8563 real-time clock/calendar
 =====================================================
 
