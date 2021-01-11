@@ -6,13 +6,12 @@
 #define LED_TYPE LED_STRIP_WS2812
 #define LED_GPIO 5
 #define LED_CHANNEL RMT_CHANNEL_0
-#define LED_STRIP_LEN 256
 
 static const rgb_t colors[] = {
-    { .raw = { 0xff, 0xff, 0xff } },
-    { .raw = { 0x00, 0x00, 0xff } },
-    { .raw = { 0x00, 0xff, 0x00 } },
-    { .raw = { 0xff, 0x00, 0x00 } },
+    { .raw = { 0x0f, 0x0f, 0x0f } },
+    { .raw = { 0x00, 0x00, 0x2f } },
+    { .raw = { 0x00, 0x2f, 0x00 } },
+    { .raw = { 0x2f, 0x00, 0x00 } },
     { .raw = { 0x00, 0x00, 0x00 } },
 };
 
@@ -22,7 +21,7 @@ void test(void *pvParameters)
 {
     led_strip_t strip = {
         .type = LED_TYPE,
-        .length = LED_STRIP_LEN,
+        .length = CONFIG_LED_STRIP_LEN,
         .gpio = LED_GPIO,
         .channel = LED_CHANNEL,
         .buf = NULL

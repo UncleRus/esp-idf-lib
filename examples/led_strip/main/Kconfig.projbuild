@@ -1,0 +1,6 @@
+menu "Example configuration"
+
+config LED_STRIP_LEN
+    int "Number of LED pixel"
+    default 8
+endmenu
