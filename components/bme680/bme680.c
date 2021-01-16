@@ -265,7 +265,7 @@ static esp_err_t bme680_get_raw_data(bme680_t *dev, bme680_raw_data_t *raw_data)
 
     if (!(dev->meas_status & BME680_NEW_DATA_BITS))
     {
-        // read maesurment status from sensor
+        // read measurement status from sensor
         CHECK(read_reg_8(dev, BME680_REG_MEAS_STATUS_0, &dev->meas_status));
         // test whether there are new data
         if (!(dev->meas_status & BME680_NEW_DATA_BITS))
