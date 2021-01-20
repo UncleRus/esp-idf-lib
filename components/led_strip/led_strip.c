@@ -281,7 +281,7 @@ esp_err_t led_strip_fill(led_strip_t *strip, size_t start, size_t len, rgb_t col
 {
     CHECK_ARG(strip && strip->buf && len && start + len <= strip->length);
 
-    for (size_t i = start; i < len; i++)
+    for (size_t i = start; i < start + len; i++)
         CHECK(led_strip_set_pixel(strip, i, color));
     return ESP_OK;
 }
