@@ -17,6 +17,7 @@
 #include <driver/spi_master.h>
 #include <esp_err.h>
 #include <led_effect.h>
+#include <esp_idf_lib_helpers.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +62,12 @@ typedef struct
 #define LED_STRIP_SPI3_SCLK_IO_NUM (18)
 #define LED_STRIP_SPI3_MOSI_IO_NUM (23)
 
+#if defined(HELPER_TARGET_IS_ESP32) && HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
+#define LED_STRIP_DEFAULT_SPI_HOST  HSPI_HOST
+#else
+#define LED_STRIP_DEFAULT_SPI_HOST  SPI2_HOST
+#endif
+
 #define LED_STRIP_SPI_DEFAULT() \
 {                                                       \
     .length = 1,                                        \
@@ -82,7 +89,7 @@ typedef struct
         .address_bits = 0,                              \
         .dummy_bits = 0,                                \
     },                                                  \
-    .host_device = SPI2_HOST,                           \
+    .host_device = LED_STRIP_DEFAULT_SPI_HOST,          \
     .device_handle = NULL,                              /* must be provided by the caller */ \
     .dma_chan = 1,                                      \
 }
