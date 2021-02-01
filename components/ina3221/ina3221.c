@@ -14,7 +14,7 @@
 #include <esp_idf_lib_helpers.h>
 #include "ina3221.h"
 
-static const char *TAG = "INA3221";
+static const char *TAG = "ina3221";
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf, but device supports up to 2.44Mhz
 

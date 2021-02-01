@@ -16,7 +16,7 @@
 #include <esp_idf_lib_helpers.h>
 #include "pcf8591.h"
 
-static const char *TAG = "PCF8591";
+static const char *TAG = "pcf8591";
 
 #define I2C_FREQ_HZ 100000
 

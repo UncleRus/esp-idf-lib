@@ -56,7 +56,7 @@
 #define CHECK_ARG_LOGE(VAL, msg, ...) do { if (!(VAL)) { ESP_LOGE(TAG, msg, ## __VA_ARGS__); return ESP_ERR_INVALID_ARG; } } while (0)
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 
-static const char *TAG = "PCA9685";
+static const char *TAG = "pca9685";
 
 inline static uint32_t round_div(uint32_t x, uint32_t y)
 {

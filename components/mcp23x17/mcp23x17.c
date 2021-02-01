@@ -13,7 +13,7 @@
 #include <esp_idf_lib_helpers.h>
 #include "mcp23x17.h"
 
-static const char *TAG = "MCP23x17";
+static const char *TAG = "mcp23x17";
 
 #define I2C_FREQ_HZ 1000000  // Max 1MHz for esp-idf, but device supports up to 1.7Mhz
 

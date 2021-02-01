@@ -20,7 +20,7 @@
 
 #define I2C_FREQ_HZ 1000000 // 1MHz
 
-const char *TAG = "SHT3x";
+const char *TAG = "sht3x";
 
 #define SHT3X_STATUS_CMD               0xF32D
 #define SHT3X_CLEAR_STATUS_CMD         0x3041

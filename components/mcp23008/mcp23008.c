@@ -32,7 +32,7 @@
 #define BIT_IOCON_DISSLW 4
 #define BIT_IOCON_SREAD  5
 
-static const char *TAG = "MCP23008";
+static const char *TAG = "mcp23008";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)

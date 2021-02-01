@@ -14,7 +14,7 @@
 #include <esp_idf_lib_helpers.h>
 #include "mcp4725.h"
 
-static const char *TAG = "MCP4725";
+static const char *TAG = "mcp4725";
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf, but device supports up to 3.4Mhz
 

@@ -17,7 +17,7 @@
 
 #define I2C_FREQ_HZ 400000
 
-static const char *TAG = "SGP40";
+static const char *TAG = "sgp40";
 
 #define CMD_SOFT_RESET  0x0600 // 00 06
 #define CMD_FEATURESET  0x2f20 // 20 2f

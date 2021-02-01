@@ -13,7 +13,7 @@
 #include <math.h>
 #include <esp_log.h>
 
-static const char *TAG = "MCP9808";
+static const char *TAG = "mcp9808";
 
 #define I2C_FREQ_HZ 400000 // 400 kHz
 

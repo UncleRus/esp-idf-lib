@@ -16,7 +16,7 @@
 
 #include "max7219_priv.h"
 
-static const char *TAG = "MAX7219";
+static const char *TAG = "max7219";
 
 #define CLOCK_SPEED_HZ (10000000) // 10 MHz
 

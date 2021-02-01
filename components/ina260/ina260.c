@@ -16,7 +16,7 @@
 
 #define I2C_FREQ_HZ 400000 // no more than 400 kHz, otherwise enabling HS mode on the chip is required
 
-static const char *TAG = "INA260";
+static const char *TAG = "ina260";
 
 #define REG_CONFIG      0
 #define REG_CURRENT     1
