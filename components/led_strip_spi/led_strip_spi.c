@@ -13,7 +13,6 @@
 #include <esp_log.h>
 #include <esp_attr.h>
 #include <esp_heap_caps.h>
-#include <driver/spi_master.h>
 #include <esp_idf_lib_helpers.h>
 #include "led_strip_spi.h"
 
@@ -21,8 +20,10 @@
 #include "led_strip_spi_sk9822.h"
 #endif
 
-#if HELPER_TARGET_IS_ESP8266
-#error led_strip_spi is not (yet) supported on ESP8266
+#if HELPER_TARGET_IS_ESP32
+#include <driver/spi_master.h>
+#elif HELPER_TARGET_IS_ESP8266
+#include <driver/spi.h>
 #endif
 
 static const char *TAG = "led_strip_spi";
@@ -35,14 +36,15 @@ void led_strip_spi_install()
     /* NOOP, for compatibility */
 }
 
-esp_err_t led_strip_spi_init(led_strip_spi_t *strip)
+#if HELPER_TARGET_IS_ESP32
+static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
 {
-    esp_err_t r = ESP_FAIL;
+    esp_err_t err = ESP_FAIL;
 
     strip->buf = heap_caps_malloc(LED_STRIP_SPI_BUFFER_SIZE(strip->length), MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
     if (strip->buf == NULL) {
         ESP_LOGE(TAG, "heap_caps_malloc()");
-        r = ESP_ERR_NO_MEM;
+        err = ESP_ERR_NO_MEM;
         goto fail;
     }
     memset(strip->buf, 0, LED_STRIP_SPI_BUFFER_SIZE(strip->length));
@@ -63,9 +65,58 @@ esp_err_t led_strip_spi_init(led_strip_spi_t *strip)
     ESP_LOGI(TAG, "LED strip initialized");
 
     /* turn off all LEDs */
-    r = led_strip_spi_flush(strip);
+    err = led_strip_spi_flush(strip);
 fail:
-    return r;
+    return err;
+}
+#endif
+
+#if HELPER_TARGET_IS_ESP8266
+static esp_err_t led_strip_spi_init_esp8266(led_strip_spi_t *strip)
+{
+    esp_err_t err;
+    spi_config_t spi_config;
+
+    strip->buf = malloc(LED_STRIP_SPI_BUFFER_SIZE(strip->length));
+    if (strip->buf == NULL) {
+        ESP_LOGE(TAG, "malloc()");
+        err = ESP_ERR_NO_MEM;
+        goto fail;
+    }
+    memset(strip->buf, 0, LED_STRIP_SPI_BUFFER_SIZE(strip->length));
+
+    /* set mandatory bits in all LED frames */
+    for (int i = 1; i <= strip->length; i++) {
+        ((uint8_t *)strip->buf)[i * 4] = LED_STRIP_SPI_FRAME_SK9822_LED_MSB3;
+    }
+    ESP_LOGI(TAG, "SPI buffer initialized");
+
+    spi_config.interface = strip->bus_config;
+    spi_config.mode = SPI_MASTER_MODE;
+    spi_config.clk_div = strip->clk_div;
+    spi_config.event_cb = NULL;
+    err = spi_init(strip->host_device, &spi_config);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "spi_init(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    ESP_LOGI(TAG, "SPI bus initialized");
+    ESP_LOGI(TAG, "LED strip initialized");
+    err = led_strip_spi_flush(strip);
+fail:
+    return err;
+}
+#endif
+
+esp_err_t led_strip_spi_init(led_strip_spi_t *strip)
+{
+#if HELPER_TARGET_IS_ESP32
+    return led_strip_spi_init_esp32(strip);
+#elif HELPER_TARGET_IS_ESP8266
+    return led_strip_spi_init_esp8266(strip);
+#else
+#error "Unknown target"
+#endif
 }
 
 esp_err_t led_strip_spi_free(led_strip_spi_t *strip)
@@ -76,9 +127,10 @@ esp_err_t led_strip_spi_free(led_strip_spi_t *strip)
     return ESP_OK;
 }
 
-esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
+#if HELPER_TARGET_IS_ESP32
+static esp_err_t led_strip_spi_flush_esp32(led_strip_spi_t *strip)
 {
-    esp_err_t r = ESP_FAIL;
+    esp_err_t err = ESP_FAIL;
     spi_transaction_t* t;
 
     CHECK_ARG(strip);
@@ -86,19 +138,49 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
         strip->transaction.tx_buffer = strip->buf;
     }
     strip->transaction.tx_buffer = strip->buf;
-    r = spi_device_queue_trans(strip->device_handle, &strip->transaction, portMAX_DELAY);
-    if (r != ESP_OK) {
-        ESP_LOGE(TAG, "spi_device_queue_trans(): %s", esp_err_to_name(r));
+    err = spi_device_queue_trans(strip->device_handle, &strip->transaction, portMAX_DELAY);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "spi_device_queue_trans(): %s", esp_err_to_name(err));
         goto fail;
     }
-    r = spi_device_get_trans_result(strip->device_handle, &t, portMAX_DELAY);
-    if (r != ESP_OK) {
-        ESP_LOGE(TAG, "spi_device_get_trans_result(): %s", esp_err_to_name(r));
+    err = spi_device_get_trans_result(strip->device_handle, &t, portMAX_DELAY);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "spi_device_get_trans_result(): %s", esp_err_to_name(err));
         goto fail;
     }
-    r = ESP_OK;
+    err = ESP_OK;
 fail:
-    return r;
+    return err;
+}
+#endif
+
+#if HELPER_TARGET_IS_ESP8266
+static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
+{
+    esp_err_t err = ESP_FAIL;
+    spi_trans_t trans = {0};
+
+    CHECK_ARG(strip);
+    trans.bits.mosi = LED_STRIP_SPI_BUFFER_SIZE(strip->length) * 8;
+    trans.mosi = strip->buf;
+    err = spi_trans(HSPI_HOST, &trans);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+fail:
+    return err;
+}
+#endif
+esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
+{
+#if HELPER_TARGET_IS_ESP32
+    return led_strip_spi_flush_esp32(strip);
+#elif HELPER_TARGET_IS_ESP8266
+    return led_strip_spi_flush_esp8266(strip);
+#else
+#error "Unknown target"
+#endif
 }
 
 bool led_strip_spi_busy(led_strip_spi_t*strip)

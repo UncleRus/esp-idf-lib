@@ -35,11 +35,13 @@ fail:
 
 void test(void *pvParameters)
 {
-    static spi_device_handle_t device_handle;
     led_strip_spi_t strip = LED_STRIP_SPI_DEFAULT();
-    strip.device_handle = device_handle;
     strip.length = N_PIXEL;
+#if HELPER_TARGET_IS_ESP32
+    static spi_device_handle_t device_handle;
+    strip.device_handle = device_handle;
     strip.bus_config.max_transfer_sz = LED_STRIP_SPI_BUFFER_SIZE(N_PIXEL);
+#endif
 
     ESP_LOGI(TAG, "Initializing LED strip");
     ESP_ERROR_CHECK(led_strip_spi_init(&strip));

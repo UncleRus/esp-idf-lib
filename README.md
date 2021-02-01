@@ -94,7 +94,7 @@ Add path to components in your project makefile, e.g:
 ```Makefile
 PROJECT_NAME := my-esp-project
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
-EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip led_strip_spi
+EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip
 include $(IDF_PATH)/make/project.mk
 ```
 

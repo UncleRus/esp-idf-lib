@@ -14,10 +14,17 @@
 #define __LED_STRIP_SPI_H__
 
 #include <driver/gpio.h>
-#include <driver/spi_master.h>
 #include <esp_err.h>
 #include <led_effect.h>
 #include <esp_idf_lib_helpers.h>
+
+#if HELPER_TARGET_IS_ESP32
+#include <driver/spi_master.h>
+#elif HELPER_TARGET_IS_ESP8266
+#include <driver/spi.h>
+#else
+#error "Unsupported target"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +43,7 @@ typedef enum
  * LED strip descriptor
  */
 
+#if HELPER_TARGET_IS_ESP32
 typedef struct
 {
     size_t length;
@@ -47,7 +55,20 @@ typedef struct
     spi_transaction_t transaction;
     int dma_chan; // 1 or 2
 } led_strip_spi_t;
+#endif
 
+#if HELPER_TARGET_IS_ESP8266
+typedef struct
+{
+    size_t length;
+    void *buf;
+    spi_interface_t bus_config;
+    spi_host_t host_device; // only HSPI can be used here
+    spi_trans_t transaction;
+    spi_clk_div_t clk_div;
+
+} led_strip_spi_t;
+#endif
 /*
  * IO_MUX pins for SPI buses
  * https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/spi_master.html
@@ -62,12 +83,23 @@ typedef struct
 #define LED_STRIP_SPI3_SCLK_IO_NUM (18)
 #define LED_STRIP_SPI3_MOSI_IO_NUM (23)
 
-#if defined(HELPER_TARGET_IS_ESP32) && HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
-#define LED_STRIP_DEFAULT_SPI_HOST  HSPI_HOST
-#else
-#define LED_STRIP_DEFAULT_SPI_HOST  SPI2_HOST
+#if HELPER_TARGET_IS_ESP32
+#   if HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
+#       define LED_STRIP_DEFAULT_SPI_HOST  HSPI_HOST
+#   else
+#       define LED_STRIP_DEFAULT_SPI_HOST  SPI2_HOST
+#   endif
 #endif
 
+#if HELPER_TARGET_IS_ESP8266
+#define LED_STRIP_DEFAULT_SPI_HOST HSPI_HOST
+#endif
+
+#if !defined(LED_STRIP_DEFAULT_SPI_HOST)
+#error "BUG: LED_STRIP_DEFAULT_SPI_HOST is not defined"
+#endif
+
+#if HELPER_TARGET_IS_ESP32
 #define LED_STRIP_SPI_DEFAULT() \
 {                                                       \
     .length = 1,                                        \
@@ -93,6 +125,28 @@ typedef struct
     .device_handle = NULL,                              /* must be provided by the caller */ \
     .dma_chan = 1,                                      \
 }
+
+#elif HELPER_TARGET_IS_ESP8266
+#define LED_STRIP_SPI_DEFAULT() \
+{                                                       \
+    .length = 1,                                        \
+    .buf = NULL,                                        /* must be provided by the caller */ \
+    .bus_config = {                                     /* spi_interface_t */ \
+        .cpol = 1,                                      /* SPI mode 3i; CPOL = 1, CPHA = 1 */\
+        .cpha = 1,                                      \
+        .bit_tx_order = 0,                              \
+        .bit_rx_order = 0,                              \
+        .byte_tx_order = 0,                             \
+        .byte_rx_order = 0,                             \
+        .mosi_en = 1,                                   \
+        .miso_en = 0,                                   \
+        .cs_en = 0,                                     \
+        .reserved9 = 23,                                \
+    },                                                  \
+    .host_device = LED_STRIP_DEFAULT_SPI_HOST,          \
+    .clk_div = SPI_2MHz_DIV,                            /* see components/esp8266/include/driver/spi.h */ \
+}
+#endif // HELPER_TARGET_IS_ESP32 HELPER_TARGET_IS_ESP8266
 
 /*
  * * add LED_STRIP_SPI_USING_$NAME to Kconfig
