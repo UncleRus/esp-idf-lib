@@ -92,7 +92,7 @@ typedef struct
     .sclk_io_num = LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM, \
     .max_transfer_sz = 0,                             \
     .clock_speed_hz = 1000000,                        \
-    .queue_size = 10,                                 \
+    .queue_size = 1,                                  \
     .device_handle = NULL,                            \
     .dma_chan = 1,                                    \
 }
