@@ -1,3 +1,15 @@
+/**
+ * @file led_strip_spi_sk9822.h
+ * @defgroup led_strip_spi led_strip_spi
+ * @{
+ *
+ * Functions and macros for SK9822 LED strips.
+ *
+ * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
+ *               2021 Tomoyuki Sakurai <y@trombik.org>
+ *
+ * MIT Licensed as described in the file LICENSE
+ */
 #if !defined(__LED_STRIP_SPI_SK9822_H__)
 #define __LED_STRIP_SPI_SK9822_H__
 
@@ -37,10 +49,17 @@ extern "C" {
         LED_STRIP_SPI_FRAME_SK9822_RESET_SIZE + \
         LED_STRIP_SPI_FRAME_SK9822_END_SIZE(N_PIXEL))
 
+/**
+ * @brief Initialize the buffer of the strip.
+ * @param strip Pointer to the strip to initialize
+ * @return `ESP_OK` on success
+ */
 esp_err_t led_strip_spi_sk9822_buf_init(led_strip_spi_t *strip);
 
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif
