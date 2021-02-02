@@ -18,7 +18,8 @@
 #define N_PIXEL CONFIG_EXAMPLE_N_PIXEL
 #define TAG "example_led_strip_spi"
 
-static esp_err_t rainbow(led_strip_spi_t *strip) {
+static esp_err_t rainbow(led_strip_spi_t *strip)
+{
     static uint8_t pos = 0;
     uint32_t c;
     esp_err_t err = ESP_FAIL;
@@ -38,6 +39,27 @@ fail:
     return err;
 }
 
+static esp_err_t simple_rgb(led_strip_spi_t *strip)
+{
+    static uint8_t counter = 0;
+    uint32_t c;
+    rgb_t color;
+    esp_err_t err;
+
+    c = 0x0000a0 << ((counter % 3) * 8);
+    color.r = (c >> 16) & 0xff;
+    color.g = (c >> 8)  & 0xff;
+    color.b =  c        & 0xff;
+    ESP_LOGI(TAG, "r: 0x%02x g: 0x%02x b: 0x%02x", color.r, color.g, color.b);
+
+    if ((err = led_strip_spi_fill(strip, 0, strip->length, color)) != ESP_OK) {
+        goto fail;
+    }
+    counter += 1;
+fail:
+    return err;
+}
+
 void test(void *pvParameters)
 {
     led_strip_spi_t strip = LED_STRIP_SPI_DEFAULT();
@@ -53,12 +75,19 @@ void test(void *pvParameters)
 
     /* turn off all LEDs */
     ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
-    while (1)
-    {
-        ESP_ERROR_CHECK(rainbow(&strip));
-        ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
+    while (1) {
+        for (int i = 0; i < 1000; i++) {
+            ESP_ERROR_CHECK(rainbow(&strip));
+            ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+        for (int i = 0; i < 10; i++) {
+            ESP_ERROR_CHECK(simple_rgb(&strip));
+            ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
+
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
     }
 }
 

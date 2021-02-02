@@ -2,8 +2,10 @@
 
 ## What the example does
 
-The example changes the colours of all the LEDs using
-[_color wheel_](https://duckduckgo.com/?q=color+wheel).
+The example runs the following effects in a loop.
+
+- changes the colours of all the LEDs using [_color wheel_](https://duckduckgo.com/?q=color+wheel).
+- simply rotates the colours (B -> G -> R)
 
 ## Configuration
 
