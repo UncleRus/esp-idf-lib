@@ -68,6 +68,10 @@ void test(void *pvParameters)
     static spi_device_handle_t device_handle;
     strip.device_handle = device_handle;
     strip.max_transfer_sz = LED_STRIP_SPI_BUFFER_SIZE(N_PIXEL);
+    strip.clock_speed_hz = 1000000 * 10; // 10Mhz
+#endif
+#if HELPER_TARGET_IS_ESP8266
+    strip.clk_div = SPI_10MHz_DIV;
 #endif
 
     ESP_LOGI(TAG, "Initializing LED strip");
