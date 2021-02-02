@@ -3,12 +3,26 @@
  * @defgroup led_strip_spi led_strip_spi
  * @{
  *
- * SPI-based ESP-IDF driver for SK9822 LED strips
+ * SPI-based ESP-IDF driver for SK9822/APA102 LED strips
  *
  * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
  *               2021 Tomoyuki Sakurai <y@trombik.org>
  *
  * MIT Licensed as described in the file LICENSE
+ *
+ * The driver uses hardware SPI to drive LED strip. While ESP32-family chips
+ * can route SPI signals to GPIOs using GPIO matrix, ESP8266 cannot.
+ *
+ * On ESP32, dedicated IO_MUX pins can clock faster (80Mhz) than GPIO pins
+ * through GPIO matrix (40Mhz), but the maximum clock frequency of `SK9822` is
+ * 30Mhz, which is below the maximum clock frequency of GPIO matrix. As such,
+ * `IO_MUX` has no practical benefits here.
+ *
+ * Because the SPI driver in `esp-idf` differs from  the one in `ESP8266 RTOS
+ * SDK`, the members of `led_strip_spi_t` are different, too. If you have
+ * better ideas to unify the two structures, I would love to hear.
+ *
+ * The driver should be able to drive `APA102`, but not tested.
  */
 #ifndef __LED_STRIP_SPI_H__
 #define __LED_STRIP_SPI_H__
@@ -141,7 +155,7 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip);
 /**
  * @brief Set color of single LED in strip
  * This function does not actually change colors of the LEDs.
- * Call ::led_strip_flush() to send buffer to the LEDs.
+ * Call ::led_strip_spi_flush() to send buffer to the LEDs.
  * @param strip Descriptor of LED strip
  * @param num LED number, 0..strip length - 1
  * @param color RGB color
@@ -152,7 +166,7 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, size_t num, rgb_t colo
 /**
  * @brief Set colors of multiple LEDs
  * This function does not actually change colors of the LEDs.
- * Call ::led_strip_flush() to send buffer to the LEDs.
+ * Call ::led_strip_spi_flush() to send buffer to the LEDs.
  * @param strip Descriptor of LED strip
  * @param start First LED index, 0-based
  * @param len Number of LEDs
