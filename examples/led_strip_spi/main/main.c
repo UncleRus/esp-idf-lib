@@ -6,8 +6,13 @@
 #include <led_strip_spi.h>
 
 /*
+ * For ESP32 and ESP32S2
  * SCLK GPIO14
  * MOSI GPIO13
+ *
+ * For ESP8266
+ * SCLK GPIO14 (D5 on NodeMCU devkit)
+ * MOSI GPIO13 (D7 on NodeMCU devkit)
  */
 
 #define N_PIXEL CONFIG_EXAMPLE_N_PIXEL
