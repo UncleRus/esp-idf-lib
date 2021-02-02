@@ -1,5 +1,5 @@
 /**
- * @file led_strip.h
+ * @file led_strip_spi.h
  * @defgroup led_strip_spi led_strip_spi
  * @{
  *
@@ -162,7 +162,7 @@ typedef struct
 
 /**
  * @brief Setup library
- * This method must be called before any other led_strip methods
+ * This method must be called before any other led_strip_spi methods
  * @return `ESP_OK` on success
  */
 esp_err_t led_strip_spi_install();
@@ -214,7 +214,7 @@ esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, size_t start, size_t l
 /**
  * @brief Set multiple LEDs to the one color
  * This function does not actually change colors of the LEDs.
- * Call ::led_strip_flush() to send buffer to the LEDs.
+ * Call ::led_strip_spi_flush() to send buffer to the LEDs.
  * @param strip Descriptor of LED strip
  * @param start First LED index, 0-based
  * @param len Number of LEDs
