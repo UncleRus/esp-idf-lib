@@ -164,7 +164,7 @@ typedef struct
  * @brief Setup library
  * This method must be called before any other led_strip methods
  */
-void led_strip_spi_install();
+esp_err_t led_strip_spi_install();
 
 /**
  * @brief Initialize LED strip and allocate buffer memory

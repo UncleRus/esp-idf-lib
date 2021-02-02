@@ -46,6 +46,8 @@ void test(void *pvParameters)
     ESP_LOGI(TAG, "Initializing LED strip");
     ESP_ERROR_CHECK(led_strip_spi_init(&strip));
 
+    /* turn off all LEDs */
+    ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
     while (1)
     {
         ESP_ERROR_CHECK(rainbow(&strip));
