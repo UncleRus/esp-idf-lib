@@ -11,5 +11,5 @@ menu "LED strip SPI"
         int "Timeout in msec to obtain mutex"
         default 1
         help
-            Timeout when obtaining mutext with xSemaphoreTake.
+            Timeout when obtaining mutex with xSemaphoreTake.
 endmenu
