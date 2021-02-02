@@ -89,7 +89,7 @@ static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
 
     err = spi_bus_add_device(strip->host_device, &strip->device_interface_config, &strip->device_handle);
     if (err != ESP_OK) {
-        ESP_LOG(TAG, "spi_bus_add_device(): %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "spi_bus_add_device(): %s", esp_err_to_name(err));
         goto fail;
     }
     ESP_LOGI(TAG, "LED strip initialized");
