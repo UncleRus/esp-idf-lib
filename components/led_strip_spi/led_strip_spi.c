@@ -52,7 +52,26 @@ fail:
 #if HELPER_TARGET_IS_ESP32
 static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
 {
+    CHECK_ARG(strip);
+
     esp_err_t err = ESP_FAIL;
+    spi_bus_config_t bus_config = {
+        .miso_io_num = -1,
+        .mosi_io_num = strip->mosi_io_num,
+        .sclk_io_num = strip->sclk_io_num,
+        .quadhd_io_num = -1,
+        .quadwp_io_num = -1,
+        .max_transfer_sz = strip->max_transfer_sz,
+    };
+    spi_device_interface_config_t device_interface_config = {
+        .clock_speed_hz = strip->clock_speed_hz,
+        .mode = 3,
+        .spics_io_num = -1,
+        .queue_size = strip->queue_size,
+        .command_bits = 0,
+        .address_bits = 0,
+        .dummy_bits = 0,
+    };
 
     if (xSemaphoreTake(mutex, MUTEX_TIMEOUT) != pdTRUE) {
         err = ESP_FAIL;
@@ -71,6 +90,7 @@ static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
     /* XXX length is in bit */
     strip->transaction.length = LED_STRIP_SPI_BUFFER_SIZE(strip->length) * 8;
 
+    /* type-specific initialization  */
 #if CONFIG_LED_STRIP_SPI_USING_SK9822
     err = led_strip_spi_sk9822_buf_init(strip);
     if (err != ESP_OK) {
@@ -80,14 +100,14 @@ static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
 #endif
     ESP_LOGD(TAG, "SPI buffer initialized");
 
-    err = spi_bus_initialize(strip->host_device, &strip->bus_config, strip->dma_chan);
+    err = spi_bus_initialize(strip->host_device, &bus_config, strip->dma_chan);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "spi_bus_initialize(): %s", esp_err_to_name(err));
         goto fail;
     }
     ESP_LOGD(TAG, "SPI bus initialized");
 
-    err = spi_bus_add_device(strip->host_device, &strip->device_interface_config, &strip->device_handle);
+    err = spi_bus_add_device(strip->host_device, &device_interface_config, &strip->device_handle);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "spi_bus_add_device(): %s", esp_err_to_name(err));
         goto fail;
@@ -107,6 +127,20 @@ static esp_err_t led_strip_spi_init_esp8266(led_strip_spi_t *strip)
 {
     esp_err_t err;
     spi_config_t spi_config;
+    spi_interface_t interface_config = {
+
+        /* SPI mode 3, CPOL = 1, CPHA = 1 */
+        .cpol = 1,
+        .cpha = 1,
+        .bit_tx_order = 0,
+        .bit_rx_order = 0,
+        .byte_tx_order = 0,
+        .byte_rx_order = 0,
+        .mosi_en = 1,
+        .miso_en = 0,
+        .cs_en = 0,
+        .reserved9 = 23,
+    };
 
     if (xSemaphoreTake(mutex, MUTEX_TIMEOUT) != pdTRUE) {
         err = ESP_FAIL;
@@ -130,12 +164,12 @@ static esp_err_t led_strip_spi_init_esp8266(led_strip_spi_t *strip)
     }
 #endif
     ESP_LOGI(TAG, "SPI buffer initialized");
-
-    spi_config.interface = strip->bus_config;
+    spi_config.interface = interface_config;
     spi_config.mode = SPI_MASTER_MODE;
     spi_config.clk_div = strip->clk_div;
     spi_config.event_cb = NULL;
-    err = spi_init(strip->host_device, &spi_config);
+
+    err = spi_init(HSPI_HOST, &spi_config);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "spi_init(): %s", esp_err_to_name(err));
         goto fail;

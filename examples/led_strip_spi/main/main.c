@@ -40,7 +40,7 @@ void test(void *pvParameters)
 #if HELPER_TARGET_IS_ESP32
     static spi_device_handle_t device_handle;
     strip.device_handle = device_handle;
-    strip.bus_config.max_transfer_sz = LED_STRIP_SPI_BUFFER_SIZE(N_PIXEL);
+    strip.max_transfer_sz = LED_STRIP_SPI_BUFFER_SIZE(N_PIXEL);
 #endif
 
     ESP_LOGI(TAG, "Initializing LED strip");

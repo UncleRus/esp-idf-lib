@@ -44,107 +44,57 @@ typedef enum
  */
 
 #if HELPER_TARGET_IS_ESP32
+
+#if HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
+#define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  HSPI_HOST
+#else
+#define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  SPI2_HOST
+#endif // HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
+
+#define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (13)
+#define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (14)
+
 typedef struct
 {
-    size_t length;
-    void *buf;
-    spi_bus_config_t bus_config;
-    spi_device_interface_config_t device_interface_config;
-    spi_host_device_t host_device; // SPI2_HOST or SPI3_HOST
-    spi_device_handle_t device_handle;
-    spi_transaction_t transaction;
-    int dma_chan; // 1 or 2
+    void *buf;                          /* Pointer to the buffer */
+    size_t length;                      /* Number of pixels */
+    spi_host_device_t host_device;      /* SPI host device name, such as `SPI2_HOST`. */
+    int mosi_io_num;                    /* GPIO number of SPI MOSI. */
+    int sclk_io_num;                    /* GPIO number of SPI SCLK. */
+    int max_transfer_sz;                /* Maximum transfer size in bytes. Defaults to 4094 if 0. */
+    int clock_speed_hz;                 /* Clock speed in Hz. */
+    int queue_size;                     /* Queue size used by `spi_device_queue_trans()`. */
+    spi_device_handle_t device_handle;  /* Pointer to device handle assigned by the driver. */
+    int dma_chan;                       /* DMA channed to use. Either 1 or 2. */
+    spi_transaction_t transaction;      /* SPI transaction used internally by the driver */
 } led_strip_spi_t;
-#endif
 
-#if HELPER_TARGET_IS_ESP8266
-typedef struct
-{
-    size_t length;
-    void *buf;
-    spi_interface_t bus_config;
-    spi_host_t host_device; // only HSPI can be used here
-    spi_trans_t transaction;
-    spi_clk_div_t clk_div;
-
-} led_strip_spi_t;
-#endif
-/*
- * IO_MUX pins for SPI buses
- * https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/spi_master.html
- *
- * | Pin  | SPI2 | SPI3 |
- * |------|------|------|
- * | SCLK |  14  |  18  |
- * | MOSI |  13  |  23  |
- */
-#define LED_STRIP_SPI2_SCLK_IO_NUM (14)
-#define LED_STRIP_SPI2_MOSI_IO_NUM (13)
-#define LED_STRIP_SPI3_SCLK_IO_NUM (18)
-#define LED_STRIP_SPI3_MOSI_IO_NUM (23)
-
-#if HELPER_TARGET_IS_ESP32
-#   if HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
-#       define LED_STRIP_DEFAULT_SPI_HOST  HSPI_HOST
-#   else
-#       define LED_STRIP_DEFAULT_SPI_HOST  SPI2_HOST
-#   endif
-#endif
-
-#if HELPER_TARGET_IS_ESP8266
-#define LED_STRIP_DEFAULT_SPI_HOST HSPI_HOST
-#endif
-
-#if !defined(LED_STRIP_DEFAULT_SPI_HOST)
-#error "BUG: LED_STRIP_DEFAULT_SPI_HOST is not defined"
-#endif
-
-#if HELPER_TARGET_IS_ESP32
 #define LED_STRIP_SPI_DEFAULT() \
-{                                                       \
-    .length = 1,                                        \
-    .buf = NULL,                                        /* must be provided by the caller */ \
-    .bus_config = {                                     \
-        .miso_io_num = -1,                              \
-        .mosi_io_num = LED_STRIP_SPI2_MOSI_IO_NUM,      \
-        .sclk_io_num = LED_STRIP_SPI2_SCLK_IO_NUM,      \
-        .quadhd_io_num = -1,                            \
-        .quadwp_io_num = -1,                            \
-        .max_transfer_sz = 0,                           /* must be provided by the caller */ \
-    },                                                  \
-    .device_interface_config = {                        \
-        .clock_speed_hz = 1000000,                      \
-        .mode = 3,                                      \
-        .spics_io_num = -1,                             \
-        .queue_size = 10,                               \
-        .command_bits = 0,                              \
-        .address_bits = 0,                              \
-        .dummy_bits = 0,                                \
-    },                                                  \
-    .host_device = LED_STRIP_DEFAULT_SPI_HOST,          \
-    .device_handle = NULL,                              /* must be provided by the caller */ \
-    .dma_chan = 1,                                      \
+{ \
+    .buf = NULL,                                      \
+    .length = 1,                                      \
+    .host_device = LED_STRIP_SPI_DEFAULT_HOST_DEVICE, \
+    .mosi_io_num = LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM, \
+    .sclk_io_num = LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM, \
+    .max_transfer_sz = 0,                             \
+    .clock_speed_hz = 1000000,                        \
+    .queue_size = 10,                                 \
+    .device_handle = NULL,                            \
+    .dma_chan = 1,                                    \
 }
 
 #elif HELPER_TARGET_IS_ESP8266
+typedef struct
+{
+    void *buf;              /* Pointer to the buffer. */
+    size_t length;          /* Number of pixels. */
+    spi_clk_div_t clk_div;  /* Value of `clk_div`, such as `SPI_2MHz_DIV`. See available values in `${IDF_PATH}/components/esp8266/include/driver/spi.h`. */
+} led_strip_spi_t;
+
 #define LED_STRIP_SPI_DEFAULT() \
-{                                                       \
-    .length = 1,                                        \
-    .buf = NULL,                                        /* must be provided by the caller */ \
-    .bus_config = {                                     /* spi_interface_t */ \
-        .cpol = 1,                                      /* SPI mode 3; CPOL = 1, CPHA = 1 */\
-        .cpha = 1,                                      \
-        .bit_tx_order = 0,                              \
-        .bit_rx_order = 0,                              \
-        .byte_tx_order = 0,                             \
-        .byte_rx_order = 0,                             \
-        .mosi_en = 1,                                   \
-        .miso_en = 0,                                   \
-        .cs_en = 0,                                     \
-        .reserved9 = 23,                                \
-    },                                                  \
-    .host_device = LED_STRIP_DEFAULT_SPI_HOST,          \
-    .clk_div = SPI_2MHz_DIV,                            /* see components/esp8266/include/driver/spi.h */ \
+{ \
+    .length = 1, \
+    .clk_div = SPI_2MHz_DIV, \
 }
 #endif // HELPER_TARGET_IS_ESP32 HELPER_TARGET_IS_ESP8266
 
