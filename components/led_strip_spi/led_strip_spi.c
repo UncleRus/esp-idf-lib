@@ -237,24 +237,6 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
 #endif
 }
 
-bool led_strip_spi_busy(led_strip_spi_t*strip)
-{
-
-    /* XXX FIXME */
-    ESP_LOGW(TAG, "led_strip_spi_busy() not implemented");
-    if (!strip) return false;
-    return false;
-}
-
-esp_err_t led_strip_spi_wait(led_strip_spi_t*strip, TickType_t timeout)
-{
-    CHECK_ARG(strip);
-
-    /* XXX FIXME */
-    ESP_LOGW(TAG, "led_strip_spi_wait() not implemented");
-    return false;
-}
-
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, size_t start, size_t len, rgb_t *data)
 {
     /* XXX FIXME */

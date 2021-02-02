@@ -132,7 +132,7 @@ typedef struct
     .length = 1,                                        \
     .buf = NULL,                                        /* must be provided by the caller */ \
     .bus_config = {                                     /* spi_interface_t */ \
-        .cpol = 1,                                      /* SPI mode 3i; CPOL = 1, CPHA = 1 */\
+        .cpol = 1,                                      /* SPI mode 3; CPOL = 1, CPHA = 1 */\
         .cpha = 1,                                      \
         .bit_tx_order = 0,                              \
         .bit_rx_order = 0,                              \
@@ -163,6 +163,7 @@ typedef struct
 /**
  * @brief Setup library
  * This method must be called before any other led_strip methods
+ * @return `ESP_OK` on success
  */
 esp_err_t led_strip_spi_install();
 
@@ -186,21 +187,6 @@ esp_err_t led_strip_spi_free(led_strip_spi_t *strip);
  * @return `ESP_OK` on success
  */
 esp_err_t led_strip_spi_flush(led_strip_spi_t*strip);
-
-/**
- * @brief Check if associated RMT channel is busy
- * @param strip Descriptor of LED strip
- * @return true if RMT peripherals is busy
- */
-bool led_strip_spi_busy(led_strip_spi_t*strip);
-
-/**
- * @brief Wait until RMT peripherals is free to send buffer to LEDs
- * @param strip Descriptor of LED strip
- * @param timeout Timeout in RTOS ticks
- * @return `ESP_OK` on success
- */
-esp_err_t led_strip_spi_wait(led_strip_spi_t*strip, TickType_t timeout);
 
 /**
  * @brief Set color of single LED in strip
