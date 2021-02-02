@@ -37,6 +37,8 @@ extern "C" {
         LED_STRIP_SPI_FRAME_SK9822_RESET_SIZE + \
         LED_STRIP_SPI_FRAME_SK9822_END_SIZE(N_PIXEL))
 
+esp_err_t led_strip_spi_sk9822_buf_init(led_strip_spi_t *strip);
+
 #ifdef __cplusplus
 }
 #endif

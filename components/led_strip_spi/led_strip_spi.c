@@ -71,10 +71,13 @@ static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
     /* XXX length is in bit */
     strip->transaction.length = LED_STRIP_SPI_BUFFER_SIZE(strip->length) * 8;
 
-    /* set mandatory bits in all LED frames */
-    for (int i = 1; i <= strip->length; i++) {
-        ((uint8_t *)strip->buf)[i * 4] = LED_STRIP_SPI_FRAME_SK9822_LED_MSB3;
+#if CONFIG_LED_STRIP_SPI_USING_SK9822
+    err = led_strip_spi_sk9822_buf_init(strip);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "led_strip_spi_sk9822_buf_init(): %s", esp_err_to_name(err));
+        goto fail;
     }
+#endif
     ESP_LOGD(TAG, "SPI buffer initialized");
 
     err = spi_bus_initialize(strip->host_device, &strip->bus_config, strip->dma_chan);
@@ -119,10 +122,13 @@ static esp_err_t led_strip_spi_init_esp8266(led_strip_spi_t *strip)
     }
     memset(strip->buf, 0, LED_STRIP_SPI_BUFFER_SIZE(strip->length));
 
-    /* set mandatory bits in all LED frames */
-    for (int i = 1; i <= strip->length; i++) {
-        ((uint8_t *)strip->buf)[i * 4] = LED_STRIP_SPI_FRAME_SK9822_LED_MSB3;
+#if CONFIG_LED_STRIP_SPI_USING_SK9822
+    err = led_strip_spi_sk9822_buf_init(strip);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "led_strip_spi_sk9822_buf_init(): %s", esp_err_to_name(err));
+        goto fail;
     }
+#endif
     ESP_LOGI(TAG, "SPI buffer initialized");
 
     spi_config.interface = strip->bus_config;

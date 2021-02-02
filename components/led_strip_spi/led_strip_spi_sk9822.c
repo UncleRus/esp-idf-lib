@@ -11,3 +11,11 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, size_t num, rgb_t colo
     ((uint8_t *)strip->buf)[index + 3] = color.r;
     return ESP_OK;
 }
+esp_err_t led_strip_spi_sk9822_buf_init(led_strip_spi_t *strip)
+{
+    /* set mandatory bits in all LED frames */
+    for (int i = 1; i <= strip->length; i++) {
+        ((uint8_t *)strip->buf)[i * 4] = LED_STRIP_SPI_FRAME_SK9822_LED_MSB3;
+    }
+    return ESP_OK;
+}
