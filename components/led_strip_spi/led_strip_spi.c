@@ -45,6 +45,7 @@ esp_err_t led_strip_spi_install()
         ESP_LOGE(TAG, "xSemaphoreCreateMutex(): faild");
         goto fail;
     }
+    err = ESP_OK;
 fail:
     return err;
 }

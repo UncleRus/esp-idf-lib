@@ -97,6 +97,16 @@ void test(void *pvParameters)
 
 void app_main()
 {
-    led_strip_spi_install();
+    esp_err_t err;
+    err = led_strip_spi_install();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "led_strip_spi_install(): %s", esp_err_to_name(err));
+        goto fail;
+    }
     xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL);
+fail:
+    ESP_LOGE(TAG, "Test failed");
+    while (1) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
