@@ -10,19 +10,6 @@
  *
  * MIT Licensed as described in the file LICENSE
  *
- * The driver uses hardware SPI to drive LED strip. While ESP32-family chips
- * can route SPI signals to GPIOs using GPIO matrix, ESP8266 cannot.
- *
- * On ESP32, dedicated IO_MUX pins can clock faster (80Mhz) than GPIO pins
- * through GPIO matrix (40Mhz), but the maximum clock frequency of `SK9822` is
- * 30Mhz, which is below the maximum clock frequency of GPIO matrix. As such,
- * `IO_MUX` has no practical benefits here.
- *
- * Because the SPI driver in `esp-idf` differs from  the one in `ESP8266 RTOS
- * SDK`, the members of `led_strip_spi_t` are different, too. If you have
- * better ideas to unify the two structures, I would love to hear.
- *
- * The driver should be able to drive `APA102`, but not tested.
  */
 #ifndef __LED_STRIP_SPI_H__
 #define __LED_STRIP_SPI_H__
@@ -44,19 +31,6 @@
 extern "C" {
 #endif
 
-/**
- * LED type
- */
-typedef enum
-{
-    LED_STRIP_SPI_SK9822 = 0,
-    LED_STRIP_SPI_MAX
-} led_strip_spi_type_t;
-
-/**
- * LED strip descriptor
- */
-
 #if HELPER_TARGET_IS_ESP32
 
 #if HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
@@ -68,21 +42,27 @@ typedef enum
 #define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (13)
 #define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (14)
 
+/**
+ * LED strip descriptor for ESP32-family.
+ */
 typedef struct
 {
-    void *buf;                          /* Pointer to the buffer */
-    size_t length;                      /* Number of pixels */
-    spi_host_device_t host_device;      /* SPI host device name, such as `SPI2_HOST`. */
-    int mosi_io_num;                    /* GPIO number of SPI MOSI. */
-    int sclk_io_num;                    /* GPIO number of SPI SCLK. */
-    int max_transfer_sz;                /* Maximum transfer size in bytes. Defaults to 4094 if 0. */
-    int clock_speed_hz;                 /* Clock speed in Hz. */
-    int queue_size;                     /* Queue size used by `spi_device_queue_trans()`. */
-    spi_device_handle_t device_handle;  /* Pointer to device handle assigned by the driver. */
-    int dma_chan;                       /* DMA channed to use. Either 1 or 2. */
-    spi_transaction_t transaction;      /* SPI transaction used internally by the driver */
+    void *buf;                          //!< Pointer to the buffer
+    size_t length;                      //! Number of pixels
+    spi_host_device_t host_device;      //! SPI host device name, such as `SPI2_HOST`.
+    int mosi_io_num;                    //! GPIO number of SPI MOSI.
+    int sclk_io_num;                    //! GPIO number of SPI SCLK.
+    int max_transfer_sz;                //! Maximum transfer size in bytes. Defaults to 4094 if 0.
+    int clock_speed_hz;                 //! Clock speed in Hz.
+    int queue_size;                     //! Queue size used by `spi_device_queue_trans()`.
+    spi_device_handle_t device_handle;  //! Device handle assigned by the driver. The caller must provdie this.
+    int dma_chan;                       //! DMA channed to use. Either 1 or 2.
+    spi_transaction_t transaction;      //! SPI transaction used internally by the driver.
 } led_strip_spi_t;
 
+/**
+ * Macro to initialize ::led_strip_spi_t
+ */
 #define LED_STRIP_SPI_DEFAULT() \
 { \
     .buf = NULL,                                      \
@@ -98,11 +78,14 @@ typedef struct
 }
 
 #elif HELPER_TARGET_IS_ESP8266
+/**
+ * LED strip descriptor for ESP8266.
+ */
 typedef struct
 {
-    void *buf;              /* Pointer to the buffer. */
-    size_t length;          /* Number of pixels. */
-    spi_clk_div_t clk_div;  /* Value of `clk_div`, such as `SPI_2MHz_DIV`. See available values in `${IDF_PATH}/components/esp8266/include/driver/spi.h`. */
+    void *buf;              //! Pointer to the buffer.
+    size_t length;          //! Number of pixels.
+    spi_clk_div_t clk_div;  //! Value of `clk_div`, such as `SPI_2MHz_DIV`. See available values in `${IDF_PATH}/components/esp8266/include/driver/spi.h`.
 } led_strip_spi_t;
 
 #define LED_STRIP_SPI_DEFAULT() \
@@ -125,7 +108,8 @@ typedef struct
 #endif
 
 /**
- * @brief Setup library
+ * @brief Setup the driver
+ *
  * This method must be called before any other led_strip_spi methods
  * @return `ESP_OK` on success
  */
@@ -133,6 +117,7 @@ esp_err_t led_strip_spi_install();
 
 /**
  * @brief Initialize LED strip and allocate buffer memory
+ *
  * @param strip Descriptor of LED strip
  * @return `ESP_OK` on success
  */
@@ -140,6 +125,7 @@ esp_err_t led_strip_spi_init(led_strip_spi_t*strip);
 
 /**
  * @brief Free LED strip
+ *
  * @param Descriptor of LED strip
  * @return `ESP_OK` on success
  */
@@ -153,11 +139,13 @@ esp_err_t led_strip_spi_free(led_strip_spi_t *strip);
 esp_err_t led_strip_spi_flush(led_strip_spi_t*strip);
 
 /**
- * @brief Set color of single LED in strip
+ * @brief Set color of single LED in strip.
+ *
  * This function does not actually change colors of the LEDs.
  * Call ::led_strip_spi_flush() to send buffer to the LEDs.
+ *
  * @param strip Descriptor of LED strip
- * @param num LED number, 0..strip length - 1
+ * @param num LED number, [0:strip.length - 1].
  * @param color RGB color
  * @return `ESP_OK` on success
  */
@@ -165,8 +153,10 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, size_t num, rgb_t colo
 
 /**
  * @brief Set colors of multiple LEDs
+ *
  * This function does not actually change colors of the LEDs.
  * Call ::led_strip_spi_flush() to send buffer to the LEDs.
+ *
  * @param strip Descriptor of LED strip
  * @param start First LED index, 0-based
  * @param len Number of LEDs
@@ -176,9 +166,11 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, size_t num, rgb_t colo
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, size_t start, size_t len, rgb_t *data);
 
 /**
- * @brief Set multiple LEDs to the one color
+ * @brief Set multiple LEDs to the one color.
+ *
  * This function does not actually change colors of the LEDs.
  * Call ::led_strip_spi_flush() to send buffer to the LEDs.
+ *
  * @param strip Descriptor of LED strip
  * @param start First LED index, 0-based
  * @param len Number of LEDs
