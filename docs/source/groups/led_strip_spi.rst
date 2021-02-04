@@ -1,9 +1,7 @@
-.. _led_strip:
+.. _led_strip_spi:
 
-led_strip_spi - SPI-based driver for SK9822
-===========================================
-
-.. warning:: The driver should work with APA102, but not tested.
+led_strip_spi - SPI-based driver for SK9822/APA102
+==================================================
 
 Supported LEDs
 --------------
@@ -13,7 +11,7 @@ The driver supports the following LEDs.
 - `SK9822`
 - `APA102`
 
-The driver should be able to drive `APA102`, but not tested.
+.. warning:: The driver should work with APA102, but not tested.
 
 Supported targets
 -----------------
@@ -23,34 +21,43 @@ The driver supports the following targets.
 - `ESP32`-family, including `ESP32S2`
 - `ESP8266`
 
-Because the SPI driver in `esp-idf` differs from  the one in `ESP8266 RTOS
-SDK`, the members of `led_strip_spi_t` are different, too. If you have
-better ideas to unify the two structures, I would love to hear.
+Because the SPI driver in `esp-idf` differs from the one in `ESP8266 RTOS
+SDK`, the members of `led_strip_spi_t` &mdash; a descriptor to configure and
+manage LED strip &mdash; are different.
 
-How to use the driver
----------------------
+.. note:: If you have better ideas to unify the two structures, I would love to hear.
 
-Call `led_strip_spi_install()`.
+Usage
+-----
+
+Call :cpp:func:`led_strip_spi_install()`.
 
 .. code-block:: C
+
    ESP_ERROR_CHECK(led_strip_spi_install());
 
-Create ::led_strip_spi_t and initialize it with `LED_STRIP_SPI_DEFAULT()`.
+Create :cpp:type:`led_strip_spi_t` and initialize it with :c:macro:`LED_STRIP_SPI_DEFAULT()`.
 
 .. code-block:: C
+
    led_strip_spi_t strip = LED_STRIP_SPI_DEFAULT();
 
 Configure the LED strip descriptor. First, set `length`.
 
 .. code-block:: C
+
    strip.length = N_PIXEL;
 
+:cpp:type:`led_strip_spi_t` is an alias of either :cpp:struct:`led_strip_spi_esp32_t` or
+:cpp:struct:`led_strip_spi_esp8266_t`.
+
 For ESP32, provide `spi_device_handle_t`, and set `max_transfer_sz` to the
-maximum size of the SPI data to transfer. `LED_STRIP_SPI_BUFFER_SIZE` macro is
+maximum size of the SPI data to transfer. :c:macro:`LED_STRIP_SPI_BUFFER_SIZE()` macro is
 provided to calculate the size from the number of pixels. Optionally, set SPI
 bus clock speed.
 
 .. code-block:: C
+
    #if HELPER_TARGET_IS_ESP32
    spi_device_handle_t device_handle;
    strip.device_handle = device_handle;
@@ -58,12 +65,13 @@ bus clock speed.
    strip.clock_speed_hz = 1000000 * 10;
    #endif
 
-Then, call `led_strip_spi_init()`.
+Then, call :cpp:func:`led_strip_spi_init()`.
 
 .. code-block:: C
-   ESP_ERROR_CHECK(led_strip_spi_init(&strip));
 
-The strip is now ready. Use :c:func:`led_strip_spi_set_pixel` and other functions to
+   led_strip_spi_init(&strip);
+
+The strip is now ready. Use :cpp:func:`led_strip_spi_set_pixel()` and other functions to
 modify the buffer. The buffer is sent to the bus when calling
 :c:func:`led_strip_spi_flush()`. See the example provided.
 
@@ -87,4 +95,10 @@ Known issues
 `SK9822` has bits to control global brightness, but the driver does not
 support it yet.
 
+.. doxygengroup:: led_strip_spi_esp32
+
+.. doxygengroup:: led_strip_spi_esp8266
+
 .. doxygengroup:: led_strip_spi
+
+.. doxygengroup:: led_strip_spi_sk9822

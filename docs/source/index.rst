@@ -196,6 +196,7 @@ Other
    groups/rda5807m
    groups/tca9548
    groups/led_strip
+   groups/led_strip_spi
    
 
 ===========
