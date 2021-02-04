@@ -34,6 +34,8 @@ Call :cpp:func:`led_strip_spi_install()`.
 
 .. code-block:: C
 
+   #include <led_strip_spi.h>
+
    ESP_ERROR_CHECK(led_strip_spi_install());
 
 Create :cpp:type:`led_strip_spi_t` and initialize it with :c:macro:`LED_STRIP_SPI_DEFAULT()`.
