@@ -1,7 +1,4 @@
-/**
- * @file led_strip_spi.h
- * @defgroup led_strip_spi led_strip_spi
- * @{
+/*
  *
  * SPI-based ESP-IDF driver for SK9822/APA102 LED strips
  *
@@ -9,6 +6,13 @@
  *               2021 Tomoyuki Sakurai <y@trombik.org>
  *
  * MIT Licensed as described in the file LICENSE
+ */
+
+/**
+ *
+ * @file led_strip_spi.h
+ * @defgroup led_strip_spi led_strip_spi
+ * @{
  *
  */
 #ifndef __LED_STRIP_SPI_H__
@@ -21,79 +25,21 @@
 
 #if HELPER_TARGET_IS_ESP32
 #include <driver/spi_master.h>
-#elif HELPER_TARGET_IS_ESP8266
+#include "led_strip_spi_esp32.h"
+#define LED_STRIP_SPI_DEFAULT()   LED_STRIP_SPI_DEFAULT_ESP32() ///< an alias of `LED_STRIP_SPI_DEFAULT_ESP32()` or `LED_STRIP_SPI_DEFAULT_ESP8266()`
+typedef led_strip_spi_esp32_t led_strip_spi_t;
+#endif
+
+#if HELPER_TARGET_IS_ESP8266
 #include <driver/spi.h>
-#else
-#error "Unsupported target"
+#include "led_strip_spi_esp8266.h"
+#define LED_STRIP_SPI_DEFAULT()   LED_STRIP_SPI_DEFAULT_ESP8266()
+typedef led_strip_spi_esp8266_t led_strip_spi_t;
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#if HELPER_TARGET_IS_ESP32
-
-#if HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
-#define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  HSPI_HOST
-#else
-#define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  SPI2_HOST
-#endif // HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
-
-#define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (13)
-#define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (14)
-
-/**
- * LED strip descriptor for ESP32-family.
- */
-typedef struct
-{
-    void *buf;                          //!< Pointer to the buffer
-    size_t length;                      //! Number of pixels
-    spi_host_device_t host_device;      //! SPI host device name, such as `SPI2_HOST`.
-    int mosi_io_num;                    //! GPIO number of SPI MOSI.
-    int sclk_io_num;                    //! GPIO number of SPI SCLK.
-    int max_transfer_sz;                //! Maximum transfer size in bytes. Defaults to 4094 if 0.
-    int clock_speed_hz;                 //! Clock speed in Hz.
-    int queue_size;                     //! Queue size used by `spi_device_queue_trans()`.
-    spi_device_handle_t device_handle;  //! Device handle assigned by the driver. The caller must provdie this.
-    int dma_chan;                       //! DMA channed to use. Either 1 or 2.
-    spi_transaction_t transaction;      //! SPI transaction used internally by the driver.
-} led_strip_spi_t;
-
-/**
- * Macro to initialize ::led_strip_spi_t
- */
-#define LED_STRIP_SPI_DEFAULT() \
-{ \
-    .buf = NULL,                                      \
-    .length = 1,                                      \
-    .host_device = LED_STRIP_SPI_DEFAULT_HOST_DEVICE, \
-    .mosi_io_num = LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM, \
-    .sclk_io_num = LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM, \
-    .max_transfer_sz = 0,                             \
-    .clock_speed_hz = 1000000,                        \
-    .queue_size = 1,                                  \
-    .device_handle = NULL,                            \
-    .dma_chan = 1,                                    \
-}
-
-#elif HELPER_TARGET_IS_ESP8266
-/**
- * LED strip descriptor for ESP8266.
- */
-typedef struct
-{
-    void *buf;              //! Pointer to the buffer.
-    size_t length;          //! Number of pixels.
-    spi_clk_div_t clk_div;  //! Value of `clk_div`, such as `SPI_2MHz_DIV`. See available values in `${IDF_PATH}/components/esp8266/include/driver/spi.h`.
-} led_strip_spi_t;
-
-#define LED_STRIP_SPI_DEFAULT() \
-{ \
-    .length = 1, \
-    .clk_div = SPI_2MHz_DIV, \
-}
-#endif // HELPER_TARGET_IS_ESP32 HELPER_TARGET_IS_ESP8266
 
 /*
  * * add LED_STRIP_SPI_USING_$NAME to Kconfig
@@ -126,7 +72,7 @@ esp_err_t led_strip_spi_init(led_strip_spi_t*strip);
 /**
  * @brief Free LED strip
  *
- * @param Descriptor of LED strip
+ * @param strip Descriptor of LED strip
  * @return `ESP_OK` on success
  */
 esp_err_t led_strip_spi_free(led_strip_spi_t *strip);
