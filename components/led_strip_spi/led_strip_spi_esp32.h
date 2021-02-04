@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2021 Tomoyuki Sakurai <y@trombik.org>
+ * MIT Licensed as described in the file LICENSE
+ */
+
 #if !defined(__LED_STRIP_SPI_ESP32__H__)
 #define __LED_STRIP_SPI_ESP32__H__
 

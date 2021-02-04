@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2021 Tomoyuki Sakurai <y@trombik.org>
+ * MIT Licensed as described in the file LICENSE
+ */
+
 #include <esp_err.h>
 #include "led_strip_spi.h"
 #include "led_strip_spi_sk9822.h"
