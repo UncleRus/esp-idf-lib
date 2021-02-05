@@ -47,17 +47,17 @@ The *Constant Power Mode* with measurements every 250 ms (`CCS811_MODE_250ms`)
 is only intended for systems where an external host system wants to run an
 algorithm with raw data.
 
-Once the sensor is initialized with function `ccs811_init_sensor()`, function
+Once the sensor is initialized with function `ccs811_init()`, function
 `ccs811_set_mode()` can be used to start periodic measurements with a given
 period.
 
 ```C
 ESP_ERROR_CHECK(i2cdev_init());
 ...
-static ccs811_sensor_t *sensor;
+static ccs811_dev_t *sensor;
 ESP_ERROR_CHECK(ccs811_init_desc(sensor, 0, CCS811_I2C_ADDRESS_1, 5, 4);
 ...
-if (ccs811_init_sensor(sensor) == ESP_OK)
+if (ccs811_init(sensor) == ESP_OK)
 {
    ...
    // start periodic measurement with one measurement per second
@@ -276,22 +276,22 @@ default I2C clock stretching. Therefore the clock stretching parameter of I2C
 has to be set to at least `CCS811_I2C_CLOCK_STRETCH`.
 
 ```C
-static ccs811_sensor_t sensor;    // pointer to sensor device data structure
+static ccs811_dev_t sensor;    // pointer to sensor device data structure
 ...
-memset(&sensor, 0, sizeof(ccs811_sensor_t));
+memset(&sensor, 0, sizeof(ccs811_dev_t));
 i2cdev_init();    // Init i2cdev library
 i2c_set_timeout(I2C_PORT, CCS811_I2C_CLOCK_STRETCH);
 ...
 ccs811_init_desc(sensor, I2C_PORT, CCS811_I2C_ADDRESS_1, I2C_SDA_PIN, I2C_SCL_PIN);
 ```
 
-Once I2C library initialized, function `ccs811_init_sensor()` has to be called
+Once I2C library initialized, function `ccs811_init()` has to be called
 for each CCS811 sensor to initialize the sensor and to check its availability
 as well as its error state.
 
 ```C
 ...
-if (ccs811_init_sensor(sensor) == ESP_OK)
+if (ccs811_init(sensor) == ESP_OK)
 {
     ...
 }

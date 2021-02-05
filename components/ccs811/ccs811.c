@@ -84,7 +84,7 @@ typedef struct
 ///////////////////////////////////////////////////////////////////////////////
 /// Static functions
 
-static esp_err_t read_reg_nolock(ccs811_sensor_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
+static esp_err_t read_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
     ESP_LOGD(TAG, "Read %d byte from i2c slave starting at reg addr %02x.", len, reg);
 
@@ -98,7 +98,7 @@ static esp_err_t read_reg_nolock(ccs811_sensor_t *dev, uint8_t reg, uint8_t *dat
     return ESP_OK;
 }
 
-static esp_err_t write_reg_nolock(ccs811_sensor_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
+static esp_err_t write_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
     ESP_LOGD(TAG, "Write %d bytes to i2c slave starting at reg addr %02x", len, reg);
 
@@ -112,7 +112,7 @@ static esp_err_t write_reg_nolock(ccs811_sensor_t *dev, uint8_t reg, uint8_t *da
     return ESP_OK;
 }
 
-static esp_err_t ccs811_is_available(ccs811_sensor_t *dev)
+static esp_err_t ccs811_is_available(ccs811_dev_t *dev)
 {
     CHECK_ARG(dev);
 
@@ -136,7 +136,7 @@ static esp_err_t ccs811_is_available(ccs811_sensor_t *dev)
     return ESP_OK;
 }
 
-static esp_err_t ccs811_enable_threshold(ccs811_sensor_t *dev, bool enabled)
+static esp_err_t ccs811_enable_threshold(ccs811_dev_t *dev, bool enabled)
 {
     CHECK_ARG(dev);
 
@@ -163,7 +163,7 @@ static esp_err_t ccs811_enable_threshold(ccs811_sensor_t *dev, bool enabled)
     return ESP_OK;
 }
 
-static esp_err_t ccs811_check_error_status(ccs811_sensor_t *dev)
+static esp_err_t ccs811_check_error_status(ccs811_dev_t *dev)
 {
     uint8_t status;
     uint8_t err_reg;
@@ -227,7 +227,7 @@ static esp_err_t ccs811_check_error_status(ccs811_sensor_t *dev)
 ///////////////////////////////////////////////////////////////////////////////
 /// Public functions
 
-esp_err_t ccs811_init_desc(ccs811_sensor_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t ccs811_init_desc(ccs811_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     if (addr != CCS811_I2C_ADDRESS_1 && addr != CCS811_I2C_ADDRESS_2)
@@ -248,14 +248,14 @@ esp_err_t ccs811_init_desc(ccs811_sensor_t *dev, uint8_t addr, i2c_port_t port, 
     return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
-esp_err_t ccs811_free_desc(ccs811_sensor_t *dev)
+esp_err_t ccs811_free_desc(ccs811_dev_t *dev)
 {
     CHECK_ARG(dev);
 
     return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
-esp_err_t ccs811_init_sensor(ccs811_sensor_t *dev)
+esp_err_t ccs811_init(ccs811_dev_t *dev)
 {
     CHECK_ARG(dev);
 
@@ -326,7 +326,7 @@ esp_err_t ccs811_init_sensor(ccs811_sensor_t *dev)
     return ESP_OK;
 }
 
-esp_err_t ccs811_set_mode(ccs811_sensor_t *dev, ccs811_mode_t mode)
+esp_err_t ccs811_set_mode(ccs811_dev_t *dev, ccs811_mode_t mode)
 {
     CHECK_ARG(dev);
 
@@ -371,7 +371,7 @@ esp_err_t ccs811_set_mode(ccs811_sensor_t *dev, ccs811_mode_t mode)
 #define CCS811_ALG_DATA_RAW_HB    6
 #define CCS811_ALG_DATA_RAW_LB    7
 
-esp_err_t ccs811_get_results(ccs811_sensor_t *dev, uint16_t *iaq_tvoc,
+esp_err_t ccs811_get_results(ccs811_dev_t *dev, uint16_t *iaq_tvoc,
         uint16_t *iaq_eco2, uint8_t *raw_i, uint16_t *raw_v)
 {
     CHECK_ARG(dev);
@@ -423,7 +423,7 @@ esp_err_t ccs811_get_results(ccs811_sensor_t *dev, uint16_t *iaq_tvoc,
     return ESP_OK;
 }
 
-esp_err_t ccs811_get_ntc_resistance(ccs811_sensor_t *dev, uint32_t r_ref,
+esp_err_t ccs811_get_ntc_resistance(ccs811_dev_t *dev, uint32_t r_ref,
         uint32_t *res)
 {
     CHECK_ARG(dev && res);
@@ -444,7 +444,7 @@ esp_err_t ccs811_get_ntc_resistance(ccs811_sensor_t *dev, uint32_t r_ref,
     return ESP_OK;
 }
 
-esp_err_t ccs811_set_environmental_data(ccs811_sensor_t *dev,
+esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev,
         float temperature, float humidity)
 {
     CHECK_ARG(dev);
@@ -465,7 +465,7 @@ esp_err_t ccs811_set_environmental_data(ccs811_sensor_t *dev,
     return ESP_OK;
 }
 
-esp_err_t ccs811_set_eco2_thresholds(ccs811_sensor_t *dev, uint16_t low,
+esp_err_t ccs811_set_eco2_thresholds(ccs811_dev_t *dev, uint16_t low,
         uint16_t high, uint8_t hysteresis)
 {
     CHECK_ARG(dev);
@@ -496,7 +496,7 @@ esp_err_t ccs811_set_eco2_thresholds(ccs811_sensor_t *dev, uint16_t low,
     return ccs811_enable_threshold(dev, true);
 }
 
-esp_err_t ccs811_enable_interrupt(ccs811_sensor_t *dev, bool enabled)
+esp_err_t ccs811_enable_interrupt(ccs811_dev_t *dev, bool enabled)
 {
     CHECK_ARG(dev);
 
@@ -518,7 +518,7 @@ esp_err_t ccs811_enable_interrupt(ccs811_sensor_t *dev, bool enabled)
     return ESP_OK;
 }
 
-esp_err_t ccs811_get_baseline(ccs811_sensor_t *dev, uint16_t *baseline)
+esp_err_t ccs811_get_baseline(ccs811_dev_t *dev, uint16_t *baseline)
 {
     CHECK_ARG(dev && baseline);
 
@@ -534,7 +534,7 @@ esp_err_t ccs811_get_baseline(ccs811_sensor_t *dev, uint16_t *baseline)
     return ESP_OK;
 }
 
-esp_err_t ccs811_set_baseline(ccs811_sensor_t *dev, uint16_t baseline)
+esp_err_t ccs811_set_baseline(ccs811_dev_t *dev, uint16_t baseline)
 {
     CHECK_ARG(dev);
 

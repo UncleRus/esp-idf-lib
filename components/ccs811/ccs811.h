@@ -76,7 +76,7 @@ typedef struct
 {
     i2c_dev_t i2c_dev;  //!< I2C device handle
     ccs811_mode_t mode; //!< operation mode
-} ccs811_sensor_t;
+} ccs811_dev_t;
 
 /**
  * @brief Initialize device descriptior
@@ -88,7 +88,7 @@ typedef struct
  * @param scl_gpio GPIO pin number for SCL
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_init_desc(ccs811_sensor_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t ccs811_init_desc(ccs811_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
@@ -96,7 +96,7 @@ esp_err_t ccs811_init_desc(ccs811_sensor_t *dev, uint8_t addr, i2c_port_t port, 
  * @param dev Pointer to the sensor device data structure
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_free_desc(ccs811_sensor_t *dev);
+esp_err_t ccs811_free_desc(ccs811_dev_t *dev);
 
 /**
  * @brief Initialize a CCS811 sensor
@@ -107,7 +107,7 @@ esp_err_t ccs811_free_desc(ccs811_sensor_t *dev);
  *
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_init_sensor(ccs811_sensor_t *dev);
+esp_err_t ccs811_init(ccs811_dev_t *dev);
 
 /**
  * @brief Set the operation mode of the sensor
@@ -141,7 +141,7 @@ esp_err_t ccs811_init_sensor(ccs811_sensor_t *dev);
  *
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_set_mode(ccs811_sensor_t *dev, ccs811_mode_t mode);
+esp_err_t ccs811_set_mode(ccs811_dev_t *dev, ccs811_mode_t mode);
 
 /**
  * @brief Get latest IAQ sensor values and/or RAW sensor data
@@ -167,7 +167,7 @@ esp_err_t ccs811_set_mode(ccs811_sensor_t *dev, ccs811_mode_t mode);
  *
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_get_results(ccs811_sensor_t *dev, uint16_t *iaq_tvoc,
+esp_err_t ccs811_get_results(ccs811_dev_t *dev, uint16_t *iaq_tvoc,
         uint16_t *iaq_eco2, uint8_t *raw_i, uint16_t *raw_v);
 
 /**
@@ -189,7 +189,7 @@ esp_err_t ccs811_get_results(ccs811_sensor_t *dev, uint16_t *iaq_tvoc,
  * @param[out] res resistance of R_NTC in Ohm
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_get_ntc_resistance(ccs811_sensor_t *dev, uint32_t r_ref,
+esp_err_t ccs811_get_ntc_resistance(ccs811_dev_t *dev, uint32_t r_ref,
         uint32_t *res);
 
 /**
@@ -204,7 +204,7 @@ esp_err_t ccs811_get_ntc_resistance(ccs811_sensor_t *dev, uint32_t r_ref,
  * @param humidity measured relative humidity in percent
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_set_environmental_data(ccs811_sensor_t *dev,
+esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev,
         float temperature, float humidity);
 
 /**
@@ -221,7 +221,7 @@ esp_err_t ccs811_set_environmental_data(ccs811_sensor_t *dev,
  * @param enabled if true, the interrupt is enabled, or disabled otherwise
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_enable_interrupt(ccs811_sensor_t *dev, bool enabled);
+esp_err_t ccs811_enable_interrupt(ccs811_dev_t *dev, bool enabled);
 
 /**
  * @brief Set eCO2 threshold mode for data ready interrupts
@@ -248,7 +248,7 @@ esp_err_t ccs811_enable_interrupt(ccs811_sensor_t *dev, bool enabled);
  * @param hysteresis hysteresis value (default 50)
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_set_eco2_thresholds(ccs811_sensor_t *dev, uint16_t low,
+esp_err_t ccs811_set_eco2_thresholds(ccs811_dev_t *dev, uint16_t low,
         uint16_t high, uint8_t hysteresis);
 
 /**
@@ -263,7 +263,7 @@ esp_err_t ccs811_set_eco2_thresholds(ccs811_sensor_t *dev, uint16_t low,
  * @param[out] baseline current baseline value on success, or 0 on error
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_get_baseline(ccs811_sensor_t *dev, uint16_t *baseline);
+esp_err_t ccs811_get_baseline(ccs811_dev_t *dev, uint16_t *baseline);
 
 /**
  * @brief Write a previously stored baseline value to the sensor
@@ -280,7 +280,7 @@ esp_err_t ccs811_get_baseline(ccs811_sensor_t *dev, uint16_t *baseline);
  * @param basline baseline to be set
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_set_baseline(ccs811_sensor_t *dev, uint16_t baseline);
+esp_err_t ccs811_set_baseline(ccs811_dev_t *dev, uint16_t baseline);
 
 #ifdef __cplusplus
 }
