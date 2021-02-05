@@ -20,7 +20,7 @@
 
 #define I2C_FREQ_HZ 400000 // 400kHz max
 
-static const char *TAG = "CCS811";
+static const char *TAG = "ccs811";
 
 /* CCS811 register addresses */
 #define CCS811_REG_STATUS          0x00
@@ -82,8 +82,9 @@ typedef struct
     } while (0)
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Static functions
 
-static esp_err_t ccs811_reg_read(ccs811_sensor_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
+static esp_err_t read_reg_nolock(ccs811_sensor_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
     ESP_LOGD(TAG, "Read %d byte from i2c slave starting at reg addr %02x.", len, reg);
 
@@ -97,7 +98,7 @@ static esp_err_t ccs811_reg_read(ccs811_sensor_t *dev, uint8_t reg, uint8_t *dat
     return ESP_OK;
 }
 
-static esp_err_t ccs811_reg_write(ccs811_sensor_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
+static esp_err_t write_reg_nolock(ccs811_sensor_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
     ESP_LOGD(TAG, "Write %d bytes to i2c slave starting at reg addr %02x", len, reg);
 
@@ -119,7 +120,7 @@ static esp_err_t ccs811_is_available(ccs811_sensor_t *dev)
 
     // check hardware id (register 0x20) and hardware version (register 0x21)
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_HW_ID, reg_data, 5));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_HW_ID, reg_data, 5));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     if (reg_data[0] != 0x81)
@@ -142,20 +143,19 @@ static esp_err_t ccs811_enable_threshold(ccs811_sensor_t *dev, bool enabled)
     ccs811_meas_mode_reg_t reg;
 
     // first, enable/disable the data ready interrupt
-    if (!ccs811_enable_interrupt(dev, enabled))
-        return false;
+    CHECK(ccs811_enable_interrupt(dev, enabled));
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     // read measurement mode register value
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
 
     // second, enable/disable the threshold interrupt mode
     reg.int_thresh = enabled;
 
     // write back measurement mode register
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_write(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
+            write_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
             "Could not set measurement mode register.");
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
@@ -171,7 +171,7 @@ static esp_err_t ccs811_check_error_status(ccs811_sensor_t *dev)
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     // check status register
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_STATUS, &status, 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_STATUS, &status, 1));
 
     if (!status & CCS811_STATUS_ERROR)
     {
@@ -181,7 +181,7 @@ static esp_err_t ccs811_check_error_status(ccs811_sensor_t *dev)
     }
 
     // Check the error register
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_ERROR_ID, &err_reg, 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_ERROR_ID, &err_reg, 1));
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -225,6 +225,7 @@ static esp_err_t ccs811_check_error_status(ccs811_sensor_t *dev)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Public functions
 
 esp_err_t ccs811_init_desc(ccs811_sensor_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
@@ -242,6 +243,7 @@ esp_err_t ccs811_init_desc(ccs811_sensor_t *dev, uint8_t addr, i2c_port_t port, 
 #if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
+    dev->i2c_dev.timeout_ticks = I2CDEV_MAX_STRETCH_TIME;
 
     return i2c_dev_create_mutex(&dev->i2c_dev);
 }
@@ -270,18 +272,18 @@ esp_err_t ccs811_init_sensor(ccs811_sensor_t *dev)
 
     // doing a software reset first
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_write(dev, CCS811_REG_SW_RESET, (uint8_t *)sw_reset, 4),
+            write_reg_nolock(dev, CCS811_REG_SW_RESET, (uint8_t *)sw_reset, 4),
             "Could not reset the sensor.");
 
     uint8_t status;
 
     // wait 100 ms after the reset
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(100));
 
     // get the status to check whether sensor is in bootloader mode
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_read(dev, CCS811_REG_STATUS, &status, 1),
-            "Could not read status register %02x.", CCS811_REG_STATUS);
+            read_reg_nolock(dev, CCS811_REG_STATUS, &status, 1),
+            "Could not read status register 0x%02x.", CCS811_REG_STATUS);
 
     // if sensor is in bootloader mode (FW_MODE == 0), it has to switch
     // to the application mode first
@@ -299,18 +301,18 @@ esp_err_t ccs811_init_sensor(ccs811_sensor_t *dev)
         uint8_t r = CCS811_REG_APP_START;
         I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
                 i2c_dev_write(&dev->i2c_dev, NULL, 0, &r, 1),
-                "Could not start application");
+                "Could not start application.");
 
         // wait 100 ms after starting the app
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(100));
 
         // get the status to check whether sensor switched to application mode
         I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-                ccs811_reg_read(dev, CCS811_REG_STATUS, &status, 1),
-                "Could not start application");
+                read_reg_nolock(dev, CCS811_REG_STATUS, &status, 1),
+                "Could not read application status.");
         if (!(status & CCS811_STATUS_FW_MODE))
         {
-            ESP_LOGE(TAG, "Could not start application.");
+            ESP_LOGE(TAG, "Could not start application, invalid status 0x%02x.", status);
             I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
             return CCS811_ERR_APP_START_FAIL;
         }
@@ -333,18 +335,18 @@ esp_err_t ccs811_set_mode(ccs811_sensor_t *dev, ccs811_mode_t mode)
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     // read measurement mode register value
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
 
     reg.drive_mode = mode;
 
     // write back measurement mode register
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_write(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
+            write_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
             "Could not set measurement mode.");
 
     // check whether setting measurement mode were succesfull
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
+            read_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
             "Could not set measurement mode.");
 
     if (reg.drive_mode != mode)
@@ -391,7 +393,7 @@ esp_err_t ccs811_get_results(ccs811_sensor_t *dev, uint16_t *iaq_tvoc,
     // read IAQ sensor values and RAW sensor data including status and error id
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_read(dev, CCS811_REG_ALG_RESULT_DATA, data, 8),
+            read_reg_nolock(dev, CCS811_REG_ALG_RESULT_DATA, data, 8),
             "Could not read sensor data.");
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -430,7 +432,7 @@ esp_err_t ccs811_get_ntc_resistance(ccs811_sensor_t *dev, uint32_t r_ref,
 
     // read baseline register
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_NTC, data, 4));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_NTC, data, 4));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     // calculation from application note ams AN000372
@@ -456,7 +458,7 @@ esp_err_t ccs811_set_environmental_data(ccs811_sensor_t *dev,
     // send environmental data to the sensor
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_write(dev, CCS811_REG_ENV_DATA, data, 4),
+            write_reg_nolock(dev, CCS811_REG_ENV_DATA, data, 4),
             "Could not write environmental data to sensor.");
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -486,7 +488,7 @@ esp_err_t ccs811_set_eco2_thresholds(ccs811_sensor_t *dev, uint16_t low,
     // write threshold data to the sensor
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_write(dev, CCS811_REG_THRESHOLDS, data, 5),
+            write_reg_nolock(dev, CCS811_REG_THRESHOLDS, data, 5),
             "Could not write threshold interrupt data to sensor.");
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -503,15 +505,13 @@ esp_err_t ccs811_enable_interrupt(ccs811_sensor_t *dev, bool enabled)
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     // read measurement mode register value
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
 
     reg.int_datardy = enabled;
     reg.int_thresh = false;      // threshold mode must not enabled
 
     // write back measurement mode register
-    I2C_DEV_CHECK_LOGE(&dev->i2c_dev,
-            ccs811_reg_write(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1),
-            "Could not set measurment mode register.");
+    I2C_DEV_CHECK(&dev->i2c_dev, write_reg_nolock(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1));
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
@@ -526,7 +526,7 @@ esp_err_t ccs811_get_baseline(ccs811_sensor_t *dev, uint16_t *baseline)
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     // read baseline register
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_read(dev, CCS811_REG_BASELINE, data, 2));
+    I2C_DEV_CHECK(&dev->i2c_dev, read_reg_nolock(dev, CCS811_REG_BASELINE, data, 2));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     *baseline = (uint16_t) (data[0]) << 8 | data[1];
@@ -542,7 +542,7 @@ esp_err_t ccs811_set_baseline(ccs811_sensor_t *dev, uint16_t baseline)
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     // write baseline register
-    I2C_DEV_CHECK(&dev->i2c_dev, ccs811_reg_write(dev, CCS811_REG_BASELINE, data, 2));
+    I2C_DEV_CHECK(&dev->i2c_dev, write_reg_nolock(dev, CCS811_REG_BASELINE, data, 2));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     return ESP_OK;

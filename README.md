@@ -137,12 +137,6 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **mcp960x**    | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter   | BSD     | Yes
 | **tsys01**     | Driver for porecision digital temperature sensor TSYS01                 | BSD     | Yes
 
-### Gas sensors
-
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes
-
 ### Pressure sensors
 
 | Component      | Description                                                             | License | Thread safety
@@ -152,11 +146,12 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **bme680**     | Driver for BME680 digital environmental sensor                          | BSD     | Yes
 | **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
 
-### Air quality sensors
+### Air quality/Gas sensors
 
 | Component      | Description                                                             | License | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------------
 | **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes
+| **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes
 
 ### ADC/DAC
 
