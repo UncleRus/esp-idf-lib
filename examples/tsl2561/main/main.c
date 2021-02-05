@@ -19,7 +19,7 @@
 
 #define ADDR TSL2561_I2C_ADDR_FLOAT
 
-void tsl2561_test(void *pvParamters)
+void tsl2561_test(void *pvParameters)
 {
     tsl2561_t dev;
     memset(&dev, 0, sizeof(tsl2561_t));

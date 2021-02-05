@@ -15,7 +15,7 @@
 
 #define I2C_FREQ_HZ 1000000 // Max 1 MHz for esp-idf, but supports up to 2.56 MHz
 
-static const char *TAG = "INA219";
+static const char *TAG = "ina219";
 
 #define REG_CONFIG      0
 #define REG_SHUNT_U     1

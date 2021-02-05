@@ -43,7 +43,7 @@ typedef enum
 } mcp4725_power_mode_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * SCL frequency is 1MHz
  * @param dev I2C device descriptor
  * @param port I2C port number

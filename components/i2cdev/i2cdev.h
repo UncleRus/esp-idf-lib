@@ -95,7 +95,7 @@ esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev);
 /**
  * @brief Read from slave device
  *
- * Issue a send operation of \p out_data register adress, followed by reading \p in_size bytes
+ * Issue a send operation of \p out_data register address, followed by reading \p in_size bytes
  * from slave into \p in_data .
  * Function is thread-safe.
  * @param[in] dev Device descriptor

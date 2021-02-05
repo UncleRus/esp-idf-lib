@@ -16,7 +16,7 @@
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
-static const char *TAG = "MCP342x";
+static const char *TAG = "mcp342x";
 
 #define BV(x) (1 << (x))
 

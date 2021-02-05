@@ -74,7 +74,7 @@ typedef struct {
 } mcp342x_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param dev Device descriptor
  * @param port I2C port
  * @param addr Device address
@@ -139,9 +139,9 @@ esp_err_t mcp342x_get_data(mcp342x_t *dev, int32_t *data, bool *ready);
 esp_err_t mcp342x_get_voltage(mcp342x_t *dev, float *volts, bool *ready);
 
 /**
- * @brief Do a single converiton
+ * @brief Do a single conversion
  * - start conversion
- * - wait convertion time
+ * - wait conversion time
  * - read conversion result
  *
  * @param dev Device descriptor

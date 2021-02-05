@@ -3,7 +3,7 @@
  * @defgroup tsl4531 tsl4531
  * @{
  *
- * ESP-IDF driver for I2C 16 bit GPIO expander MCP23017
+ * ESP-IDF driver for digital ambient light sensor TSL4531
  *
  * Ported from esp-open-rtos
  *
@@ -58,7 +58,7 @@ typedef struct {
 } tsl4531_t;
 
 /**
- * Initialize device descriptior
+ * Initialize device descriptor
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO pin
@@ -86,7 +86,7 @@ esp_err_t tsl4531_init(tsl4531_t *dev);
  * @param dev Device descriptor
  * @param integration_time Integration time
  * @param skip_power_save PowerSave Mode. When true, the power save states are
- *        skipped following a light integration cyclefor shorter sampling rates
+ *        skipped following a light integration cycle for shorter sampling rates
  * @return `ESP_OK` on success
  */
 esp_err_t tsl4531_config(tsl4531_t *dev, tsl4531_integration_time_t integration_time, bool skip_power_save);

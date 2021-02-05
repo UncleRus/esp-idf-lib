@@ -47,7 +47,7 @@ typedef enum {
 } si7021_resolution_t;
 
 /**
- * Initialize device descriptior
+ * Initialize device descriptor
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO pin

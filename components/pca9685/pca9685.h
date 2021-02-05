@@ -49,7 +49,7 @@ typedef enum
 } pca9685_channel_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param dev Pointer to I2C device descriptor
  * @param addr PCA9685 address
  * @param port I2C port number

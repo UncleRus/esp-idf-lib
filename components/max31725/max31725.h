@@ -65,7 +65,7 @@ typedef enum {
 } max31725_mode_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param dev Device descriptor
  * @param port I2C port number
  * @param addr I2C address

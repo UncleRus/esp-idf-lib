@@ -23,7 +23,7 @@ extern "C" {
 #define TCA95X5_I2C_ADDR_BASE 0x20
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  *
  * SCL frequency is 400kHz
  *

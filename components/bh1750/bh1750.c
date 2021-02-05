@@ -36,15 +36,20 @@
 
 #define I2C_FREQ_HZ 400000
 
-static const char *TAG = "BH1750";
+static const char *TAG = "bh1750";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
+inline static esp_err_t send_command_nolock(i2c_dev_t *dev, uint8_t cmd)
+{
+    return i2c_dev_write(dev, NULL, 0, &cmd, 1);
+}
+
 static esp_err_t send_command(i2c_dev_t *dev, uint8_t cmd)
 {
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, &cmd, 1));
+    I2C_DEV_CHECK(dev, send_command_nolock(dev, cmd));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
@@ -95,7 +100,7 @@ esp_err_t bh1750_setup(i2c_dev_t *dev, bh1750_mode_t mode, bh1750_resolution_t r
 {
     CHECK_ARG(dev);
 
-    uint8_t opcode = mode == BH1750_MODE_CONTINIOUS ? OPCODE_CONT : OPCODE_OT;
+    uint8_t opcode = mode == BH1750_MODE_CONTINUOUS ? OPCODE_CONT : OPCODE_OT;
     switch (resolution)
     {
         case BH1750_RES_LOW:  opcode |= OPCODE_LOW;   break;
@@ -114,8 +119,10 @@ esp_err_t bh1750_set_measurement_time(i2c_dev_t *dev, uint8_t time)
 {
     CHECK_ARG(dev);
 
-    CHECK(send_command(dev, OPCODE_MT_HI | (time >> 5)));
-    CHECK(send_command(dev, OPCODE_MT_LO | (time & 0x1f)));
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, send_command_nolock(dev, OPCODE_MT_HI | (time >> 5)));
+    I2C_DEV_CHECK(dev, send_command_nolock(dev, OPCODE_MT_LO | (time & 0x1f)));
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }

@@ -1,5 +1,29 @@
 # Changelog
 
+## v.0.7.1
+
+#### Features
+
+- (mcp960x) #141 Driver + example for MCP960X/L0X/RL0X
+- (tsys01) #142 Driver + example for TSYS01
+
+#### Bugfixes
+
+- (qmc5883l) dd17522 Fix possible race condition
+- (tca95x5) #144 Copy-paste error, add example
+- (esp_idf_lib_helpers) #143 Invalid error message
+- (tsl4531) c2e835d Fix possible race condition
+- (sht3x) 8289262 Fix possible race confition in SS measurement, refactoring
+- (bh1750, bmp180) d57488b Fix possible race condition
+
+## v.0.7
+
+#### Features
+
+- (ina260) #126 Driver for INA260 precision digital current and power monitor
+- (rda5807m) #25 Driver for single-chip broadcast FM radio tuner RDA5807M
+- (i2cdev) #138 I2C clock stertching support
+
 ## v.0.6.1
 
 #### Bugfixes

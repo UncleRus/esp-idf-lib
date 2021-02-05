@@ -149,7 +149,7 @@ esp_err_t ina260_reset(ina260_t *dev);
  *
  * @param dev Device descriptor
  * @param mode Operating mode
- * @param avg_mode Averaging mide
+ * @param avg_mode Averaging mode
  * @param vbus_ct Bus voltage conversion time
  * @param ish_ct Shunt current conversion time
  * @return `ESP_OK` on success
@@ -162,7 +162,7 @@ esp_err_t ina260_set_config(ina260_t *dev, ina260_mode_t mode, ina260_averaging_
  *
  * @param dev Device descriptor
  * @param[out] mode Operating mode
- * @param[out] avg_mode Averaging mide
+ * @param[out] avg_mode Averaging mode
  * @param[out] vbus_ct Bus voltage conversion time
  * @param[out] ish_ct Shunt current conversion time
  * @return `ESP_OK` on success

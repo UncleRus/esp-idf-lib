@@ -112,6 +112,8 @@ Humidity & temperature sensors
    groups/lm75
    groups/bme680
    groups/mcp9808
+   groups/mcp960x
+   groups/tsys01
    
 Gas sensors
 ==========
@@ -129,6 +131,13 @@ Pressure sensors
    groups/bmp280
    groups/bme680
    groups/ms5611
+
+Air quality sensors
+===================
+.. toctree::
+   :maxdepth: 1
+
+   groups/sgp40
 
 ADC/DAC
 =======
@@ -166,6 +175,7 @@ Light sensors
    groups/bh1750
    groups/tsl2561
    groups/tsl4531
+   groups/tsl2591
 
 GPIO expanders
 ==============
@@ -198,5 +208,6 @@ Other
 Indices and tables
 ==================
 
+* :ref:`chips`
 * :ref:`genindex`
 * :ref:`search`

@@ -162,7 +162,7 @@ typedef struct
  * @brief Initialize device descriptor
  *
  * @param dev Device descriptor
- * @param addr BMP280 address
+ * @param addr BME680 address
  * @param port I2C port number
  * @param sda_gpio GPIO pin for SDA
  * @param scl_gpio GPIO pin for SCL

@@ -117,7 +117,7 @@ static const band_limit_t band_limits[] = {
     [RDA5807M_BAND_50_76]  = {50000, 76000}
 };
 
-static const char *TAG = "RDA5807M";
+static const char *TAG = "rda5807m";
 
 static inline esp_err_t read_register_nolock(rda5807m_t *dev, uint8_t reg, uint16_t *val)
 {

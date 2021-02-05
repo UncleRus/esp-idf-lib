@@ -24,7 +24,7 @@
 #define FORMAT MAX31725_FMT_NORMAL
 
 // Main task
-void test(void *pvParamters)
+void test(void *pvParameters)
 {
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));

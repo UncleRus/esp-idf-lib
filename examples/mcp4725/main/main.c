@@ -44,7 +44,7 @@ void task(void *pvParameters)
         wait_for_eeprom(&dev);
     }
 
-    printf("Set default DAC ouptut value to MAX...\n");
+    printf("Set default DAC output value to MAX...\n");
     ESP_ERROR_CHECK(mcp4725_set_raw_output(&dev, MCP4725_MAX_VALUE, true));
     wait_for_eeprom(&dev);
 

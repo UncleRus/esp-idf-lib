@@ -46,11 +46,11 @@
  *  of length 5.  The first and third bytes are humidity (%) and temperature (C), respectively.  Bytes 2 and 4
  *  are zero-filled and the fifth is a checksum such that:
  *
- *  byte_5 == (byte_1 + byte_2 + byte_3 + btye_4) & 0xFF
+ *  byte_5 == (byte_1 + byte_2 + byte_3 + byte_4) & 0xFF
  *
  */
 
-static const char *TAG = "DHTxx";
+static const char *TAG = "dht";
 
 #if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;

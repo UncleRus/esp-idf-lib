@@ -14,7 +14,7 @@
 #include <esp_idf_lib_helpers.h>
 #include "max31725.h"
 
-static const char *TAG = "MAX31725";
+static const char *TAG = "max31725";
 
 static const float t_lsb = 0.00390625;
 

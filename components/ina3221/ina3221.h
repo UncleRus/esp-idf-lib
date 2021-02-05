@@ -89,7 +89,7 @@ typedef union
     {
         uint16_t esht :1; ///< Enable/Disable shunt measure    // LSB
         uint16_t ebus :1; ///< Enable/Disable bus measure
-        uint16_t mode :1; ///< Single shot measure or continious mode
+        uint16_t mode :1; ///< Single shot measure or continuous mode
         uint16_t vsht :3; ///< Shunt voltage conversion time
         uint16_t vbus :3; ///< Bus voltage conversion time
         uint16_t avg  :3; ///< number of sample collected and averaged together

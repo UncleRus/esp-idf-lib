@@ -18,7 +18,7 @@
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
-static const char *TAG = "BMP180";
+static const char *TAG = "bmp180";
 
 #define BMP180_RX_QUEUE_SIZE      10
 #define BMP180_TASK_PRIORITY      9
@@ -55,7 +55,7 @@ static esp_err_t bmp180_read_reg_16(i2c_dev_t *dev, uint8_t reg, int16_t *r)
     return ESP_OK;
 }
 
-static inline esp_err_t bmp180_start_messurement(i2c_dev_t *dev, uint8_t cmd)
+static inline esp_err_t bmp180_start_measurement(i2c_dev_t *dev, uint8_t cmd)
 {
     return i2c_dev_write_reg(dev, BMP180_CONTROL_REG, &cmd, 1);
 }
@@ -63,7 +63,7 @@ static inline esp_err_t bmp180_start_messurement(i2c_dev_t *dev, uint8_t cmd)
 static esp_err_t bmp180_get_uncompensated_temperature(i2c_dev_t *dev, int32_t *ut)
 {
     // Write Start Code into reg 0xF4.
-    CHECK(bmp180_start_messurement(dev, BMP180_MEASURE_TEMP));
+    CHECK(bmp180_start_measurement(dev, BMP180_MEASURE_TEMP));
 
     // Wait 5ms, datasheet states 4.5ms
     ets_delay_us(5000);
@@ -89,7 +89,7 @@ static esp_err_t bmp180_get_uncompensated_pressure(i2c_dev_t *dev, bmp180_mode_t
     }
 
     // Write Start Code into reg 0xF4
-    CHECK(bmp180_start_messurement(dev, BMP180_MEASURE_PRESS | (oss << 6)));
+    CHECK(bmp180_start_measurement(dev, BMP180_MEASURE_PRESS | (oss << 6)));
 
     ets_delay_us(us);
 
@@ -130,13 +130,17 @@ esp_err_t bmp180_init(bmp180_dev_t *dev)
 {
     CHECK_ARG(dev);
 
-    if (!bmp180_is_available(&dev->i2c_dev))
-    {
-        ESP_LOGE(TAG, "Device not found");
-        return ESP_ERR_NOT_FOUND;
-    }
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+
+    uint8_t id;
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, BMP180_VERSION_REG, &id, 1));
+    if (id != BMP180_CHIP_ID)
+    {
+        I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+        ESP_LOGE(TAG, "Invalid device ID: 0x%02x", id);
+        return ESP_ERR_NOT_FOUND;
+    }
 
     I2C_DEV_CHECK(&dev->i2c_dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 0, &dev->AC1));
     I2C_DEV_CHECK(&dev->i2c_dev, bmp180_read_reg_16(&dev->i2c_dev, BMP180_CALIBRATION_REG + 2, &dev->AC2));
@@ -167,16 +171,7 @@ esp_err_t bmp180_init(bmp180_dev_t *dev)
     return ESP_OK;
 }
 
-bool bmp180_is_available(i2c_dev_t *i2c_dev)
-{
-    if (!i2c_dev)
-        return false;
-
-    uint8_t id;
-    if (i2c_dev_read_reg(i2c_dev, BMP180_VERSION_REG, &id, 1) != ESP_OK)
-        return false;
-    return id == BMP180_CHIP_ID;
-}
+///////////////////////////////////////////////////////////////////////////////
 
 esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressure, bmp180_mode_t oss)
 {

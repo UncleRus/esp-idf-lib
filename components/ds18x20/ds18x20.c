@@ -46,7 +46,7 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
 #endif
 
-static const char *TAG = "DS18x20";
+static const char *TAG = "ds18x20";
 
 esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait)
 {

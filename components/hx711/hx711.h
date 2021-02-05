@@ -88,7 +88,7 @@ esp_err_t hx711_wait(hx711_t *dev, size_t timeout_ms);
  * @brief Read raw data from device.
  *
  * Please call this function only when device is ready,
- * otherwise communictaion errors may occur
+ * otherwise communication errors may occur
  *
  * @param dev Device descriptor
  * @param data Raw ADC data

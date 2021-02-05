@@ -16,7 +16,7 @@
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
-static const char *TAG = "SI7021";
+static const char *TAG = "si7021";
 
 #define DELAY_MS 50  // fixed delay
 

@@ -43,7 +43,7 @@ extern "C" {
 #define TCA9548_CHANNEL7 BV(7)
 
 /**
- * Initialize device descriptior
+ * Initialize device descriptor
  * @param dev Device descriptor
  * @param port I2C port
  * @param addr Device address
