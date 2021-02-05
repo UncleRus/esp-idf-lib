@@ -146,11 +146,12 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **bme680**     | Driver for BME680 digital environmental sensor                          | BSD     | Yes
 | **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
 
-### Air quality sensors
+### Air quality/Gas sensors
 
 | Component      | Description                                                             | License | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------------
 | **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes
+| **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes
 
 ### ADC/DAC
 
@@ -215,7 +216,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 
 - [Tomoyuki Sakurai](https://github.com/trombik), developer of the LM75 driver, 
   author of the RTOS SDK ESP82666 support, master CI
-- [Gunar Schorcht](https://github.com/gschorcht), developer of SHT3x and BME680 drivers
+- [Gunar Schorcht](https://github.com/gschorcht), developer of SHT3x, BME680 and CCS811 drivers
 - [Brian Schwind](https://github.com/bschwind), developer of TS2561 and TSL4531 drivers
 - [Andrej Krutak](https://github.com/andree182), developer of BH1750 driver
 - Frank Bargstedt, developer of BMP180 driver

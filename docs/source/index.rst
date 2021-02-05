@@ -115,6 +115,13 @@ Humidity & temperature sensors
    groups/mcp960x
    groups/tsys01
    
+Gas sensors
+==========
+.. toctree::
+   :maxdepth: 1
+
+   groups/ccs811
+   
 Pressure sensors
 ================
 .. toctree::
