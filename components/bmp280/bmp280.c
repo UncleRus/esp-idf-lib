@@ -17,7 +17,7 @@
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
-static const char *TAG = "BMP280";
+static const char *TAG = "bmp280";
 
 /**
  * BMP280 registers

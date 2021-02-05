@@ -14,7 +14,7 @@
 
 #define I2C_FREQ_HZ 100000 // 100kHz
 
-static const char *TAG = "TDA74xx";
+static const char *TAG = "tda74xx";
 
 #define REG_INPUT_SELECTOR 0x00
 #define REG_INPUT_GAIN     0x01

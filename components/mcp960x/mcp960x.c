@@ -14,7 +14,7 @@
 
 #define I2C_FREQ_HZ 100000 // 100 KHz
 
-static const char *TAG = "MCP960x";
+static const char *TAG = "mcp960x";
 
 #define REG_T_HOT      0x00
 #define REG_T_DELTA    0x01

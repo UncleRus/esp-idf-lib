@@ -175,7 +175,7 @@
 #define BME680_CDM_RHR  43      // 0x02 - res_heat_range
 #define BME680_CDM_RSWE 45      // 0x04 - range_sw_error
 
-static const char *TAG = "BME680";
+static const char *TAG = "bme680";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)

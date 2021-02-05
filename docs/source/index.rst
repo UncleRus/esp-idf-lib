@@ -125,6 +125,13 @@ Pressure sensors
    groups/bme680
    groups/ms5611
 
+Air quality sensors
+===================
+.. toctree::
+   :maxdepth: 1
+
+   groups/sgp40
+
 ADC/DAC
 =======
 .. toctree::

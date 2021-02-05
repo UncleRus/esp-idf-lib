@@ -13,7 +13,7 @@
 
 #define I2C_FREQ_HZ 100000 // 100kHz
 
-static const char *TAG = "TCA9548";
+static const char *TAG = "tca9548";
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \

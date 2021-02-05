@@ -13,9 +13,9 @@
 #include <freertos/task.h>
 #include "tsys01.h"
 
-#define I2C_FREQ_HZ 1000000 // 1MHz (max
+#define I2C_FREQ_HZ 1000000 // 1MHz
 
-static const char *TAG = "TSYS01";
+static const char *TAG = "tsys01";
 
 #define CMD_RESET  0x1e
 #define CMD_START  0x48

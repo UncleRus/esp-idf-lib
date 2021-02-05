@@ -21,7 +21,7 @@
     #define CONFIG_RE_BTN_PRESSED_LEVEL 1
 #endif
 
-static const char *TAG = "ENCODER";
+static const char *TAG = "encoder";
 static rotary_encoder_t *encs[CONFIG_RE_MAX] = { 0 };
 static const int8_t valid_states[] = { 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 };
 static SemaphoreHandle_t mutex;

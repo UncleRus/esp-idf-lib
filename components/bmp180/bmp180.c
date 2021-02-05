@@ -18,7 +18,7 @@
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
-static const char *TAG = "BMP180";
+static const char *TAG = "bmp180";
 
 #define BMP180_RX_QUEUE_SIZE      10
 #define BMP180_TASK_PRIORITY      9

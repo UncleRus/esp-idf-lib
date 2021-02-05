@@ -16,7 +16,7 @@
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
-static const char *TAG = "TSL2591";
+static const char *TAG = "tsl2591";
 
 // Registers
 #define TSL2591_REG_COMMAND 0x80

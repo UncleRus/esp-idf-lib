@@ -37,7 +37,7 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-static const char *TAG = "MS5611";
+static const char *TAG = "ms5611";
 
 static inline esp_err_t send_command(ms5611_t *dev, uint8_t cmd)
 {

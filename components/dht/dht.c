@@ -50,7 +50,7 @@
  *
  */
 
-static const char *TAG = "DHTxx";
+static const char *TAG = "dht";
 
 #if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;

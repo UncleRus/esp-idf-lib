@@ -146,6 +146,12 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **bme680**     | Driver for BME680 digital environmental sensor                          | BSD     | Yes
 | **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
 
+### Air quality sensors
+
+| Component      | Description                                                             | License | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------------
+| **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes
+
 ### ADC/DAC
 
 | Component      | Description                                                             | License | Thread safety
