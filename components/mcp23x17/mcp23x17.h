@@ -96,7 +96,7 @@ esp_err_t mcp23x17_free_desc(mcp23x17_t *dev);
 #else
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  * @param dev Pointer to device descriptor
  * @param host SPI host
  * @param clock_speed_hz SPI clock speed, Hz (max `MCP23X17_MAX_SPI_FREQ`)

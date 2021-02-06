@@ -128,11 +128,11 @@ static inline esp_err_t read_register16(tsl2591_t *dev, uint8_t low_register, ui
 }
 
 
-// Initialisation.
+// Initialization.
 esp_err_t tsl2591_init_desc(tsl2591_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
-    ESP_LOGD(TAG, "Initialise descriptor");
+    ESP_LOGD(TAG, "Initialize descriptor");
 
     dev->i2c_dev.port = port;
     dev->i2c_dev.addr = TSL2591_I2C_ADDR; // tsl2591 has only one i2c address.
@@ -156,7 +156,7 @@ esp_err_t tsl2591_free_desc(tsl2591_t *dev)
 esp_err_t tsl2591_init(tsl2591_t *dev)
 {
     CHECK_ARG(dev);
-    ESP_LOGD(TAG, "Initialise sensor.");
+    ESP_LOGD(TAG, "Initialize sensor.");
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 

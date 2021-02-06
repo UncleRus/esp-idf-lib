@@ -76,7 +76,7 @@ typedef struct
 } ccs811_dev_t;
 
 /**
- * @brief Initialize device descriptior
+ * @brief Initialize device descriptor
  *
  * @param dev Pointer to the sensor device data structure
  * @param addr Sensor address
@@ -164,8 +164,7 @@ esp_err_t ccs811_set_mode(ccs811_dev_t *dev, ccs811_mode_t mode);
  *
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_get_results(ccs811_dev_t *dev, uint16_t *iaq_tvoc,
-        uint16_t *iaq_eco2, uint8_t *raw_i, uint16_t *raw_v);
+esp_err_t ccs811_get_results(ccs811_dev_t *dev, uint16_t *iaq_tvoc, uint16_t *iaq_eco2, uint8_t *raw_i, uint16_t *raw_v);
 
 /**
  * @brief Get the resistance of connected NTC thermistor
@@ -186,8 +185,7 @@ esp_err_t ccs811_get_results(ccs811_dev_t *dev, uint16_t *iaq_tvoc,
  * @param[out] res resistance of R_NTC in Ohm
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_get_ntc_resistance(ccs811_dev_t *dev, uint32_t r_ref,
-        uint32_t *res);
+esp_err_t ccs811_get_ntc_resistance(ccs811_dev_t *dev, uint32_t r_ref, uint32_t *res);
 
 /**
  * @brief Set environmental data
@@ -201,8 +199,7 @@ esp_err_t ccs811_get_ntc_resistance(ccs811_dev_t *dev, uint32_t r_ref,
  * @param humidity measured relative humidity in percent
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev,
-        float temperature, float humidity);
+esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev, float temperature, float humidity);
 
 /**
  * @brief Enable or disable data ready interrupt signal *nINT*
@@ -245,8 +242,7 @@ esp_err_t ccs811_enable_interrupt(ccs811_dev_t *dev, bool enabled);
  * @param hysteresis hysteresis value (default 50)
  * @returns ESP_OK on success
  */
-esp_err_t ccs811_set_eco2_thresholds(ccs811_dev_t *dev, uint16_t low,
-        uint16_t high, uint8_t hysteresis);
+esp_err_t ccs811_set_eco2_thresholds(ccs811_dev_t *dev, uint16_t low, uint16_t high, uint8_t hysteresis);
 
 /**
  * @brief Get the current baseline value from sensor

@@ -129,9 +129,9 @@ typedef struct
 } tsl2591_t;
 
 
-// Initialisation.
+// Initialization.
 /**
- * Initialise device descriptior.
+ * Initialize device descriptor.
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO pin
@@ -148,7 +148,7 @@ esp_err_t tsl2591_init_desc(tsl2591_t *dev, i2c_port_t port, gpio_num_t sda_gpio
 esp_err_t tsl2591_free_desc(tsl2591_t *dev);
 
 /**
- * Initialise device.
+ * Initialize device.
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
