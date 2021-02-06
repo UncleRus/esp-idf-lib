@@ -84,6 +84,15 @@ static esp_err_t update_reg(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t v
     return ESP_OK;
 }
 
+static esp_err_t dev_sleep(i2c_dev_t *dev, bool sleep)
+{
+    CHECK(update_reg(dev, REG_MODE1, MODE1_SLEEP, sleep ? MODE1_SLEEP : 0));
+    if (!sleep)
+        ets_delay_us(WAKEUP_DELAY_US);
+
+    return ESP_OK;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Public
 
@@ -172,9 +181,7 @@ esp_err_t pca9685_sleep(i2c_dev_t *dev, bool sleep)
     CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, update_reg(dev, REG_MODE1, MODE1_SLEEP, sleep ? MODE1_SLEEP : 0));
-    if (!sleep)
-        ets_delay_us(WAKEUP_DELAY_US);
+    I2C_DEV_CHECK(dev, dev_sleep(dev, sleep));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
@@ -245,11 +252,11 @@ esp_err_t pca9685_set_prescaler(i2c_dev_t *dev, uint8_t prescaler)
     CHECK_ARG_LOGE(prescaler >= MIN_PRESCALER,
             "Invalid prescaler value: (%d), must be >= 3", prescaler);
 
-    CHECK(pca9685_sleep(dev, true));
     I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, dev_sleep(dev, true));
     I2C_DEV_CHECK(dev, write_reg(dev, REG_PRE_SCALE, prescaler));
+    I2C_DEV_CHECK(dev, dev_sleep(dev, false));
     I2C_DEV_GIVE_MUTEX(dev);
-    CHECK(pca9685_sleep(dev, false));
 
     return ESP_OK;
 }
