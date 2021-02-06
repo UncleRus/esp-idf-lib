@@ -54,14 +54,15 @@ period.
 ```C
 ESP_ERROR_CHECK(i2cdev_init());
 ...
-static ccs811_dev_t *sensor;
-ESP_ERROR_CHECK(ccs811_init_desc(sensor, 0, CCS811_I2C_ADDRESS_1, 5, 4);
+static ccs811_dev_t sensor;
+memset(&sensor, 0, sizeof(ccs811_dev_t)); // Zero descriptor
+ESP_ERROR_CHECK(ccs811_init_desc(&sensor, 0, CCS811_I2C_ADDRESS_1, 5, 4);
 ...
-if (ccs811_init(sensor) == ESP_OK)
+if (ccs811_init(&sensor) == ESP_OK)
 {
    ...
    // start periodic measurement with one measurement per second
-   ESP_ERROR_CHECK(ccs811_set_mode(sensor, CCS811_MODE_1S));
+   ESP_ERROR_CHECK(ccs811_set_mode(&sensor, CCS811_MODE_1S));
 }
 ...
 ```
@@ -107,7 +108,7 @@ uint8_t  raw_i;
 uint16_t raw_v;
 ...
 // get the results and do something with them
-if (ccs811_get_results(sensor, &tvoc, &eco2, &raw_i, &raw_v) == ESP_OK)
+if (ccs811_get_results(&sensor, &tvoc, &eco2, &raw_i, &raw_v) == ESP_OK)
 {
     ...
 }
@@ -177,7 +178,7 @@ following:
 
 // get NTC resistance
 uint32_t r_ntc;
-ccs811_get_ntc_resistance(sensor, CCS811_R_REF, &r_ntc);
+ccs811_get_ntc_resistance(&sensor, CCS811_R_REF, &r_ntc);
 
 // calculation of temperature from application note ams AN000372
 double ntc_temp;
@@ -209,7 +210,7 @@ The interrupt is disabled by default. It can be enabled with function
 ```C
 ...
 // enable the data ready interrupt
-ESP_ERROR_CHECK(ccs811_enable_interrupt(sensor, true));
+ESP_ERROR_CHECK(ccs811_enable_interrupt(&sensor, true));
 ...
 ```
 
@@ -236,7 +237,7 @@ interrupt.
 ```C
 ...
 // set threshold parameters and enable threshold interrupt mode
-ESP_ERROR_CHECK(ccs811_set_eco2_thresholds(sensor, 600, 1100, 40));
+ESP_ERROR_CHECK(ccs811_set_eco2_thresholds(&sensor, 600, 1100, 40));
 ...
 ```
 
@@ -282,7 +283,7 @@ memset(&sensor, 0, sizeof(ccs811_dev_t));
 i2cdev_init();    // Init i2cdev library
 i2c_set_timeout(I2C_PORT, CCS811_I2C_CLOCK_STRETCH);
 ...
-ccs811_init_desc(sensor, I2C_PORT, CCS811_I2C_ADDRESS_1, I2C_SDA_PIN, I2C_SCL_PIN);
+ccs811_init_desc(&sensor, I2C_PORT, CCS811_I2C_ADDRESS_1, I2C_SDA_PIN, I2C_SCL_PIN);
 ```
 
 Once I2C library initialized, function `ccs811_init()` has to be called
@@ -291,7 +292,7 @@ as well as its error state.
 
 ```C
 ...
-if (ccs811_init(sensor) == ESP_OK)
+if (ccs811_init(&sensor) == ESP_OK)
 {
     ...
 }
@@ -304,7 +305,7 @@ start periodic measurement. The sensor mode can be changed anytime later.
 ```C
 ...
 // start periodic measurement with one measurement per second
-ccs811_set_mode(sensor, CCS811_MODE_1S);
+ccs811_set_mode(&sensor, CCS811_MODE_1S);
 ...
 ```
 
@@ -332,7 +333,7 @@ void user_task(void *pvParameters)
     while (1)
     {
         // get the results and do something with them
-        if (ccs811_get_results(sensor, &tvoc, &eco2, 0, 0) == ESP_OK)
+        if (ccs811_get_results(&sensor, &tvoc, &eco2, 0, 0) == ESP_OK)
             ...
         // passive waiting until 1 second is over
         vTaskDelayUntil(&last_wakeup, 1000 / portTICK_PERIOD_MS);
@@ -379,7 +380,7 @@ void user_task_interrupt(void *pvParameters)
         vTaskSuspend(NULL);
 
         // after resume get the results and do something with them
-        if (ccs811_get_results(sensor, &tvoc, &eco2, 0, 0) == ESP_OK)
+        if (ccs811_get_results(&sensor, &tvoc, &eco2, 0, 0) == ESP_OK)
             ...
     }
 }
@@ -405,7 +406,7 @@ whenever new data are available (INT_DATA_RDY).
 gpio_set_interrupt(INT_GPIO, GPIO_INTTYPE_EDGE_NEG, nINT_handler);
 
 // enable the data ready interrupt INT_DATA_RDY
-ccs811_enable_interrupt(sensor, true);
+ccs811_enable_interrupt(&sensor, true);
 ...
 ```
 
@@ -418,6 +419,6 @@ whenever eCO2 value exceeds the thresholds (INT_THRESHOLD) defined by parameters
 gpio_set_interrupt(INT_GPIO, GPIO_INTTYPE_EDGE_NEG, nINT_handler);
 
 // set threshold parameters and enable threshold interrupt mode INT_THRESHOLD
-ccs811_set_eco2_thresholds(sensor, 600, 1100, 40);
+ccs811_set_eco2_thresholds(&sensor, 600, 1100, 40);
 ...
 ```

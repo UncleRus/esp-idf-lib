@@ -12,19 +12,16 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#ifndef CCS811_DRV_H_
-#define CCS811_DRV_H_
+#ifndef __CCS811_H__
+#define __CCS811_H__
 
 #include <stdbool.h>
 #include <i2cdev.h>
 #include <esp_err.h>
 
 //!< CCS811 I2C addresses
-#define CCS811_I2C_ADDRESS_1      0x5A      //!< default
-#define CCS811_I2C_ADDRESS_2      0x5B
-
-//!< CCS811 clock streching counter
-#define CCS811_I2C_CLOCK_STRETCH  200
+#define CCS811_I2C_ADDRESS_1      0x5a      //!< default
+#define CCS811_I2C_ADDRESS_2      0x5b
 
 #define CCS811_ERR_BASE 0xa000
 
@@ -286,5 +283,7 @@ esp_err_t ccs811_set_baseline(ccs811_dev_t *dev, uint16_t baseline);
 }
 #endif /* End of CPP guard */
 
-#endif /* CCS811_DRV_H_ */
+/**@}*/
+
+#endif /* __CCS811_H__ */
 
