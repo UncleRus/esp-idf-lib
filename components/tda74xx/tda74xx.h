@@ -52,7 +52,8 @@ typedef enum {
 } tda74xx_band_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port number
  * @param sda_gpio GPIO pin number for SDA
@@ -63,13 +64,15 @@ esp_err_t tda74xx_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tda74xx_free_desc(i2c_dev_t *dev);
 
 /**
- * Switch input
+ * @brief Switch input
+ *
  * @param dev Device descriptor
  * @param input Input #, 0..3
  * @return `ESP_OK` on success
@@ -77,7 +80,8 @@ esp_err_t tda74xx_free_desc(i2c_dev_t *dev);
 esp_err_t tda74xx_set_input(i2c_dev_t *dev, uint8_t input);
 
 /**
- * Get current input
+ * @brief Get current input
+ *
  * @param dev Device descriptor
  * @param[out] input Input #, 0..3
  * @return `ESP_OK` on success
@@ -85,7 +89,8 @@ esp_err_t tda74xx_set_input(i2c_dev_t *dev, uint8_t input);
 esp_err_t tda74xx_get_input(i2c_dev_t *dev, uint8_t *input);
 
 /**
- * Set input gain, dB
+ * @brief Set input gain, dB
+ *
  * @param dev Device descriptor
  * @param gain_db Gain, 0..30 dB
  * @return `ESP_OK` on success
@@ -93,7 +98,8 @@ esp_err_t tda74xx_get_input(i2c_dev_t *dev, uint8_t *input);
 esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db);
 
 /**
- * Get input gain
+ * @brief Get input gain
+ *
  * @param dev Device descriptor
  * @param[out] gain_db Gain, 0..30 dB
  * @return `ESP_OK` on success
@@ -101,7 +107,8 @@ esp_err_t tda74xx_set_input_gain(i2c_dev_t *dev, uint8_t gain_db);
 esp_err_t tda74xx_get_input_gain(i2c_dev_t *dev, uint8_t *gain_db);
 
 /**
- * Set master volume
+ * @brief Set master volume
+ *
  * @param dev Device descriptor
  * @param volume_db Volume, -48..0 dB
  * @return `ESP_OK` on success
@@ -109,7 +116,8 @@ esp_err_t tda74xx_get_input_gain(i2c_dev_t *dev, uint8_t *gain_db);
 esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db);
 
 /**
- * Get master volume
+ * @brief Get master volume
+ *
  * @param dev Device descriptor
  * @param[out] volume_db Volume, -48..0 dB
  * @return `ESP_OK` on success
@@ -117,7 +125,8 @@ esp_err_t tda74xx_set_volume(i2c_dev_t *dev, int8_t volume_db);
 esp_err_t tda74xx_get_volume(i2c_dev_t *dev, int8_t *volume_db);
 
 /**
- * Set equalizer gain
+ * @brief Set equalizer gain
+ *
  * @param dev Device descriptor
  * @param band Band
  * @param gain_db Gain, -14..14 dB in 2 dB step
@@ -126,7 +135,8 @@ esp_err_t tda74xx_get_volume(i2c_dev_t *dev, int8_t *volume_db);
 esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t gain_db);
 
 /**
- * Get equalizer gain
+ * @brief Get equalizer gain
+ *
  * @param dev Device descriptor
  * @param band Band
  * @param[out] gain_db Gain, -14..14 dB in 2 dB step
@@ -135,7 +145,8 @@ esp_err_t tda74xx_set_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t
 esp_err_t tda74xx_get_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t *gain_db);
 
 /**
- * Attenuate speaker
+ * @brief Attenuate speaker
+ *
  * @param dev Device descriptor
  * @param channel Audio channel
  * @param atten_db Attenuation, 0..56 dB
@@ -144,10 +155,11 @@ esp_err_t tda74xx_get_equalizer_gain(i2c_dev_t *dev, tda74xx_band_t band, int8_t
 esp_err_t tda74xx_set_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t channel, uint8_t atten_db);
 
 /**
- * Get speaker attenuation
+ * @brief Get speaker attenuation
+ *
  * @param dev Device descriptor
  * @param channel Audio channel
- * @param atten_db Attenuation, 0..56 dB
+ * @param[out] atten_db Attenuation, 0..56 dB
  * @return `ESP_OK` on success
  */
 esp_err_t tda74xx_get_speaker_attenuation(i2c_dev_t *dev, tda74xx_channel_t channel, uint8_t *atten_db);

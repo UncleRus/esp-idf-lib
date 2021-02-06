@@ -30,23 +30,27 @@ extern "C" {
  */
 typedef struct
 {
-    gpio_num_t trigger_pin;
-    gpio_num_t echo_pin;
+    gpio_num_t trigger_pin; //!< GPIO output pin for trigger
+    gpio_num_t echo_pin;    //!< GPIO input pin for echo
 } ultrasonic_sensor_t;
 
 /**
- * Init ranging module
+ * @brief Init ranging module
+ *
  * @param dev Pointer to the device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev);
 
 /**
- * Measure distance
+ * @brief Measure distance
+ *
  * @param dev Pointer to the device descriptor
  * @param max_distance Maximal distance to measure, centimeters
- * @param distance Distance in centimeters or ULTRASONIC_ERROR_xxx if error occurred
- * @return `ESP_OK` on success
+ * @param[out] distance Distance in centimeters
+ * @return `ESP_OK` on success, otherwise:
+ *         - ::ESP_ERR_ULTRASONIC_PING_TIMEOUT - Device is not responding
+ *         - ::ESP_ERR_ULTRASONIC_ECHO_TIMEOUT - Distance is too big or wave is scattered
  */
 esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);
 

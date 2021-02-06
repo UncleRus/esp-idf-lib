@@ -25,7 +25,7 @@ extern "C" {
 /**
  * @brief Initialize device descriptor
  *
- * SCL frequency is 400kHz
+ * Default SCL frequency is 400kHz
  *
  * @param dev Pointer to I2C device descriptor
  * @param port I2C port number
@@ -67,6 +67,7 @@ esp_err_t tca95x5_port_set_mode(i2c_dev_t *dev, uint16_t mode);
 
 /**
  * @brief Read GPIO port value
+ *
  * @param dev Pointer to I2C device descriptor
  * @param val 16-bit GPIO port value, 0 bit for P0.0 .. 15 bit for P1.7
  * @return `ESP_OK` on success
@@ -75,6 +76,7 @@ esp_err_t tca95x5_port_read(i2c_dev_t *dev, uint16_t *val);
 
 /**
  * @brief Write value to GPIO port
+ *
  * @param dev Pointer to I2C device descriptor
  * @param val GPIO port value, 0 bit for P0.0 .. 15 bit for P1.7
  * @return ESP_OK on success
@@ -83,6 +85,7 @@ esp_err_t tca95x5_port_write(i2c_dev_t *dev, uint16_t val);
 
 /**
  * @brief Read GPIO pin level
+ *
  * @param dev Pointer to device descriptor
  * @param pin Pin number, 0 for P0.0 .. 15 for P1.7
  * @param[out] val `true` if pin currently in high state

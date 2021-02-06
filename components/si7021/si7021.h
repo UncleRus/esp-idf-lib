@@ -47,7 +47,8 @@ typedef enum {
 } si7021_resolution_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO pin
@@ -57,14 +58,15 @@ typedef enum {
 esp_err_t si7021_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_free_desc(i2c_dev_t *dev);
 
 /**
- * Reset device
+ * @brief Reset device
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -133,7 +135,8 @@ esp_err_t si7021_get_heater_current(i2c_dev_t *dev, uint8_t *level);
 esp_err_t si7021_set_heater_current(i2c_dev_t *dev, uint8_t level);
 
 /**
- * Get measurement resolution
+ * @brief Get measurement resolution
+ *
  * @param dev Device descriptor
  * @param[out] r Resolution
  * @return `ESP_OK` on success
@@ -141,7 +144,8 @@ esp_err_t si7021_set_heater_current(i2c_dev_t *dev, uint8_t level);
 esp_err_t si7021_get_resolution(i2c_dev_t *dev, si7021_resolution_t *r);
 
 /**
- * Set measurement resolution
+ * @brief Set measurement resolution
+ *
  * @param dev Device descriptor
  * @param r Resolution
  * @return `ESP_OK` on success
@@ -149,7 +153,8 @@ esp_err_t si7021_get_resolution(i2c_dev_t *dev, si7021_resolution_t *r);
 esp_err_t si7021_set_resolution(i2c_dev_t *dev, si7021_resolution_t r);
 
 /**
- * Measure temperature
+ * @brief Measure temperature
+ *
  * @param dev Device descriptor
  * @param[out] t Temperature, deg. Celsius
  * @return `ESP_OK` on success
@@ -157,7 +162,8 @@ esp_err_t si7021_set_resolution(i2c_dev_t *dev, si7021_resolution_t r);
 esp_err_t si7021_measure_temperature(i2c_dev_t *dev, float *t);
 
 /**
- * Measure relative humidity
+ * @brief Measure relative humidity
+ *
  * @param dev Device descriptor
  * @param[out] rh Relative humidity, %
  * @return `ESP_OK` on success

@@ -44,7 +44,9 @@ typedef enum
 
 /**
  * @brief Initialize device descriptor
- * SCL frequency is 1MHz
+ *
+ * Default SCL frequency is 1MHz
+ *
  * @param dev I2C device descriptor
  * @param port I2C port number
  * @param addr I2C address,
@@ -56,6 +58,7 @@ esp_err_t mcp4725_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev I2C device descriptor
  * @return `ESP_OK` on success
  */
@@ -63,6 +66,7 @@ esp_err_t mcp4725_free_desc(i2c_dev_t *dev);
 
 /**
  * @brief Get device EEPROM status
+ *
  * @param dev I2C device descriptor
  * @param busy true when EEPROM is busy
  * @return `ESP_OK` on success
@@ -71,15 +75,17 @@ esp_err_t mcp4725_eeprom_busy(i2c_dev_t *dev, bool *busy);
 
 /**
  * @brief Get power mode
+ *
  * @param dev I2C device descriptor
  * @param eeprom Read power mode from EEPROM if true
- * @param mode Power mode
+ * @param[out] mode Power mode
  * @return `ESP_OK` on success
  */
 esp_err_t mcp4725_get_power_mode(i2c_dev_t *dev, bool eeprom, mcp4725_power_mode_t *mode);
 
 /**
  * @brief Set power mode
+ *
  * @param dev I2C device descriptor
  * @param mode Power mode
  * @param eeprom Store mode to device EEPROM if true
@@ -89,15 +95,17 @@ esp_err_t mcp4725_set_power_mode(i2c_dev_t *dev, bool eeprom, mcp4725_power_mode
 
 /**
  * @brief Get current DAC value
+ *
  * @param dev I2C device descriptor
  * @param eeprom Read value from device EEPROM if true
- * @param value Raw output value, 0..4095
+ * @param[out] value Raw output value, 0..4095
  * @return `ESP_OK` on success
  */
 esp_err_t mcp4725_get_raw_output(i2c_dev_t *dev, bool eeprom, uint16_t *value);
 
 /**
  * @brief Set DAC output value
+ *
  * @param dev I2C device descriptor
  * @param value Raw output value, 0..4095
  * @param eeprom Store value to device EEPROM if true
@@ -107,16 +115,18 @@ esp_err_t mcp4725_set_raw_output(i2c_dev_t *dev, uint16_t value, bool eeprom);
 
 /**
  * @brief Get current DAC output voltage
+ *
  * @param dev I2C device descriptor
  * @param vdd Device operating voltage, volts
  * @param eeprom Read voltage from device EEPROM if true
- * @param voltage Current output voltage, volts
+ * @param[out] voltage Current output voltage, volts
  * @return `ESP_OK` on success
  */
 esp_err_t mcp4725_get_voltage(i2c_dev_t *dev, float vdd, bool eeprom, float *voltage);
 
 /**
  * @brief Set DAC output voltage
+ *
  * @param dev I2C device descriptor
  * @param vdd Device operating voltage, volts
  * @param value Output value, volts

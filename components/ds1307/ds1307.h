@@ -37,7 +37,8 @@ typedef enum
 } ds1307_squarewave_freq_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO
@@ -47,7 +48,8 @@ typedef enum
 esp_err_t ds1307_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -55,6 +57,7 @@ esp_err_t ds1307_free_desc(i2c_dev_t *dev);
 
 /**
  * @brief Start/stop clock
+ *
  * @param dev Device descriptor
  * @param start Start clock if true
  * @return `ESP_OK` on success
@@ -63,6 +66,7 @@ esp_err_t ds1307_start(i2c_dev_t *dev, bool start);
 
 /**
  * @brief Get current clock state
+ *
  * @param dev Device descriptor
  * @param[out] running true if clock running
  * @return `ESP_OK` on success
@@ -71,6 +75,7 @@ esp_err_t ds1307_is_running(i2c_dev_t *dev, bool *running);
 
 /**
  * @brief Get current time
+ *
  * @param dev Device descriptor
  * @param[out] time Pointer to the time struct to fill
  * @return `ESP_OK` on success
@@ -79,6 +84,7 @@ esp_err_t ds1307_get_time(i2c_dev_t *dev, struct tm *time);
 
 /**
  * @brief Set time to RTC
+ *
  * @param dev Device descriptor
  * @param[in] time Pointer to the time struct
  * @return `ESP_OK` on success
@@ -87,6 +93,7 @@ esp_err_t ds1307_set_time(i2c_dev_t *dev, const struct tm *time);
 
 /**
  * @brief Enable or disable square-wave oscillator output
+ *
  * @param dev Device descriptor
  * @param enable Enable oscillator if true
  * @return `ESP_OK` on success
@@ -95,6 +102,7 @@ esp_err_t ds1307_enable_squarewave(i2c_dev_t *dev, bool enable);
 
 /**
  * @brief Get square-wave oscillator output
+ *
  * @param dev Device descriptor
  * @param[out] sqw_en true if square-wave oscillator enabled
  * @return `ESP_OK` on success
@@ -103,6 +111,7 @@ esp_err_t ds1307_is_squarewave_enabled(i2c_dev_t *dev, bool *sqw_en);
 
 /**
  * @brief Set square-wave oscillator frequency
+ *
  * @param dev Device descriptor
  * @param freq Frequency
  * @return `ESP_OK` on success
@@ -111,6 +120,7 @@ esp_err_t ds1307_set_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t fr
 
 /**
  * @brief Get current square-wave oscillator frequency
+ *
  * @param dev Device descriptor
  * @param[out] sqw_freq Frequency
  * @return `ESP_OK` on success
@@ -119,6 +129,7 @@ esp_err_t ds1307_get_squarewave_freq(i2c_dev_t *dev, ds1307_squarewave_freq_t *s
 
 /**
  * @brief Get current output level of the SQW/OUT pin
+ *
  * @param dev Device descriptor
  * @param[out] out current output level of the SQW/OUT pin, true if high
  * @return `ESP_OK` on success
@@ -127,7 +138,9 @@ esp_err_t ds1307_get_output(i2c_dev_t *dev, bool *out);
 
 /**
  * @brief Set output level of the SQW/OUT pin
+ *
  * Set output level if square-wave output is disabled
+ *
  * @param dev Device descriptor
  * @param value High level if true
  * @return `ESP_OK` on success
@@ -136,6 +149,7 @@ esp_err_t ds1307_set_output(i2c_dev_t *dev, bool value);
 
 /**
  * @brief Read RAM contents into the buffer
+ *
  * @param dev Device descriptor
  * @param offset Start byte, 0..55
  * @param[out] buf Buffer to store data
@@ -146,9 +160,10 @@ esp_err_t ds1307_read_ram(i2c_dev_t *dev, uint8_t offset, uint8_t *buf, uint8_t 
 
 /**
  * @brief Write buffer to RTC RAM
+ *
  * @param dev Device descriptor
  * @param offset Start byte, 0..55
- * @param[in] buf Buffer
+ * @param buf Buffer
  * @param len Bytes to write, 1..56
  * @return `ESP_OK` on success
  */

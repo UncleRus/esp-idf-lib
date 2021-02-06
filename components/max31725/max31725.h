@@ -66,6 +66,7 @@ typedef enum {
 
 /**
  * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port number
  * @param addr I2C address
@@ -77,13 +78,15 @@ esp_err_t max31725_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t max31725_free_desc(i2c_dev_t *dev);
 
 /**
- * Read current device config
+ * @brief Read current device config
+ *
  * @param dev Device descriptor
  * @param[out] mode Operating mode
  * @param[out] fmt Data format
@@ -96,7 +99,8 @@ esp_err_t max31725_get_config(i2c_dev_t *dev, max31725_mode_t *mode, max31725_da
         max31725_os_polarity_t *op, max31725_os_mode_t *om);
 
 /**
- * Configure device
+ * @brief Configure device
+ *
  * @param dev Device descriptor
  * @param mode Operating mode
  * @param fmt Data format
@@ -122,7 +126,8 @@ esp_err_t max31725_set_config(i2c_dev_t *dev, max31725_mode_t mode, max31725_dat
 esp_err_t max31725_one_shot(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt);
 
 /**
- * Read temperature register
+ * @brief Read temperature register
+ *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
  * @param fmt Data format
@@ -131,7 +136,8 @@ esp_err_t max31725_one_shot(i2c_dev_t *dev, float *temp, max31725_data_format_t 
 esp_err_t max31725_get_temperature(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt);
 
 /**
- * Read OS threshold temperature
+ * @brief Read OS threshold temperature
+ *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
  * @param fmt Data format
@@ -140,7 +146,8 @@ esp_err_t max31725_get_temperature(i2c_dev_t *dev, float *temp, max31725_data_fo
 esp_err_t max31725_get_os_temp(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt);
 
 /**
- * Set OS threshold temperature
+ * @brief Set OS threshold temperature
+ *
  * @param dev Device descriptor
  * @param temp Temperature, deg.C
  * @param fmt Data format
@@ -149,7 +156,8 @@ esp_err_t max31725_get_os_temp(i2c_dev_t *dev, float *temp, max31725_data_format
 esp_err_t max31725_set_os_temp(i2c_dev_t *dev, float temp, max31725_data_format_t fmt);
 
 /**
- * Read OS hysteresis temperature
+ * @brief Read OS hysteresis temperature
+ *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
  * @param fmt Data format
@@ -158,7 +166,8 @@ esp_err_t max31725_set_os_temp(i2c_dev_t *dev, float temp, max31725_data_format_
 esp_err_t max31725_get_hysteresis_temp(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt);
 
 /**
- * Set OS hysteresis temperature
+ * @brief Set OS hysteresis temperature
+ *
  * @param dev Device descriptor
  * @param temp Temperature, deg.C
  * @param fmt Data format

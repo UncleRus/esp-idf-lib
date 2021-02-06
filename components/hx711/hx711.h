@@ -61,7 +61,8 @@ esp_err_t hx711_init(hx711_t *dev);
 esp_err_t hx711_power_down(hx711_t *dev, bool down);
 
 /**
- * @brief Set device gain + channel
+ * @brief Set device gain and channel
+ *
  * @param dev Device descriptor
  * @param gain Gain + channel value
  * @return `ESP_OK` on success, `ESP_ERR_TIMEOUT` if device not found
@@ -70,6 +71,7 @@ esp_err_t hx711_set_gain(hx711_t *dev, hx711_gain_t gain);
 
 /**
  * @brief Check if device ready to send data
+ *
  * @param dev Device descriptor
  * @param ready true if data ready
  * @return `ESP_OK` on success
@@ -78,6 +80,7 @@ esp_err_t hx711_is_ready(hx711_t *dev, bool *ready);
 
 /**
  * @brief Wait for device to become ready
+ *
  * @param dev Device descriptor
  * @param timeout_ms Maximum time to wait, milliseconds
  * @return `ESP_OK` on success

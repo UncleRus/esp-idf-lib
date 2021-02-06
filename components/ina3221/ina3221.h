@@ -137,6 +137,7 @@ typedef struct
 
 /**
  * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param addr Device I2C address
  * @param port I2C port
@@ -148,6 +149,7 @@ esp_err_t ina3221_init_desc(ina3221_t *dev, uint8_t addr, i2c_port_t port, gpio_
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */
@@ -155,7 +157,9 @@ esp_err_t ina3221_free_desc(ina3221_t *dev);
 
 /**
  * @brief Write current config to device
+ *
  * Sync internal config buffer and mask with external device register. (When struct is set manually).
+ *
  * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */
@@ -163,7 +167,9 @@ esp_err_t ina3221_sync(ina3221_t *dev);
 
 /**
  * @brief Trigger measurement
+ *
  * Send current config register to trig a measurement in single-shot mode.
+ *
  * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */
@@ -171,7 +177,9 @@ esp_err_t ina3221_trigger(ina3221_t *dev);
 
 /**
  * @brief Read status from device
+ *
  * Get mask register from the device, used to read flags.
+ *
  * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */
@@ -179,6 +187,7 @@ esp_err_t ina3221_get_status(ina3221_t *dev);
 
 /**
  * @brief Set options for bus and shunt
+ *
  * @param dev Device descriptor
  * @param mode Selection of measurement (true : continuous // false : single-shot)
  * @param bus Enable/Disable bus measures
@@ -189,6 +198,7 @@ esp_err_t ina3221_set_options(ina3221_t *dev, bool mode, bool bus, bool shunt);
 
 /**
  * @brief Select channels
+ *
  * @param dev Device descriptor
  * @param ch1 Enable/Disable channel 1 (true : enable // false : disable)
  * @param ch2 Enable/Disable channel 2 (true : enable // false : disable)
@@ -199,6 +209,7 @@ esp_err_t ina3221_enable_channel(ina3221_t *dev, bool ch1, bool ch2, bool ch3);
 
 /**
  * @brief Select channel to be sum (don't impact enable channel status)
+ *
  * @param dev Device descriptor
  * @param ch1 Enable/Disable channel 1 (true : enable // false : disable)
  * @param ch2 Enable/Disable channel 2 (true : enable // false : disable)
@@ -209,6 +220,7 @@ esp_err_t ina3221_enable_channel_sum(ina3221_t *dev, bool ch1, bool ch2, bool ch
 
 /**
  * @brief enable/disable latch on warning and critical alert pin
+ *
  * @param dev Device descriptor
  * @param warning Enable/Disable warning latch (true : Latch // false : Transparent)
  * @param critical Enable/Disable critical latch (true : Latch // false : Transparent)
@@ -218,6 +230,7 @@ esp_err_t ina3221_enable_latch_pin(ina3221_t *dev, bool warning, bool critical);
 
 /**
  * @brief Set average (number of samples measured)
+ *
  * @param dev Device descriptor
  * @param avg Value of average selection
  * @return ESP_OK to indicate success
@@ -226,6 +239,7 @@ esp_err_t ina3221_set_average(ina3221_t *dev, ina3221_avg_t avg);
 
 /**
  * @brief Set conversion time for bus.
+ *
  * @param dev Device descriptor
  * @param ct Value of conversion time selection
  * @return ESP_OK to indicate success
@@ -234,6 +248,7 @@ esp_err_t ina3221_set_bus_conversion_time(ina3221_t *dev, ina3221_ct_t ct);
 
 /**
  * @brief Set conversion time for shunt.
+ *
  * @param dev Device descriptor
  * @param ct Value of conversion time selection
  * @return ESP_OK to indicate success
@@ -242,7 +257,9 @@ esp_err_t ina3221_set_shunt_conversion_time(ina3221_t *dev, ina3221_ct_t ct);
 
 /**
  * @brief Reset device
+ *
  * Device will be configured like POR (Power-On-Reset)
+ *
  * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */
@@ -250,6 +267,7 @@ esp_err_t ina3221_reset(ina3221_t *dev);
 
 /**
  * @brief Get Bus voltage (V)
+ *
  * @param dev Device descriptor
  * @param channel Select channel value to get
  * @param voltage Data pointer to get bus voltage (V)
@@ -259,6 +277,7 @@ esp_err_t ina3221_get_bus_voltage(ina3221_t *dev, ina3221_channel_t channel, flo
 
 /**
  * @brief Get Shunt voltage (mV) and current (mA)
+ *
  * @param dev Device descriptor
  * @param channel Select channel value to get
  * @param voltage Data pointer to get shunt voltage (mV)
@@ -269,6 +288,7 @@ esp_err_t ina3221_get_shunt_value(ina3221_t *dev, ina3221_channel_t channel, flo
 
 /**
  * @brief Get Shunt-voltage (mV) sum value of selected channels
+ *
  * @param dev Device descriptor
  * @param voltage Data pointer to get shunt voltage (mV)
  * @return ESP_OK to indicate success
@@ -277,7 +297,9 @@ esp_err_t ina3221_get_sum_shunt_value(ina3221_t *dev, float *voltage);
 
 /**
  * @brief Set Critical alert
+ *
  * Alert when measurement(s) is greater
+ *
  * @param dev Device descriptor
  * @param channel Select channel value to set
  * @param current Value to set (mA) // max : 163800/shunt (mOhm)
@@ -287,7 +309,9 @@ esp_err_t ina3221_set_critical_alert(ina3221_t *dev, ina3221_channel_t channel, 
 
 /**
  * @brief Set Warning alert
+ *
  * Alert when average measurement(s) is greater
+ *
  * @param dev Device descriptor
  * @param channel Select channel value to set
  * @param current Value to set (mA)  // max : 163800/shunt (mOhm)
@@ -297,7 +321,9 @@ esp_err_t ina3221_set_warning_alert(ina3221_t *dev, ina3221_channel_t channel, f
 
 /**
  * @brief Set Sum Warning alert
+ *
  * Compared to each completed cycle of all selected channels : Sum register
+ *
  * @param dev Device descriptor
  * @param voltage voltage to set (mV) //  max : 655.32
  * @return ESP_OK to indicate success
@@ -306,8 +332,10 @@ esp_err_t ina3221_set_sum_warning_alert(ina3221_t *dev, float voltage);
 
 /**
  * @brief Set Power-valid upper-limit
+ *
  * Used to determine if power conditions are met. Bus needs to be enabled.
  * If bus voltage exceed the value set, PV pin will be set high.
+ *
  * @param dev Device descriptor
  * @param voltage voltage to set (V)
  * @return ESP_OK to indicate success
@@ -316,8 +344,10 @@ esp_err_t ina3221_set_power_valid_upper_limit(ina3221_t *dev, float voltage);
 
 /**
  * @brief Set Power-valid lower-limit
+ *
  * Used to determine if power conditions are met. Bus needs to be enabled.
  * If bus voltage drops below the value set, PV pin will be set low.
+ *
  * @param dev Device descriptor
  * @param voltage Voltage to set (V)
  * @return ESP_OK to indicate success

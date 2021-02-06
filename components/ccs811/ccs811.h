@@ -270,7 +270,7 @@ esp_err_t ccs811_get_baseline(ccs811_dev_t *dev, uint16_t *baseline);
  * of 20 min after power up.
  *
  * @param dev pointer to the sensor device data structure
- * @param basline baseline to be set
+ * @param baseline baseline to be set
  * @returns ESP_OK on success
  */
 esp_err_t ccs811_set_baseline(ccs811_dev_t *dev, uint16_t baseline);

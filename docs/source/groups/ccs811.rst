@@ -328,13 +328,6 @@ Before using the CCS811 driver, function `i2cdev_init()` needs to be called.
    memset(&sensor, 0, sizeof(ccs811_dev_t)); // Zero descriptor
    ESP_ERROR_CHECK(ccs811_init_desc(&sensor, 0, CCS811_I2C_ADDRESS_1, 5, 4);
    ...
-   if (ccs811_init(&sensor) == ESP_OK)
-   {
-      ...
-      // start periodic measurement with one measurement per second
-      ESP_ERROR_CHECK(ccs811_set_mode(&sensor, CCS811_MODE_1S));
-   }
-   ...
 
 Once I2C library initialized, function `ccs811_init()` has to be called
 for each CCS811 sensor to initialize the sensor and to check its availability

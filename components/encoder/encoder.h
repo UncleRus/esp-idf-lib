@@ -65,21 +65,24 @@ typedef struct
 } rotary_encoder_event_t;
 
 /**
- * Initialize library
- * @param queue Event queue
+ * @brief Initialize library
+ *
+ * @param queue Event queue to send encoder events
  * @return `ESP_OK` on success
  */
 esp_err_t rotary_encoder_init(QueueHandle_t queue);
 
 /**
- * Add new rotary encoder
+ * @brief Add new rotary encoder
+ *
  * @param re Encoder descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t rotary_encoder_add(rotary_encoder_t *re);
 
 /**
- * Remove previously added rotary encoder
+ * @brief Remove previously added rotary encoder
+ *
  * @param re Encoder descriptor
  * @return `ESP_OK` on success
  */

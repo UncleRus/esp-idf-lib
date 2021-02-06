@@ -75,6 +75,7 @@ typedef struct {
 
 /**
  * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param addr Device address
@@ -86,6 +87,7 @@ esp_err_t mcp342x_init_desc(mcp342x_t *dev, i2c_port_t port, uint8_t addr, gpio_
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -93,6 +95,7 @@ esp_err_t mcp342x_free_desc(mcp342x_t *dev);
 
 /**
  * @brief Configure device
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -100,6 +103,7 @@ esp_err_t mcp342x_set_config(mcp342x_t *dev);
 
 /**
  * @brief Read device configuration
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -107,6 +111,7 @@ esp_err_t mcp342x_get_config(mcp342x_t *dev);
 
 /**
  * @brief Get conversion time in microseconds
+ *
  * @param dev Device descriptor
  * @param[out] us Conversion time, us
  * @return `ESP_OK` on success
@@ -115,6 +120,7 @@ esp_err_t mcp342x_get_sample_time_us(mcp342x_t *dev, uint32_t *us);
 
 /**
  * @brief Start conversion
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -122,6 +128,7 @@ esp_err_t mcp342x_start_conversion(mcp342x_t *dev);
 
 /**
  * @brief Get raw ADC value
+ *
  * @param dev Device descriptor
  * @param[out] data ADC value
  * @param[out] ready Data validity flag
@@ -131,6 +138,7 @@ esp_err_t mcp342x_get_data(mcp342x_t *dev, int32_t *data, bool *ready);
 
 /**
  * @brief Get ADC voltage
+ *
  * @param dev Device descriptor
  * @param[out] volts ADC voltage, volts
  * @param[out] ready Data validity flag
@@ -140,6 +148,7 @@ esp_err_t mcp342x_get_voltage(mcp342x_t *dev, float *volts, bool *ready);
 
 /**
  * @brief Do a single conversion
+ *
  * - start conversion
  * - wait conversion time
  * - read conversion result

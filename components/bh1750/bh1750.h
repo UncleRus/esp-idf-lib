@@ -50,8 +50,9 @@ typedef enum
 
 /**
  * @brief Initialize device descriptor
- * @param[out] dev Pointer to device descriptor
- * @param[in] addr I2C address, BH1750_ADDR_LO or BH1750_ADDR_HI
+ *
+ * @param[out] dev Device descriptor
+ * @param[in] addr I2C address, ::BH1750_ADDR_LO or ::BH1750_ADDR_HI
  * @param[in] port I2C port number
  * @param[in] sda_gpio GPIO pin number for SDA
  * @param[in] scl_gpio GPIO pin number for SCL
@@ -61,6 +62,7 @@ esp_err_t bh1750_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_n
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Pointer to device descriptor
  * @return `ESP_OK` on success
  */
@@ -68,6 +70,7 @@ esp_err_t bh1750_free_desc(i2c_dev_t *dev);
 
 /**
  * @brief Power down device
+ *
  * @param dev Pointer to device descriptor
  * @return `ESP_OK` on success
  */
@@ -75,6 +78,7 @@ esp_err_t bh1750_power_down(i2c_dev_t *dev);
 
 /**
  * @brief Power on device
+ *
  * @param dev Pointer to device descriptor
  * @return `ESP_OK` on success
  */
@@ -82,6 +86,7 @@ esp_err_t bh1750_power_on(i2c_dev_t *dev);
 
 /**
  * @brief Setup device parameters
+ *
  * @param dev Pointer to device descriptor
  * @param mode Measurement mode
  * @param resolution Measurement resolution
@@ -91,6 +96,7 @@ esp_err_t bh1750_setup(i2c_dev_t *dev, bh1750_mode_t mode, bh1750_resolution_t r
 
 /**
  * @brief Set measurement time
+ *
  * @param dev Pointer to device descriptor
  * @param time Measurement time (see datasheet)
  * @return `ESP_OK` on success
@@ -99,6 +105,7 @@ esp_err_t bh1750_set_measurement_time(i2c_dev_t *dev, uint8_t time);
 
 /**
  * @brief Read LUX value from the device.
+ *
  * @param dev Pointer to device descriptor
  * @param[out] level read value in lux units
  * @return `ESP_OK` on success

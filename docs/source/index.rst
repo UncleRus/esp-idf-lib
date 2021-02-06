@@ -198,10 +198,18 @@ Other
    groups/led_strip
    
 
+===========
+Information
+===========
+.. toctree::
+   :maxdepth: 1
+   
+   chips
+   
+
 ==================
 Indices and tables
 ==================
 
-* :ref:`chips`
 * :ref:`genindex`
 * :ref:`search`

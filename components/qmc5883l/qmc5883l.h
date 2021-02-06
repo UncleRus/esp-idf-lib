@@ -93,6 +93,7 @@ typedef struct {
 
 /**
  * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port number
  * @param addr I2C address
@@ -104,28 +105,32 @@ esp_err_t qmc5883l_init_desc(qmc5883l_t *dev, i2c_port_t port, uint8_t addr, gpi
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_free_desc(qmc5883l_t *dev);
 
 /**
- * Reset device
+ * @brief Reset device
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_reset(qmc5883l_t *dev);
 
 /**
- * Read chip ID
+ * @brief Read chip ID
+ *
  * @param dev Device descriptor
- * @param id Chip ID
+ * @param[out] id Chip ID
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_chip_id(qmc5883l_t *dev, uint8_t *id);
 
 /**
- * Set device mode
+ * @brief Set device mode
+ *
  * @param dev Device descriptor
  * @param mode Mode
  * @return `ESP_OK` on success
@@ -133,15 +138,17 @@ esp_err_t qmc5883l_get_chip_id(qmc5883l_t *dev, uint8_t *id);
 esp_err_t qmc5883l_set_mode(qmc5883l_t *dev, qmc5883l_mode_t mode);
 
 /**
- * Read current device mode
+ * @brief Read current device mode
+ *
  * @param dev Device descriptor
- * @param mode Mode
+ * @param[out] mode Mode
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_mode(qmc5883l_t *dev, qmc5883l_mode_t *mode);
 
 /**
- * Set device configuration
+ * @brief Set device configuration
+ *
  * @param dev Device descriptor
  * @param odr Output data rate
  * @param osr Oversampling
@@ -151,17 +158,19 @@ esp_err_t qmc5883l_get_mode(qmc5883l_t *dev, qmc5883l_mode_t *mode);
 esp_err_t qmc5883l_set_config(qmc5883l_t *dev, qmc5883l_odr_t odr, qmc5883l_osr_t osr, qmc5883l_range_t rng);
 
 /**
- * Read current device configuration
+ * @brief Read current device configuration
+ *
  * @param dev Device descriptor
- * @param odr Output data rate
- * @param osr Oversampling
- * @param rng Field range
+ * @param[out] odr Output data rate
+ * @param[out] osr Oversampling
+ * @param[out] rng Field range
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_config(qmc5883l_t *dev, qmc5883l_odr_t *odr, qmc5883l_osr_t *osr, qmc5883l_range_t *rng);
 
 /**
- * Enable/disable interrupt pin
+ * @brief Enable/disable interrupt pin
+ *
  * @param dev Device descriptor
  * @param enable Enable interrupt if true
  * @return `ESP_OK` on success
@@ -169,50 +178,56 @@ esp_err_t qmc5883l_get_config(qmc5883l_t *dev, qmc5883l_odr_t *odr, qmc5883l_osr
 esp_err_t qmc5883l_set_int(qmc5883l_t *dev, bool enable);
 
 /**
- * Get interrupt pin state
+ * @brief Get interrupt pin state
+ *
  * @param dev Device descriptor
- * @param enable Interrupt pin enabled if true
+ * @param[out] enable Interrupt pin enabled if true
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_int(qmc5883l_t *dev, bool *enable);
 
 /**
- * Get magnetic data state
+ * @brief Get magnetic data state
+ *
  * @param dev Device descriptor
- * @param ready Magnetic data ready to read if true
+ * @param[out] ready Magnetic data ready to read if true
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_data_ready(qmc5883l_t *dev, bool *ready);
 
 /**
- * Read raw magnetic data
+ * @brief Read raw magnetic data
+ *
  * @param dev Device descriptor
- * @param raw Raw magnetic data
+ * @param[out] raw Raw magnetic data
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_raw_data(qmc5883l_t *dev, qmc5883l_raw_data_t *raw);
 
 /**
- * Convert raw magnetic data to milligauss
+ * @brief Convert raw magnetic data to milligauss
+ *
  * @param dev Device descriptor
  * @param raw Raw magnetic data
- * @param data Magnetic data in mG
+ * @param[out] data Magnetic data in mG
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_raw_to_mg(qmc5883l_t *dev, qmc5883l_raw_data_t *raw, qmc5883l_data_t *data);
 
 /**
- * Read magnetic data in milligauss
+ * @brief Read magnetic data in milligauss
+ *
  * @param dev Device descriptor
- * @param data Magnetic data in mG
+ * @param[out] data Magnetic data in mG
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_data(qmc5883l_t *dev, qmc5883l_data_t *data);
 
 /**
- * Read raw temperature data (see datasheet)
+ * @brief Read raw temperature data (see datasheet)
+ *
  * @param dev Device descriptor
- * @param temp Raw temperature data
+ * @param[out] temp Raw temperature data
  * @return `ESP_OK` on success
  */
 esp_err_t qmc5883l_get_raw_temp(qmc5883l_t *dev, int16_t *temp);

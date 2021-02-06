@@ -129,9 +129,9 @@ typedef struct
 } tsl2591_t;
 
 
-// Initialization.
 /**
- * Initialize device descriptor.
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO pin
@@ -141,244 +141,272 @@ typedef struct
 esp_err_t tsl2591_init_desc(tsl2591_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor.
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_free_desc(tsl2591_t *dev);
 
 /**
- * Initialize device.
+ * @brief Initialize device
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_init(tsl2591_t *dev);
 
-
-// Measure.
 /**
- * Read channel data.
+ * @brief Read channel data
+ *
  * @param dev Device descriptor
- * @param channel0 Channel 0 data
- * @param channel1 Channel 1 data
+ * @param[out] channel0 Channel 0 data
+ * @param[out] channel1 Channel 1 data
  */
 esp_err_t tsl2591_get_channel_data(tsl2591_t *dev, uint16_t *channel0, uint16_t *channel1);
 
 /**
- * Calculate light intensity from channels.
+ * @brief Calculate light intensity from channels
+ *
  * @param dev Device descriptor
  * @param channel0 Channel0 data
  * @param channel1 Channel1 data
- * @param lux Light intensity
+ * @param[out] lux Light intensity
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_calculate_lux(tsl2591_t *dev, uint16_t channel0, uint16_t channel1, float *lux);
 
 /**
- * Get and calculate light intensity.
+ * @brief Get and calculate light intensity
+ *
  * @param dev Device descriptor
- * @param lux Light intensity
+ * @param[out] lux Light intensity
  * @return `ESP_OK`
  */
 esp_err_t tsl2591_get_lux(tsl2591_t *dev, float *lux);
 
-// Setters and getters enable register.
 /**
- * Set device power status. 
+ * @brief Set device power status
+ *
  * @param dev Device descriptor
  * @param power_status Power status
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_power_status(tsl2591_t *dev, tsl2591_power_status_t power_status);
+
 /**
- * Get device power status. 
+ * @brief Get device power status
+ *
  * @param dev Device descriptor
- * @param power_status Power status
+ * @param[out] power_status Power status
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_power_status(tsl2591_t *dev, tsl2591_power_status_t *power_status);
 
 /**
- * Set device ALS status.
+ * @brief Set device ALS status
+ *
  * @param dev Device descriptor
  * @param als_status Als status
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_als_status(tsl2591_t *dev, tsl2591_als_status_t als_status);
+
 /**
- * Get device ALS status.
+ * @brief Get device ALS status
+ *
  * @param dev Device descriptor
- * @param als_status Als status
+ * @param[out] als_status Als status
  * @return `ESP_OK`
  */
 esp_err_t tsl2591_get_als_status(tsl2591_t *dev, tsl2591_als_status_t *als_status);
 
 /**
- * Set device interrupt.
+ * @brief Set device interrupt mode
+ *
  * @param dev Device descriptor
- * @param interrupt interrupt
+ * @param interrupt interrupt mode
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_interrupt(tsl2591_t *dev, tsl2591_interrupt_t interrupt);
+
 /**
- * Get device interrupt.
+ * @brief Get device interrupt mode
+ *
  * @param dev Device descriptor
- * @param interrupt interrupt
+ * @param[out] interrupt interrupt mode
  * @return `ESP_OK`
  */
 esp_err_t tsl2591_get_interrupt(tsl2591_t *dev, tsl2591_interrupt_t *interrupt);
 
 /**
- * Set device sleep after interrupt .
+ * @brief Set sleeping after interrupt
+ *
  * @param dev Device descriptor
- * @param interrupt_setting interrupt setting
+ * @param sleep_after_intr Sleeping after interrupt
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_sleep_after_intr(tsl2591_t *dev, tsl2591_sleep_after_intr_t sleep_after_intr);
+
 /**
- * Get device sleep after interrupt.
+ * @brief Get sleeping after interrupt setting
+ *
  * @param dev Device descriptor
- * @param interrupt_setting interrupt setting
+ * @param[out] sleep_after_intr Sleeping after interrupt
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_sleep_after_intr(tsl2591_t *dev, tsl2591_sleep_after_intr_t *sleep_after_intr);
 
-
-//Setters and getters control register.
 /**
- * Set device integration time.
+ * @brief Set device integration time
+ *
  * @param dev Device descriptor
  * @param integration_time Integration time
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_integration_time(tsl2591_t *dev, tsl2591_integration_time_t integration_time);
+
 /**
- * Get device integration time.
+ * @brief Get device integration time
+ *
  * @param dev Device descriptor
- * @param integration_time Integration time
+ * @param[out] integration_time Integration time
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_integration_time(tsl2591_t *dev, tsl2591_integration_time_t *integration_time);
 
 /**
- * Set device gain.
+ * @brief Set device gain
+ *
  * @param dev Device descriptor
  * @param gain Gain
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_gain(tsl2591_t *dev, tsl2591_gain_t gain);
+
 /**
- * Get device gain.
+ * @brief Get device gain
+ *
  * @param dev Device descriptor
- * @param gain Gain
+ * @param[out] gain Gain
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_gain(tsl2591_t *dev, tsl2591_gain_t *gain);
 
-
-// Setter and getter persistence filter.
 /**
- * Set device persistence filter. 
+ * @brief Set device persistence filter
+ *
  * @param dev Device descriptor
  * @param filter Persistence filter 
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_set_persistence_filter(tsl2591_t *dev, tsl2591_persistence_filter_t filter);
+
 /**
- * Get device persistence filter. 
+ * @brief Get device persistence filter
+ *
  * @param dev Device descriptor
- * @param gain Gain
+ * @param[out] filter Persistence filter
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_persistence_filter(tsl2591_t *dev, tsl2591_persistence_filter_t *filter);
 
-
-// Setters thresholds.
 /**
- * Set ALS interrupt low threshold
+ * @brief Set ALS interrupt low threshold
+ *
  * @param dev Device descriptor
- * @param low_thresh Low threshold
+ * @param low_threshold Low threshold
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_als_set_low_threshold(tsl2591_t *dev, uint16_t low_threshold);
 
 /**
- * Set ALS interrupt high threshold.
+ * @brief Set ALS interrupt high threshold
+ *
  * @param dev Device descriptor
- * @param high_thresh High threshold
+ * @param high_threshold High threshold
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_als_set_high_threshold(tsl2591_t *dev, uint16_t high_threshold);
 
 /**
- * Set no persist ALS interrupt low threshold.
+ * @brief Set no persist ALS interrupt low threshold
+ *
  * @param dev Device descriptor
- * @param low_thresh Low threshold
+ * @param low_threshold Low threshold
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_no_persist_set_low_threshold(tsl2591_t *dev, uint16_t low_threshold);
 
 /**
- * Set no persist ALS interrupt high threshold.
+ * @brief Set no persist ALS interrupt high threshold
+ *
  * @param dev Device descriptor
- * @param high_thresh High threshold
+ * @param high_threshold High threshold
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_no_persist_set_high_threshold(tsl2591_t *dev, uint16_t high_threshold);
 
-
-// Special functions.
 /**
- * Set interrupt. At least on interrupt must be enabled.
+ * @brief Set interrupt
+ *
+ * At least on interrupt must be enabled.
+ *
  * @param dev Device descriptor
  * @return `ESP_PK` on success
  */
 esp_err_t tsl2591_set_test_intr(tsl2591_t *dev);
 
 /**
- * Clear ALS interrupt.
+ * @brief Clear ALS interrupt
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_clear_als_intr(tsl2591_t *dev);
 
 /**
- * Clear ALS no persist interrupt.
+ * @brief Clear ALS no persist interrupt
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_clear_als_np_intr(tsl2591_t *dev);
 
 /**
- * Clear both interrupts.
+ * @brief Clear both interrupts
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_clear_both_intr(tsl2591_t *dev);
 
-
-// Getters status flags.
 /**
- * Get als no persist interrupt flag.
+ * @brief Get ALS no persist interrupt flag
+ *
  * @param dev Device descriptor
- * @param flag  Interrupt flag
+ * @param[out] flag Interrupt flag
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_np_intr_flag(tsl2591_t *dev, bool *flag);
 
 /**
- * Get als interrupt flag.
+ * @brief Get ALS interrupt flag
+ *
  * @param dev Device descriptor
- * @param flag Interrupt flag
+ * @param[out] flag Interrupt flag
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_als_intr_flag(tsl2591_t *dev, bool *flag);
 
 /**
- * Get als valid flag. This flag ist set if one integration cycle ist completed
- * after ALS enable.
+ * @brief Get ALS validity flag
+ *
+ * This flag is set when integration cycle is completed
+ * after enabling ALS.
+ *
  * @param dev Device descriptor
- * @param flag Interrupt flag
+ * @param[out] flag Validity flag
  * @return `ESP_OK` on success
  */
 esp_err_t tsl2591_get_als_valid_flag(tsl2591_t *dev, bool *flag);

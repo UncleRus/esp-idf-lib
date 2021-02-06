@@ -63,6 +63,7 @@ typedef struct
 
 /**
  * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param addr I2C address, `MS5611_ADDR_CSB_HIGH` or `MS5611_ADDR_CSB_LOW`
  * @param port I2C port
@@ -74,6 +75,7 @@ esp_err_t ms5611_init_desc(ms5611_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -81,7 +83,9 @@ esp_err_t ms5611_free_desc(ms5611_t *dev);
 
 /**
  * @brief Init MS5611-01BA03
+ *
  * Reset device and read calibration data
+ *
  * @param dev Device descriptor
  * @param osr Oversampling ratio
  * @return `ESP_OK` on success
@@ -90,6 +94,7 @@ esp_err_t ms5611_init(ms5611_t *dev, ms5611_osr_t osr);
 
 /**
  * @brief Measure pressure and temperature
+ *
  * @param dev Device descriptor
  * @param[out] pressure Pressure, Pa
  * @param[out] temperature Temperature, degrees Celsius
