@@ -21,17 +21,14 @@
 static esp_err_t rainbow(led_strip_spi_t *strip)
 {
     static uint8_t pos = 0;
-    uint32_t c;
     esp_err_t err = ESP_FAIL;
     rgb_t color;
 
-    c = led_effect_color_wheel(pos);
-    color.r = (c >> 16) & 0xff;
-    color.g = (c >> 8)  & 0xff;
-    color.b =  c        & 0xff;
+    color = led_effect_color_wheel_rgb(pos);
     ESP_LOGI(TAG, "r: 0x%02x g: 0x%02x b: 0x%02x", color.r, color.g, color.b);
 
     if ((err = led_strip_spi_fill(strip, 0, strip->length, color)) != ESP_OK) {
+        ESP_LOGE(TAG, "led_strip_spi_fill(): %s", esp_err_to_name(err));
         goto fail;
     }
     pos += 1;
@@ -53,6 +50,7 @@ static esp_err_t simple_rgb(led_strip_spi_t *strip)
     ESP_LOGI(TAG, "r: 0x%02x g: 0x%02x b: 0x%02x", color.r, color.g, color.b);
 
     if ((err = led_strip_spi_fill(strip, 0, strip->length, color)) != ESP_OK) {
+        ESP_LOGE(TAG, "led_strip_spi_fill(): %s", esp_err_to_name(err));
         goto fail;
     }
     counter += 1;
@@ -103,7 +101,13 @@ void app_main()
         ESP_LOGE(TAG, "led_strip_spi_install(): %s", esp_err_to_name(err));
         goto fail;
     }
-    xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL);
+    if (xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL) != pdPASS) {
+        ESP_LOGE(TAG, "xTaskCreate(): failed");
+        goto fail;
+    }
+    while (1) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 fail:
     ESP_LOGE(TAG, "Test failed");
     while (1) {

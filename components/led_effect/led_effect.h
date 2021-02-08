@@ -53,6 +53,13 @@ typedef struct
  */
 uint32_t led_effect_color_wheel(uint8_t pos);
 
+/**
+ * @brief Same as in `led_effect_color_wheel` but Returns `rgb_t`.
+ * @param pos Previous position in the wheel
+ * @return the next color.
+ */
+rgb_t led_effect_color_wheel_rgb(uint8_t pos);
+
 #ifdef __cplusplus
 }
 #endif

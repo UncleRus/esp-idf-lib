@@ -37,3 +37,15 @@ uint32_t led_effect_color_wheel(uint8_t pos) {
         return ((uint32_t)(pos * 3) << 16) | ((uint32_t)(255 - pos * 3) << 8) | (0);
     }
 }
+
+rgb_t led_effect_color_wheel_rgb(uint8_t pos)
+{
+    uint32_t next_color;
+    rgb_t next_pixel;
+
+    next_color = led_effect_color_wheel(pos);
+    next_pixel.r = (next_color >> 16) & 0xff;
+    next_pixel.g = (next_color >>  8) & 0xff;
+    next_pixel.b = (next_color      );
+    return next_pixel;
+}
