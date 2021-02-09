@@ -135,7 +135,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **lm75**       | Driver for LM75, a digital temperature sensor and thermal watchdog      | ISC     | Yes
 | **mcp9808**    | Driver for MCP9808, precision digital temperature sensor                | BSD     | Yes
 | **mcp960x**    | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter   | BSD     | Yes
-| **tsys01**     | Driver for porecision digital temperature sensor TSYS01                 | BSD     | Yes
+| **tsys01**     | Driver for precision digital temperature sensor TSYS01                  | BSD     | Yes
 
 ### Pressure sensors
 
