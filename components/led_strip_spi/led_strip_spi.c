@@ -272,6 +272,13 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
 #endif
 }
 
+esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int index, const rgb_t color)
+{
+#if CONFIG_LED_STRIP_SPI_USING_SK9822
+    return led_strip_spi_set_pixel_sk9822(strip, index, color);
+#endif
+}
+
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, size_t start, size_t len, rgb_t *data)
 {
     /* XXX FIXME */

@@ -95,7 +95,7 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip);
  * @param color RGB color
  * @return `ESP_OK` on success
  */
-esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, size_t num, rgb_t color);
+esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int num, const rgb_t color);
 
 /**
  * @brief Set colors of multiple LEDs

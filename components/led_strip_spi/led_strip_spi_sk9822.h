@@ -57,6 +57,15 @@ extern "C" {
  */
 esp_err_t led_strip_spi_sk9822_buf_init(led_strip_spi_t *strip);
 
+/**
+ * @brief Set color of a pixel of SK9822 strip.
+ * @param[in] strip LED strip descriptor.
+ * @param[in] num Index of the LED pixel (zero-based).
+ * @param[in] color The color to set.
+ * @return `ESP_OK` on success.
+ */
+esp_err_t led_strip_spi_set_pixel_sk9822(led_strip_spi_t *strip, size_t num, rgb_t color);
+
 #ifdef __cplusplus
 }
 #endif

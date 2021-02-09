@@ -36,6 +36,29 @@ fail:
     return err;
 }
 
+static esp_err_t rainbow_scroll(led_strip_spi_t *strip)
+{
+    static uint8_t pos = 0;
+    const uint8_t offset = 0xff / N_PIXEL >= 1 ? 0xff / N_PIXEL : 1;
+
+    esp_err_t err = ESP_FAIL;
+    rgb_t color;
+
+    for (int i = 0; i < N_PIXEL; i++) {
+        color = led_effect_color_wheel_rgb(pos + offset * i);
+        err = led_strip_spi_set_pixel(strip, i, color);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "led_strip_spi_set_pixel(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    }
+    ESP_LOGI(TAG, "pos: %d", pos);
+    pos += 1;
+fail:
+    return err;
+
+}
+
 static esp_err_t simple_rgb(led_strip_spi_t *strip)
 {
     static uint8_t counter = 0;
@@ -78,17 +101,29 @@ void test(void *pvParameters)
     /* turn off all LEDs */
     ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
     while (1) {
-        for (int i = 0; i < 1000; i++) {
+
+        /* rainbow */
+        for (int i = 0; i < 255; i++) {
             ESP_ERROR_CHECK(rainbow(&strip));
             ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
 
             vTaskDelay(pdMS_TO_TICKS(100));
         }
+
+        /* simple RGB */
         for (int i = 0; i < 10; i++) {
             ESP_ERROR_CHECK(simple_rgb(&strip));
             ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
 
             vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+
+        /* rainbow scroll */
+        for (int i = 0; i < 2048; i++) {
+            ESP_ERROR_CHECK(rainbow_scroll(&strip));
+            ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
+
+            vTaskDelay(pdMS_TO_TICKS(10));
         }
     }
 }
