@@ -1,0 +1,5 @@
+menu "Example configuration"
+    config EXAMPLE_N_PIXEL
+        int "Number of pixels"
+        default 8
+endmenu
