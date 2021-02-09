@@ -279,11 +279,19 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int index, const
 #endif
 }
 
-esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, size_t start, size_t len, rgb_t *data)
+esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data)
 {
-    /* XXX FIXME */
-    ESP_LOGW(TAG, "led_strip_spi_set_pixels() not implemented");
-    return ESP_OK;
+    esp_err_t err = ESP_FAIL;
+
+    for (int i = 0; i < len; i++) {
+        err = led_strip_spi_set_pixel(strip, start + i, data);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "led_strip_spi_set_pixel(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    }
+fail:
+    return err;
 }
 
 esp_err_t led_strip_spi_fill(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color)

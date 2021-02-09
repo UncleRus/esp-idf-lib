@@ -109,7 +109,7 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int num, const r
  * @param data Pointer to RGB data
  * @return `ESP_OK` on success
  */
-esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, size_t start, size_t len, rgb_t *data);
+esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data);
 
 /**
  * @brief Set multiple LEDs to the one color.
