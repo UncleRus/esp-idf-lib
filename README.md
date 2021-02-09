@@ -197,6 +197,13 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **mcp23008**   | Driver for 8-bit I2C GPIO expander MCP23008                             | BSD     | Yes
 | **mcp23x17**   | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17              | BSD     | Yes
 
+### Addressable LEDs
+
+| Component      | Description                                                             | License | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------------
+| **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | Yes
+| **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes
+
 ### Other
 
 | Component      | Description                                                             | License | Thread safety
@@ -208,8 +215,6 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
 | **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
 | **tca9548**    | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch           | BSD     | Yes
-| **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | Yes
-| **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes
 | **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes
 
 
