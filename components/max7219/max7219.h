@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 #define MAX7219_MAX_CASCADE_SIZE 8
-#define MAX7219_MAX_BRIGHTNESS   31
+#define MAX7219_MAX_BRIGHTNESS   15
 
 /**
  * Display descriptor
