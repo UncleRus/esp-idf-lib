@@ -181,6 +181,14 @@ GPIO expanders
    groups/tca95x5
    groups/mcp23008
    groups/mcp23x17
+   
+Addressable LEDs
+================
+.. toctree::
+   :maxdepth: 1
+
+   groups/led_strip
+   groups/led_strip_spi
 
 Other
 =====
@@ -195,8 +203,7 @@ Other
    groups/tda74xx
    groups/rda5807m
    groups/tca9548
-   groups/led_strip
-   groups/led_strip_spi
+   groups/ds3502
    
 
 ===========
