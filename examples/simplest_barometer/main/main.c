@@ -71,18 +71,16 @@ void lcd_test(void *pvParameters)
         else
         {
             // print data
-            snprintf(s, 15, "t: %.01f C", temperature);
-            s[sizeof(s) - 1] = 0;
+            snprintf(s, sizeof(s), "t: %.01f C", temperature);
             hd44780_gotoxy(&lcd, 0, 0);
             hd44780_puts(&lcd, s);
 
-            snprintf(s, 15, "P: %.02f kPa", pressure / 1000);
-            s[sizeof(s) - 1] = 0;
+            snprintf(s, sizeof(s), "P: %.02f kPa", pressure / 1000);
             hd44780_gotoxy(&lcd, 0, 1);
             hd44780_puts(&lcd, s);
         }
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
