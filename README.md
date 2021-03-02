@@ -216,6 +216,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
 | **tca9548**    | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch           | BSD     | Yes
 | **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes
+| **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes
 
 
 ## Credits
