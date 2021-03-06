@@ -3,8 +3,17 @@
 #include <freertos/task.h>
 #include <ads111x.h>
 #include <string.h>
-
-#define DEV_COUNT 2   // 2 ICs
+// Make the connections as below:
+/*
+| S. No. | ADS 1115 | ESP 32            |
+|--------|----------|-------------------|
+| 1.     | V_DD     | V_in or 5V source |
+| 2.     | GND      | GND               |
+| 3.     | SCL      | D22               |
+| 4.     | SDA      | D21               |
+| 5.     | A0       | analog input      |
+*/
+#define DEV_COUNT 1   // 1 IC
 
 #define I2C_PORT 0
 
@@ -12,8 +21,8 @@
 #define SDA_GPIO 4
 #define SCL_GPIO 5
 #else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#define SDA_GPIO 21     
+#define SCL_GPIO 22
 #endif
 
 #if defined(CONFIG_IDF_TARGET_ESP32S2)
@@ -48,7 +57,9 @@ static void measure(size_t n)
     int16_t raw = 0;
     if (ads111x_get_value(&devices[n], &raw) == ESP_OK)
     {
-        float voltage = gain_val / ADS111X_MAX_VALUE * raw;
+        float voltage =  gain_val / ADS111X_MAX_VALUE * raw;        // The gain will vary in your case, hence you can 
+                                                                    //channge the value if needed in this step
+                                                                    //float voltage = raw/<your custom gain> 
         printf("[%u] Raw ADC value: %d, voltage: %.04f volts\n", n, raw, voltage);
     }
     else
@@ -76,7 +87,7 @@ void ads111x_test(void *pvParameters)
         for (size_t i = 0; i < DEV_COUNT; i++)
             measure(i);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);   // readings will come every 500 ms
     }
 }
 
