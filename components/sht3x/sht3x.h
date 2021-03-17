@@ -134,14 +134,14 @@ esp_err_t sht3x_measure(sht3x_t *dev, float *temperature, float *humidity);
  *
  * The function returns the duration in RTOS ticks required by the sensor to
  * perform a measurement for the given repeatability. Once a measurement is
- * started with function *sht3x_start_measurement* the user task can use this
- * duration in RTOS ticks directly to wait with function *vTaskDelay* until
+ * started with function ::sht3x_start_measurement() the user task can use this
+ * duration in RTOS ticks directly to wait with function `vTaskDelay()` until
  * the measurement results can be fetched.
  *
  * Please note: The duration only depends on repeatability level. Therefore,
  * it can be considered as constant for a repeatability.
  *
- * @param repeat    Repeatability, see type *sht3x_repeat_t*
+ * @param repeat    Repeatability, see type ::sht3x_repeat_t
  * @return          Measurement duration given in RTOS ticks
  */
 uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
@@ -168,8 +168,8 @@ uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
  * measurements is defined by the parameter *mode*.
  *
  * @param dev       Device descriptor
- * @param mode      Measurement mode, see type *sht3x_mode_t*
- * @param repeat    Repeatability, see type *sht3x_repeat_t*
+ * @param mode      Measurement mode, see type ::sht3x_mode_t
+ * @param repeat    Repeatability, see type ::sht3x_repeat_t
  * @return          `ESP_OK` on success
  */
 esp_err_t sht3x_start_measurement(sht3x_t *dev, sht3x_mode_t mode, sht3x_repeat_t repeat);
@@ -194,9 +194,9 @@ esp_err_t sht3x_stop_periodic_measurement(sht3x_t *dev);
  *      data[0] = Temperature MSB
  *      data[1] = Temperature LSB
  *      data[2] = Temperature CRC
- *      data[3] = Pressure MSB
- *      data[4] = Pressure LSB
- *      data[2] = Pressure CRC
+ *      data[3] = Humidity MSB
+ *      data[4] = Humidity LSB
+ *      data[2] = Humidity CRC
  *
  * In case that there are no new data that can be read, the function fails.
  *
@@ -219,8 +219,8 @@ esp_err_t sht3x_compute_values(sht3x_raw_data_t raw_data, float *temperature, fl
 /**
  * @brief Get measurement results in form of sensor values
  *
- * The function combines function *sht3x_read_raw_data* and function
- * *sht3x_compute_values* to get the measurement results.
+ * The function combines function ::sht3x_read_raw_data() and function
+ * ::sht3x_compute_values() to get the measurement results.
  *
  * In case that there are no results that can be read, the function fails.
  *
