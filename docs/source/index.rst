@@ -106,6 +106,7 @@ Humidity & temperature sensors
 
    groups/dht
    groups/sht3x
+   groups/sht4x
    groups/si7021
    groups/ds18x20
    groups/max31725
