@@ -181,7 +181,7 @@ esp_err_t sht4x_compute_values(sht4x_raw_data_t raw_data, float *temperature, fl
 /**
  * @brief Get measurement results in form of sensor values
  *
- * The function combines function ::sht4x_read_raw_data() and function
+ * The function combines function ::sht4x_get_raw_data() and function
  * ::sht4x_compute_values() to get the measurement results.
  *
  * In case that there are no results that can be read, the function fails.

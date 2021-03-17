@@ -36,18 +36,15 @@ static const char *TAG = "sht4x";
 
 #define G_POLYNOM 0x31
 
-static uint8_t crc8(uint8_t data[], int len)
+static uint8_t crc8(uint8_t data[], size_t len)
 {
     uint8_t crc = 0xff;
 
-    for (int i = 0; i < len; i++)
+    for (size_t i = 0; i < len; i++)
     {
         crc ^= data[i];
-        for (int i = 0; i < 8; i++)
-        {
-            crc <<= 1;
-            crc = crc & 0x80 ? crc ^ G_POLYNOM : crc;
-        }
+        for (size_t i = 0; i < 8; i++)
+            crc = crc & 0x80 ? (crc << 1) ^ G_POLYNOM : crc << 1;
     }
     return crc;
 }
