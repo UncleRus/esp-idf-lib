@@ -1,5 +1,17 @@
 # Changelog
 
+## v.0.7.3
+
+#### Features
+
+- (led_strip_spi) #156 SPI-based driver for SK9822/APA102 LED strips
+- (ds3502) #160 Driver for nonvolatile digital potentiometer DS3502
+
+#### Bugfixes
+
+- (pca9685) b633f86 Speed-ups
+- (max7219) #159 Add "minus" sign and fix maximum brightness
+
 ## v.0.7.2
 
 #### Features
