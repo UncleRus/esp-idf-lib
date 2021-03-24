@@ -6,6 +6,7 @@
 
 - (led_strip_spi) #156 SPI-based driver for SK9822/APA102 LED strips
 - (ds3502) #160 Driver for nonvolatile digital potentiometer DS3502
+- (sht4x) #165 Driver for SHT4x temperature and humidity sensor
 
 #### Bugfixes
 
