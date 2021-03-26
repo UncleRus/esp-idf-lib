@@ -30,12 +30,8 @@ Use "idf.py set-target esp32s2" before "idf.py menuconfig" to change the chip ty
 * 3.3
 * 3.2
 
-Due to incompatibilities in ESP8266 RTOS SDK's SPI driver and hardware, the following
-libraries are not supported on ESP8266.
-
-* `max7219`
-* `mcp23x17`
-* `led_strip`
+Due to the incompatibility of ESP8266 drivers and hardware, some libraries are not
+supported on ESP8266 (see `ESP8266` column in the tables). 
 
 ## How to use
 
@@ -109,115 +105,115 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 
 ### Common drivers
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **i2cdev**     | I2C utilites                                                            | MIT     | Yes
-| **onewire**    | Bit-banging one wire driver                                             | MIT *   | No
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **i2cdev**     | I2C utilites                                                            | MIT     | Yes     | Yes
+| **onewire**    | Bit-banging 1-Wire driver                                               | MIT *   | Yes     | *No*
 
 ### Real-time clocks
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **ds1302**     | Driver for DS1302 RTC module                                            | BSD     | No
-| **ds1307**     | Driver for DS1307 RTC module                                            | BSD     | Yes
-| **ds3231**     | Driver for DS1337 RTC and DS3231 high precision RTC module              | MIT     | Yes
-| **pcf8563**    | Driver for PCF8563 real-time clock/calendar                             | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **ds1302**     | Driver for DS1302 RTC module                                            | BSD     | Yes     | *No*
+| **ds1307**     | Driver for DS1307 RTC module                                            | BSD     | Yes     | Yes
+| **ds3231**     | Driver for DS1337 RTC and DS3231 high precision RTC module              | MIT     | Yes     | Yes
+| **pcf8563**    | Driver for PCF8563 real-time clock/calendar                             | BSD     | Yes     | Yes
 
 ### Humidity & temperature sensors
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **dht**        | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021   | BSD     | No
-| **sht3x**      | Driver for Sensirion SHT3x digital temperature and humidity sensor      | BSD     | Yes
-| **sht4x**      | Driver for Sensirion SHT4x digital temperature and humidity sensor      | BSD     | Yes
-| **si7021**     | Driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and compatible             | BSD     | Yes
-| **ds18x20**    | Driver for DS18B20/DS18S20 families of one-wire temperature sensor ICs  | BSD     | No
-| **max31725**   | Driver for MAX31725/MAX31726 temperature sensors                        | BSD     | Yes
-| **lm75**       | Driver for LM75, a digital temperature sensor and thermal watchdog      | ISC     | Yes
-| **mcp9808**    | Driver for MCP9808, precision digital temperature sensor                | BSD     | Yes
-| **mcp960x**    | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter   | BSD     | Yes
-| **tsys01**     | Driver for precision digital temperature sensor TSYS01                  | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **dht**        | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021   | BSD     | Yes     | *No*
+| **sht3x**      | Driver for Sensirion SHT3x digital temperature and humidity sensor      | BSD     | Yes     | Yes
+| **sht4x**      | Driver for Sensirion SHT4x digital temperature and humidity sensor      | BSD     | Yes     | Yes
+| **si7021**     | Driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and compatible             | BSD     | Yes     | Yes
+| **ds18x20**    | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs    | BSD     | Yes     | *No*
+| **max31725**   | Driver for MAX31725/MAX31726 temperature sensors                        | BSD     | Yes     | Yes
+| **lm75**       | Driver for LM75, a digital temperature sensor and thermal watchdog      | ISC     | Yes     | Yes
+| **mcp9808**    | Driver for MCP9808, precision digital temperature sensor                | BSD     | Yes     | Yes
+| **mcp960x**    | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter   | BSD     | Yes     | Yes
+| **tsys01**     | Driver for precision digital temperature sensor TSYS01                  | BSD     | Yes     | Yes
 
 ### Pressure sensors
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **bmp180**     | Driver for BMP180 digital pressure sensor                               | MIT     | Yes
-| **bmp280**     | Driver for BMP280/BME280 digital pressure sensor                        | MIT     | Yes
-| **bme680**     | Driver for BME680 digital environmental sensor                          | BSD     | Yes
-| **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **bmp180**     | Driver for BMP180 digital pressure sensor                               | MIT     | Yes     | Yes
+| **bmp280**     | Driver for BMP280/BME280 digital pressure sensor                        | MIT     | Yes     | Yes
+| **bme680**     | Driver for BME680 digital environmental sensor                          | BSD     | Yes     | Yes
+| **ms5611**     | Driver for barometic pressure sensor MS5611-01BA03                      | BSD     | Yes     | Yes
 
 ### Air quality/Gas sensors
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes
-| **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes     | Yes
+| **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes     | Yes
 
 ### ADC/DAC
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **ads111x**    | Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC  | BSD     | Yes
-| **hx711**      | Driver for HX711 24-bit ADC for weigh scales                            | BSD     | Yes
-| **mcp4725**    | Driver for 12-bit DAC MCP4725                                           | BSD     | Yes
-| **pcf8591**    | Driver for 8-bit ADC and an 8-bit DAC PCF8591                           | BSD     | Yes
-| **mcp342x**    | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428              | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **ads111x**    | Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC  | BSD     | Yes     | Yes
+| **hx711**      | Driver for HX711 24-bit ADC for weigh scales                            | BSD     | Yes     | *No*
+| **mcp4725**    | Driver for 12-bit DAC MCP4725                                           | BSD     | Yes     | Yes
+| **pcf8591**    | Driver for 8-bit ADC and an 8-bit DAC PCF8591                           | BSD     | Yes     | Yes
+| **mcp342x**    | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428              | BSD     | Yes     | Yes
 
 ### Power/Current monitors
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **ina3221**    | Driver for INA3221 shunt and bus voltage monitor                        | MIT     | Yes
-| **ina219**     | Driver for INA219/INA220 bidirectional current/power monitor            | BSD     | Yes
-| **ina260**     | Driver for INA260 precision digital current and power monitor           | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **ina3221**    | Driver for INA3221 shunt and bus voltage monitor                        | MIT     | Yes     | Yes
+| **ina219**     | Driver for INA219/INA220 bidirectional current/power monitor            | BSD     | Yes     | Yes
+| **ina260**     | Driver for INA260 precision digital current and power monitor           | BSD     | Yes     | Yes
 
 ### Magnetic sensors
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **hmc5883l**   | Driver for HMC5883L 3-axis digital compass                              | BSD     | Yes
-| **qmc5883l**   | Driver for QMC5883L 3-axis magnetic sensor                              | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **hmc5883l**   | Driver for HMC5883L 3-axis digital compass                              | BSD     | Yes     | Yes
+| **qmc5883l**   | Driver for QMC5883L 3-axis magnetic sensor                              | BSD     | Yes     | Yes
 
 ### Light sensors
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **bh1750**     | Driver for BH1750 light sensor                                          | BSD     | Yes
-| **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes
-| **tsl4531**    | Driver for digital ambient light sensor TSL4531                         | BSD     | Yes
-| **tsl2591**    | Driver for light-to-digital converter TSL2591                           | MIT     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **bh1750**     | Driver for BH1750 light sensor                                          | BSD     | Yes     | Yes
+| **tsl2561**    | Driver for light-to-digital converter TSL2561                           | BSD     | Yes     | Yes
+| **tsl4531**    | Driver for digital ambient light sensor TSL4531                         | BSD     | Yes     | Yes
+| **tsl2591**    | Driver for light-to-digital converter TSL2591                           | MIT     | Yes     | Yes
 
 ### GPIO expanders
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **pcf8574**    | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                | MIT     | Yes
-| **pcf8575**    | Driver for PCF8575 remote 16-bit I/O expander for I2C-bus               | MIT     | Yes
-| **tca95x5**    | Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus      | BSD     | Yes
-| **mcp23008**   | Driver for 8-bit I2C GPIO expander MCP23008                             | BSD     | Yes
-| **mcp23x17**   | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17              | BSD     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **pcf8574**    | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                | MIT     | Yes     | Yes
+| **pcf8575**    | Driver for PCF8575 remote 16-bit I/O expander for I2C-bus               | MIT     | Yes     | Yes
+| **tca95x5**    | Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus      | BSD     | Yes     | Yes
+| **mcp23008**   | Driver for 8-bit I2C GPIO expander MCP23008                             | BSD     | Yes     | Yes
+| **mcp23x17**   | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17              | BSD     | *No*    | Yes
 
 ### Addressable LEDs
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | Yes
-| **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | *No*    | Yes
+| **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes     | Yes
 
 ### Other
 
-| Component      | Description                                                             | License | Thread safety
-|----------------|-------------------------------------------------------------------------|---------|---------------
-| **ultrasonic** | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05              | BSD     | No
-| **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | No
-| **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes
-| **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | Yes
-| **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes
-| **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes
-| **tca9548**    | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch           | BSD     | Yes
-| **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes
-| **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **ultrasonic** | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05              | BSD     | Yes     | *No*
+| **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | Yes     | *No*
+| **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes     | Yes
+| **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | *No*    | Yes
+| **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes     | Yes
+| **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes     | Yes
+| **tca9548**    | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch           | BSD     | Yes     | Yes
+| **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes     | Yes
+| **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes     | Yes
 
 
 ## Credits
