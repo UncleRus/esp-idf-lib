@@ -25,7 +25,7 @@ extern "C" {
 /**
  * @brief Initialize device descriptor
  *
- * SCL frequency is 400kHz
+ * Default SCL frequency is 400kHz
  *
  * @param dev Pointer to I2C device descriptor
  * @param port I2C port number

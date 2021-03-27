@@ -36,7 +36,8 @@ typedef struct
 } sgp40_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO
@@ -46,42 +47,48 @@ typedef struct
 esp_err_t sgp40_init_desc(sgp40_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t sgp40_free_desc(sgp40_t *dev);
 
 /**
- * Read device information, initialize the VOC algorithm
+ * @brief Read device information, initialize the VOC algorithm
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t sgp40_init(sgp40_t *dev);
 
 /**
- * Reset device, than put it to idle mode
+ * @brief Reset device, than put it to idle mode
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t sgp40_soft_reset(sgp40_t *dev);
 
 /**
- * Perform a self-test
+ * @brief Perform a self-test
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t sgp40_self_test(sgp40_t *dev);
 
 /**
- * Turn hotplate off, stop measurement and put device to idle mode
+ * @brief Turn hotplate off, stop measurement and put device to idle mode
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t sgp40_heater_off(sgp40_t *dev);
 
 /**
- * Perform a measurement.
+ * @brief Perform a measurement
+ *
  * @param dev Device descriptor
  * @param humidity Relative humidity, percents. Use NaN if
  *                 you want uncompensated measurement
@@ -94,7 +101,8 @@ esp_err_t sgp40_heater_off(sgp40_t *dev);
 esp_err_t sgp40_measure_raw(sgp40_t *dev, float humidity, float temperature, uint16_t *raw);
 
 /**
- * Perform a measurement and update VOC index
+ * @brief Perform a measurement and update VOC index
+ *
  * @param dev Device descriptor
  * @param humidity Relative humidity, percents. Use NaN if
  *                 you want uncompensated measurement

@@ -38,7 +38,8 @@ typedef struct
 } ds1302_t;
 
 /**
- * @brief Init device
+ * @brief Initialize device
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -46,6 +47,7 @@ esp_err_t ds1302_init(ds1302_t *dev);
 
 /**
  * @brief Start/stop clock
+ *
  * @param dev Device descriptor
  * @param start Start clock if true
  * @return `ESP_OK` on success
@@ -54,14 +56,16 @@ esp_err_t ds1302_start(ds1302_t *dev, bool start);
 
 /**
  * @brief Get current clock state
+ *
  * @param dev Device descriptor
- * @param running true if clock running
+ * @param[out] running true if clock running
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_is_running(ds1302_t *dev, bool *running);
 
 /**
  * @brief Enable/disable write protection
+ *
  * @param dev Device descriptor
  * @param wp Set RTC write-protected if true
  * @return `ESP_OK` on success
@@ -70,44 +74,51 @@ esp_err_t ds1302_set_write_protect(ds1302_t *dev, bool wp);
 
 /**
  * @brief Get write protection status
+ *
  * @param dev Device descriptor
- * @param wp true if RTC write-protected
+ * @param[out] wp true if RTC write-protected
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_get_write_protect(ds1302_t *dev, bool *wp);
 
 /**
  * @brief Get current time
+ *
  * @param dev Device descriptor
- * @param time Pointer to the time struct to fill
+ * @param[out] time Current time
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_get_time(ds1302_t *dev, struct tm *time);
 
 /**
  * @brief Set time to RTC
+ *
  * @param dev Device descriptor
- * @param time Pointer to the time struct
+ * @param time Time
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_set_time(ds1302_t *dev, const struct tm *time);
 
 /**
  * @brief Read RAM contents into the buffer
+ *
  * @param dev Device descriptor
  * @param offset Start byte, 0..55
- * @param buf Buffer
+ * @param[out] buf Buffer
  * @param len Bytes to read, 1..56
+ *
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_read_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len);
 
 /**
  * @brief Write buffer to RTC RAM
+ *
  * @param dev Device descriptor
  * @param offset Start byte, 0..55
  * @param buf Buffer
  * @param len Bytes to write, 1..56
+ *
  * @return `ESP_OK` on success
  */
 esp_err_t ds1302_write_sram(ds1302_t *dev, uint8_t offset, void *buf, uint8_t len);

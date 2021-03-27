@@ -118,7 +118,8 @@ typedef struct
 
 /**
  * @brief Initialize device descriptor
- * @param dev Pointer to device descriptor
+ *
+ * @param dev Device descriptor
  * @param port I2C port number
  * @param sda_gpio GPIO pin number for SDA
  * @param scl_gpio GPIO pin number for SCL
@@ -128,13 +129,15 @@ esp_err_t hmc5883l_init_desc(hmc5883l_dev_t *dev, i2c_port_t port, gpio_num_t sd
 
 /**
  * @brief Free device descriptor
- * @param dev Pointer to device descriptor
+ *
+ * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_free_desc(hmc5883l_dev_t *dev);
 
 /**
- * @brief Init device
+ * @brief Initialize device
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -142,30 +145,34 @@ esp_err_t hmc5883l_init(hmc5883l_dev_t *dev);
 
 /**
  * @brief Get operating mode
+ *
  * @param dev Device descriptor
- * @param val Measurement mode
+ * @param[out] val Operating mode
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_opmode(hmc5883l_dev_t *dev, hmc5883l_opmode_t *val);
 
 /**
  * @brief Set operating mode
+ *
  * @param dev Device descriptor
- * @param mode Measurement mode
+ * @param mode Operating mode
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_set_opmode(hmc5883l_dev_t *dev, hmc5883l_opmode_t mode);
 
 /**
  * @brief Get number of samples averaged per measurement output
+ *
  * @param dev Device descriptor
- * @param val Number of samples
+ * @param[out] val Number of samples
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_samples_averaged(hmc5883l_dev_t *dev, hmc5883l_samples_averaged_t *val);
 
 /**
  * @brief Set number of samples averaged per measurement output
+ *
  * @param dev Device descriptor
  * @param samples Number of samples
  * @return `ESP_OK` on success
@@ -174,14 +181,16 @@ esp_err_t hmc5883l_set_samples_averaged(hmc5883l_dev_t *dev, hmc5883l_samples_av
 
 /**
  * @brief Get data output rate in continuous measurement mode
+ *
  * @param dev Device descriptor
- * @param val Data output rate
+ * @param[out] val Data output rate
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_data_rate(hmc5883l_dev_t *dev, hmc5883l_data_rate_t *val);
 
 /**
  * @brief Set data output rate in continuous measurement mode
+ *
  * @param dev Device descriptor
  * @param rate Data output rate
  * @return `ESP_OK` on success
@@ -190,16 +199,20 @@ esp_err_t hmc5883l_set_data_rate(hmc5883l_dev_t *dev, hmc5883l_data_rate_t rate)
 
 /**
  * @brief Get measurement mode (bias of the axes)
- * See datasheet for self test description
+ *
+ * See datasheet for self test description.
+ *
  * @param dev Device descriptor
- * @param val Bias
+ * @param[out] val Bias
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_bias(hmc5883l_dev_t *dev, hmc5883l_bias_t *val);
 
 /**
  * @brief Set measurement mode (bias of the axes)
- * See datasheet for self test description
+ *
+ * See datasheet for self test description.
+ *
  * @param dev Device descriptor
  * @param bias Bias
  * @return `ESP_OK` on success
@@ -208,8 +221,9 @@ esp_err_t hmc5883l_set_bias(hmc5883l_dev_t *dev, hmc5883l_bias_t bias);
 
 /**
  * @brief Get device gain
+ *
  * @param dev Device descriptor
- * @param val Current gain
+ * @param[out] val Current gain
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_gain(hmc5883l_dev_t *dev, hmc5883l_gain_t *val);
@@ -224,6 +238,7 @@ esp_err_t hmc5883l_set_gain(hmc5883l_dev_t *dev, hmc5883l_gain_t gain);
 
 /**
  * @brief Get data state
+ *
  * @param dev Device descriptor
  * @param[out] val true when data is written to all six data registers
  * @return `ESP_OK` on success
@@ -231,13 +246,15 @@ esp_err_t hmc5883l_set_gain(hmc5883l_dev_t *dev, hmc5883l_gain_t gain);
 esp_err_t hmc5883l_data_is_ready(hmc5883l_dev_t *dev, bool *val);
 
 /**
- * @brief Get lock state.
+ * @brief Get lock state
+ *
  * If data is locked, any new data will not be placed in data registers until
  * one of these conditions are met:
- * 1. data have been read,
- * 2. operating mode is changed,
- * 3. the measurement configuration (bias) is changed,
- * 4. power is reset.
+ *  - data have been read,
+ *  - operating mode is changed,
+ *  - the measurement configuration (bias) is changed,
+ *  - power is reset.
+ *
  * @param dev Device descriptor
  * @param[out] val true when data registers is locked
  * @return `ESP_OK` on success
@@ -246,24 +263,27 @@ esp_err_t hmc5883l_data_is_locked(hmc5883l_dev_t *dev, bool *val);
 
 /**
  * @brief Get raw magnetic data
+ *
  * @param dev Device descriptor
- * @param data Pointer to the struct to write raw data
+ * @param[out] data Raw data
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_raw_data(hmc5883l_dev_t *dev, hmc5883l_raw_data_t *data);
 
 /**
  * @brief Convert raw magnetic data to milligausses
+ *
  * @param dev Device descriptor
- * @param raw Pointer to source raw data struct
- * @param mg Pointer to target struct to write converted data
+ * @param raw Source raw data
+ * @param[out] mg Converted data
  */
 esp_err_t hmc5883l_raw_to_mg(const hmc5883l_dev_t *dev, const hmc5883l_raw_data_t *raw, hmc5883l_data_t *mg);
 
 /**
  * @brief Get magnetic data in milligausses
+ *
  * @param dev Device descriptor
- * @param data Pointer to the struct to write data
+ * @param[out] data Magnetic data
  * @return `ESP_OK` on success
  */
 esp_err_t hmc5883l_get_data(hmc5883l_dev_t *dev, hmc5883l_data_t *data);

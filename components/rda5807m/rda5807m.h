@@ -91,7 +91,8 @@ typedef struct
 } rda5807m_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO
@@ -101,14 +102,16 @@ typedef struct
 esp_err_t rda5807m_init_desc(rda5807m_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_free_desc(rda5807m_t *dev);
 
 /**
- * Initialize device
+ * @brief Initialize device
+ *
  * @param dev Device descriptor
  * @param clock_freq RCLK frequency, usually `RDA5807M_CLK_32768HZ`
  * @return `ESP_OK` on success
@@ -116,25 +119,29 @@ esp_err_t rda5807m_free_desc(rda5807m_t *dev);
 esp_err_t rda5807m_init(rda5807m_t *dev, rda5807m_clock_freq_t clock_freq);
 
 /**
- * Get current device status
+ * @brief Get current device status
+ *
  * @param dev Device descriptor
- * @param state Device status descriptor
+ * @param[out] state Device status descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_state(rda5807m_t *dev, rda5807m_state_t *state);
 
 /**
- * Get volume level (DAC gain)
+ * @brief Get volume level (DAC gain)
+ *
  * @param dev Device descriptor
- * @param vol Volume level, 0..RDA5807M_VOL_MAX
+ * @param[out] vol Volume level, 0..RDA5807M_VOL_MAX
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_volume(rda5807m_t *dev, uint8_t *vol);
 
 /**
- * Set volume level (DAC gain)
+ * @brief Set volume level (DAC gain)
+ *
  * Volume scale is logarithmic. When 0, device is muted and output impedance
  * is very large.
+ *
  * @param dev Device descriptor
  * @param vol Volume level, 0..RDA5807M_VOL_MAX
  * @return `ESP_OK` on success
@@ -142,15 +149,17 @@ esp_err_t rda5807m_get_volume(rda5807m_t *dev, uint8_t *vol);
 esp_err_t rda5807m_set_volume(rda5807m_t *dev, uint8_t vol);
 
 /**
- * Get current mute state
+ * @brief Get current mute state
+ *
  * @param dev Device descriptor
- * @param mute Mute state
+ * @param[out] mute Mute state
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_mute(rda5807m_t *dev, bool *mute);
 
 /**
- * Mute/unmute device
+ * @brief Mute/unmute device
+ *
  * @param dev Device descriptor
  * @param mute Mute if true
  * @return `ESP_OK` on success
@@ -158,15 +167,17 @@ esp_err_t rda5807m_get_mute(rda5807m_t *dev, bool *mute);
 esp_err_t rda5807m_set_mute(rda5807m_t *dev, bool mute);
 
 /**
- * Get current soft mute state
+ * @brief Get current soft mute state
+ *
  * @param dev Device descriptor
- * @param softmute Soft mute state
+ * @param[out] softmute Soft mute state
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_softmute(rda5807m_t *dev, bool *softmute);
 
 /**
- * Enable/disable soft mute
+ * @brief Enable/disable soft mute
+ *
  * @param dev Device descriptor
  * @param softmute If true, enable soft mute
  * @return `ESP_OK` on success
@@ -174,15 +185,17 @@ esp_err_t rda5807m_get_softmute(rda5807m_t *dev, bool *softmute);
 esp_err_t rda5807m_set_softmute(rda5807m_t *dev, bool softmute);
 
 /**
- * Get current state of the bass boost feature
+ * @brief Get current state of the bass boost feature
+ *
  * @param dev Device descriptor
- * @param bass_boost Bass boost state
+ * @param[out] bass_boost Bass boost state
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_bass_boost(rda5807m_t *dev, bool *bass_boost);
 
 /**
- * Enable/disable bass boost feature
+ * @brief Enable/disable bass boost feature
+ *
  * @param dev Device descriptor
  * @param bass_boost If true, enable bass boost
  * @return `ESP_OK` on success
@@ -190,15 +203,17 @@ esp_err_t rda5807m_get_bass_boost(rda5807m_t *dev, bool *bass_boost);
 esp_err_t rda5807m_set_bass_boost(rda5807m_t *dev, bool bass_boost);
 
 /**
- * Get forced mono state
+ * @brief Get forced mono state
+ *
  * @param dev Device descriptor
- * @param mono Forced mono state
+ * @param[out] mono Forced mono state
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_mono(rda5807m_t *dev, bool *mono);
 
 /**
- * Enable/disable forced mono
+ * @brief Enable/disable forced mono
+ *
  * @param dev Device descriptor
  * @param mono If true, audio will be in mono even if stereo is available
  * @return `ESP_OK` on success
@@ -206,15 +221,17 @@ esp_err_t rda5807m_get_mono(rda5807m_t *dev, bool *mono);
 esp_err_t rda5807m_set_mono(rda5807m_t *dev, bool mono);
 
 /**
- * Get current band
+ * @brief Get current band
+ *
  * @param dev Device descriptor
- * @param band Current band
+ * @param[out] band Current band
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_band(rda5807m_t *dev, rda5807m_band_t *band);
 
 /**
- * Switch device to band
+ * @brief Switch device to band
+ *
  * @param dev Device descriptor
  * @param band New band
  * @return `ESP_OK` on success
@@ -222,15 +239,17 @@ esp_err_t rda5807m_get_band(rda5807m_t *dev, rda5807m_band_t *band);
 esp_err_t rda5807m_set_band(rda5807m_t *dev, rda5807m_band_t band);
 
 /**
- * Get current channel spacing (frequency step)
+ * @brief Get current channel spacing (frequency step)
+ *
  * @param dev Device descriptor
- * @param spacing Current channel spacing
+ * @param[out] spacing Current channel spacing
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing_t *spacing);
 
 /**
- * Set channel spacing (frequency step)
+ * @brief Set channel spacing (frequency step)
+ *
  * @param dev Device descriptor
  * @param spacing Channel spacing, usually `RDA5807M_CHAN_SPACE_100`
  * @return `ESP_OK` on success
@@ -238,15 +257,17 @@ esp_err_t rda5807m_get_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing
 esp_err_t rda5807m_set_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing_t spacing);
 
 /**
- * Get frequency the device is tuned to
+ * @brief Get frequency the device is tuned to
+ *
  * @param dev Device descriptor
- * @param frequency Frequency, kHz
+ * @param[out] frequency Frequency, kHz
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_frequency_khz(rda5807m_t *dev, uint32_t *frequency);
 
 /**
- * Tune device to a frequency
+ * @brief Tune device to a frequency
+ *
  * @param dev Device descriptor
  * @param frequency Frequency, kHz
  * @return `ESP_OK` on success
@@ -254,15 +275,17 @@ esp_err_t rda5807m_get_frequency_khz(rda5807m_t *dev, uint32_t *frequency);
 esp_err_t rda5807m_set_frequency_khz(rda5807m_t *dev, uint32_t frequency);
 
 /**
- * Get current state of the automatic frequency control
+ * @brief Get current state of the automatic frequency control
+ *
  * @param dev Device descriptor
- * @param afc AFC state
+ * @param[out] afc AFC state
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_get_afc(rda5807m_t *dev, bool *afc);
 
 /**
- * Enable/disable automatic frequency control
+ * @brief Enable/disable automatic frequency control
+ *
  * @param dev Device descriptor
  * @param afc AFC state
  * @return `ESP_OK` on success
@@ -270,7 +293,8 @@ esp_err_t rda5807m_get_afc(rda5807m_t *dev, bool *afc);
 esp_err_t rda5807m_set_afc(rda5807m_t *dev, bool afc);
 
 /**
- * Start seeking stations
+ * @brief Start seeking stations
+ *
  * @param dev Device descriptor
  * @param up Seeking direction: true - up, false - down
  * @param wrap If true, wrap at the upper or lower band limit and
@@ -282,7 +306,8 @@ esp_err_t rda5807m_set_afc(rda5807m_t *dev, bool afc);
 esp_err_t rda5807m_seek_start(rda5807m_t *dev, bool up, bool wrap, uint8_t threshold);
 
 /**
- * Stop seeking stations
+ * @brief Stop seeking stations
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */

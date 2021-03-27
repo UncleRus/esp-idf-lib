@@ -1,0 +1,11 @@
+menu "SHT4X demo"
+
+	choice
+		prompt "Demo mode"
+		config SHT4X_DEMO_HL
+			bool "High level"
+		config SHT4X_DEMO_LL
+			bool "Low level"
+	endchoice
+    
+endmenu

@@ -58,7 +58,8 @@ typedef struct {
 } tsl4531_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO pin
@@ -68,21 +69,24 @@ typedef struct {
 esp_err_t tsl4531_init_desc(tsl4531_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl4531_free_desc(tsl4531_t *dev);
 
 /**
- * Initialize device
+ * @brief Initialize device
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tsl4531_init(tsl4531_t *dev);
 
 /**
- * Configure device
+ * @brief Configure device
+ *
  * @param dev Device descriptor
  * @param integration_time Integration time
  * @param skip_power_save PowerSave Mode. When true, the power save states are
@@ -92,9 +96,10 @@ esp_err_t tsl4531_init(tsl4531_t *dev);
 esp_err_t tsl4531_config(tsl4531_t *dev, tsl4531_integration_time_t integration_time, bool skip_power_save);
 
 /**
- * Read conversion results in lux
+ * @brief Read conversion results in lux
+ *
  * @param dev Device descriptor
- * @param lux Conversion result in lux
+ * @param[out] lux Conversion result in lux
  * @return `ESP_OK` on success
  */
 esp_err_t tsl4531_read_lux(tsl4531_t *dev, uint16_t *lux);

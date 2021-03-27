@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 #define MAX7219_MAX_CASCADE_SIZE 8
-#define MAX7219_MAX_BRIGHTNESS   31
+#define MAX7219_MAX_BRIGHTNESS   15
 
 /**
  * Display descriptor
@@ -42,7 +42,8 @@ typedef struct
 } max7219_t;
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param host SPI host
  * @param cs_pin CS GPIO number
@@ -51,7 +52,8 @@ typedef struct
 esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
@@ -59,15 +61,18 @@ esp_err_t max7219_free_desc(max7219_t *dev);
 
 /**
  * @brief Initialize display
+ *
  * Switch it to normal operation from shutdown mode,
  * set scan limit to the max and clear
+ *
  * @param dev Display descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t max7219_init(max7219_t *dev);
 
 /**
- * Set decode mode and clear display
+ * @brief Set decode mode and clear display
+ *
  * @param dev Display descriptor
  * @param bcd true to set BCD decode mode, false to normal
  * @return `ESP_OK` on success
@@ -75,7 +80,8 @@ esp_err_t max7219_init(max7219_t *dev);
 esp_err_t max7219_set_decode_mode(max7219_t *dev, bool bcd);
 
 /**
- * Set display brightness
+ * @brief Set display brightness
+ *
  * @param dev Display descriptor
  * @param value Brightness value, 0..MAX7219_MAX_BRIGHTNESS
  * @return `ESP_OK` on success
@@ -83,7 +89,8 @@ esp_err_t max7219_set_decode_mode(max7219_t *dev, bool bcd);
 esp_err_t max7219_set_brightness(max7219_t *dev, uint8_t value);
 
 /**
- * Shutdown display or set it to normal mode
+ * @brief Shutdown display or set it to normal mode
+ *
  * @param dev Display descriptor
  * @param shutdown Shutdown display if true
  * @return `ESP_OK` on success
@@ -91,7 +98,8 @@ esp_err_t max7219_set_brightness(max7219_t *dev, uint8_t value);
 esp_err_t max7219_set_shutdown_mode(max7219_t *dev, bool shutdown);
 
 /**
- * Write data to display digit
+ * @brief Write data to display digit
+ *
  * @param dev Display descriptor
  * @param digit Digit index, 0..dev->digits - 1
  * @param val Data
@@ -100,14 +108,16 @@ esp_err_t max7219_set_shutdown_mode(max7219_t *dev, bool shutdown);
 esp_err_t max7219_set_digit(max7219_t *dev, uint8_t digit, uint8_t val);
 
 /**
- * Clear display
+ * @brief Clear display
+ *
  * @param dev Display descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t max7219_clear(max7219_t *dev);
 
 /**
- * Draw text on 7-segment display
+ * @brief Draw text on 7-segment display
+ *
  * @param dev Display descriptor
  * @param pos Start digit
  * @param s Text
@@ -116,7 +126,8 @@ esp_err_t max7219_clear(max7219_t *dev);
 esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s);
 
 /**
- * Draw 64-bit image on 8x8 matrix
+ * @brief Draw 64-bit image on 8x8 matrix
+ *
  * @param dev Display descriptor
  * @param pos Start digit
  * @param image 64-bit buffer with image data

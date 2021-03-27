@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 #include <pca9685.h>
 #include <string.h>
+#include <esp_log.h>
 
 #define ADDR PCA9685_ADDR_BASE
 #if defined(CONFIG_IDF_TARGET_ESP8266)
@@ -17,6 +18,10 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
+#define PWM_FREQ_HZ 1500
+
+static const char *TAG = "pca9685_test";
+
 void pca9685_test(void *pvParameters)
 {
     i2c_dev_t dev;
@@ -28,21 +33,23 @@ void pca9685_test(void *pvParameters)
     ESP_ERROR_CHECK(pca9685_restart(&dev));
 
     uint16_t freq;
-    ESP_ERROR_CHECK(pca9685_set_pwm_frequency(&dev, 1000));
+    ESP_ERROR_CHECK(pca9685_set_pwm_frequency(&dev, PWM_FREQ_HZ));
     ESP_ERROR_CHECK(pca9685_get_pwm_frequency(&dev, &freq));
-    printf("Freq 1000Hz, real %d\n", freq);
+
+    ESP_LOGI(TAG, "Freq %dHz, real %d", PWM_FREQ_HZ, freq);
 
     uint16_t val = 0;
     while (1)
     {
-        printf("Set ch0 to %d, ch4 to %d\n", val, 4096 - val);
+        if (!(val % 100))
+            ESP_LOGI(TAG, "CH0 = %-4d | CH3 = %-4d", val, PCA9685_MAX_PWM_VALUE - val);
 
         if (pca9685_set_pwm_value(&dev, 0, val) != ESP_OK)
-            printf("Could not set PWM value to ch0\n");
-        if (pca9685_set_pwm_value(&dev, 4, 4096 - val) != ESP_OK)
-            printf("Could not set PWM value to ch4");
+            ESP_LOGE(TAG, "Could not set PWM value to ch0");
+        if (pca9685_set_pwm_value(&dev, 4, PCA9685_MAX_PWM_VALUE - val) != ESP_OK)
+            ESP_LOGE(TAG, "Could not set PWM value to ch3");
 
-        if (val++ == 4096)
+        if (val++ > PCA9685_MAX_PWM_VALUE - 1)
             val = 0;
     }
 }
@@ -52,6 +59,6 @@ void app_main()
     // Init i2cdev library
     ESP_ERROR_CHECK(i2cdev_init());
 
-    xTaskCreatePinnedToCore(pca9685_test, "pca9685_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(pca9685_test, TAG, configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL, APP_CPU_NUM);
 }
 

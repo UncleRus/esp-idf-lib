@@ -84,6 +84,15 @@ static esp_err_t update_reg(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t v
     return ESP_OK;
 }
 
+static esp_err_t dev_sleep(i2c_dev_t *dev, bool sleep)
+{
+    CHECK(update_reg(dev, REG_MODE1, MODE1_SLEEP, sleep ? MODE1_SLEEP : 0));
+    if (!sleep)
+        ets_delay_us(WAKEUP_DELAY_US);
+
+    return ESP_OK;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Public
 
@@ -172,9 +181,7 @@ esp_err_t pca9685_sleep(i2c_dev_t *dev, bool sleep)
     CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, update_reg(dev, REG_MODE1, MODE1_SLEEP, sleep ? MODE1_SLEEP : 0));
-    if (!sleep)
-        ets_delay_us(WAKEUP_DELAY_US);
+    I2C_DEV_CHECK(dev, dev_sleep(dev, sleep));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
@@ -245,11 +252,11 @@ esp_err_t pca9685_set_prescaler(i2c_dev_t *dev, uint8_t prescaler)
     CHECK_ARG_LOGE(prescaler >= MIN_PRESCALER,
             "Invalid prescaler value: (%d), must be >= 3", prescaler);
 
-    CHECK(pca9685_sleep(dev, true));
     I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, dev_sleep(dev, true));
     I2C_DEV_CHECK(dev, write_reg(dev, REG_PRE_SCALE, prescaler));
+    I2C_DEV_CHECK(dev, dev_sleep(dev, false));
     I2C_DEV_GIVE_MUTEX(dev);
-    CHECK(pca9685_sleep(dev, false));
 
     return ESP_OK;
 }
@@ -263,14 +270,14 @@ esp_err_t pca9685_get_pwm_frequency(i2c_dev_t *dev, uint16_t *freq)
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_PRE_SCALE, &prescale));
     I2C_DEV_GIVE_MUTEX(dev);
-    *freq = INTERNAL_FREQ / ((uint32_t)4096 * (prescale + 1));
+    *freq = INTERNAL_FREQ / ((uint32_t)PCA9685_MAX_PWM_VALUE * (prescale + 1));
 
     return ESP_OK;
 }
 
 esp_err_t pca9685_set_pwm_frequency(i2c_dev_t *dev, uint16_t freq)
 {
-    uint32_t prescaler = round_div(INTERNAL_FREQ, (uint32_t)4096 * freq) - 1;
+    uint32_t prescaler = round_div(INTERNAL_FREQ, (uint32_t)PCA9685_MAX_PWM_VALUE * freq) - 1;
     CHECK_ARG_LOGE(prescaler >= MIN_PRESCALER && prescaler <= MAX_PRESCALER,
             "Invalid prescaler value (%d), must be in (%d..%d)", prescaler,
             MIN_PRESCALER, MAX_PRESCALER);
@@ -282,30 +289,25 @@ esp_err_t pca9685_set_pwm_value(i2c_dev_t *dev, uint8_t channel, uint16_t val)
     CHECK_ARG(dev);
     CHECK_ARG_LOGE(channel <= PCA9685_CHANNEL_ALL,
             "Invalid channel %d, must be in (0..%d)", channel, PCA9685_CHANNEL_ALL);
-    CHECK_ARG_LOGE(val <= 4096,
-            "Invalid PWM value %d, must be in (0..4096)", val);
+    CHECK_ARG_LOGE(val <= PCA9685_MAX_PWM_VALUE,
+            "Invalid PWM value %d, must be in (0..PCA9685_MAX_PWM_VALUE)", val);
 
     uint8_t reg = channel == PCA9685_CHANNEL_ALL ? REG_ALL_LED : REG_LED_N(channel);
 
+    bool full_on = val >= PCA9685_MAX_PWM_VALUE;
+    bool full_off = val == 0;
+
+    uint16_t raw = full_on ? 4095 : val;
+
+    uint8_t buf[4] = {
+        0,
+        full_on ? LED_FULL_ON_OFF : 0,
+        raw,
+        full_off ? LED_FULL_ON_OFF | (raw >> 8) : raw >> 8
+    };
+
     I2C_DEV_TAKE_MUTEX(dev);
-    if (val == 0)
-    {
-        // Full off, takes precedence over full on.
-        I2C_DEV_CHECK(dev, write_reg(dev, reg + OFFS_REG_LED_OFF, LED_FULL_ON_OFF));
-    }
-    else if (val < 4096)
-    {
-        // Normal
-        uint8_t buf[4] = { 0, 0, val, val >> 8 };
-        I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, buf, 4));
-    }
-    else
-    {
-        // Clear full off, as it takes precedence over full on.
-        I2C_DEV_CHECK(dev, write_reg(dev, reg + OFFS_REG_LED_OFF, 0));
-        // Full on
-        I2C_DEV_CHECK(dev, write_reg(dev, reg + OFFS_REG_LED_ON, LED_FULL_ON_OFF));
-    }
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, buf, 4));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
@@ -318,13 +320,25 @@ esp_err_t pca9685_set_pwm_values(i2c_dev_t *dev, uint8_t first_ch, uint8_t chann
     CHECK_ARG_LOGE(channels > 0 && first_ch + channels - 1 < PCA9685_CHANNEL_ALL,
             "Invalid first_ch or channels: (%d, %d)", first_ch, channels);
 
-    esp_err_t res;
-    for (uint8_t i = 0; i < channels; i ++)
-        if ((res = pca9685_set_pwm_value(dev, first_ch + i, values[i])) != ESP_OK)
-        {
-            ESP_LOGE(TAG, "Could not set channel %d value %d: %d", i, values[i], res);
-            return res;
-        }
+
+    size_t size = channels * 4;
+    uint8_t buf[size];
+    for (uint8_t ch = first_ch; ch < first_ch + channels; ch++)
+    {
+        bool full_on = values[ch] >= PCA9685_MAX_PWM_VALUE;
+        bool full_off = values[ch] == 0;
+
+        uint16_t val = full_on ? 4095 : values[ch];
+
+        buf[ch * 4] = 0;
+        buf[ch * 4 + 1] = full_on ? LED_FULL_ON_OFF : 0;
+        buf[ch * 4 + 2] = val;
+        buf[ch * 4 + 3] = full_off ? LED_FULL_ON_OFF | (val >> 8) : val >> 8;
+    }
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_LED_N(first_ch), buf, size));
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }

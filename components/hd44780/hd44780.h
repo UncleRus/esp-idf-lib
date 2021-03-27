@@ -62,7 +62,9 @@ struct hd44780
 
 /**
  * @brief Init LCD
+ *
  * Set cursor position to (0, 0)
+ *
  * @param lcd LCD descriptor
  * @return `ESP_OK` on success
  */
@@ -70,7 +72,9 @@ esp_err_t hd44780_init(const hd44780_t *lcd);
 
 /**
  * @brief Control LCD
+ *
  * On/off LCD, show/hide cursor, set cursor blink
+ *
  * @param lcd LCD descriptor
  * @param on Switch LCD on if true
  * @param cursor Show cursor if true
@@ -81,7 +85,9 @@ esp_err_t hd44780_control(const hd44780_t *lcd, bool on, bool cursor, bool curso
 
 /**
  * @brief Clear LCD
+ *
  * Clear memory and move cursor to (0, 0)
+ *
  * @param lcd LCD descriptor
  * @return `ESP_OK` on success
  */
@@ -89,6 +95,7 @@ esp_err_t hd44780_clear(const hd44780_t *lcd);
 
 /**
  * @brief Move cursor
+ *
  * @param lcd LCD descriptor
  * @param col Column
  * @param line Line
@@ -98,6 +105,7 @@ esp_err_t hd44780_gotoxy(const hd44780_t *lcd, uint8_t col, uint8_t line);
 
 /**
  * @brief Write character at cursor position
+ *
  * @param lcd LCD descriptor
  * @param c Character to write
  * @return `ESP_OK` on success
@@ -106,6 +114,7 @@ esp_err_t hd44780_putc(const hd44780_t *lcd, char c);
 
 /**
  * @brief Write NULL-terminated string at cursor position
+ *
  * @param lcd LCD descriptor
  * @param s String to write
  * @return `ESP_OK` on success
@@ -114,6 +123,7 @@ esp_err_t hd44780_puts(const hd44780_t *lcd, const char *s);
 
 /**
  * @brief Switch backlight
+ *
  * @param lcd LCD descriptor
  * @param on Turn backlight on if true
  * @return `ESP_OK` on success
@@ -121,8 +131,10 @@ esp_err_t hd44780_puts(const hd44780_t *lcd, const char *s);
 esp_err_t hd44780_switch_backlight(hd44780_t *lcd, bool on);
 
 /**
- * @brief Upload character data to the CGRAM.
- * Cursor position will be moved to (0, 0) after uploading
+ * @brief Upload character data to the CGRAM
+ *
+ * After upload cursor will be moved to (0, 0).
+ *
  * @param lcd LCD descriptor
  * @param num Character number (0..7)
  * @param data Character data: 8 or 10 bytes depending on the font
@@ -132,6 +144,7 @@ esp_err_t hd44780_upload_character(const hd44780_t *lcd, uint8_t num, const uint
 
 /**
  * @brief Scroll the display content to left by one character
+ *
  * @param lcd LCD descriptor
  * @return `ESP_OK` on success
  */
@@ -139,6 +152,7 @@ esp_err_t hd44780_scroll_left(const hd44780_t *lcd);
 
 /**
  * @brief Scroll the display content to right by one character
+ *
  * @param lcd LCD descriptor
  * @return `ESP_OK` on success
  */

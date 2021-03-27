@@ -43,7 +43,8 @@ extern "C" {
 #define TCA9548_CHANNEL7 BV(7)
 
 /**
- * Initialize device descriptor
+ * @brief Initialize device descriptor
+ *
  * @param dev Device descriptor
  * @param port I2C port
  * @param addr Device address
@@ -54,14 +55,16 @@ extern "C" {
 esp_err_t tca9548_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
- * Free device descriptor
+ * @brief Free device descriptor
+ *
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t tca9548_free_desc(i2c_dev_t *dev);
 
 /**
- * Switch channels
+ * @brief Switch channels
+ *
  * @param dev Device descriptor
  * @param channels Channel flags, combination of TCA9548_CHANNELn
  * @return `ESP_OK` on success
@@ -69,7 +72,8 @@ esp_err_t tca9548_free_desc(i2c_dev_t *dev);
 esp_err_t tca9548_set_channels(i2c_dev_t *dev, uint8_t channels);
 
 /**
- * Read current channels configuration
+ * @brief Read current channels configuration
+ *
  * @param dev Device descriptor
  * @param[out] channels Channel flags, combination of TCA9548_CHANNELn
  * @return `ESP_OK` on success

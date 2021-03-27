@@ -1,0 +1,15 @@
+menu "LED strip SPI"
+    choice LED_STRIP_SPI_PROTOCOL_CHOOSE
+        prompt "Choose protocol for SPI"
+        default LED_STRIP_SPI_USING_SK9822
+        help
+            The protocol to use SPI communication.
+        config LED_STRIP_SPI_USING_SK9822
+            bool "SK9822 (and APA102)"
+    endchoice
+    config LED_STRIP_SPI_MUTEX_TIMEOUT_MS
+        int "Timeout in msec to obtain mutex"
+        default 1
+        help
+            Timeout when obtaining mutex with xSemaphoreTake.
+endmenu

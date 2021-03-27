@@ -33,9 +33,6 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-#define DS18B20_FAMILY_ID 0x28
-#define DS18S20_FAMILY_ID 0x10
-
 #if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
@@ -53,7 +50,7 @@ esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait)
     if (!onewire_reset(pin))
         return ESP_ERR_INVALID_RESPONSE;
 
-    if (addr == ds18x20_ANY)
+    if (addr == DS18X20_ANY)
         onewire_skip_rom(pin);
     else
         onewire_select(pin, addr);
@@ -84,7 +81,7 @@ esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *
     if (!onewire_reset(pin))
         return ESP_ERR_INVALID_RESPONSE;
 
-    if (addr == ds18x20_ANY)
+    if (addr == DS18X20_ANY)
         onewire_skip_rom(pin);
     else
         onewire_select(pin, addr);
@@ -135,43 +132,44 @@ esp_err_t ds18x20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *t
     return ds18x20_read_temperature(pin, addr, temperature);
 }
 
-esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, int addr_count, float *result_list)
+esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, float *result_list)
 {
-    CHECK_ARG(result_list);
+    CHECK_ARG(result_list && addr_count);
 
-    CHECK(ds18x20_measure(pin, ds18x20_ANY, true));
+    CHECK(ds18x20_measure(pin, DS18X20_ANY, true));
 
     return ds18x20_read_temp_multi(pin, addr_list, addr_count, result_list);
 }
 
-int ds18x20_scan_devices(gpio_num_t pin, ds18x20_addr_t *addr_list, int addr_count)
+esp_err_t ds18x20_scan_devices(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, size_t *found)
 {
-    CHECK_ARG(addr_list);
+    CHECK_ARG(addr_list && addr_count);
 
     onewire_search_t search;
     onewire_addr_t addr;
-    int found = 0;
 
+    *found = 0;
     onewire_search_start(&search);
     while ((addr = onewire_search_next(&search, pin)) != ONEWIRE_NONE)
     {
         uint8_t family_id = (uint8_t)addr;
         if (family_id == DS18B20_FAMILY_ID || family_id == DS18S20_FAMILY_ID)
         {
-            if (found < addr_count)
-                addr_list[found] = addr;
-            found++;
+            if (*found < addr_count)
+                addr_list[*found] = addr;
+            *found += 1;
         }
     }
-    return found;
+
+    return ESP_OK;
 }
 
-esp_err_t ds18x20_read_temp_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, int addr_count, float *result_list)
+esp_err_t ds18x20_read_temp_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, float *result_list)
 {
     CHECK_ARG(result_list);
 
     esp_err_t res = ESP_OK;
-    for (int i = 0; i < addr_count; i++)
+    for (size_t i = 0; i < addr_count; i++)
     {
         esp_err_t tmp = ds18x20_read_temperature(pin, addr_list[i], &result_list[i]);
         if (tmp != ESP_OK)

@@ -63,7 +63,7 @@ typedef enum
 /**
  * @brief Initialize device descriptor
  *
- * @param[out] dev Pointer to device descriptor
+ * @param dev Device descriptor
  * @param port I2C port number
  * @param sda_gpio GPIO pin number for SDA
  * @param scl_gpio GPIO pin number for SCL
@@ -80,7 +80,7 @@ esp_err_t bmp180_init_desc(bmp180_dev_t *dev, i2c_port_t port, gpio_num_t sda_gp
 esp_err_t bmp180_free_desc(bmp180_dev_t *dev);
 
 /**
- * @brief Init bmp180 device
+ * @brief Initialize device
  *
  * @param dev Pointer to BMP180 device descriptor
  * @return `ESP_OK` on success

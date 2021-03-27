@@ -106,6 +106,7 @@ Humidity & temperature sensors
 
    groups/dht
    groups/sht3x
+   groups/sht4x
    groups/si7021
    groups/ds18x20
    groups/max31725
@@ -125,12 +126,13 @@ Pressure sensors
    groups/bme680
    groups/ms5611
 
-Air quality sensors
-===================
+Air quality/Gas sensors
+=======================
 .. toctree::
    :maxdepth: 1
 
    groups/sgp40
+   groups/ccs811
 
 ADC/DAC
 =======
@@ -180,6 +182,14 @@ GPIO expanders
    groups/tca95x5
    groups/mcp23008
    groups/mcp23x17
+   
+Addressable LEDs
+================
+.. toctree::
+   :maxdepth: 1
+
+   groups/led_strip
+   groups/led_strip_spi
 
 Other
 =====
@@ -194,13 +204,21 @@ Other
    groups/tda74xx
    groups/rda5807m
    groups/tca9548
-   groups/led_strip
+   groups/ds3502
+   
+
+===========
+Information
+===========
+.. toctree::
+   :maxdepth: 1
+   
+   chips
    
 
 ==================
 Indices and tables
 ==================
 
-* :ref:`chips`
 * :ref:`genindex`
 * :ref:`search`

@@ -25,3 +25,13 @@ If your LED strip has many pixels:
 - Use a large capacitor on the power rail.
 
 See [Adafruit NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide).
+
+`WS2812` is 5V device, but it also supports lower voltage on the signal rails.
+Make sure the distance between `GPIO` of the microcontroller and the first LED
+is short. If you are lucky, you do not need voltage level converter. The
+example runs fine with a single jumper wire on a half-size breadboard. Use
+voltage level converter module, such as
+[SparkFun Logic Level Converter](https://www.sparkfun.com/products/12009), or
+level-shift IC, such as
+[FXMA108](https://www.onsemi.com/products/standard-logic/level-translators/fxma108)
+if it does not.

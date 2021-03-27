@@ -72,6 +72,7 @@ typedef enum {
 
 /**
  * @brief Initialize device descriptor
+ *
  * @param dev I2C device descriptor
  * @param port I2C port
  * @param sda_gpio SDA GPIO
@@ -82,6 +83,7 @@ esp_err_t ds3231_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio,
 
 /**
  * @brief Free device descriptor
+ *
  * @param dev I2C device descriptor
  * @return ESP_OK to indicate success
  */
@@ -99,6 +101,7 @@ esp_err_t ds3231_set_time(i2c_dev_t *dev, struct tm *time);
 
 /**
  * @brief Get the time from the RTC, populates a supplied tm struct
+ *
  * @param dev Device descriptor
  * @param[out] time RTC time
  * @return ESP_OK to indicate success
@@ -116,7 +119,7 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time);
  * and you can set both alarms at the same time (pass `DS3231_ALARM_1`/`DS3231_ALARM_2`/`DS3231_ALARM_BOTH`).
  *
  * If only setting one alarm just pass 0 for `tm` struct and `option` field for the other alarm.
- * If using `DS3231_ALARM1_EVERY_SECOND`/`DS3231_ALARM2_EVERY_MIN` you can pass 0 for `tm` struct.
+ * If using ::DS3231_ALARM1_EVERY_SECOND/::DS3231_ALARM2_EVERY_MIN you can pass 0 for `tm` struct.
  *
  * If you want to enable interrupts for the alarms you need to do that separately.
  *
@@ -139,6 +142,7 @@ esp_err_t ds3231_get_oscillator_stop_flag(i2c_dev_t *dev, bool *flag);
 
 /**
  * @brief Clear the oscillator stopped flag
+ *
  * @param dev Device descriptor
  * @return ESP_OK to indicate success
  */

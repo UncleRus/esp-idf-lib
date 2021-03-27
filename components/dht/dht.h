@@ -36,13 +36,13 @@ typedef enum
 } dht_sensor_type_t;
 
 /**
- * @brief Read data from sensor on specified pin.
- * Humidity and temperature are returned as integers.
- * For example: humidity=625 is 62.5 %
- *              temperature=24.4 is 24.4 degrees Celsius
+ * @brief Read integer data from sensor on specified pin
  *
- * @param[in] sensor_type DHT11 or DHT22
- * @param[in] pin GPIO pin connected to sensor OUT
+ * Humidity and temperature are returned as integers.
+ * For example: humidity=625 is 62.5 %, temperature=244 is 24.4 degrees Celsius
+ *
+ * @param sensor_type DHT11 or DHT22
+ * @param pin GPIO pin connected to sensor OUT
  * @param[out] humidity Humidity, percents * 10
  * @param[out] temperature Temperature, degrees Celsius * 10
  * @return `ESP_OK` on success
@@ -51,11 +51,12 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
         int16_t *humidity, int16_t *temperature);
 
 /**
- * @brief Read data from sensor on specified pin.
+ * @brief Read float data from sensor on specified pin
+ *
  * Humidity and temperature are returned as floats.
  *
- * @param[in] sensor_type DHT11 or DHT22
- * @param[in] pin GPIO pin connected to sensor OUT
+ * @param sensor_type DHT11 or DHT22
+ * @param pin GPIO pin connected to sensor OUT
  * @param[out] humidity Humidity, percents
  * @param[out] temperature Temperature, degrees Celsius
  * @return `ESP_OK` on success

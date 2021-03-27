@@ -1,0 +1,12 @@
+menu "LED effect"
+    choice LED_EFFECT_COLOR
+        prompt "Choose RGB or RGBW"
+        default LED_EFFECT_COLOR_USING_RGB
+        help
+            Choose whethert if LED has white LED
+        config LED_EFFECT_COLOR_USING_RGB
+            bool "RGB"
+        config LED_EFFECT_COLOR_USING_RGBW
+            bool "RGBW"
+    endchoice
+endmenu
