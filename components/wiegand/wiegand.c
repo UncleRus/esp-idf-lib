@@ -21,14 +21,14 @@ static const char *TAG = "wiegand";
 
 static void isr_disable(wiegand_reader_t *reader)
 {
-    gpio_intr_disable(reader->gpio_d0);
-    gpio_intr_disable(reader->gpio_d1);
+    gpio_set_intr_type(reader->gpio_d0, GPIO_INTR_DISABLE);
+    gpio_set_intr_type(reader->gpio_d1, GPIO_INTR_DISABLE);
 }
 
 static void isr_enable(wiegand_reader_t *reader)
 {
-    gpio_intr_enable(reader->gpio_d0);
-    gpio_intr_enable(reader->gpio_d1);
+    gpio_set_intr_type(reader->gpio_d0, GPIO_INTR_LOW_LEVEL);
+    gpio_set_intr_type(reader->gpio_d1, GPIO_INTR_LOW_LEVEL);
 }
 
 static void IRAM_ATTR isr_handler(void *arg)
@@ -79,6 +79,10 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
 {
     CHECK_ARG(reader && buf_size && callback);
 
+    esp_err_t res = gpio_install_isr_service(0);
+    if (res != ESP_OK && res != ESP_ERR_INVALID_STATE)
+        return res;
+
     memset(reader, 0, sizeof(wiegand_reader_t));
     reader->gpio_d0 = gpio_d0;
     reader->gpio_d1 = gpio_d1;
@@ -97,8 +101,7 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
     CHECK(gpio_set_direction(gpio_d1, GPIO_MODE_INPUT));
     CHECK(gpio_set_pull_mode(gpio_d0, internal_pullups ? GPIO_PULLUP_ONLY : GPIO_FLOATING));
     CHECK(gpio_set_pull_mode(gpio_d1, internal_pullups ? GPIO_PULLUP_ONLY : GPIO_FLOATING));
-    CHECK(gpio_set_intr_type(gpio_d0, GPIO_INTR_LOW_LEVEL));
-    CHECK(gpio_set_intr_type(gpio_d1, GPIO_INTR_LOW_LEVEL));
+    isr_disable(reader);
     CHECK(gpio_isr_handler_add(gpio_d0, isr_handler, reader));
     CHECK(gpio_isr_handler_add(gpio_d1, isr_handler, reader));
     isr_enable(reader);
