@@ -9,6 +9,7 @@
  */
 #include <esp_log.h>
 #include <string.h>
+#include <stdlib.h>
 #include "wiegand.h"
 
 static const char *TAG = "wiegand";
