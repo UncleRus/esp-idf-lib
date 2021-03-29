@@ -1,8 +1,9 @@
 /**
  * @file wiegand.c
  *
+ * ESP-IDF component to communicate with Wiegand reader
  *
- * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (C) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
@@ -10,7 +11,7 @@
 #include <string.h>
 #include "wiegand.h"
 
-static const char *TAG = "WIEGAND";
+static const char *TAG = "wiegand";
 
 #define TIMER_INTERVAL_US 50000 // 50ms
 
@@ -57,14 +58,16 @@ static void timer_handler(void *arg)
 {
     wiegand_reader_t *reader = (wiegand_reader_t *)arg;
 
-    ESP_LOGD(TAG, "(%p) Got %d bits of data", reader, reader->bits);
+    ESP_LOGD(TAG, "Got %d bits of data", reader->bits);
+
+    isr_disable(reader);
 
     if (reader->callback)
         reader->callback(reader);
 
-    isr_disable(reader);
     reader->bits = 0;
     memset(reader->buf, 0, reader->size);
+
     isr_enable(reader);
 }
 
@@ -81,10 +84,8 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
     reader->size = buf_size;
     reader->buf = calloc(buf_size, 1);
 
-    char t_name[17];
-    snprintf(t_name, sizeof(t_name), "wiegand_%p", reader);
     esp_timer_create_args_t timer_args = {
-        .name = t_name,
+        .name = TAG,
         .arg = reader,
         .callback = timer_handler,
         .dispatch_method = ESP_TIMER_TASK
@@ -101,7 +102,7 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
     CHECK(gpio_isr_handler_add(gpio_d1, isr_handler, reader));
     isr_enable(reader);
 
-    ESP_LOGI(TAG, "(%p) Reader initialized on D0=%d, D1=%d", reader, gpio_d0, gpio_d1);
+    ESP_LOGI(TAG, "Reader initialized on D0=%d, D1=%d", gpio_d0, gpio_d1);
 
     return ESP_OK;
 }
@@ -117,31 +118,157 @@ esp_err_t wiegand_reader_done(wiegand_reader_t *reader)
     CHECK(esp_timer_delete(reader->timer));
     free(reader->buf);
 
-    ESP_LOGI(TAG, "(%p) Reader removed", reader);
+    ESP_LOGI(TAG, "Reader removed");
 
     return ESP_OK;
 }
 
-esp_err_t wiegand_reader_decode(wiegand_reader_t *reader, wiegand_fmt_t fmt, void *res)
-{
-    CHECK_ARG(res && reader && reader->buf);
+////////////////////////////////////////////////////////////////////////////////
+/// Decode
 
-    switch (fmt)
+static inline uint8_t get_bit(wiegand_reader_t *reader, size_t pos)
+{
+    return (reader->buf[pos / 8] >> (7 - (pos % 8))) & 1;
+}
+
+static uint64_t get_bit_field(wiegand_reader_t *reader, size_t start_bit, size_t bits)
+{
+    uint64_t res = 0;
+    for (size_t i = 0; i < bits; i++)
+        res = (res << 1) | get_bit(reader, start_bit + i);
+    return res;
+}
+
+typedef struct
+{
+    uint8_t bits;
+    size_t issue_level_start, issue_level_len;
+    size_t facility_start, facility_len;
+    size_t number_start, number_len;
+    size_t cardholder_start, cardholder_len;
+} format_desc_t;
+
+static const format_desc_t formats[] = {
+    [WIEGAND_H10301] = {
+        .bits = 26,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 8,
+        .number_start      = 9,  .number_len      = 16,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_2804] = {
+        .bits = 28,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 4,  .facility_len    = 8,
+        .number_start      = 12, .number_len      = 15,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_ATS30] = {
+        .bits = 30,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 12,
+        .number_start      = 13, .number_len      = 16,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_ADT31] = {
+        .bits = 31,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 4,
+        .number_start      = 0,  .number_len      = 0,
+        .cardholder_start  = 5,  .cardholder_len  = 23,
+    },
+    [WIEGAND_KASTLE] = {
+        .bits = 32,
+        .issue_level_start = 2,  .issue_level_len = 5,
+        .facility_start    = 7,  .facility_len    = 8,
+        .number_start      = 0,  .number_len      = 0,
+        .cardholder_start  = 15, .cardholder_len  = 16,
+    },
+    [WIEGAND_D10202] = {
+        .bits = 33,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 7,
+        .number_start      = 8,  .number_len      = 24,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_H10306] = {
+        .bits = 34,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 16,
+        .number_start      = 17, .number_len      = 16,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_C1000] = {
+        .bits = 35,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 2,  .facility_len    = 12,
+        .number_start      = 14, .number_len      = 20,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_KS36] = {
+        .bits = 36,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 11, .facility_len    = 8,
+        .number_start      = 19, .number_len      = 16,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_S12906] = {
+        .bits = 36,
+        .issue_level_start = 9,  .issue_level_len = 2,
+        .facility_start    = 1,  .facility_len    = 8,
+        .number_start      = 11, .number_len      = 24,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_SIEMENS] = {
+        .bits = 36,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 18,
+        .number_start      = 19, .number_len      = 16,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_H10302] = {
+        .bits = 37,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 0,  .facility_len    = 0,
+        .number_start      = 1,  .number_len      = 35,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+    [WIEGAND_H10304] = {
+        .bits = 37,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 1,  .facility_len    = 16,
+        .number_start      = 0,  .number_len      = 0,
+        .cardholder_start  = 17, .cardholder_len  = 19,
+    },
+    [WIEGAND_P10001] = {
+        .bits = 40,
+        .issue_level_start = 0,  .issue_level_len = 0,
+        .facility_start    = 4,  .facility_len    = 12,
+        .number_start      = 16, .number_len      = 16,
+        .cardholder_start  = 0,  .cardholder_len  = 0,
+    },
+};
+
+esp_err_t wiegand_reader_decode(wiegand_reader_t *reader, wiegand_format_t fmt, wiegand_card_t *card)
+{
+    CHECK_ARG(card && reader && reader->buf && fmt < WIEGAND_FMT_MAX);
+
+    if (formats[fmt].bits != reader->bits)
     {
-        case WIEGAND_26_HID:
-            if (reader->bits != 26) return ESP_FAIL;
-            *(uint32_t *)reader->buf <<= 1;
-            ((wiegand_fmt_26_hid_t *)res)->facility = reader->buf[0];
-            ((wiegand_fmt_26_hid_t *)res)->number = ((uint16_t)(reader->buf[1]) << 8) | reader->buf[2];
-            ((wiegand_fmt_26_hid_t *)res)->raw = (((uint32_t)reader->buf[0]) << 16) | ((wiegand_fmt_26_hid_t *)res)->number;
-            break;
-        case WIEGAND_31_HID:
-            if (reader->bits != 31) return ESP_FAIL;
-            ((wiegand_fmt_31_hid_t *)res)->facility = (reader->buf[0] >> 3) & 0x0f;
-            *(uint32_t *)reader->buf <<= 5;
-            ((wiegand_fmt_31_hid_t *)res)->cardholder = ((uint32_t)(reader->buf[0]) << 16) | ((uint32_t)(reader->buf[1]) << 8) | reader->buf[2];
+        ESP_LOGE(TAG, "Invalid bits count: expected %d, got %d", formats[fmt].bits, reader->bits);
+        return ESP_FAIL;
     }
 
+    memset(card, 0, sizeof(wiegand_card_t));
+
+    if (formats[fmt].issue_level_len)
+        card->issue_level = get_bit_field(reader, formats[fmt].issue_level_start, formats[fmt].issue_level_len);
+    if (formats[fmt].facility_len)
+        card->facility = get_bit_field(reader, formats[fmt].facility_start, formats[fmt].facility_len);
+    if (formats[fmt].number_len)
+        card->number = get_bit_field(reader, formats[fmt].number_start, formats[fmt].number_len);
+    if (formats[fmt].cardholder_len)
+        card->cardholder = get_bit_field(reader, formats[fmt].cardholder_start, formats[fmt].cardholder_len);
+
     return ESP_OK;
 }
-
