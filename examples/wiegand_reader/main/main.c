@@ -14,21 +14,25 @@ static const char *TAG = "wiegand_reader";
 #define D1_GPIO 17
 #endif
 
-#define WIEGAND_CARD_FORMAT WIEGAND_H10301 // 26 bit HID (H10301)
+#define READER_BUF_SIZE 4 // 32 bits should be enough for demo
 
 static wiegand_reader_t reader;
 
 static void reader_callback(wiegand_reader_t *r)
 {
+    // Can use xQueueSend() here
     ESP_LOGI(TAG, "Got card, %d bits, ID: %08x", r->bits, *((uint32_t*)r->buf));
 }
 
 void task(void *arg)
 {
-    ESP_ERROR_CHECK(wiegand_reader_init(&reader, D0_GPIO, D1_GPIO, true, 16, reader_callback));
+    // Initialize reader
+    ESP_ERROR_CHECK(wiegand_reader_init(&reader, D0_GPIO, D1_GPIO, true, READER_BUF_SIZE, reader_callback));
+
     while (1)
     {
-        ESP_LOGI(TAG, "Waiting...");
+        ESP_LOGI(TAG, "Doing something...");
+        // Can use xQueueReceive() here
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
