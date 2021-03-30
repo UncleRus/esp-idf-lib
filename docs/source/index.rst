@@ -205,6 +205,7 @@ Other
    groups/rda5807m
    groups/tca9548
    groups/ds3502
+   groups/weigand
    
 
 ===========

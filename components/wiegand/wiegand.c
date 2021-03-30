@@ -1,7 +1,7 @@
 /**
  * @file wiegand.c
  *
- * ESP-IDF component to communicate with Wiegand reader
+ * ESP-IDF Weigand protocol receiver and decoder
  *
  * Copyright (C) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
