@@ -214,7 +214,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **tca9548**    | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch           | BSD     | Yes     | Yes
 | **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes     | Yes
 | **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes     | Yes
-| **pca9685**    | Weigand protocol receiver and decoder                                   | BSD     | Yes     | *No*
+| **pca9685**    | Wiegand protocol receiver                                               | BSD     | Yes     | *No*
 
 
 ## Credits

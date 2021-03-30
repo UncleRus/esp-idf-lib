@@ -20,22 +20,21 @@ static wiegand_reader_t reader;
 
 static void reader_callback(wiegand_reader_t *r)
 {
-    wiegand_card_t card;
+    ESP_LOGI(TAG, "Got card, %d bits, ID: %08x", r->bits, *((uint32_t*)r->buf));
+}
 
-    // decode card
-    if (wiegand_reader_decode(r, WIEGAND_CARD_FORMAT, &card) != ESP_OK)
+void task(void *arg)
+{
+    ESP_ERROR_CHECK(wiegand_reader_init(&reader, D0_GPIO, D1_GPIO, true, 16, reader_callback));
+    while (1)
     {
-        ESP_LOGE(TAG, "Unknown format, bits: %d", r->bits);
-        return;
+        ESP_LOGI(TAG, "Waiting...");
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
-
-    // print card info
-    ESP_LOGI(TAG, "[Got card] Issue Level: 0x%02x; Facility Code: 0x%04x; Card Number: 0x%08x; Card Holder: 0x%08x",
-            card.issue_level, card.facility, (uint32_t)card.number, card.cardholder);
 }
 
 void app_main()
 {
-    ESP_ERROR_CHECK(wiegand_reader_init(&reader, D0_GPIO, D1_GPIO, false, 8, reader_callback));
+    xTaskCreate(task, "main_task", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 
