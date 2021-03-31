@@ -16,9 +16,9 @@
 #define MUTEX_TIMEOUT 10
 
 #ifdef CONFIG_RE_BTN_PRESSED_LEVEL_0
-    #define CONFIG_RE_BTN_PRESSED_LEVEL 0
+#define BTN_PRESSED_LEVEL 0
 #else
-    #define CONFIG_RE_BTN_PRESSED_LEVEL 1
+#define BTN_PRESSED_LEVEL 1
 #endif
 
 static const char *TAG = "encoder";
@@ -48,7 +48,7 @@ inline static void read_encoder(rotary_encoder_t *re)
         }
 
         // read button state
-        if (gpio_get_level(re->pin_btn) == CONFIG_RE_BTN_PRESSED_LEVEL)
+        if (gpio_get_level(re->pin_btn) == BTN_PRESSED_LEVEL)
         {
             if (re->btn_state == RE_BTN_RELEASED)
             {

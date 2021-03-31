@@ -4,6 +4,7 @@
 #include <string.h>
 #include <encoder.h>
 #include <esp_idf_lib_helpers.h>
+#include <esp_log.h>
 
 // Connect common encoder pin to ground
 #if HELPER_TARGET_IS_ESP8266
@@ -22,17 +23,20 @@
 
 #define EV_QUEUE_LEN 5
 
+static const char *TAG = "encoder_example";
+
 static QueueHandle_t event_queue;
 static rotary_encoder_t re;
 
 void test(void *arg)
 {
+    // Create event queue for rotary encoders
     event_queue = xQueueCreate(EV_QUEUE_LEN, sizeof(rotary_encoder_event_t));
 
     // Setup rotary encoder library
     ESP_ERROR_CHECK(rotary_encoder_init(event_queue));
 
-    // Add one
+    // Add one encoder
     memset(&re, 0, sizeof(rotary_encoder_t));
     re.pin_a = RE_A_GPIO;
     re.pin_b = RE_B_GPIO;
@@ -40,33 +44,30 @@ void test(void *arg)
     ESP_ERROR_CHECK(rotary_encoder_add(&re));
 
     rotary_encoder_event_t e;
-    int32_t vol = 0;
+    int32_t val = 0;
 
-    printf("Initial volume level: %d\n", vol);
-
+    ESP_LOGI(TAG, "Initial value: %d", val);
     while (1)
     {
         xQueueReceive(event_queue, &e, portMAX_DELAY);
 
-        printf("Got encoder event. type = %d, sender = 0x%08x, diff = %d\n", e.type, (uint32_t)e.sender, e.diff);
-
         switch (e.type)
         {
             case RE_ET_BTN_PRESSED:
-                printf("Button pressed\n");
+                ESP_LOGI(TAG, "Button pressed");
                 break;
             case RE_ET_BTN_RELEASED:
-                printf("Button released\n");
+                ESP_LOGI(TAG, "Button released");
                 break;
             case RE_ET_BTN_CLICKED:
-                printf("Button clicked\n");
+                ESP_LOGI(TAG, "Button clicked");
                 break;
             case RE_ET_BTN_LONG_PRESSED:
-                printf("Looooong pressed button\n");
+                ESP_LOGI(TAG, "Looooong pressed button");
                 break;
             case RE_ET_CHANGED:
-                vol += e.diff;
-                printf("Volume was changed to %d\n", vol);
+                val += e.diff;
+                ESP_LOGI(TAG, "Value = %d", val);
                 break;
             default:
                 break;
@@ -76,5 +77,5 @@ void test(void *arg)
 
 void app_main()
 {
-    xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    xTaskCreate(test, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
 }
