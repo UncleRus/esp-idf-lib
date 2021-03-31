@@ -18,7 +18,8 @@
 #define TRIGGER_LOW_DELAY 4
 #define TRIGGER_HIGH_DELAY 10
 #define PING_TIMEOUT 6000
-#define ROUNDTRIP 58
+#define ROUNDTRIP_M 5800.0f
+#define ROUNDTRIP_CM 58
 
 #if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -49,9 +50,10 @@ esp_err_t ultrasonic_init(const ultrasonic_sensor_t *dev)
     return gpio_set_level(dev->trigger_pin, 0);
 }
 
-esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
+
+esp_err_t ultrasonic_measure_raw(const ultrasonic_sensor_t *dev, uint32_t max_time_us, uint32_t *time_us)
 {
-    CHECK_ARG(dev && distance);
+    CHECK_ARG(dev && time_us);
 
     PORT_ENTER_CRITICAL;
 
@@ -77,16 +79,37 @@ esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_dis
     // got echo, measuring
     int64_t echo_start = esp_timer_get_time();
     int64_t time = echo_start;
-    int64_t meas_timeout = max_distance * ROUNDTRIP;
     while (gpio_get_level(dev->echo_pin))
     {
         time = esp_timer_get_time();
-        if (timeout_expired(echo_start, meas_timeout))
+        if (timeout_expired(echo_start, max_time_us))
             RETURN_CRITICAL(ESP_ERR_ULTRASONIC_ECHO_TIMEOUT);
     }
     PORT_EXIT_CRITICAL;
 
-    *distance = (time - echo_start) / ROUNDTRIP;
+    *time_us = time - echo_start;
+
+    return ESP_OK;
+}
+
+esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, float max_distance, float *distance)
+{
+    CHECK_ARG(dev && distance);
+
+    uint32_t time_us;
+    CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_M, &time_us));
+    *distance = time_us / ROUNDTRIP_M;
+
+    return ESP_OK;
+}
+
+esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance)
+{
+    CHECK_ARG(dev && distance);
+
+    uint32_t time_us;
+    CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_CM, &time_us));
+    *distance = time_us / ROUNDTRIP_CM;
 
     return ESP_OK;
 }

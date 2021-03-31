@@ -3,10 +3,17 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ultrasonic.h>
+#include <esp_err.h>
 
 #define MAX_DISTANCE_CM 500 // 5m max
+
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#define TRIGGER_GPIO 4
+#define ECHO_GPIO 5
+#else
 #define TRIGGER_GPIO 17
 #define ECHO_GPIO 16
+#endif
 
 void ultrasonic_test(void *pvParameters)
 {
@@ -19,11 +26,11 @@ void ultrasonic_test(void *pvParameters)
 
     while (true)
     {
-        uint32_t distance;
-        esp_err_t res = ultrasonic_measure_cm(&sensor, MAX_DISTANCE_CM, &distance);
+        float distance;
+        esp_err_t res = ultrasonic_measure(&sensor, MAX_DISTANCE_CM, &distance);
         if (res != ESP_OK)
         {
-            printf("Error: ");
+            printf("Error %d: ", res);
             switch (res)
             {
                 case ESP_ERR_ULTRASONIC_PING:
@@ -36,13 +43,13 @@ void ultrasonic_test(void *pvParameters)
                     printf("Echo timeout (i.e. distance too big)\n");
                     break;
                 default:
-                    printf("%d\n", res);
+                    printf("%s\n", esp_err_to_name(res));
             }
         }
         else
-            printf("Distance: %d cm\n", distance);
+            printf("Distance: %0.04f m\n", distance);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
