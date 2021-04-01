@@ -254,12 +254,23 @@ fail:
 #endif
 
 #if HELPER_TARGET_IS_ESP8266
+
+#define ESP8266_SPI_MAX_DATA_LENGTH 64 // in bytes
+
 static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
 {
     esp_err_t err = ESP_FAIL;
     spi_trans_t trans = {0};
+    int mosi_buffer_block_size, mosi_buffer_block_size_mod;
 
     CHECK_ARG(strip);
+
+    /* XXX send ESP8266_SPI_MAX_DATA_LENGTH bytes data at a time. the
+     * documentation does not mention the limitation, but the SPI master
+     * driver complains:
+     * "spi: spi_master_trans(454): spi mosi must be shorter than 512 bits" */
+    mosi_buffer_block_size = LED_STRIP_SPI_BUFFER_SIZE(strip->length) / ESP8266_SPI_MAX_DATA_LENGTH;
+    mosi_buffer_block_size_mod = LED_STRIP_SPI_BUFFER_SIZE(strip->length) % ESP8266_SPI_MAX_DATA_LENGTH;
 
     if (xSemaphoreTake(mutex, MUTEX_TIMEOUT) != pdTRUE) {
         err = ESP_FAIL;
@@ -267,12 +278,23 @@ static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
         goto fail_without_give;
     }
 
-    trans.bits.mosi = LED_STRIP_SPI_BUFFER_SIZE(strip->length) * 8;
-    trans.mosi = strip->buf;
-    err = spi_trans(HSPI_HOST, &trans);
-    if (err != ESP_OK) {
-        ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
-        goto fail;
+    for (int i = 0; i < mosi_buffer_block_size; i++) {
+        trans.bits.mosi = ESP8266_SPI_MAX_DATA_LENGTH * 8; // bits, not bytes
+        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * i / sizeof(uint32_t);
+        err = spi_trans(HSPI_HOST, &trans);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    }
+    if (mosi_buffer_block_size_mod > 0) {
+        trans.bits.mosi = mosi_buffer_block_size_mod * 8; // bits, not bytes
+        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * mosi_buffer_block_size / sizeof(uint32_t);
+        err = spi_trans(HSPI_HOST, &trans);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
+            goto fail;
+        }
     }
 fail:
     if (xSemaphoreGive(mutex) != pdTRUE) {
