@@ -55,7 +55,7 @@ typedef struct
     size_t length;
     gpio_num_t gpio;
     rmt_channel_t channel;
-    void *buf;
+    uint8_t *buf;
 } led_strip_t;
 
 /**

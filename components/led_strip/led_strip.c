@@ -230,19 +230,19 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
         case LED_STRIP_WS2812:
         case LED_STRIP_SK6812:
             // GRB
-            ((uint8_t *)strip->buf)[idx] = color.g;
-            ((uint8_t *)strip->buf)[idx + 1] = color.r;
-            ((uint8_t *)strip->buf)[idx + 2] = color.b;
+            strip->buf[idx] = color.g;
+            strip->buf[idx + 1] = color.r;
+            strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
-                ((uint8_t *)strip->buf)[idx + 3] = color.w;
+                strip->buf[idx + 3] = color.w;
             break;
         case LED_STRIP_APA106:
             // RGB
-            ((uint8_t *)strip->buf)[idx] = color.r;
-            ((uint8_t *)strip->buf)[idx + 1] = color.g;
-            ((uint8_t *)strip->buf)[idx + 2] = color.b;
+            strip->buf[idx] = color.r;
+            strip->buf[idx + 1] = color.g;
+            strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
-                ((uint8_t *)strip->buf)[idx + 3] = color.w;
+                strip->buf[idx + 3] = color.w;
             break;
         default:
             ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
@@ -262,16 +262,16 @@ esp_err_t led_strip_set_pixels(led_strip_t *strip, size_t start, size_t len, rgb
             for (size_t i = 0; i < len; i++, data++)
             {
                 size_t idx = (start + i) * COLOR_SIZE(strip);
-                ((uint8_t *)strip->buf)[idx] = data->g;
-                ((uint8_t *)strip->buf)[idx + 1] = data->r;
-                ((uint8_t *)strip->buf)[idx + 2] = data->b;
+                strip->buf[idx] = data->g;
+                strip->buf[idx + 1] = data->r;
+                strip->buf[idx + 2] = data->b;
                 if (strip->is_rgbw)
-                    ((uint8_t *)strip->buf)[idx + 3] = data->w;
+                    strip->buf[idx + 3] = data->w;
             }
             break;
         case LED_STRIP_APA106:
             // RGB, direct copy
-            memcpy(strip->buf, data, len * COLOR_SIZE(strip));
+            memcpy(strip->buf + start * COLOR_SIZE(strip), data, len * COLOR_SIZE(strip));
             break;
         default:
             ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
