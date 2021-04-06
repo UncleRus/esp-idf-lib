@@ -103,12 +103,13 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 
 ## Components
 
-### Common drivers
+### Common libraries
 
 | Component      | Description                                                             | License | ESP8266 | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------|---------------
 | **i2cdev**     | I2C utilites                                                            | MIT     | Yes     | Yes
 | **onewire**    | Bit-banging 1-Wire driver                                               | MIT *   | Yes     | *No*
+| **lib8tion**   | Math functions specifically designed for LED programming                | MIT     | Yes     | -
 
 ### Real-time clocks
 
