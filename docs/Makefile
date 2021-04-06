@@ -24,6 +24,8 @@ help:
 
 xml/index.xml:
 	doxygen doxygen.conf
+	sed -i 's/LIB8STATIC_ALWAYS_INLINE/inline static/g' xml/*.xml
+	sed -i 's/LIB8STATIC/inline static/g' xml/*.xml
 
 clean:
 	-rm -rf $(BUILDDIR)/* xml/*

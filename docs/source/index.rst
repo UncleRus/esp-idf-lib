@@ -81,13 +81,14 @@ Add path to components in your project makefile, e.g:
 Available components
 ====================
 
-Common drivers
-==============
+Common libraries
+================
 .. toctree::
    :maxdepth: 1
 
    groups/i2cdev
    groups/onewire
+   groups/lib8tion
 
 Real-time clocks
 ================
