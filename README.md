@@ -15,7 +15,7 @@ Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 
 * master
 * 4.x
-* 3.2.2
+* 3.3.5
 
 ### ESP32 Chip Support
 
