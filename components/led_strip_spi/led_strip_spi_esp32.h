@@ -34,11 +34,11 @@
 #include <esp_idf_lib_helpers.h>
 #include <driver/spi_master.h>
 
-#if HELPER_TARGET_VERSION < HELPER_TARGET_VERSION_ESP32_V4
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
 #define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  HSPI_HOST
 #else
-#define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  SPI2_HOST ///< Default is `HSPI_HOST` (`SPI2_HOST` if `esp-idf` version is v3.x).
-#endif // HELPER_TARGET_VERSION HELPER_TARGET_VERSION_ESP32_V4
+#define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  SPI2_HOST ///< Default is `SPI2_HOST` (`HSPI_HOST` if `esp-idf` version is v3.x).
+#endif
 
 #define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (13) ///< GPIO pin number of `LED_STRIP_SPI_DEFAULT_HOST_DEVICE`'s MOSI (13)
 #define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (14) ///< GPIO pin number of `LED_STRIP_SPI_DEFAULT_HOST_DEVICE`'s SCLK (14)
