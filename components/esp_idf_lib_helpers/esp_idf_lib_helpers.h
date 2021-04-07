@@ -18,7 +18,7 @@
 /* }}} */
 
 #if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S2)) && !defined(ESP_IDF_VERSION_MAJOR)
-#error Unsupported ESP-IDF version (<= v3.5). Please update!
+#error Unsupported ESP-IDF version (<= v3.3.5). Please update!
 #endif
 
 /* HELPER_TARGET_IS_ESP32
