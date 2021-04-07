@@ -46,15 +46,19 @@ typedef enum
 } led_strip_type_t;
 
 /**
- * LED strip descriptor
+ * @struct LED strip descriptor
  */
 typedef struct
 {
-    led_strip_type_t type;
-    bool is_rgbw;
-    size_t length;
-    gpio_num_t gpio;
-    rmt_channel_t channel;
+    led_strip_type_t type; ///< LED type
+    bool is_rgbw;          ///< true for RGBW strips
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+    uint8_t brightness;    ///< Brightness 0..255, call ::led_strip_flush() after change.
+                           ///< Supported only for ESP-IDF version >= 4.4
+#endif
+    size_t length;         ///< Number of LEDs in strip
+    gpio_num_t gpio;       ///< Data GPIO pin
+    rmt_channel_t channel; ///< RMT channel
     uint8_t *buf;
 } led_strip_t;
 

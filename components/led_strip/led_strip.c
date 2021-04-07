@@ -68,6 +68,13 @@ static rmt_item32_t sk6812_bit1 = { 0 };
 static rmt_item32_t apa106_bit0 = { 0 };
 static rmt_item32_t apa106_bit1 = { 0 };
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+static inline uint8_t scale8_video(uint8_t i, uint8_t scale)
+{
+    return (((uint16_t)i * (uint16_t)scale) >> 8) + ((i && scale) ? 1 : 0);
+}
+#endif
+
 static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
                                    size_t wanted_num, size_t *translated_size, size_t *item_num,
                                    const rmt_item32_t *bit0, const rmt_item32_t *bit1)
@@ -82,12 +89,22 @@ static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t s
     size_t num = 0;
     uint8_t *psrc = (uint8_t *)src;
     rmt_item32_t *pdest = dest;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+    led_strip_t *strip;
+    esp_err_t r = rmt_translator_get_context(item_num, (void **)&strip);
+    uint8_t brightness = r == ESP_OK ? strip->brightness : 255;
+#endif
     while (size < src_size && num < wanted_num)
     {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+        uint8_t b = scale8_video(*psrc, brightness);
+#else
+        uint8_t b = *psrc;
+#endif
         for (int i = 0; i < 8; i++)
         {
             // MSB first
-            pdest->val = *psrc & (1 << (7 - i)) ? bit1->val : bit0->val;
+            pdest->val = b & (1 << (7 - i)) ? bit1->val : bit0->val;
             num++;
             pdest++;
         }
@@ -185,6 +202,10 @@ esp_err_t led_strip_init(led_strip_t *strip)
             return ESP_ERR_NOT_SUPPORTED;
     }
     CHECK(rmt_translator_init(config.channel, f));
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+    // No support for translator context prior to ESP-IDF 4.4
+    CHECK(rmt_translator_set_context(config.channel, strip));
+#endif
 
     return ESP_OK;
 }
@@ -204,6 +225,7 @@ esp_err_t led_strip_flush(led_strip_t *strip)
     CHECK_ARG(strip && strip->buf);
 
     CHECK(rmt_wait_tx_done(strip->channel, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
+    ets_delay_us(50);
     return rmt_write_sample(strip->channel, strip->buf,
                             strip->length * COLOR_SIZE(strip), false);
 }
