@@ -17,6 +17,10 @@
 #endif
 /* }}} */
 
+#if defined(CONFIG_IDF_TARGET_ESP8266)
+#include <esp_idf_version.h>
+#endif
+
 #if !defined(ESP_IDF_VERSION) || !defined(ESP_IDF_VERSION_VAL)
 #error Unknown ESP-IDF/ESP8266 RTOS SDK version
 #endif
