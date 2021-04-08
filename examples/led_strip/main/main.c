@@ -24,7 +24,10 @@ void test(void *pvParameters)
         .length = CONFIG_LED_STRIP_LEN,
         .gpio = LED_GPIO,
         .channel = LED_CHANNEL,
-        .buf = NULL
+        .buf = NULL,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+        .brightness = 255
+#endif
     };
 
     ESP_ERROR_CHECK(led_strip_init(&strip));
