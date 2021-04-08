@@ -17,9 +17,14 @@
 #endif
 /* }}} */
 
-#if (defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S2)) && !defined(ESP_IDF_VERSION_MAJOR)
-#error Unsupported ESP-IDF version (<= v3.3.5). Please update!
+#if !defined(ESP_IDF_VERSION) || !defined(ESP_IDF_VERSION_VAL)
+#error Unknown ESP-IDF/ESP8266 RTOS SDK version
 #endif
+
+/* Minimal supported version for ESP32, ESP32S2 */
+#define HELPER_ESP32_MIN_VER    ESP_IDF_VERSION_VAL(3, 3, 5)
+/* Minimal supported version for ESP8266 */
+#define HELPER_ESP8266_MIN_VER  ESP_IDF_VERSION_VAL(3, 3, 0)
 
 /* HELPER_TARGET_IS_ESP32
  *
@@ -37,6 +42,14 @@
 #define HELPER_TARGET_IS_ESP8266   (1)
 #else
 #error BUG: cannot determine the target
+#endif
+
+#if HELPER_TARGET_IS_ESP32 && ESP_IDF_VERSION < HELPER_ESP32_MIN_VER
+#error Unsupported ESP-IDF version. Please update!
+#endif
+
+#if HELPER_TARGET_IS_ESP8266 && ESP_IDF_VERSION < HELPER_ESP8266_MIN_VER
+#error Unsupported ESP8266 RTOS SDK version. Please update!
 #endif
 
 /* show the actual values for debugging */

@@ -380,6 +380,7 @@ jobs:
           # idf.py in ESP8266 RTOS SDK is broken in many ways.
           - make
         branch:
+          - v3.3
           - master
     steps:
       - name: Checkout
