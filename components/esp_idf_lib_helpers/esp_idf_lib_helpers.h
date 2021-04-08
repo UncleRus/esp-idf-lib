@@ -10,16 +10,13 @@
  * build.
  */
 #include <freertos/FreeRTOS.h>
+#include <esp_idf_version.h>
 
 /* {{{ pre-tests */
 #if defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S2)
 #error BUG: defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S2)
 #endif
 /* }}} */
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#include <esp_idf_version.h>
-#endif
 
 #if !defined(ESP_IDF_VERSION) || !defined(ESP_IDF_VERSION_VAL)
 #error Unknown ESP-IDF/ESP8266 RTOS SDK version
