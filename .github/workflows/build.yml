@@ -366,7 +366,7 @@ jobs:
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
               make defconfig
-              make
+              make -j$(nproc)
             fi
           done
 
@@ -507,7 +507,7 @@ jobs:
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
               make defconfig
-              make
+              make -j$(nproc)
             fi
           done
 
