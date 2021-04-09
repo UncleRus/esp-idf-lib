@@ -218,6 +218,11 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **wiegand**    | Wiegand protocol receiver                                               | BSD     | Yes     | *No*
 
 
+## Library maintainers
+
+- [Ruslan V. Uss](https://github.com/UncleRus)
+- [Tomoyuki Sakurai](https://github.com/trombik)
+
 ## Credits
 
 - [Tomoyuki Sakurai](https://github.com/trombik), developer of the LM75 driver, 
