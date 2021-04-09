@@ -1,6 +1,5 @@
 # ESP-IDF Components library
 
-
 [![Build Status](https://github.com/UncleRus/esp-idf-lib/workflows/Build%20examples/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions?query=workflow%3A%22Build+examples%22)
 [![Build the documentation](https://github.com/UncleRus/esp-idf-lib/workflows/Build%20the%20documentation/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions?query=workflow%3A%22Build+the+documentation%22)
 [![Docs Status](https://readthedocs.org/projects/esp-idf-lib/badge/?version=latest&style=flat)](https://esp-idf-lib.readthedocs.io/en/latest/)
@@ -9,29 +8,18 @@ Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/
 
 Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
-## Supported versions
+## Supported versions of frameworks and devices
 
-### ESP-IDF
+| Chip           | Framework          | Versions
+|----------------|--------------------|-----------------------
+| ESP32          | ESP-IDF            | master, v4.x, v.3.3.5
+| ESP32-S2 *[1]* | ESP-IDF            | master, v4.x, v.3.3.5
+| ESP8266  *[2]* | ESP8266 RTOS SDK   | master, v3.3
 
-* master
-* 4.x
-* 3.3.5
+[1] *Use "`idf.py set-target esp32s2`" before "`idf.py menuconfig`" to change the chip type.*
 
-### ESP32 Chip Support
-
- * ESP32
- * ESP32S2
-
-Use "idf.py set-target esp32s2" before "idf.py menuconfig" to change the chip type.
-
-### ESP8266 RTOS SDK
-
-* master
-* 3.3
-* 3.2
-
-Due to the incompatibility of ESP8266 drivers and hardware, some libraries are not
-supported on ESP8266 (see `ESP8266` column in the tables). 
+[2] *Due to the incompatibility of ESP8266 drivers and hardware, some libraries are not*
+*supported on ESP8266 (see "ESP8266" column in the tables).*
 
 ## How to use
 
