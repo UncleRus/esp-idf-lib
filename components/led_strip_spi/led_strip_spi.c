@@ -63,7 +63,7 @@ esp_err_t led_strip_spi_install()
     mutex = xSemaphoreCreateMutex();
     if (mutex == NULL) {
         err = ESP_FAIL;
-        ESP_LOGE(TAG, "xSemaphoreCreateMutex(): faild");
+        ESP_LOGE(TAG, "xSemaphoreCreateMutex(): failed");
         goto fail;
     }
     err = ESP_OK;
@@ -320,6 +320,7 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int index, const
 #if CONFIG_LED_STRIP_SPI_USING_SK9822
     return led_strip_spi_set_pixel_sk9822(strip, index, color);
 #endif
+    return ESP_ERR_NOT_SUPPORTED;
 }
 
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data)

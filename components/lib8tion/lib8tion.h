@@ -6,14 +6,7 @@
  Fast, efficient 8-bit math functions specifically
  designed for high-performance LED programming.
 
- Because of the AVR(Arduino) and ARM assembly language
- implementations provided, using these functions often
- results in smaller and faster code than the equivalent
- program using plain "C" arithmetic and logic.
-
-
  Included are:
-
 
  - Saturating unsigned 8-bit add and subtract.
  Instead of wrapping around if an overflow occurs,
@@ -133,12 +126,6 @@
  == from + ((to - from) * fract16) / 65536)
  map8(in, rangeStart, rangeEnd)
  == map(in, 0, 255, rangeStart, rangeEnd);
-
- - Optimized memmove, memcpy, and memset, that are
- faster than standard avr-libc 1.8.
- memmove8(dest, src,  bytecount)
- memcpy8( dest, src,  bytecount)
- memset8( buf, value, bytecount)
 
  - Beat generators which return sine or sawtooth
  waves in a specified number of Beats Per Minute.
@@ -631,7 +618,7 @@ LIB8STATIC uint8_t squarewave8(uint8_t in, uint8_t pulsewidth)
 
 #define GET_MILLIS() (esp_timer_get_time() / 1000)
 
-// beat16 generates a 16-bit 'sawtooth' wave at a given BPM,
+/// beat16 generates a 16-bit 'sawtooth' wave at a given BPM,
 ///        with BPM specified in Q8.8 fixed-point format; e.g.
 ///        for this function, 120 BPM MUST BE specified as
 ///        120*256 = 30720.

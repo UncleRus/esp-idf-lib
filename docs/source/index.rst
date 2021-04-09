@@ -89,6 +89,7 @@ Common libraries
    groups/i2cdev
    groups/onewire
    groups/lib8tion
+   gtoups/color
 
 Real-time clocks
 ================
