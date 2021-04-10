@@ -68,13 +68,6 @@ static rmt_item32_t sk6812_bit1 = { 0 };
 static rmt_item32_t apa106_bit0 = { 0 };
 static rmt_item32_t apa106_bit1 = { 0 };
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
-static inline uint8_t scale8_video(uint8_t i, uint8_t scale)
-{
-    return (((uint16_t)i * (uint16_t)scale) >> 8) + ((i && scale) ? 1 : 0);
-}
-#endif
-
 static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
                                    size_t wanted_num, size_t *translated_size, size_t *item_num,
                                    const rmt_item32_t *bit0, const rmt_item32_t *bit1)
