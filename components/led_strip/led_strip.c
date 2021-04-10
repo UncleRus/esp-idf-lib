@@ -255,7 +255,7 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
             strip->buf[idx + 1] = color.r;
             strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
-                strip->buf[idx + 3] = rgb_white(color);
+                strip->buf[idx + 3] = rgb_luma(color);
             break;
         case LED_STRIP_APA106:
             // RGB
@@ -263,7 +263,7 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
             strip->buf[idx + 1] = color.g;
             strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
-                strip->buf[idx + 3] = rgb_white(color);
+                strip->buf[idx + 3] = rgb_luma(color);
             break;
         default:
             ESP_LOGE(TAG, "Unknown strip type %d", strip->type);

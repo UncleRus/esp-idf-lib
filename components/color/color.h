@@ -13,104 +13,13 @@
 #define __COLOR_H__
 
 #include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+
+#include "rgb.h"
+#include "hsv.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/// TODO port other RGB/HSV operators from FastLED pixeltypes.h
-
-/**
- * @struct RGB color representation
- */
-typedef struct
-{
-    union {
-        uint8_t r;
-        uint8_t red;
-    };
-    union {
-        uint8_t g;
-        uint8_t green;
-    };
-    union {
-        uint8_t b;
-        uint8_t blue;
-    };
-} rgb_t;
-
-/**
- * @struct HSV color representation
- */
-typedef struct
-{
-    union {
-        uint8_t h;
-        uint8_t hue;
-    };
-    union {
-        uint8_t s;
-        uint8_t sat;
-        uint8_t saturation;
-    };
-    union {
-        uint8_t v;
-        uint8_t val;
-        uint8_t value;
-    };
-} hsv_t;
-
-/**
- * @brief Calculate brightness for RGB color
- *
- * Note: this is fast approximation formula Y = (R+R+R+B+G+G+G+G)>>3
- *
- * @param color RGB color
- * @return white level (brightness)
- */
-static inline uint8_t rgb_white(rgb_t color)
-{
-    uint16_t res = (((uint16_t)color.r << 1) + (uint16_t)color.r + ((uint16_t)color.g << 2) + (uint16_t)color.b) >> 3;
-    return res > 255 ? 255 : res;
-}
-
-/**
- * @brief Create rgb_t color from 24-bit color code 0x00RRGGBB
- *
- * @param color_code 24-bit color code
- * @return RGB color
- */
-static inline rgb_t rgb_from_code(uint32_t color_code)
-{
-    rgb_t res = {
-        .r = (color_code >> 16) & 0xff,
-        .g = (color_code >> 8) & 0xff,
-        .b = color_code & 0xff,
-    };
-    return res;
-}
-
-/**
- * @brief Create 24-bit color code 0x00RRGGBB from rgb_t
- *
- * @param color rgb_t color
- * @return Color code
- */
-static inline uint32_t rgb_to_code(rgb_t color)
-{
-    return ((uint32_t)color.r << 16) | ((uint32_t)color.g << 8) | color.b;
-}
-
-#define HUE_RED    0
-#define HUE_ORANGE 32
-#define HUE_YELLOW 64
-#define HUE_GREEN  96
-#define HUE_AQUA   128
-#define HUE_BLUE   160
-#define HUE_PURPLE 192
-#define HUE_PINK   224
 
 #define HUE_MAX_RAINBOW  255
 #define HUE_MAX_SPECTRUM 255
