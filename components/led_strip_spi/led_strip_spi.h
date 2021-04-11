@@ -35,7 +35,7 @@
 
 #include <driver/gpio.h>
 #include <esp_err.h>
-#include <led_effect.h>
+#include <color.h>
 #include <esp_idf_lib_helpers.h>
 
 #if HELPER_TARGET_IS_ESP32

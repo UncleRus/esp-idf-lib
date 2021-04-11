@@ -26,24 +26,11 @@
 #ifndef __LED_EFFECT__H__
 #define __LED_EFFECT__H__
 
-#include <stdint.h>
+#include <color.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * RGB(W) color representation
- */
-typedef struct
-{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-#if defined(LED_EFFECT_COLOR_USING_RGBW)
-    uint8_t w;
-#endif
-} rgb_t;
 
 /*
  * returns 32 bit color code in a position of colors. the MSB 8bit is always

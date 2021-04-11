@@ -15,25 +15,15 @@
 #include <driver/gpio.h>
 #include <esp_err.h>
 #include <driver/rmt.h>
+#include <color.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * RGB color representation
- */
-typedef struct
-{
-    union
-    {
-        struct
-        {
-            uint8_t r, g, b, w;
-        };
-        uint8_t raw[4];
-    };
-} rgb_t;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#define LED_STIRP_BRIGNTNESS
+#endif
 
 /**
  * LED type
@@ -52,7 +42,7 @@ typedef struct
 {
     led_strip_type_t type; ///< LED type
     bool is_rgbw;          ///< true for RGBW strips
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#ifdef LED_STIRP_BRIGNTNESS
     uint8_t brightness;    ///< Brightness 0..255, call ::led_strip_flush() after change.
                            ///< Supported only for ESP-IDF version >= 4.4
 #endif

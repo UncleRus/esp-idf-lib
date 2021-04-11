@@ -10,7 +10,7 @@
 #include "led_strip.h"
 #include <esp_log.h>
 #include <esp_attr.h>
-#include <string.h>
+#include <stdlib.h>
 #include <esp_idf_lib_helpers.h>
 
 #if HELPER_TARGET_IS_ESP8266
@@ -68,13 +68,6 @@ static rmt_item32_t sk6812_bit1 = { 0 };
 static rmt_item32_t apa106_bit0 = { 0 };
 static rmt_item32_t apa106_bit1 = { 0 };
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
-static inline uint8_t scale8_video(uint8_t i, uint8_t scale)
-{
-    return (((uint16_t)i * (uint16_t)scale) >> 8) + ((i && scale) ? 1 : 0);
-}
-#endif
-
 static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
                                    size_t wanted_num, size_t *translated_size, size_t *item_num,
                                    const rmt_item32_t *bit0, const rmt_item32_t *bit1)
@@ -89,14 +82,14 @@ static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t s
     size_t num = 0;
     uint8_t *psrc = (uint8_t *)src;
     rmt_item32_t *pdest = dest;
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#ifdef LED_STIRP_BRIGNTNESS
     led_strip_t *strip;
     esp_err_t r = rmt_translator_get_context(item_num, (void **)&strip);
     uint8_t brightness = r == ESP_OK ? strip->brightness : 255;
 #endif
     while (size < src_size && num < wanted_num)
     {
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#ifdef LED_STIRP_BRIGNTNESS
         uint8_t b = scale8_video(*psrc, brightness);
 #else
         uint8_t b = *psrc;
@@ -171,13 +164,12 @@ esp_err_t led_strip_init(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->length > 0);
 
-    strip->buf = malloc(strip->length * COLOR_SIZE(strip));
+    strip->buf = calloc(strip->length, COLOR_SIZE(strip));
     if (!strip->buf)
     {
         ESP_LOGE(TAG, "Not enough memory");
         return ESP_ERR_NO_MEM;
     }
-    memset(strip->buf, 0, strip->length * COLOR_SIZE(strip));
 
     rmt_config_t config = RMT_DEFAULT_CONFIG_TX(strip->gpio, strip->channel);
     config.clk_div = LED_STRIP_RMT_CLK_DIV;
@@ -202,7 +194,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
             return ESP_ERR_NOT_SUPPORTED;
     }
     CHECK(rmt_translator_init(config.channel, f));
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#ifdef LED_STIRP_BRIGNTNESS
     // No support for translator context prior to ESP-IDF 4.4
     CHECK(rmt_translator_set_context(config.channel, strip));
 #endif
@@ -256,7 +248,7 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
             strip->buf[idx + 1] = color.r;
             strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
-                strip->buf[idx + 3] = color.w;
+                strip->buf[idx + 3] = rgb_luma(color);
             break;
         case LED_STRIP_APA106:
             // RGB
@@ -264,7 +256,7 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
             strip->buf[idx + 1] = color.g;
             strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
-                strip->buf[idx + 3] = color.w;
+                strip->buf[idx + 3] = rgb_luma(color);
             break;
         default:
             ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
@@ -276,29 +268,8 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
 esp_err_t led_strip_set_pixels(led_strip_t *strip, size_t start, size_t len, rgb_t *data)
 {
     CHECK_ARG(strip && strip->buf && len && start + len <= strip->length);
-    switch (strip->type)
-    {
-        case LED_STRIP_WS2812:
-        case LED_STRIP_SK6812:
-            // GRB
-            for (size_t i = 0; i < len; i++, data++)
-            {
-                size_t idx = (start + i) * COLOR_SIZE(strip);
-                strip->buf[idx] = data->g;
-                strip->buf[idx + 1] = data->r;
-                strip->buf[idx + 2] = data->b;
-                if (strip->is_rgbw)
-                    strip->buf[idx + 3] = data->w;
-            }
-            break;
-        case LED_STRIP_APA106:
-            // RGB, direct copy
-            memcpy(strip->buf + start * COLOR_SIZE(strip), data, len * COLOR_SIZE(strip));
-            break;
-        default:
-            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-            return ESP_ERR_NOT_SUPPORTED;
-    }
+    for (size_t i = 0; i < len; i++)
+        CHECK(led_strip_set_pixel(strip, i + start, data[i]));
     return ESP_OK;
 }
 
