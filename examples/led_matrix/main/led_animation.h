@@ -6,6 +6,7 @@
 
 #include <esp_err.h>
 #include <color.h>
+#include <led_strip.h>
 
 typedef struct
 {
