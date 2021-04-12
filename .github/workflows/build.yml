@@ -166,7 +166,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          IGNORE_FILE="travis-ignore"
+          IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
           # XXX share cache between examples.
@@ -211,7 +211,7 @@ jobs:
           echo ${PATH}
           ${__PROJECT_GCC_FILE} --version
 
-          IGNORE_FILE="travis-ignore"
+          IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
           cd "${__PROJECT_EXAMPLE_DIR}"
@@ -354,7 +354,7 @@ jobs:
         run: |
           echo ${PATH}
           ${__PROJECT_GCC_FILE} --version
-          IGNORE_FILE="travis-ignore"
+          IGNORE_FILE="ci-ignore"
 
           # XXX only v3.3.x has export.sh
           if [ -f "${IDF_PATH}/export.sh" ]; then
@@ -497,7 +497,7 @@ jobs:
           echo ${PATH}
           ${__PROJECT_GCC_FILE} --version
 
-          IGNORE_FILE="travis-ignore-esp8266"
+          IGNORE_FILE="ci-ignore-esp8266"
 
           # these drivers do not compile for ESP8266 yet
           export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip"
@@ -649,7 +649,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          IGNORE_FILE="travis-ignore"
+          IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
           export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
