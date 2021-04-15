@@ -12,19 +12,8 @@
 #include <string.h>
 #include <esp_system.h>
 #include <esp_idf_lib_helpers.h>
+#include <esp_log.h> // to include ets_sys.h
 #include "hd44780.h"
-
-#if defined(CONFIG_IDF_TARGET_ESP32)
-    #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
-        #include <esp32/rom/ets_sys.h>
-    #else
-        #include <rom/ets_sys.h>
-    #endif
-#elif defined(CONFIG_IDF_TARGET_ESP32S2)
-    #include <esp32s2/rom/ets_sys.h>
-#else
-    #include <rom/ets_sys.h>
-#endif
 
 #define MS 1000
 

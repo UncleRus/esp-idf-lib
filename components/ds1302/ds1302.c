@@ -12,19 +12,9 @@
  */
 #include <freertos/FreeRTOS.h>
 #include <string.h>
+#include <esp_log.h> // to include ets_sys.h
+#include <esp_idf_lib_helpers.h>
 #include "ds1302.h"
-
-#if defined(CONFIG_IDF_TARGET_ESP32)
-    #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
-        #include <esp32/rom/ets_sys.h>
-    #else
-        #include <rom/ets_sys.h>
-    #endif
-#elif defined(CONFIG_IDF_TARGET_ESP32S2)
-    #include <esp32s2/rom/ets_sys.h>
-#else
-    #include <rom/ets_sys.h>
-#endif
 
 #define CH_REG   0x80
 #define WP_REG   0x8e
@@ -49,16 +39,13 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S2)
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
-
-#elif defined(CONFIG_IDF_TARGET_ESP8266)
+#else
 #define PORT_ENTER_CRITICAL portENTER_CRITICAL()
 #define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
-#else
-#error cannot identify the target
 #endif
 
 #define CHECK_MUX(x) do { esp_err_t __; if ((__ = (x)) != ESP_OK) { PORT_EXIT_CRITICAL; return __; } } while (0)
