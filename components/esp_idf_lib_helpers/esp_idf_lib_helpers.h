@@ -12,12 +12,6 @@
 #include <freertos/FreeRTOS.h>
 #include <esp_idf_version.h>
 
-/* {{{ pre-tests */
-#if defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S2)
-#error BUG: defined(CONFIG_IDF_TARGET_ESP32) && defined(CONFIG_IDF_TARGET_ESP8266) && defined(CONFIG_IDF_TARGET_ESP32S2)
-#endif
-/* }}} */
-
 #if !defined(ESP_IDF_VERSION) || !defined(ESP_IDF_VERSION_VAL)
 #error Unknown ESP-IDF/ESP8266 RTOS SDK version
 #endif
@@ -28,10 +22,9 @@
 #define HELPER_ESP8266_MIN_VER  ESP_IDF_VERSION_VAL(3, 3, 0)
 
 /* HELPER_TARGET_IS_ESP32
- *
  * 1 when the target is esp32
  */
-#if defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S2)
+#if defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3)
 #define HELPER_TARGET_IS_ESP32     (1)
 #define HELPER_TARGET_IS_ESP8266   (0)
 
@@ -58,6 +51,7 @@
 #define VALUE_TO_STRING(x) #x
 #define VALUE(x) VALUE_TO_STRING(x)
 #define VAR_NAME_VALUE(var) #var "="  VALUE(var)
+#pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32C3))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32S2))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP8266))
