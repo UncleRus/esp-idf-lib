@@ -1,2 +1,7 @@
 COMPONENT_ADD_INCLUDEDIRS = .
-COMPONENT_DEPENDS = log esp_idf_lib_helpers
+
+ifdef CONFIG_IDF_TARGET_ESP8266
+COMPONENT_DEPENDS = esp8266 log esp_idf_lib_helpers
+else
+COMPONENT_DEPENDS = driver esp_timer log esp_idf_lib_helpers
+endif

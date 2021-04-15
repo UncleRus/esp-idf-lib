@@ -1,5 +1,11 @@
+if(${IDF_TARGET} STREQUAL esp8266)
+    set(req esp8266 log esp_idf_lib_helpers)
+else()
+    set(req driver esp_timer log esp_idf_lib_helpers)
+endif()
+
 idf_component_register(
-    SRCS "wiegand.c"
+    SRCS wiegand.c
     INCLUDE_DIRS .
-    REQUIRES log esp_idf_lib_helpers
+    REQUIRES ${req}
 )

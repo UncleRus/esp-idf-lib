@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "tsys01.c"
+    SRCS tsys01.c
     INCLUDE_DIRS .
     REQUIRES i2cdev log esp_idf_lib_helpers
 )

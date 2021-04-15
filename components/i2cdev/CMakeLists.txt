@@ -5,7 +5,7 @@ else()
 endif()
 
 idf_component_register(
-    SRCS "i2cdev.c"
+    SRCS i2cdev.c
     INCLUDE_DIRS .
     REQUIRES ${req}
 )

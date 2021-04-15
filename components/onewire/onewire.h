@@ -23,8 +23,7 @@
 #define __ONEWIRE_H__
 
 #include <stdbool.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include <stdint.h>
 #include <driver/gpio.h>
 
 #ifdef __cplusplus

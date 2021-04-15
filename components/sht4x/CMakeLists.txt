@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "sht4x.c"
+    SRCS sht4x.c
     INCLUDE_DIRS .
     REQUIRES i2cdev log esp_idf_lib_helpers
 )
