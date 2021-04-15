@@ -43,8 +43,8 @@ typedef enum
  *
  * @param sensor_type DHT11 or DHT22
  * @param pin GPIO pin connected to sensor OUT
- * @param[out] humidity Humidity, percents * 10
- * @param[out] temperature Temperature, degrees Celsius * 10
+ * @param[out] humidity Humidity, percents * 10, nullable
+ * @param[out] temperature Temperature, degrees Celsius * 10, nullable
  * @return `ESP_OK` on success
  */
 esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
@@ -57,8 +57,8 @@ esp_err_t dht_read_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
  *
  * @param sensor_type DHT11 or DHT22
  * @param pin GPIO pin connected to sensor OUT
- * @param[out] humidity Humidity, percents
- * @param[out] temperature Temperature, degrees Celsius
+ * @param[out] humidity Humidity, percents, nullable
+ * @param[out] temperature Temperature, degrees Celsius, nullable
  * @return `ESP_OK` on success
  */
 esp_err_t dht_read_float_data(dht_sensor_type_t sensor_type, gpio_num_t pin,
