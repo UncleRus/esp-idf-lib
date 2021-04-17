@@ -40,7 +40,7 @@ typedef struct
 /// This allows testing a RGB for zero-ness
 static inline bool rgb_is_zero(rgb_t a)
 {
-    return a.r || a.g || a.b;
+    return !(a.r | a.g | a.b);
 }
 
 /// Create rgb_t color from 24-bit color code 0x00RRGGBB
