@@ -26,7 +26,7 @@ extern "C" {
 #define HUE_MAX_RAW      191
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Color conversion
+// Color conversion
 
 /**
  * @brief Convert HSV to RGB using balanced rainbow
@@ -115,7 +115,7 @@ hsv_t rgb2hsv_approximate(rgb_t rgb);
 rgb_t rgb_heat_color(uint8_t temperature);
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Fill functions
+// Fill functions
 
 /**
  * Fill an array of HSV colors with a solid HSV color
@@ -242,9 +242,29 @@ static inline void rgb_fill_gradient4_rgb(rgb_t *target, size_t num, rgb_t c1, r
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Filter functions
+// Palette functions
 
-/// Function which must be provided by the application for use in two-dimensional filter functions.
+/**
+ * Return an HSV color with 'index' from 'palette' (array of HSV colors).
+ * Even though palette has lesser than 256 explicily defined entries, you
+ * can use an 'index' from 0..255.  The 'pal_size' explicit palette entries will
+ * be spread evenly across the 0..255 range, and the intermedate values
+ * will be HSV-interpolated between adjacent explicit entries.
+ */
+hsv_t color_from_palette_hsv(hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
+
+/**
+ * Same for RGB palette
+ */
+rgb_t color_from_palette_rgb(rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
+
+////////////////////////////////////////////////////////////////////////////////
+// Filter functions
+
+/**
+ * Function which must be provided by the application for use in two-dimensional
+ * filter functions.
+ */
 typedef size_t (*xy_to_offs_cb)(size_t x, size_t y);
 
 /**
@@ -292,6 +312,27 @@ void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_
  * to black.
  */
 void blur2d(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
+
+////////////////////////////////////////////////////////////////////////////////
+// Gamma functions
+
+/**
+ * @brief Single gamma adjustment to a single scalar value.
+ *
+ * Bear in mind that RGB leds have only eight bits per channel of color resolution,
+ * and that very small, subtle shadings may not be visible.
+ */
+uint8_t apply_gamma2brightness(uint8_t brightness, float gamma);
+
+/**
+ * @brief Single gamma adjustment to each channel of a RGB color.
+ */
+rgb_t apply_gamma2rgb(rgb_t c, float gamma);
+
+/**
+ * @brief Different gamma adjustments for each channel of a RGB color.
+ */
+rgb_t apply_gamma2rgb_channels(rgb_t c, float gamma_r, float gamma_g, float gamma_b);
 
 #ifdef __cplusplus
 }
