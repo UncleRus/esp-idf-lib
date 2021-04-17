@@ -122,28 +122,28 @@ rgb_t hsv2rgb_rainbow(hsv_t hsv)
     // Level Y2 is a strong boost.
     const uint8_t Y1 = 1;
     const uint8_t Y2 = 0;
-    
+
     // G2: Whether to divide all greens by two.
     // Depends GREATLY on your particular LEDs
     const uint8_t G2 = 0;
-    
+
     // Gscale: what to scale green down by.
     // Depends GREATLY on your particular LEDs
     const uint8_t Gscale = 0;
-    
-    
+
+
     uint8_t hue = hsv.hue;
     uint8_t sat = hsv.sat;
     uint8_t val = hsv.val;
-    
+
     uint8_t offset = hue & 0x1F; // 0..31
-    
+
     // offset8 = offset * 8
     uint8_t offset8 = offset << 3;
     uint8_t third = scale8(offset8, (256 / 3)); // max = 85
-    
+
     uint8_t r, g, b;
-    
+
     if (!(hue & 0x80))
     {
         // 0XX
@@ -320,12 +320,7 @@ rgb_t hsv2rgb_rainbow(hsv_t hsv)
         }
     }
 
-    rgb_t rgb = {
-        .r = r,
-        .g = g,
-        .b = b
-    };
-    return rgb;
+    return rgb_from_values(r, g, b);
 }
 
 #define FIXFRAC8(N,D) (((N) * 256) / (D))
@@ -503,16 +498,5 @@ hsv_t rgb2hsv_approximate(rgb_t rgb)
 
     h += 1;
 
-    hsv_t hsv = {
-       .h = h, .s = s, .v = v
-    };
-    return hsv;
+    return hsv_from_values(h, s, v);
 }
-
-// Examples that need work:
-//   0,192,192
-//   192,64,64
-//   224,32,32
-//   252,0,126
-//   252,252,0
-//   252,252,126

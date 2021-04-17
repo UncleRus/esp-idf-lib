@@ -25,6 +25,9 @@ extern "C" {
 #define HUE_MAX_SPECTRUM 255
 #define HUE_MAX_RAW      191
 
+////////////////////////////////////////////////////////////////////////////////
+/// Color conversion
+
 /**
  * @brief Convert HSV to RGB using balanced rainbow
  *
@@ -100,6 +103,195 @@ rgb_t hsv2rgb_raw(hsv_t hsv);
  * @return      Approximated HSV color
  */
 hsv_t rgb2hsv_approximate(rgb_t rgb);
+
+/**
+ * @brief Approximates a 'black body radiation' spectrum for a given 'heat' level.
+ *
+ * This is useful for animations of 'fire'. Heat is specified as an arbitrary scale
+ * from 0 (cool) to 255 (hot).
+ * This is NOT a chromatically correct 'black body radiation' spectrum, but it's
+ * surprisingly close, and it's fast and small.
+ */
+rgb_t rgb_heat_color(uint8_t temperature);
+
+////////////////////////////////////////////////////////////////////////////////
+/// Fill functions
+
+/**
+ * Fill an array of HSV colors with a solid HSV color
+ */
+void hsv_fill_solid_hsv(hsv_t *target, hsv_t color, size_t num);
+
+/**
+ * Fill an array of RGB colors with a solid HSV color
+ */
+void rgb_fill_solid_hsv(rgb_t *target, hsv_t color, size_t num);
+
+/**
+ * Fill an array of RGB colors with a solid RGB color
+ */
+void rgb_fill_solid_rgb(rgb_t *target, rgb_t color, size_t num);
+
+/**
+ * @brief Fill an array of HSV colors with a smooth HSV gradient between two
+ *        specified HSV colors.
+ *
+ * Since 'hue' is a value around a color wheel,
+ * there are always two ways to sweep from one hue
+ * to another.
+ * This function lets you specify which way you want
+ * the hue gradient to sweep around the color wheel:
+ *
+ *     FORWARD_HUES: hue always goes clockwise
+ *     BACKWARD_HUES: hue always goes counter-clockwise
+ *     SHORTEST_HUES: hue goes whichever way is shortest
+ *     LONGEST_HUES: hue goes whichever way is longest
+ *
+ * The default is SHORTEST_HUES, as this is nearly
+ * always what is wanted.
+ */
+void hsv_fill_gradient_hsv(hsv_t *target, size_t startpos, hsv_t startcolor, size_t endpos, hsv_t endcolor,
+        color_gradient_direction_t direction);
+
+static inline void hsv_fill_gradient2_hsv(hsv_t *target, size_t num, hsv_t c1, hsv_t c2,
+        color_gradient_direction_t direction)
+{
+    hsv_fill_gradient_hsv(target, 0, c1, num - 1, c2, direction);
+}
+
+static inline void hsv_fill_gradient3_hsv(hsv_t *target, size_t num, hsv_t c1, hsv_t c2, hsv_t c3,
+        color_gradient_direction_t direction)
+{
+    size_t half = num / 2;
+    hsv_fill_gradient_hsv(target, 0,    c1, half,    c2, direction);
+    hsv_fill_gradient_hsv(target, half, c2, num - 1, c3, direction);
+}
+
+static inline void hsv_fill_gradient4_hsv(hsv_t *target, size_t num, hsv_t c1, hsv_t c2, hsv_t c3, hsv_t c4,
+        color_gradient_direction_t direction)
+{
+    size_t onethird = num / 3;
+    size_t twothirds = num * 2 / 3;
+    hsv_fill_gradient_hsv(target, 0,         c1, onethird,  c2, direction);
+    hsv_fill_gradient_hsv(target, onethird,  c2, twothirds, c3, direction);
+    hsv_fill_gradient_hsv(target, twothirds, c3, num - 1,   c4, direction);
+}
+
+/**
+ * Same as ::hsv_fill_gradient_hsv(), but for array of RGB
+ *
+ * The gradient is computed in HSV space, and then HSV values are
+ * converted to RGB as they're written into the RGB array.
+ */
+void rgb_fill_gradient_hsv(rgb_t *target, size_t startpos, hsv_t startcolor, size_t endpos, hsv_t endcolor,
+        color_gradient_direction_t direction);
+
+static inline void rgb_fill_gradient2_hsv(rgb_t *target, size_t num, hsv_t c1, hsv_t c2,
+        color_gradient_direction_t direction)
+{
+    rgb_fill_gradient_hsv(target, 0, c1, num - 1, c2, direction);
+}
+
+static inline void rgb_fill_gradient3_hsv(rgb_t *target, size_t num, hsv_t c1, hsv_t c2, hsv_t c3,
+        color_gradient_direction_t direction)
+{
+    size_t half = num / 2;
+    rgb_fill_gradient_hsv(target, 0,    c1, half,    c2, direction);
+    rgb_fill_gradient_hsv(target, half, c2, num - 1, c3, direction);
+}
+
+static inline void rgb_fill_gradient4_hsv(rgb_t *target, size_t num, hsv_t c1, hsv_t c2, hsv_t c3, hsv_t c4,
+        color_gradient_direction_t direction)
+{
+    size_t onethird = num / 3;
+    size_t twothirds = num * 2 / 3;
+    rgb_fill_gradient_hsv(target, 0,         c1, onethird,  c2, direction);
+    rgb_fill_gradient_hsv(target, onethird,  c2, twothirds, c3, direction);
+    rgb_fill_gradient_hsv(target, twothirds, c3, num - 1,   c4, direction);
+}
+
+/**
+ * @brief Fill a range of LEDs with a smooth RGB gradient
+ *        between two specified RGB colors.
+ *
+ * Unlike HSV, there is no 'color wheel' in RGB space, and therefore
+ * there's only one 'direction' for the gradient to go, and no
+ * 'direction' is needed.
+ */
+void rgb_fill_gradient_rgb(rgb_t *leds, size_t startpos, rgb_t startcolor, size_t endpos, rgb_t endcolor);
+
+static inline void rgb_fill_gradient2_rgb(rgb_t *target, size_t num, rgb_t c1, rgb_t c2)
+{
+    rgb_fill_gradient_rgb(target, 0, c1, num - 1, c2);
+}
+
+static inline void rgb_fill_gradient3_rgb(rgb_t *target, size_t num, rgb_t c1, rgb_t c2, rgb_t c3)
+{
+    size_t half = num / 2;
+    rgb_fill_gradient_rgb(target, 0,    c1, half,    c2);
+    rgb_fill_gradient_rgb(target, half, c2, num - 1, c3);
+}
+
+static inline void rgb_fill_gradient4_rgb(rgb_t *target, size_t num, rgb_t c1, rgb_t c2, rgb_t c3, rgb_t c4)
+{
+    size_t onethird = num / 3;
+    size_t twothirds = num * 2 / 3;
+    rgb_fill_gradient_rgb(target, 0,         c1, onethird,  c2);
+    rgb_fill_gradient_rgb(target, onethird,  c2, twothirds, c3);
+    rgb_fill_gradient_rgb(target, twothirds, c3, num - 1,   c4);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Filter functions
+
+/// Function which must be provided by the application for use in two-dimensional filter functions.
+typedef size_t (*xy_to_offs_cb)(size_t x, size_t y);
+
+/**
+ * @brief One-dimensional blur filter.
+ *
+ * Spreads light to 2 line neighbors.
+ *
+ *   0 = no spread at all
+ *  64 = moderate spreading
+ * 172 = maximum smooth, even spreading
+ *
+ * 173..255 = wider spreading, but increasing flicker
+ *
+ * Total light is NOT entirely conserved, so many repeated calls to 'blur'
+ * will also result in the light fading, eventually all the way to black;
+ * this is by design so that it can be used to (slowly) clear the LEDs
+ * to black.
+ */
+void blur1d(rgb_t *leds, size_t num_leds, fract8 blur_amount);
+
+/**
+ * @brief Perform a blur1d on each column of a rectangular matrix
+ */
+void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
+
+/**
+ * @brief Perform a blur1d on each row of a rectangular matrix
+ */
+void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
+
+/**
+ * @brief Two-dimensional blur filter.
+ *
+ * Spreads light to 8 XY neighbors.
+ *
+ *   0 = no spread at all
+ *  64 = moderate spreading
+ * 172 = maximum smooth, even spreading
+ *
+ * 173..255 = wider spreading, but increasing flicker
+ *
+ * Total light is NOT entirely conserved, so many repeated calls to 'blur'
+ * will also result in the light fading, eventually all the way to black;
+ * this is by design so that it can be used to (slowly) clear the LEDs
+ * to black.
+ */
+void blur2d(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
 
 #ifdef __cplusplus
 }

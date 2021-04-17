@@ -54,6 +54,17 @@ static inline rgb_t rgb_from_code(uint32_t color_code)
     return res;
 }
 
+/// Create rgb_t color from values
+static inline rgb_t rgb_from_values(uint8_t r, uint8_t g, uint8_t b)
+{
+    rgb_t res = {
+        .r = r,
+        .g = g,
+        .b = b,
+    };
+    return res;
+}
+
 /// Convert RGB color to 24-bit color code 0x00RRGGBB
 static inline uint32_t rgb_to_code(rgb_t color)
 {
@@ -215,6 +226,18 @@ static inline rgb_t rgb_lerp16(rgb_t a, rgb_t b, fract16 frac)
         .r = lerp16by16(a.r, b.r, frac),
         .g = lerp16by16(a.g, b.g, frac),
         .b = lerp16by16(a.b, b.b, frac),
+    };
+    return res;
+}
+
+/// Computes a new color blended some fraction of the way between two other
+/// colors.
+static inline rgb_t rgb_blend(rgb_t existing, rgb_t overlay, fract8 amount)
+{
+    rgb_t res = {
+        .r = blend8(existing.r, overlay.r, amount),
+        .g = blend8(existing.g, overlay.g, amount),
+        .b = blend8(existing.b, overlay.b, amount),
     };
     return res;
 }

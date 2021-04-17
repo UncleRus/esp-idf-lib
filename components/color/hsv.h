@@ -29,6 +29,14 @@ extern "C" {
 #define HUE_PURPLE 192
 #define HUE_PINK   224
 
+typedef enum
+{
+    COLOR_FORWARD_HUES = 0,
+    COLOR_BACKWARD_HUES,
+    COLOR_SHORTEST_HUES,
+    COLOR_LONGEST_HUES
+} color_gradient_direction_t;
+
 /// HSV color representation
 typedef struct
 {
@@ -48,11 +56,26 @@ typedef struct
     };
 } hsv_t;
 
-/// This allows testing a RGB for zero-ness
+/// This allows testing a HSV for zero-ness
 static inline bool hsv_is_zero(hsv_t a)
 {
-    return a.h || a.s || a.v;
+    return !(a.h | a.s | a.v);
 }
+
+/// Create HSV color from values
+static inline hsv_t hsv_from_values(uint8_t h, uint8_t s, uint8_t v)
+{
+    hsv_t res = {
+        .h = h,
+        .s = s,
+        .v = v
+    };
+    return res;
+}
+
+/// Computes a new color blended some fraction of the way between two other
+/// colors.
+hsv_t blend(hsv_t existing, hsv_t overlay, fract8 amount, color_gradient_direction_t direction);
 
 #ifdef __cplusplus
 }
