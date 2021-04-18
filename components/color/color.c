@@ -658,9 +658,85 @@ void hsv_fill_gradient_hsv(hsv_t *target, size_t startpos, hsv_t startcolor, siz
 void rgb_fill_gradient_hsv(rgb_t *target, size_t startpos, hsv_t startcolor, size_t endpos, hsv_t endcolor,
         color_gradient_direction_t direction)
 {
-    hsv_fill_gradient_hsv((hsv_t *)target, startpos, startcolor, endpos, endcolor, direction);
+    // if the points are in the wrong order, straighten them
+    if (endpos < startpos)
+    {
+        size_t t = endpos;
+        hsv_t tc = endcolor;
+        endcolor = startcolor;
+        endpos = startpos;
+        startpos = t;
+        startcolor = tc;
+    }
+
+    // If we're fading toward black (val=0) or white (sat=0),
+    // then set the endhue to the starthue.
+    // This lets us ramp smoothly to black or white, regardless
+    // of what 'hue' was set in the endcolor (since it doesn't matter)
+    if (endcolor.value == 0 || endcolor.saturation == 0)
+        endcolor.hue = startcolor.hue;
+
+    // Similarly, if we're fading in from black (val=0) or white (sat=0)
+    // then set the starthue to the endhue.
+    // This lets us ramp smoothly up from black or white, regardless
+    // of what 'hue' was set in the startcolor (since it doesn't matter)
+    if (startcolor.value == 0 || startcolor.saturation == 0)
+        startcolor.hue = endcolor.hue;
+
+    saccum87 huedistance87;
+    saccum87 satdistance87;
+    saccum87 valdistance87;
+
+    satdistance87 = (endcolor.sat - startcolor.sat) << 7;
+    valdistance87 = (endcolor.val - startcolor.val) << 7;
+
+    uint8_t huedelta8 = endcolor.hue - startcolor.hue;
+
+    if (direction == COLOR_SHORTEST_HUES)
+    {
+        direction = COLOR_FORWARD_HUES;
+        if (huedelta8 > 127)
+            direction = COLOR_BACKWARD_HUES;
+    }
+
+    if (direction == COLOR_LONGEST_HUES)
+    {
+        direction = COLOR_FORWARD_HUES;
+        if (huedelta8 < 128)
+            direction = COLOR_BACKWARD_HUES;
+    }
+
+    if (direction == COLOR_FORWARD_HUES)
+    {
+        huedistance87 = huedelta8 << 7;
+    }
+    else /* direction == BACKWARD_HUES */
+    {
+        huedistance87 = (uint8_t) (256 - huedelta8) << 7;
+        huedistance87 = -huedistance87;
+    }
+
+    size_t pixeldistance = endpos - startpos;
+    int16_t divisor = pixeldistance ? pixeldistance : 1;
+
+    saccum87 huedelta87 = huedistance87 / divisor;
+    saccum87 satdelta87 = satdistance87 / divisor;
+    saccum87 valdelta87 = valdistance87 / divisor;
+
+    huedelta87 *= 2;
+    satdelta87 *= 2;
+    valdelta87 *= 2;
+
+    accum88 hue88 = startcolor.hue << 8;
+    accum88 sat88 = startcolor.sat << 8;
+    accum88 val88 = startcolor.val << 8;
     for (size_t i = startpos; i <= endpos; ++i)
-        target[i] = hsv2rgb_rainbow(*((hsv_t *)(target + i)));
+    {
+        target[i] = hsv2rgb_rainbow(hsv_from_values(hue88 >> 8, sat88 >> 8, val88 >> 8));
+        hue88 += huedelta87;
+        sat88 += satdelta87;
+        val88 += valdelta87;
+    }
 }
 
 void rgb_fill_gradient_rgb(rgb_t *leds, size_t startpos, rgb_t startcolor, size_t endpos, rgb_t endcolor)
@@ -781,6 +857,8 @@ hsv_t color_from_palette_hsv(hsv_t *palette, uint8_t pal_size, uint8_t index, ui
 
     return hsv_from_values(hue1, sat1, val1);
 }
+
+#include <stdlib.h>
 
 rgb_t color_from_palette_rgb(rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend)
 {
