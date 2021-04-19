@@ -21,7 +21,7 @@ uint16_t inoise16_1d(uint32_t x);
 ///@}
 
 /// @name raw 16 bit noise functions
-//@{
+///@{
 /// 16 bit raw versions of the noise functions.  These values are not scaled/altered and have
 /// output values roughly in the range (-18k,18k)
 int16_t inoise16_3d_raw(uint32_t x, uint32_t y, uint32_t z);
@@ -63,6 +63,7 @@ int8_t inoise8_1d_raw(uint16_t x);
 ///@param time the time position for the noise field
 void fill_raw_noise8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint16_t x, int scale, uint16_t time);
 void fill_raw_noise16into8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint32_t x, int scale, uint32_t time);
+///@}
 ///@}
 
 #endif /* __NOISE_H__ */
