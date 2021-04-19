@@ -1,3 +1,9 @@
+/**
+ * @file noise1.c
+ *
+ * Perlin noise effect
+ * Author: Chuck Sommerville
+ */
 #include <lib8tion.h>
 #include <noise.h>
 #include <stdlib.h>

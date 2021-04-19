@@ -1,3 +1,9 @@
+/**
+ * @file plasma_waves.c
+ *
+ * Plasma waves effect.
+ * Author: Edmund "Skorn" Horn
+ */
 #include <lib8tion.h>
 #include <stdlib.h>
 #include "plasma_waves.h"

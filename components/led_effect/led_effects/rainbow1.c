@@ -1,3 +1,14 @@
+/**
+ * @file rainbow1.c
+ *
+ * Simple rainbow effect
+ *
+ * Parameters:
+ *     scale  Density of rainbows
+ *            Suggested range 10-50.
+ *     speed  Speed with which the rainbow shimmers
+ *            Suggested range 1-50.
+ */
 #include <lib8tion.h>
 #include <noise.h>
 #include <stdlib.h>
@@ -44,8 +55,8 @@ esp_err_t led_effect_rainbow1_set_params(led_effect_t *state, led_effect_rainbow
 
     params_t *params = (params_t *)state->internal;
     params->direction = direction;
-    params->scale = scale8_video(scale, 50);
-    params->speed = scale8_video(speed, 50);
+    params->scale = scale;
+    params->speed = speed;
 
     return ESP_OK;
 }
