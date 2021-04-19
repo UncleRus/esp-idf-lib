@@ -6,11 +6,13 @@
 #include <esp_log.h>
 #include <lib8tion.h>
 #include <led_effect.h>
+
 #include <led_effects/noise1.h>
 #include <led_effects/plasma_waves.h>
 #include <led_effects/rainbow1.h>
 #include <led_effects/waterfall.h>
 #include <led_effects/dna.h>
+#include <led_effects/rays.h>
 
 static const char *TAG = "led_matrix";
 
@@ -36,6 +38,7 @@ typedef enum {
     EFFECT_WATERFALL_COLORS,
     EFFECT_PLASMA_WAVES,
     EFFECT_RAINBOW1,
+    EFFECT_RAYS,
 
     EFFECT_MAX
 } effect_t;
@@ -55,9 +58,9 @@ static esp_err_t render_frame(led_effect_t *state, void *arg)
             // calculate strip index of pixel
             size_t strip_idx = y * state->width + (y % 2 ? state->width - x - 1 : x);
             // find pixel offset in state frame buffer
-            uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAME_BUF_OFFS(state, x, y);
-            // read and convert (if needed) color
-            rgb_t color = state->buf_type == LED_EFFECT_RGB ? *((rgb_t *)pixel) : hsv2rgb_rainbow(*((hsv_t *)pixel));
+            uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAMEBUF_OFFS(state, x, y);
+            // read color
+            rgb_t color = *((rgb_t *)pixel);
 #ifndef LED_STIRP_BRIGNTNESS
             // limit brightness and current in case the led_strip does not support global brightness
             color = rgb_scale_video(color, LED_BRIGHTNESS);
@@ -108,6 +111,9 @@ static void display_frame(void *arg)
         case EFFECT_RAINBOW1:
             res = led_effect_rainbow1_run(state);
             break;
+        case EFFECT_RAYS:
+            res = led_effect_rays_run(state);
+            break;
         default:
             return;
     }
@@ -142,6 +148,9 @@ static void switch_effect(led_effect_t *state)
         case EFFECT_RAINBOW1:
             led_effect_rainbow1_done(state);
             break;
+        case EFFECT_RAYS:
+            led_effect_rays_done(state);
+            break;
         default:
             break;
     }
@@ -175,6 +184,9 @@ static void switch_effect(led_effect_t *state)
         case EFFECT_RAINBOW1:
             led_effect_rainbow1_init(state, random8_to(3), random8_between(10, 50), random8_between(1, 50));
             break;
+        case EFFECT_RAYS:
+            led_effect_rays_init(state, random8_between(0, 50), random8_between(1, 3), random8_between(5, 10));
+            break;
         default:
             break;
     }
@@ -191,7 +203,7 @@ void test(void *pvParameters)
 
     // Setup framebuffer
     led_effect_t effect;
-    led_effect_init(&effect, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, LED_EFFECT_RGB, render_frame);
+    led_effect_init(&effect, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, render_frame);
 
     // setup timer
     esp_timer_create_args_t timer_args = {
