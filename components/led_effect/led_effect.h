@@ -1,54 +1,166 @@
-/*
- * The MIT License (MIT)
+/**
+ * @file led_effect.h
+ * @defgroup led_effect led_effect
+ * @{
  *
- * Copyright (c) 2016 Harm Aldick
- *               2021 Tomoyuki Sakurai <y@trombik.org>
+ * Simple abstraction of effects on an addressable LED matrix for ESP-IDF
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Copyright (C) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * MIT Licensed as described in the file LICENSE
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
-*/
+ */
+#ifndef __LED_EFFECT_H__
+#define __LED_EFFECT_H__
 
-#ifndef __LED_EFFECT__H__
-#define __LED_EFFECT__H__
-
+#include <esp_err.h>
 #include <color.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * returns 32 bit color code in a position of colors. the MSB 8bit is always
- * 0x00.
- *
- * 0xWW 0xRR 0xGG 0xBB
- */
-uint32_t led_effect_color_wheel(uint8_t pos);
+#define LED_EFFECT_FRAMEBUF_OFFS(state, x, y) (((state)->width * (y) + (x)) * sizeof(rgb_t))
+
+typedef struct led_effect_s led_effect_t;
+
+typedef esp_err_t (*led_effect_render_cb_t)(led_effect_t *state, void *arg);
 
 /**
- * @brief Same as in `led_effect_color_wheel` but Returns `rgb_t`.
- * @param pos Previous position in the wheel
- * @return the next color.
+ * Effect state descriptor
  */
-rgb_t led_effect_color_wheel_rgb(uint8_t pos);
+struct led_effect_s
+{
+    uint8_t *frame_buf;
+    size_t width;
+    size_t height;
+    size_t frame_num;
+    uint64_t last_frame_us;
+    volatile bool busy;
+    led_effect_render_cb_t render; ///< See ::led_effect_render()
+    uint8_t *internal;  // for effect settings, internal vars, palettes and so on
+};
+
+/**
+ * @brief Initialize effect state
+ *
+ * @param state     Effect state
+ * @param width     Frame width in pixels
+ * @param height    Frame height in pixels
+ * @param buf_type  Color type of frame buffer
+ * @param render_cb Renderer callback function
+ *
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_init(led_effect_t *state, size_t width, size_t height, led_effect_render_cb_t render_cb);
+
+/**
+ * @brief Free effect state buffers
+ *
+ * @param state     Effect state
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_free(led_effect_t *state);
+
+/**
+ * @brief Set RGB color of framebuffer pixel
+ *
+ * If the framebuffer color type is HSV, the color will be converted automatically
+ *
+ * @param state     Effect state
+ * @param x         X coordinate
+ * @param y         Y coordinate
+ * @param color     RGB color
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_set_pixel_rgb(led_effect_t *state, size_t x, size_t y, rgb_t color);
+
+/**
+ * @brief Set HSV color of framebuffer pixel
+ *
+ * If the framebuffer color type is RGB, the color will be converted automatically
+ *
+ * @param state     Effect state
+ * @param x         X coordinate
+ * @param y         Y coordinate
+ * @param color     HSV color
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_set_pixel_hsv(led_effect_t *state, size_t x, size_t y, hsv_t color);
+
+/**
+ * @brief Get RGB color of framebuffer pixel
+ *
+ * If the framebuffer color type is HSV, result will be converted to RGB automatically
+ *
+ * @param state       Effect state
+ * @param x           X coordinate
+ * @param y           Y coordinate
+ * @param[out] color  RGB color
+ * @return            ESP_OK on success
+ */
+esp_err_t led_effect_get_pixel_rgb(led_effect_t *state, size_t x, size_t y, rgb_t *color);
+
+/**
+ * @brief Get HSV color of framebuffer pixel
+ *
+ * If the framebuffer color type is RGB, result will be converted to HSV automatically
+ *
+ * @param state       Effect state
+ * @param x           X coordinate
+ * @param y           Y coordinate
+ * @param[out] color  HSV color
+ * @return            ESP_OK on success
+ */
+esp_err_t led_effect_get_pixel_hsv(led_effect_t *state, size_t x, size_t y, hsv_t *color);
+
+/**
+ * @brief Clear framebuffer
+ *
+ * @param state     Effect state
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_clear(led_effect_t *state);
+
+/**
+ * @brief Start frame rendering
+ *
+ * This function must be called in effects at the beginning of rendering frame
+ *
+ * @param state     Effect state
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_begin_frame(led_effect_t *state);
+
+/**
+ * @brief Finish frame rendering
+ *
+ * This function must be called in effects at the end of rendering frame
+ *
+ * @param state     Effect state
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_end_frame(led_effect_t *state);
+
+/**
+ * @brief Render frambuffer to actual display or LED strip
+ *
+ * Rendering is performed by calling the callback function with passing
+ * it as arguments state and arg
+ *
+ * @param state     Effect state
+ * @param arg       Argument to pass to callback
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_render(led_effect_t *state, void *arg);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+/**
+ * @defgroup effects
+ * @}
+ * */
+
+#endif /* __LED_EFFECT_H__ */

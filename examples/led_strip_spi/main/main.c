@@ -2,8 +2,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
-#include <led_effect.h>
 #include <led_strip_spi.h>
+#include "effect.h"
 
 /*
  * For ESP32 and ESP32S2

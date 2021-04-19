@@ -91,6 +91,7 @@ Common libraries
    groups/lib8tion
    groups/color
    groups/noise
+   groups/led_effect
 
 Real-time clocks
 ================

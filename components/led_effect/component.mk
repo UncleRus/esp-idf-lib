@@ -1,2 +1,3 @@
 COMPONENT_ADD_INCLUDEDIRS = .
-COMPONENT_DEPENDS = log color
+COMPONENT_SRCDIRS = . led_effects
+COMPONENT_DEPENDS = log color lib8tion noise

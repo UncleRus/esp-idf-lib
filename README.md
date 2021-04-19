@@ -100,6 +100,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **lib8tion**   | Math functions specifically designed for LED programming                | MIT     | Yes     | -
 | **color**      | Common library for RGB and HSV colors                                   | MIT     | Yes     | -
 | **noise**      | Noise generation functions                                              | MIT     | Yes     | -
+| **led_effect** | LED effects library                                                     | MIT     | Yes     | -
 
 ### Real-time clocks
 
