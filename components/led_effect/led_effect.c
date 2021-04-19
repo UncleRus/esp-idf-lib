@@ -1,57 +1,115 @@
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2016 Harm Aldick
- *               2021 Tomoyuki Sakurai <y@trombik.org>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
-*/
-
+#include <stdlib.h>
 #include "led_effect.h"
 
-uint32_t led_effect_color_wheel(uint8_t pos)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+
+#define BUF_SIZE(state) ((state)->width * (state)->height * sizeof(rgb_t))
+
+esp_err_t led_effect_init(led_effect_t *state, size_t width, size_t height, led_effect_render_cb_t render_cb)
 {
-    pos = 255 - pos;
-    if (pos < 85)
-    {
-        return ((uint32_t)(255 - pos * 3) << 16) | ((uint32_t)(0) << 8) | (pos * 3);
-    }
-    else if (pos < 170)
-    {
-        pos -= 85;
-        return ((uint32_t)(0) << 16) | ((uint32_t)(pos * 3) << 8) | (255 - pos * 3);
-    }
-    else
-    {
-        pos -= 170;
-        return ((uint32_t)(pos * 3) << 16) | ((uint32_t)(255 - pos * 3) << 8) | (0);
-    }
+    CHECK_ARG(state && width && height && render_cb);
+
+    state->width = width;
+    state->height = height;
+    state->frame_num = 0;
+    state->last_frame_us = 0;
+    state->render = render_cb;
+    state->internal = NULL;
+    state->frame_buf = calloc(1, BUF_SIZE(state));
+    if (!state->frame_buf)
+        return ESP_ERR_NO_MEM;
+
+    return ESP_OK;
 }
 
-rgb_t led_effect_color_wheel_rgb(uint8_t pos)
+esp_err_t led_effect_free(led_effect_t *state)
 {
-    uint32_t next_color;
-    rgb_t next_pixel;
+    CHECK_ARG(state);
 
-    next_color = led_effect_color_wheel(pos);
-    next_pixel.r = (next_color >> 16) & 0xff;
-    next_pixel.g = (next_color >>  8) & 0xff;
-    next_pixel.b = (next_color      );
-    return next_pixel;
+    if (state->frame_buf)
+        free(state->frame_buf);
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_set_pixel_rgb(led_effect_t *state, size_t x, size_t y, rgb_t color)
+{
+    CHECK_ARG(state && state->frame_buf && x < state->width && y < state->height);
+
+    uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAMEBUF_OFFS(state, x, y);
+    *((rgb_t *)pixel) = color;
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_set_pixel_hsv(led_effect_t *state, size_t x, size_t y, hsv_t color)
+{
+    CHECK_ARG(state && state->frame_buf && x < state->width && y < state->height);
+
+    uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAMEBUF_OFFS(state, x, y);
+    *((rgb_t *)pixel) = hsv2rgb_rainbow(color);
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_get_pixel_rgb(led_effect_t *state, size_t x, size_t y, rgb_t *color)
+{
+    CHECK_ARG(color && state && state->frame_buf && x < state->width && y < state->height);
+
+    uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAMEBUF_OFFS(state, x, y);
+    *color = *((rgb_t *)pixel);
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_get_pixel_hsv(led_effect_t *state, size_t x, size_t y, hsv_t *color)
+{
+    CHECK_ARG(color && state && state->frame_buf && x < state->width && y < state->height);
+
+    uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAMEBUF_OFFS(state, x, y);
+    *color = rgb2hsv_approximate(*((rgb_t *)pixel));
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_clear(led_effect_t *state)
+{
+    CHECK_ARG(state && state->frame_buf);
+
+    memset(state->frame_buf, 0, BUF_SIZE(state));
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_begin_frame(led_effect_t *state)
+{
+    CHECK_ARG(state);
+
+    if (state->busy)
+        return ESP_ERR_INVALID_STATE;
+
+    state->busy = true;
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_end_frame(led_effect_t *state)
+{
+    CHECK_ARG(state);
+
+    state->frame_num++;
+    state->last_frame_us = esp_timer_get_time();
+    state->busy = false;
+
+    return ESP_OK;
+}
+
+esp_err_t led_effect_render(led_effect_t *state, void *arg)
+{
+    CHECK_ARG(state && state->frame_buf && state->render);
+
+    if (state->busy)
+        return ESP_ERR_INVALID_STATE;
+
+    return state->render(state, arg);
 }

@@ -988,7 +988,7 @@ void blur1d(rgb_t *leds, size_t num_leds, fract8 blur_amount)
     }
 }
 
-void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy)
+void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy, void *ctx)
 {
     // blur columns
     uint8_t keep = 255 - blur_amount;
@@ -998,14 +998,14 @@ void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, 
         rgb_t carryover = rgb_from_code(0);
         for (size_t i = 0; i < height; ++i)
         {
-            size_t offs = xy(col, i);
+            size_t offs = xy(ctx, col, i);
             rgb_t cur = leds[offs];
             rgb_t part = cur;
             part = rgb_scale(part, seep);
             cur = rgb_add_rgb(rgb_scale(cur, keep), carryover);
             if (i)
             {
-                size_t prev_offs = xy(col, i - 1);
+                size_t prev_offs = xy(ctx, col, i - 1);
                 leds[prev_offs] = rgb_add_rgb(leds[prev_offs], part);
             }
             leds[offs] = cur;
@@ -1014,7 +1014,7 @@ void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, 
     }
 }
 
-void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy)
+void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy, void *ctx)
 {
     // blur rows same as columns, for irregular matrix
     uint8_t keep = 255 - blur_amount;
@@ -1024,14 +1024,14 @@ void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_
         rgb_t carryover = rgb_from_code(0);
         for (size_t i = 0; i < width; i++)
         {
-            size_t offs = xy(i, row);
+            size_t offs = xy(ctx, i, row);
             rgb_t cur = leds[offs];
             rgb_t part = cur;
             part = rgb_scale(part, seep);
             cur = rgb_add_rgb(rgb_scale(cur, keep), carryover);
             if (i)
             {
-                size_t prev_offs = xy(i - 1, row);
+                size_t prev_offs = xy(ctx, i - 1, row);
                 leds[prev_offs] = rgb_add_rgb(leds[prev_offs], part);
             }
             leds[offs] = cur;
@@ -1040,10 +1040,10 @@ void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_
     }
 }
 
-void blur2d(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy)
+void blur2d(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy, void *ctx)
 {
-    blur_rows(leds, width, height, blur_amount, xy);
-    blur_columns(leds, width, height, blur_amount, xy);
+    blur_rows(leds, width, height, blur_amount, xy, ctx);
+    blur_columns(leds, width, height, blur_amount, xy, ctx);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
