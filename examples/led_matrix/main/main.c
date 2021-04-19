@@ -2,118 +2,100 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <led_strip.h>
-#include "led_animation.h"
+#include <esp_timer.h>
+#include <esp_log.h>
+#include <led_effect.h>
+#include <led_effects/noise1.h>
+#include <led_effects/plasma_waves.h>
+#include <led_effects/rainbow1.h>
+#include <led_effects/waterfall.h>
+
+static const char *TAG = "led_matrix";
 
 #define LED_TYPE LED_STRIP_WS2812
 #define LED_GPIO 5
 #define LED_CHANNEL RMT_CHANNEL_0
 #define LED_MATRIX_WIDTH  16
 #define LED_MATRIX_HEIGHT 16
-#define LED_BRIGHTNESS 30 // 0..255
+#define LED_BRIGHTNESS 20 // 0..255
+#define FPS 30
 
-////////////////////////////////////////////////////////////////////////////////
+static led_strip_t strip = {
+    .type = LED_TYPE,
+    .length = LED_MATRIX_WIDTH * LED_MATRIX_HEIGHT,
+    .gpio = LED_GPIO,
+    .channel = LED_CHANNEL,
+    .buf = NULL,
+#ifdef LED_STIRP_BRIGNTNESS
+    .brightness = LED_BRIGHTNESS
+#endif
+};
 
-#define MATRIX_START_COLOR   0x9bf800
-#define MATRIX_DIM_COLOR     0x558800
-#define MATRIX_STEP          0x0a1000
-#define MATRIX_ALMOST_OFF    0x050800
-#define MATRIX_OFF_THRESH    0x030000
-#define MATRIX_DIMMEST_COLOR 0x020300
-
-void led_effect_matrix(led_animation_t *state, size_t scale)
+// renderer from led_effect frame buffer to actual LED strip
+static esp_err_t render_frame(led_effect_t *state, void *arg)
 {
-    state->frame_num++;
-
-    for (size_t x = 0; x < state->width; x++)
-    {
-        // process matrix from bottom to the second line from the top
-        for (size_t y = 0; y < state->height - 1; y++)
+    for (size_t y = 0; y < state->height; y++)
+        for (size_t x = 0; x < state->width; x++)
         {
-            rgb_t cur_color, upper_color;
-
-            // get current pixel color
-            led_animation_get_pixel(state, x, y, &cur_color);
-            uint32_t cur_code = rgb_to_code(cur_color);
-            // get color of the pixel above current
-            led_animation_get_pixel(state, x, y + 1, &upper_color);
-            uint32_t upper_code = rgb_to_code(upper_color);
-
-            // if above is max brightness, ignore this fact with some probability or move tail down
-            if (upper_code == MATRIX_START_COLOR && random8_to(7 * state->height) != 0)
-                led_animation_set_pixel(state, x, y, upper_color);
-            // if current pixel is off, light up new tails with some probability
-            else if (cur_code == 0 && random8_to((100 - scale) * state->height) == 0)
-                led_animation_set_pixel(state, x, y, rgb_from_code(MATRIX_START_COLOR));
-            // if current pixel is almost off, try to make the fading out slower
-            else if (cur_code <= MATRIX_ALMOST_OFF)
-            {
-                if (cur_code >= MATRIX_OFF_THRESH)
-                    led_animation_set_pixel(state, x, y, rgb_from_code(MATRIX_DIMMEST_COLOR));
-                else if (cur_code != 0)
-                    led_animation_set_pixel(state, x, y, rgb_from_code(0));
-            }
-            else if (cur_code == MATRIX_START_COLOR)
-                // first step of tail fading
-                led_animation_set_pixel(state, x, y, rgb_from_code(MATRIX_DIM_COLOR));
+            // calculate strip index of pixel
+            size_t strip_idx = y * state->width + (y % 2 ? state->width - x - 1 : x);
+            // find pixel offset in state frame buffer
+            uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAME_BUF_OFFS(state, x, y);
+            // set pixel in strip
+            if (state->buf_type == LED_EFFECT_RGB)
+                led_strip_set_pixel(&strip, strip_idx, *((rgb_t *)pixel));
             else
-                // otherwise just lower the brightness one step
-                led_animation_set_pixel(state, x, y, rgb_from_code(cur_code - MATRIX_STEP));
+                led_strip_set_pixel(&strip, strip_idx, hsv2rgb_rainbow(*((hsv_t *)pixel)));
         }
 
-        // upper line processing
-        rgb_t cur_color;
-        led_animation_get_pixel(state, x, state->height - 1, &cur_color);
-        uint32_t cur_code = rgb_to_code(cur_color);
-
-        // if current top pixel is off, fill it with some probability
-        if (cur_code == 0)
-        {
-            if (random8_to(100 - scale) == 0)
-                led_animation_set_pixel(state, x, state->height - 1, rgb_from_code(MATRIX_START_COLOR));
-        }
-        // if current pixel is almost off, try to make the fading out slower
-        else if (cur_code <= MATRIX_ALMOST_OFF)
-        {
-            if (cur_code >= MATRIX_OFF_THRESH)
-                led_animation_set_pixel(state, x, state->height - 1, rgb_from_code(MATRIX_DIMMEST_COLOR));
-            else
-                led_animation_set_pixel(state, x, state->height - 1, rgb_from_code(0));
-        }
-        else if (cur_code == MATRIX_START_COLOR)
-            // first step of tail fading
-            led_animation_set_pixel(state, x, state->height - 1, rgb_from_code(MATRIX_DIM_COLOR));
-        else
-            // otherwise just lower the brightness one step
-            led_animation_set_pixel(state, x, state->height - 1, rgb_from_code(cur_code - MATRIX_STEP));
-    }
+    // flush strip buffer
+    return led_strip_flush(&strip);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+// timer callback
+static void display_frame(void *arg)
+{
+    led_effect_t *state = (led_effect_t *)arg;
+    //ESP_ERROR_CHECK(led_effect_noise1_run(state));
+    //ESP_ERROR_CHECK(led_effect_plasma_waves_run(state));
+    //ESP_ERROR_CHECK(led_effect_rainbow1_run(state));
+    ESP_ERROR_CHECK(led_effect_waterfall_run(state));
+    ESP_ERROR_CHECK(led_effect_render(state, &strip));
+}
 
 void test(void *pvParameters)
 {
-    led_strip_t strip = {
-        .type = LED_TYPE,
-        .length = LED_MATRIX_WIDTH * LED_MATRIX_HEIGHT,
-        .gpio = LED_GPIO,
-        .channel = LED_CHANNEL,
-        .buf = NULL,
-#ifdef LED_STIRP_BRIGNTNESS
-        .brightness = LED_BRIGHTNESS
-#endif
-    };
+    // setup strip
     ESP_ERROR_CHECK(led_strip_init(&strip));
+    ESP_LOGI(TAG, "LED strip initialized");
 
-    led_animation_t animation;
-    ESP_ERROR_CHECK(led_animation_init(&animation, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT));
+    // Setup effect
+    led_effect_t effect;
+    ESP_ERROR_CHECK(led_effect_init(&effect, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, LED_EFFECT_RGB, render_frame));
 
-    printf("Init done\n");
+    // Init effect
+    //ESP_ERROR_CHECK(led_effect_noise1_init(&effect, 30, 8));
+    //ESP_ERROR_CHECK(led_effect_plasma_waves_init(&effect, 235));
+    //ESP_ERROR_CHECK(led_effect_rainbow1_init(&effect, RAINBOW1_HORIZONTAL, 150, 30));
+    ESP_ERROR_CHECK(led_effect_waterfall_init(&effect, WATERFALL_FIRE, 150, 90, 80));
+    ESP_LOGI(TAG, "Effect initialized");
+
+    // setup timer
+    esp_timer_create_args_t timer_args = {
+        .name = "effect",
+        .arg  = &effect,
+        .callback = display_frame,
+        .dispatch_method = ESP_TIMER_TASK
+    };
+    esp_timer_handle_t timer;
+    ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer));
+    ESP_ERROR_CHECK(esp_timer_start_periodic(timer, 1000000 / FPS));
+    ESP_LOGI(TAG, "Frame timer started");
+
     while (1)
     {
-        led_effect_matrix(&animation, 10);
-        ESP_ERROR_CHECK(led_animation_render(&animation, &strip));
-        ESP_ERROR_CHECK(led_strip_flush(&strip));
-        vTaskDelay(pdMS_TO_TICKS(40));
+        ESP_LOGI(TAG, "Total frames rendered: %d", effect.frame_num);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
