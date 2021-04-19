@@ -125,3 +125,60 @@ ESP_ERROR_CHECK(ads111x_init_desc(&dev, addr, I2C_PORT, SDA_GPIO, SCL_GPIO));
 ...
 ```
 
+### Can I use I2C device drivers from interrupts?
+
+No, you can't. Since the drivers use mutexes, this will crash the system.
+Instead, you can do something like this:
+
+```C
+...
+
+static i2c_dev_t pcf8574;
+static TaskHandle_t read_task;
+
+static void IRAM_ATTR isr_handler(void *arg)
+{
+    vTaskNotifyGiveFromISR(read_task, NULL);
+}
+
+static void read_port_task(void *arg)
+{
+    uint8_t val;
+    while (1)
+    {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        if (pcf8574_port_read(&pcf8574, &val) != ESP_OK)
+            continue;
+        // Do something with val
+    }
+}
+
+...
+
+void app_main()
+{
+	...
+	
+    pcf8574_init_desc(&pcf8574, 0, ADDR, I2C_SDA_GPIO, I2C_SCL_GPIO);
+    if (xTaskCreate(read_port, TAG, TASK_STACK, NULL, TASK_PRIORITY, &read_task) != pdPASS)
+    {
+    	...
+    }
+
+	// setup GPIO
+    gpio_config_t io_conf;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    io_conf.pin_bit_mask = BIT(INTR_GPIO);
+    gpio_config(&io_conf);
+
+	// Setup ISR
+    CHECK(gpio_install_isr_service(0));
+    CHECK(gpio_isr_handler_add(CONFIG_KEYBOARD_INTR_GPIO, isr_handler, NULL));
+}
+
+...
+```
+
