@@ -90,6 +90,7 @@ Common libraries
    groups/onewire
    groups/lib8tion
    groups/color
+   groups/noise
 
 Real-time clocks
 ================

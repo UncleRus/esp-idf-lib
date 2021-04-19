@@ -99,6 +99,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **onewire**    | Bit-banging 1-Wire driver                                               | MIT *   | Yes     | *No*
 | **lib8tion**   | Math functions specifically designed for LED programming                | MIT     | Yes     | -
 | **color**      | Common library for RGB and HSV colors                                   | MIT     | Yes     | -
+| **noise**      | Noise generation functions                                              | MIT     | Yes     | -
 
 ### Real-time clocks
 
