@@ -1,12 +1,13 @@
 # FAQ
 
-- [How to debug I2C-based drivers](#how-to-debug-i2c-based-drivers)
-- [Why are semaphores used in ic2dev routines?](#why-are-semaphores-mutexes-used-in-ic2dev-routines)
+- [How to debug I2C-based drivers?](#how-to-debug-i2c-based-drivers)
+- [Why are semaphores used in i2cdev routines?](#why-are-semaphores-mutexes-used-in-ic2dev-routines)
 - [How can I connect multiple I2C devices?](#how-can-i-connect-multiple-i2c-devices)
 - [How can I change frequency of I2C clock?](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
-- [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
+- [How to use internal pull-up resistors?](#how-to-use-internal-pull-up-resistors)
+- [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
 
-### How to debug I2C-based drivers
+### How to debug I2C-based drivers?
 
 Common causes of I2C issues are:
 
@@ -36,7 +37,7 @@ can decode I2C signals and display I2C transactions in human-readable way.
 If the driver does not work after these steps, please [let us
 know](https://github.com/UncleRus/esp-idf-lib/issues).
 
-### Why are semaphores (mutexes) used in ic2dev routines?
+### Why are semaphores (mutexes) used in i2cdev routines?
 
 i2cdev uses two types of mutexes: port and transactional.
 
