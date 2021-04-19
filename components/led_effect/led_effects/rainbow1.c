@@ -63,7 +63,7 @@ esp_err_t led_effect_rainbow1_set_params(led_effect_t *state, led_effect_rainbow
 
 esp_err_t led_effect_rainbow1_run(led_effect_t *state)
 {
-    CHECK_ARG(state);
+    CHECK(led_effect_begin_frame(state));
 
     params_t *params = (params_t *)state->internal;
 

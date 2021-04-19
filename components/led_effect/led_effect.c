@@ -99,12 +99,25 @@ esp_err_t led_effect_clear(led_effect_t *state)
     return ESP_OK;
 }
 
+esp_err_t led_effect_begin_frame(led_effect_t *state)
+{
+    CHECK_ARG(state);
+
+    if (state->busy)
+        return ESP_ERR_INVALID_STATE;
+
+    state->busy = true;
+
+    return ESP_OK;
+}
+
 esp_err_t led_effect_end_frame(led_effect_t *state)
 {
     CHECK_ARG(state);
 
     state->frame_num++;
     state->last_frame_us = esp_timer_get_time();
+    state->busy = false;
 
     return ESP_OK;
 }
@@ -113,6 +126,8 @@ esp_err_t led_effect_render(led_effect_t *state, void *arg)
 {
     CHECK_ARG(state && state->frame_buf && state->render);
 
+    if (state->busy)
+        return ESP_ERR_INVALID_STATE;
+
     return state->render(state, arg);
 }
-

@@ -57,14 +57,14 @@ esp_err_t led_effect_noise1_set_params(led_effect_t *state, uint8_t scale, uint8
 
 esp_err_t led_effect_noise1_run(led_effect_t *state)
 {
-    CHECK_ARG(state);
+    CHECK(led_effect_begin_frame(state));
 
     params_t *params = (params_t *)state->internal;
 
     uint32_t frame_timeout = (esp_timer_get_time() - state->last_frame_us) / 1000;
     if (frame_timeout >= 1000)
         params->x_offs++;
-    if (frame_timeout >= 30)
+    if (frame_timeout >= 10)
     {
         params->z_pos += params->speed;
         params->hue++;

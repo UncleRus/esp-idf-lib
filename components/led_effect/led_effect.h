@@ -42,6 +42,7 @@ struct led_effect_s
     size_t height;
     size_t frame_num;
     uint64_t last_frame_us;
+    volatile bool busy;
     led_effect_render_cb_t render; ///< See ::led_effect_render()
     uint8_t *internal;  // for effect settings, internal vars, palettes and so on
 };
@@ -129,9 +130,19 @@ esp_err_t led_effect_get_pixel_hsv(led_effect_t *state, size_t x, size_t y, hsv_
 esp_err_t led_effect_clear(led_effect_t *state);
 
 /**
+ * @brief Start frame rendering
+ *
+ * This function must be called in effects at the beginning of rendering frame
+ *
+ * @param state     Effect state
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_begin_frame(led_effect_t *state);
+
+/**
  * @brief Finish frame rendering
  *
- * This function must be called in effects at the end of rendering frame/
+ * This function must be called in effects at the end of rendering frame
  *
  * @param state     Effect state
  * @return          ESP_OK on success

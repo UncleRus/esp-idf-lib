@@ -24,6 +24,8 @@ static const char *TAG = "led_matrix";
 
 #define SWITCH_PERIOD_MS 5000
 
+#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
+
 typedef enum {
     EFFECT_NONE = 0,
 
@@ -38,6 +40,35 @@ typedef enum {
     EFFECT_MAX
 } effect_t;
 
+// renderer from led_effect frame buffer to actual LED strip
+// this can be easily adapted to led_strip_spi
+static esp_err_t render_frame(led_effect_t *state, void *arg)
+{
+    if (!arg)
+        return ESP_ERR_INVALID_ARG;
+
+    led_strip_t *led_strip = (led_strip_t *)arg;
+
+    for (size_t y = 0; y < state->height; y++)
+        for (size_t x = 0; x < state->width; x++)
+        {
+            // calculate strip index of pixel
+            size_t strip_idx = y * state->width + (y % 2 ? state->width - x - 1 : x);
+            // find pixel offset in state frame buffer
+            uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAME_BUF_OFFS(state, x, y);
+            // read and convert (if needed) color
+            rgb_t color = state->buf_type == LED_EFFECT_RGB ? *((rgb_t *)pixel) : hsv2rgb_rainbow(*((hsv_t *)pixel));
+#ifndef LED_STIRP_BRIGNTNESS
+            // limit brightness and current in case the led_strip does not support global brightness
+            color = rgb_scale_video(color, LED_BRIGHTNESS);
+#endif
+            CHECK(led_strip_set_pixel(led_strip, strip_idx, color));
+        }
+
+    // flush strip buffer
+    return led_strip_flush(led_strip);
+}
+
 static led_strip_t strip = {
     .type = LED_TYPE,
     .length = LED_MATRIX_WIDTH * LED_MATRIX_HEIGHT,
@@ -51,56 +82,39 @@ static led_strip_t strip = {
 
 static esp_timer_handle_t timer;
 
-// renderer from led_effect frame buffer to actual LED strip
-static esp_err_t render_frame(led_effect_t *state, void *arg)
-{
-    for (size_t y = 0; y < state->height; y++)
-        for (size_t x = 0; x < state->width; x++)
-        {
-            // calculate strip index of pixel
-            size_t strip_idx = y * state->width + (y % 2 ? state->width - x - 1 : x);
-            // find pixel offset in state frame buffer
-            uint8_t *pixel = state->frame_buf + LED_EFFECT_FRAME_BUF_OFFS(state, x, y);
-            // set pixel in strip
-            if (state->buf_type == LED_EFFECT_RGB)
-                led_strip_set_pixel(&strip, strip_idx, *((rgb_t *)pixel));
-            else
-                led_strip_set_pixel(&strip, strip_idx, hsv2rgb_rainbow(*((hsv_t *)pixel)));
-        }
-
-    // flush strip buffer
-    return led_strip_flush(&strip);
-}
-
 static effect_t current_effect = EFFECT_NONE;
 
 // timer callback
 static void display_frame(void *arg)
 {
     led_effect_t *state = (led_effect_t *)arg;
+    esp_err_t res = 0;
     switch(current_effect)
     {
         case EFFECT_DNA:
-            led_effect_dna_run(state);
+            res = led_effect_dna_run(state);
             break;
         case EFFECT_NOISE1:
-            led_effect_noise1_run(state);
+            res = led_effect_noise1_run(state);
             break;
         case EFFECT_WATERFALL_FIRE:
         case EFFECT_WATERFALL_SIMPLE:
         case EFFECT_WATERFALL_COLORS:
-            led_effect_waterfall_run(state);
+            res = led_effect_waterfall_run(state);
             break;
         case EFFECT_PLASMA_WAVES:
-            led_effect_plasma_waves_run(state);
+            res = led_effect_plasma_waves_run(state);
             break;
         case EFFECT_RAINBOW1:
-            led_effect_rainbow1_run(state);
+            res = led_effect_rainbow1_run(state);
             break;
         default:
             return;
     }
-    led_effect_render(state, &strip);
+    if (res == ESP_OK)
+        led_effect_render(state, &strip);
+    else
+        ESP_LOGW(TAG, "Frame dropped");
 }
 
 static void switch_effect(led_effect_t *state)
@@ -164,6 +178,8 @@ static void switch_effect(led_effect_t *state)
         default:
             break;
     }
+
+    // start rendering
     esp_timer_start_periodic(timer, 1000000 / FPS);
 }
 

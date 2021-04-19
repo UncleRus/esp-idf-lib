@@ -71,7 +71,7 @@ esp_err_t led_effect_plasma_waves_set_params(led_effect_t *state, uint8_t speed)
 
 esp_err_t led_effect_plasma_waves_run(led_effect_t *state)
 {
-    CHECK_ARG(state);
+    CHECK(led_effect_begin_frame(state));
 
     params_t *params = (params_t *)state->internal;
 
