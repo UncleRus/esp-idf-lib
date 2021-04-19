@@ -265,7 +265,7 @@ rgb_t color_from_palette_rgb(rgb_t *palette, uint8_t pal_size, uint8_t index, ui
  * Function which must be provided by the application for use in two-dimensional
  * filter functions.
  */
-typedef size_t (*xy_to_offs_cb)(size_t x, size_t y);
+typedef size_t (*xy_to_offs_cb)(void *ctx, size_t x, size_t y);
 
 /**
  * @brief One-dimensional blur filter.
@@ -288,12 +288,12 @@ void blur1d(rgb_t *leds, size_t num_leds, fract8 blur_amount);
 /**
  * @brief Perform a blur1d on each column of a rectangular matrix
  */
-void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
+void blur_columns(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy, void *ctx);
 
 /**
  * @brief Perform a blur1d on each row of a rectangular matrix
  */
-void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
+void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy, void *ctx);
 
 /**
  * @brief Two-dimensional blur filter.
@@ -311,7 +311,7 @@ void blur_rows(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_
  * this is by design so that it can be used to (slowly) clear the LEDs
  * to black.
  */
-void blur2d(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy);
+void blur2d(rgb_t *leds, size_t width, size_t height, fract8 blur_amount, xy_to_offs_cb xy, void *ctx);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Gamma functions

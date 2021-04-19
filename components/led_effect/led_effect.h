@@ -20,12 +20,7 @@
 extern "C" {
 #endif
 
-#define LED_EFFECT_FRAME_BUF_OFFS(state, x, y) (((state)->width * (y) + (x)) * ((state)->buf_type == LED_EFFECT_RGB ? sizeof(rgb_t) : sizeof(hsv_t)))
-
-typedef enum {
-    LED_EFFECT_RGB = 0,
-    LED_EFFECT_HSV
-} led_effect_type_t;
+#define LED_EFFECT_FRAMEBUF_OFFS(state, x, y) (((state)->width * (y) + (x)) * sizeof(rgb_t))
 
 typedef struct led_effect_s led_effect_t;
 
@@ -36,7 +31,6 @@ typedef esp_err_t (*led_effect_render_cb_t)(led_effect_t *state, void *arg);
  */
 struct led_effect_s
 {
-    led_effect_type_t buf_type;
     uint8_t *frame_buf;
     size_t width;
     size_t height;
@@ -58,8 +52,7 @@ struct led_effect_s
  *
  * @return          ESP_OK on success
  */
-esp_err_t led_effect_init(led_effect_t *state, size_t width, size_t height, led_effect_type_t buf_type,
-        led_effect_render_cb_t render_cb);
+esp_err_t led_effect_init(led_effect_t *state, size_t width, size_t height, led_effect_render_cb_t render_cb);
 
 /**
  * @brief Free effect state buffers
