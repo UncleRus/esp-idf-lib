@@ -20,6 +20,7 @@
 typedef enum {
     RAINBOW1_HORIZONTAL = 0,
     RAINBOW1_VERTICAL,
+    RAINBOW1_DIAGONAL,
 } led_effect_rainbow1_direction_t;
 
 esp_err_t led_effect_rainbow1_init(led_effect_t *state, led_effect_rainbow1_direction_t direction,

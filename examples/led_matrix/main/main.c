@@ -159,7 +159,7 @@ static void switch_effect(led_effect_t *state)
             led_effect_plasma_waves_init(state, random8_between(50, 255));
             break;
         case EFFECT_RAINBOW1:
-            led_effect_rainbow1_init(state, random8_to(2), random8_between(10, 50), random8_between(1, 50));
+            led_effect_rainbow1_init(state, random8_to(3), random8_between(10, 50), random8_between(1, 50));
             break;
         default:
             break;
@@ -196,6 +196,7 @@ void test(void *pvParameters)
 
 void app_main()
 {
+    rand16seed = esp_random();
     led_strip_install();
     xTaskCreate(test, "test", 8192, NULL, 5, NULL);
 }
