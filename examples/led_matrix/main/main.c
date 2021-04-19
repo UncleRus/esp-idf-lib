@@ -4,6 +4,7 @@
 #include <led_strip.h>
 #include <esp_timer.h>
 #include <esp_log.h>
+#include <lib8tion.h>
 #include <led_effect.h>
 #include <led_effects/noise1.h>
 #include <led_effects/plasma_waves.h>
@@ -21,6 +22,22 @@ static const char *TAG = "led_matrix";
 #define LED_BRIGHTNESS 20 // 0..255
 #define FPS 30
 
+#define SWITCH_PERIOD_MS 5000
+
+typedef enum {
+    EFFECT_NONE = 0,
+
+    EFFECT_DNA,
+    EFFECT_NOISE1,
+    EFFECT_WATERFALL_FIRE,
+    EFFECT_WATERFALL_SIMPLE,
+    EFFECT_WATERFALL_COLORS,
+    EFFECT_PLASMA_WAVES,
+    EFFECT_RAINBOW1,
+
+    EFFECT_MAX
+} effect_t;
+
 static led_strip_t strip = {
     .type = LED_TYPE,
     .length = LED_MATRIX_WIDTH * LED_MATRIX_HEIGHT,
@@ -31,6 +48,8 @@ static led_strip_t strip = {
     .brightness = LED_BRIGHTNESS
 #endif
 };
+
+static esp_timer_handle_t timer;
 
 // renderer from led_effect frame buffer to actual LED strip
 static esp_err_t render_frame(led_effect_t *state, void *arg)
@@ -53,35 +72,110 @@ static esp_err_t render_frame(led_effect_t *state, void *arg)
     return led_strip_flush(&strip);
 }
 
+static effect_t current_effect = EFFECT_NONE;
+
 // timer callback
 static void display_frame(void *arg)
 {
     led_effect_t *state = (led_effect_t *)arg;
-    //ESP_ERROR_CHECK(led_effect_noise1_run(state));
-    //ESP_ERROR_CHECK(led_effect_plasma_waves_run(state));
-    //ESP_ERROR_CHECK(led_effect_rainbow1_run(state));
-    //ESP_ERROR_CHECK(led_effect_waterfall_run(state));
-    ESP_ERROR_CHECK(led_effect_dna_run(state));
-    ESP_ERROR_CHECK(led_effect_render(state, &strip));
+    switch(current_effect)
+    {
+        case EFFECT_DNA:
+            led_effect_dna_run(state);
+            break;
+        case EFFECT_NOISE1:
+            led_effect_noise1_run(state);
+            break;
+        case EFFECT_WATERFALL_FIRE:
+        case EFFECT_WATERFALL_SIMPLE:
+        case EFFECT_WATERFALL_COLORS:
+            led_effect_waterfall_run(state);
+            break;
+        case EFFECT_PLASMA_WAVES:
+            led_effect_plasma_waves_run(state);
+            break;
+        case EFFECT_RAINBOW1:
+            led_effect_rainbow1_run(state);
+            break;
+        default:
+            return;
+    }
+    led_effect_render(state, &strip);
+}
+
+static void switch_effect(led_effect_t *state)
+{
+    // stop rendering
+    esp_timer_stop(timer);
+
+    // finish current effect
+    switch(current_effect)
+    {
+        case EFFECT_DNA:
+            led_effect_dna_done(state);
+            break;
+        case EFFECT_NOISE1:
+            led_effect_noise1_done(state);
+            break;
+        case EFFECT_WATERFALL_FIRE:
+        case EFFECT_WATERFALL_SIMPLE:
+        case EFFECT_WATERFALL_COLORS:
+            led_effect_waterfall_done(state);
+            break;
+        case EFFECT_PLASMA_WAVES:
+            led_effect_plasma_waves_done(state);
+            break;
+        case EFFECT_RAINBOW1:
+            led_effect_rainbow1_done(state);
+            break;
+        default:
+            break;
+    }
+
+    // clear framebuffer
+    led_effect_clear(state);
+
+    current_effect = random8_between(EFFECT_DNA, EFFECT_MAX);
+
+    // init new effect
+    switch(current_effect)
+    {
+        case EFFECT_DNA:
+            led_effect_dna_init(state, random8_between(10, 100), random8_between(1, 10), random8_to(2));
+            break;
+        case EFFECT_NOISE1:
+            led_effect_noise1_init(state, random8_between(10, 100), random8_between(1, 50));
+            break;
+        case EFFECT_WATERFALL_FIRE:
+            led_effect_waterfall_init(state, WATERFALL_FIRE, 0, random8_between(20, 120), random8_between(50, 200));
+            break;
+        case EFFECT_WATERFALL_SIMPLE:
+            led_effect_waterfall_init(state, WATERFALL_SIMPLE, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
+            break;
+        case EFFECT_WATERFALL_COLORS:
+            led_effect_waterfall_init(state, WATERFALL_COLORS, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
+            break;
+        case EFFECT_PLASMA_WAVES:
+            led_effect_plasma_waves_init(state, random8_between(50, 255));
+            break;
+        case EFFECT_RAINBOW1:
+            led_effect_rainbow1_init(state, random8_to(2), random8_between(10, 50), random8_between(1, 50));
+            break;
+        default:
+            break;
+    }
+    esp_timer_start_periodic(timer, 1000000 / FPS);
 }
 
 void test(void *pvParameters)
 {
     // setup strip
-    ESP_ERROR_CHECK(led_strip_init(&strip));
+    led_strip_init(&strip);
     ESP_LOGI(TAG, "LED strip initialized");
 
-    // Setup effect
+    // Setup framebuffer
     led_effect_t effect;
-    ESP_ERROR_CHECK(led_effect_init(&effect, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, LED_EFFECT_RGB, render_frame));
-
-    // Init effect
-    //ESP_ERROR_CHECK(led_effect_noise1_init(&effect, 30, 8));
-    //ESP_ERROR_CHECK(led_effect_plasma_waves_init(&effect, 235));
-    //ESP_ERROR_CHECK(led_effect_rainbow1_init(&effect, RAINBOW1_HORIZONTAL, 150, 30));
-    //ESP_ERROR_CHECK(led_effect_waterfall_init(&effect, WATERFALL_FIRE, 150, 90, 80));
-    ESP_ERROR_CHECK(led_effect_dna_init(&effect, 30, 8, true));
-    ESP_LOGI(TAG, "Effect initialized");
+    led_effect_init(&effect, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, LED_EFFECT_RGB, render_frame);
 
     // setup timer
     esp_timer_create_args_t timer_args = {
@@ -90,15 +184,13 @@ void test(void *pvParameters)
         .callback = display_frame,
         .dispatch_method = ESP_TIMER_TASK
     };
-    esp_timer_handle_t timer;
-    ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer));
-    ESP_ERROR_CHECK(esp_timer_start_periodic(timer, 1000000 / FPS));
-    ESP_LOGI(TAG, "Frame timer started");
+    esp_timer_create(&timer_args, &timer);
 
     while (1)
     {
-        ESP_LOGI(TAG, "Total frames rendered: %d", effect.frame_num);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        switch_effect(&effect);
+        ESP_LOGI(TAG, "Switching to effect: %d", current_effect);
+        vTaskDelay(pdMS_TO_TICKS(SWITCH_PERIOD_MS));
     }
 }
 
