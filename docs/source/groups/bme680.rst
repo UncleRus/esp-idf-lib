@@ -342,4 +342,5 @@ set.
    ...
 
 .. doxygengroup:: bme680
+   :members:
 

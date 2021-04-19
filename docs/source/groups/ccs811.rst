@@ -469,4 +469,5 @@ whenever eCO2 value exceeds the thresholds (INT_THRESHOLD) defined by parameters
    ...
 
 .. doxygengroup:: ccs811
+   :members:
 

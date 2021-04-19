@@ -98,9 +98,13 @@ Known issues
 support it yet.
 
 .. doxygengroup:: led_strip_spi_esp32
+   :members:
 
 .. doxygengroup:: led_strip_spi_esp8266
+   :members:
 
 .. doxygengroup:: led_strip_spi
+   :members:
 
 .. doxygengroup:: led_strip_spi_sk9822
+   :members:

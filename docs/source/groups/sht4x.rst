@@ -4,4 +4,5 @@ sht4x - driver for Sensirion SHT40/SHT41 digital temperature and humidity sensor
 =================================================================================
 
 .. doxygengroup:: sht4x
+   :members:
 

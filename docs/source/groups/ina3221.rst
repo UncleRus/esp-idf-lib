@@ -4,4 +4,5 @@ ina3221 - Driver for INA3221 shunt and bus voltage monitor
 ==========================================================
 
 .. doxygengroup:: ina3221
+   :members:
 

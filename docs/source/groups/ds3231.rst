@@ -4,4 +4,5 @@ ds3231 - Driver for DS1337 RTC and DS3231 high precision RTC module
 ===================================================================
 
 .. doxygengroup:: ds3231
+   :members:
 

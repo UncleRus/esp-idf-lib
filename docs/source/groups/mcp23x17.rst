@@ -6,4 +6,5 @@ mcp23x17 - Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17
 .. warning:: This component does not support (yet) ESP8266 RTOS SDK!
 
 .. doxygengroup:: mcp23x17
+   :members:
 

@@ -4,4 +4,5 @@ tsl2591 - Driver for light-to-digital converter TSL2591
 =======================================================
 
 .. doxygengroup:: tsl2591
+   :members:
 
