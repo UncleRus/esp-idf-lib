@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "led_effect.h"
 
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
