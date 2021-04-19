@@ -9,6 +9,7 @@
 #include <led_effects/plasma_waves.h>
 #include <led_effects/rainbow1.h>
 #include <led_effects/waterfall.h>
+#include <led_effects/dna.h>
 
 static const char *TAG = "led_matrix";
 
@@ -59,7 +60,8 @@ static void display_frame(void *arg)
     //ESP_ERROR_CHECK(led_effect_noise1_run(state));
     //ESP_ERROR_CHECK(led_effect_plasma_waves_run(state));
     //ESP_ERROR_CHECK(led_effect_rainbow1_run(state));
-    ESP_ERROR_CHECK(led_effect_waterfall_run(state));
+    //ESP_ERROR_CHECK(led_effect_waterfall_run(state));
+    ESP_ERROR_CHECK(led_effect_dna_run(state));
     ESP_ERROR_CHECK(led_effect_render(state, &strip));
 }
 
@@ -77,7 +79,8 @@ void test(void *pvParameters)
     //ESP_ERROR_CHECK(led_effect_noise1_init(&effect, 30, 8));
     //ESP_ERROR_CHECK(led_effect_plasma_waves_init(&effect, 235));
     //ESP_ERROR_CHECK(led_effect_rainbow1_init(&effect, RAINBOW1_HORIZONTAL, 150, 30));
-    ESP_ERROR_CHECK(led_effect_waterfall_init(&effect, WATERFALL_FIRE, 150, 90, 80));
+    //ESP_ERROR_CHECK(led_effect_waterfall_init(&effect, WATERFALL_FIRE, 150, 90, 80));
+    ESP_ERROR_CHECK(led_effect_dna_init(&effect, 30, 8, true));
     ESP_LOGI(TAG, "Effect initialized");
 
     // setup timer
