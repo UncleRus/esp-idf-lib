@@ -36,7 +36,7 @@ static i2c_port_state_t states[I2C_NUM_MAX];
 #endif
 
 #if CONFIG_I2CDEV_NOLOCK
-#define SEMAPHORE_TAKE(port)
+#define SEMAPHORE_GIVE(port)
 #else
 #define SEMAPHORE_GIVE(port) do { \
         if (!xSemaphoreGive(states[port].lock)) \
