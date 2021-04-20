@@ -5,4 +5,13 @@ config I2CDEV_TIMEOUT
     default 1000
     range 100 5000
     
+config I2CDEV_NOLOCK
+	bool "Disable the use of mutexes"
+	default n
+	help
+		Attention! After enabling this option, all I2C device
+		drivers will become non-thread safe. 
+		Use this option if you need to access your I2C devices
+		from interrupt handlers. 
+    
 endmenu

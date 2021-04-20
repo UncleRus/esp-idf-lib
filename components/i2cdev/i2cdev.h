@@ -69,6 +69,8 @@ esp_err_t i2cdev_done();
 /**
  * @brief Create mutex for device descriptor
  *
+ * This function does nothing if option CONFIG_I2CDEV_NOLOCK is enabled.
+ *
  * @param dev Device descriptor
  * @return ESP_OK on success
  */
@@ -76,6 +78,8 @@ esp_err_t i2c_dev_create_mutex(i2c_dev_t *dev);
 
 /**
  * @brief Delete mutex for device descriptor
+ *
+ * This function does nothing if option CONFIG_I2CDEV_NOLOCK is enabled.
  *
  * @param dev Device descriptor
  * @return ESP_OK on success
@@ -85,6 +89,8 @@ esp_err_t i2c_dev_delete_mutex(i2c_dev_t *dev);
 /**
  * @brief Take device mutex
  *
+ * This function does nothing if option CONFIG_I2CDEV_NOLOCK is enabled.
+ *
  * @param dev Device descriptor
  * @return ESP_OK on success
  */
@@ -92,6 +98,8 @@ esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev);
 
 /**
  * @brief Give device mutex
+ *
+ * This function does nothing if option CONFIG_I2CDEV_NOLOCK is enabled.
  *
  * @param dev Device descriptor
  * @return ESP_OK on success

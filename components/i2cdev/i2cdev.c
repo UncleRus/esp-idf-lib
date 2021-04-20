@@ -23,6 +23,9 @@ typedef struct {
 
 static i2c_port_state_t states[I2C_NUM_MAX];
 
+#if CONFIG_I2CDEV_NOLOCK
+#define SEMAPHORE_TAKE(port)
+#else
 #define SEMAPHORE_TAKE(port) do { \
         if (!xSemaphoreTake(states[port].lock, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT))) \
         { \
@@ -30,7 +33,11 @@ static i2c_port_state_t states[I2C_NUM_MAX];
             return ESP_ERR_TIMEOUT; \
         } \
         } while (0)
+#endif
 
+#if CONFIG_I2CDEV_NOLOCK
+#define SEMAPHORE_TAKE(port)
+#else
 #define SEMAPHORE_GIVE(port) do { \
         if (!xSemaphoreGive(states[port].lock)) \
         { \
@@ -38,11 +45,13 @@ static i2c_port_state_t states[I2C_NUM_MAX];
             return ESP_FAIL; \
         } \
         } while (0)
+#endif
 
 esp_err_t i2cdev_init()
 {
     memset(states, 0, sizeof(states));
 
+#if !CONFIG_I2CDEV_NOLOCK
     for (int i = 0; i < I2C_NUM_MAX; i++)
     {
         states[i].lock = xSemaphoreCreateMutex();
@@ -52,6 +61,7 @@ esp_err_t i2cdev_init()
             return ESP_FAIL;
         }
     }
+#endif
 
     return ESP_OK;
 }
@@ -69,7 +79,9 @@ esp_err_t i2cdev_done()
             states[i].installed = false;
             SEMAPHORE_GIVE(i);
         }
+#if !CONFIG_I2CDEV_NOLOCK
         vSemaphoreDelete(states[i].lock);
+#endif
         states[i].lock = NULL;
     }
     return ESP_OK;
@@ -77,6 +89,7 @@ esp_err_t i2cdev_done()
 
 esp_err_t i2c_dev_create_mutex(i2c_dev_t *dev)
 {
+#if !CONFIG_I2CDEV_NOLOCK
     if (!dev) return ESP_ERR_INVALID_ARG;
 
     ESP_LOGV(TAG, "[0x%02x at %d] creating mutex", dev->addr, dev->port);
@@ -87,22 +100,26 @@ esp_err_t i2c_dev_create_mutex(i2c_dev_t *dev)
         ESP_LOGE(TAG, "[0x%02x at %d] Could not create device mutex", dev->addr, dev->port);
         return ESP_FAIL;
     }
+#endif
 
     return ESP_OK;
 }
 
 esp_err_t i2c_dev_delete_mutex(i2c_dev_t *dev)
 {
+#if !CONFIG_I2CDEV_NOLOCK
     if (!dev) return ESP_ERR_INVALID_ARG;
 
     ESP_LOGV(TAG, "[0x%02x at %d] deleting mutex", dev->addr, dev->port);
 
     vSemaphoreDelete(dev->mutex);
+#endif
     return ESP_OK;
 }
 
 esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev)
 {
+#if !CONFIG_I2CDEV_NOLOCK
     if (!dev) return ESP_ERR_INVALID_ARG;
 
     ESP_LOGV(TAG, "[0x%02x at %d] taking mutex", dev->addr, dev->port);
@@ -112,11 +129,13 @@ esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev)
         ESP_LOGE(TAG, "[0x%02x at %d] Could not take device mutex", dev->addr, dev->port);
         return ESP_ERR_TIMEOUT;
     }
+#endif
     return ESP_OK;
 }
 
 esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev)
 {
+#if !CONFIG_I2CDEV_NOLOCK
     if (!dev) return ESP_ERR_INVALID_ARG;
 
     ESP_LOGV(TAG, "[0x%02x at %d] giving mutex", dev->addr, dev->port);
@@ -126,6 +145,7 @@ esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev)
         ESP_LOGE(TAG, "[0x%02x at %d] Could not give device mutex", dev->addr, dev->port);
         return ESP_FAIL;
     }
+#endif
     return ESP_OK;
 }
 
