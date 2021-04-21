@@ -193,12 +193,18 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | *No*    | Yes
 | **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes     | Yes
 
+### Displays
+
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | Yes     | *No*
+| **ssd1306**    | Driver for SSD1306/SH1106 OLED displays                                 | MIT     | *I2C only* | *Yes*
+
 ### Other
 
 | Component      | Description                                                             | License | ESP8266 | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------|---------------
 | **ultrasonic** | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05              | BSD     | Yes     | *No*
-| **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | Yes     | *No*
 | **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes     | Yes
 | **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | *No*    | Yes
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes     | Yes

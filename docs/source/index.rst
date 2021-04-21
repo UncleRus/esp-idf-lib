@@ -195,12 +195,20 @@ Addressable LEDs
    groups/led_strip
    groups/led_strip_spi
 
+
+Displays
+========
+.. toctree::
+   :maxdepth: 1
+
+   groups/hd44780
+   groups/ssd1306
+
 Other
 =====
 .. toctree::
    :maxdepth: 1
 
-   groups/hd44780
    groups/max7219
    groups/pca9685
    groups/ultrasonic

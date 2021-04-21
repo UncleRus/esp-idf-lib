@@ -1,0 +1,10 @@
+.. _ssd1306:
+
+ssd1306 - Driver for OLED disaplys SSD1306/SH1106
+=================================================
+
+.. note:: Currently supported only I2C and 4-wire SPI interfaces
+
+.. doxygengroup:: ssd1306
+   :members:
+
