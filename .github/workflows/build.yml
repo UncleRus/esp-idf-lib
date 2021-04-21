@@ -2,12 +2,36 @@
 name: Build examples
 on:
   push:
-     branches:
-        - master
   pull_request:
      branches:
         - master
+
+  # include workflow_dispatch to enable manual trigger from Web UI.
+  workflow_dispatch:
 jobs:
+  pre_build:
+
+    # A job to see if the entrire jobs should be skipped. each job for a
+    # target should have:
+    #
+    # needs: pre_build
+    # if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.0
+        with:
+
+          # if the content does not change, skip.
+          concurrent_skipping: same_content
+
+          # if the change includes documentation changes only, skip.
+          paths_ignore: '["docs/**", "**/*.md"]'
+
+          # but do not skip if the triggered event is one of these.
+          do_not_skip: '["workflow_dispatch", "schedule"]'
 
   # XXX create multiple jobs for major versions
   #
@@ -23,6 +47,8 @@ jobs:
   # are many duplications. but no need to modify the entire build process to
   # adopt changes in master.
   build_esp32_v4_x:
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -229,6 +255,8 @@ jobs:
           done
   build_esp32_v3_x:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -376,6 +404,8 @@ jobs:
 
   build_esp8266:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -517,6 +547,8 @@ jobs:
 
   build_esp8266_v3_x:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -669,6 +701,8 @@ jobs:
   # additionally, esp32s2 build requires idf.py. make is not supported.
   build_esp32s2_v4_x:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
