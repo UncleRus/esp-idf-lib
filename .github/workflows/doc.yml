@@ -4,8 +4,24 @@ on:
   - push
 
 jobs:
+  pre_build:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.0
+        with:
+
+          # if the content does not change, skip.
+          concurrent_skipping: same_content
+
+          # but do not skip if the triggered event is one of these.
+          do_not_skip: '["workflow_dispatch", "schedule"]'
   docs:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
