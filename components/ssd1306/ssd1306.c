@@ -100,8 +100,6 @@ static esp_err_t spi_send(ssd1306_t *dev, uint32_t dc, const uint8_t *data, size
     trans.length = length * 8;
     trans.tx_buffer = data;
 
-    //ESP_LOGI(TAG, "len: %d, DATA: 0x%02x", trans.length, *(uint8_t *)trans.tx_buffer);
-
     gpio_set_level(dev->dc_gpio, dc);
 
     return spi_device_polling_transmit(dev->spi_dev, &trans);
@@ -355,18 +353,12 @@ esp_err_t ssd1306_set_charge_pump_enabled(ssd1306_t *dev, bool enabled)
 {
     CHECK_ARG(dev);
 
-    switch (dev->chip)
-    {
-        case SH1106_CHIP:
-            return send_cmd_arg(dev, SH1106_SET_CHARGE_PUMP,
-                    enabled ? SH1106_CHARGE_PUMP_EN : SH1106_CHARGE_PUMP_DIS);
-        case SSD1306_CHIP:
-            return send_cmd_arg(dev, SSD1306_SET_CHARGE_PUMP,
-                    enabled ? SSD1306_CHARGE_PUMP_EN : SSD1306_CHARGE_PUMP_DIS);
-        default:
-            ESP_LOGD(TAG, "Unsupported screen type");
-            return ESP_ERR_NOT_SUPPORTED;
-    }
+    if (dev->chip == SSD1306_CHIP)
+        return send_cmd_arg(dev, SSD1306_SET_CHARGE_PUMP,
+                enabled ? SSD1306_CHARGE_PUMP_EN : SSD1306_CHARGE_PUMP_DIS);
+    else
+        return send_cmd_arg(dev, SH1106_SET_CHARGE_PUMP,
+                enabled ? SH1106_CHARGE_PUMP_EN : SH1106_CHARGE_PUMP_DIS);
 }
 
 esp_err_t ssd1306_set_mem_addr_mode(ssd1306_t *dev, ssd1306_mem_addr_mode_t mode)

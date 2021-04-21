@@ -3,9 +3,9 @@
  * @defgroup ssd1306 ssd1306
  * @{
  *
- * ESP-IDF driver for SSD1306/SH1106 OLED displays.
+ * ESP-IDF driver for SSD1306/SH1106 OLED displays
  *
- * Ported from esp-open-rtos.
+ * Ported from esp-open-rtos
  *
  * Copyright (c) 2016, 2021 urx (https://github.com/urx),
  *                          Ruslan V. Uss (https://github.com/UncleRus)
@@ -105,9 +105,12 @@ typedef enum
     OLED_COLOR_INVERT = 2,       //!< Invert pixel (XOR)
 } ssd1306_color_t;
 
+/**
+ * Display mode
+ */
 typedef enum {
-    SSD1306_MODE_NORMAL = 0,
-    SSD1306_MODE_FILL,
+    SSD1306_MODE_NORMAL = 0, //!< Normal mode, default
+    SSD1306_MODE_FILL,       //!< Fill whole display with color
 } ssd1306_display_mode_t;
 
 #ifdef CONFIG_SSD1306_PROTOCOL_I2C

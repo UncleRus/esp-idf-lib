@@ -234,7 +234,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 - [Alex Stewart](https://github.com/astewart-consensus), developer of DS18B20 driver
 - [Richard A Burton](mailto:richardaburton@gmail.com), developer of DS3231 driver
 - [Bhuvanchandra DV](https://github.com/bhuvanchandra), developer of DS3231 driver
-- [Zaltora](https://github.com/Zaltora), developer of INA3231 driver
+- [Zaltora](https://github.com/Zaltora), developer of INA3231 and SSD1306 drivers
 - [Bernhard Guillon](https://gitlab.com/mrnice), developer of MS5611-01BA03 driver
 - [Pham Ngoc Thanh](https://github.com/panoti), developer of PCF8591 driver
 - [Lucio Tarantino](https://github.com/dianlight), developer of ADS111x driver
