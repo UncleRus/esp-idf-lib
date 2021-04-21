@@ -13,7 +13,11 @@ static const char *TAG = "ssd1306_spi4_example";
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 64
 
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
+#define HOST VSPI_HOST
+#else
 #define HOST SPI3_HOST
+#endif
 #define MOSI_GPIO 23
 #define CLK_GPIO  18
 #define CS_GPIO   16
