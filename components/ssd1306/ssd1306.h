@@ -86,6 +86,8 @@ typedef struct
     uint8_t *fb;                 //!< Framebuffer
 } ssd1306_t;
 
+#define SSD1306_FRAMEBUF_SIZE(dev) ((size_t)((dev)->width) * (dev)->height / 8)
+
 /**
  * Addressing mode, see datasheet
  */

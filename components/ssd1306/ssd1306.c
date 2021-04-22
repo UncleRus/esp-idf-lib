@@ -92,8 +92,6 @@ static const char *TAG = "ssd1306";
 #define SPI_CHECK(dev, x) do { esp_err_t __; if ((__ = x) != ESP_OK) { spi_device_release_bus(dev); return __; }} while (0)
 #endif
 
-#define FRAMEBUF_SIZE(dev) ((dev)->width * (dev)->height / 8)
-
 #if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
 static esp_err_t spi_send(ssd1306_t *dev, uint32_t dc, const uint8_t *data, size_t length)
 {
@@ -265,15 +263,22 @@ esp_err_t ssd1306_init(ssd1306_t *dev)
 {
     CHECK_ARG(dev && (dev->chip == SSD1306_CHIP || dev->chip == SH1106_CHIP));
 
-    uint8_t pin_cfg;
+    uint8_t pin_cfg, mux_ratio;
     switch (dev->height)
     {
         case 16:
         case 32:
             pin_cfg = 0x02;
+            mux_ratio = dev->height - 1;
             break;
+        case 48:
         case 64:
             pin_cfg = 0x12;
+            mux_ratio = dev->height - 1;
+            break;
+        case 128:
+            pin_cfg = 0x12;
+            mux_ratio = 63;
             break;
         default:
             ESP_LOGE(TAG, "Unsupported screen height: %d", dev->height);
@@ -281,7 +286,7 @@ esp_err_t ssd1306_init(ssd1306_t *dev)
     }
 
     // allocate framebuffer memory
-    dev->fb = calloc(1, FRAMEBUF_SIZE(dev));
+    dev->fb = calloc(1, SSD1306_FRAMEBUF_SIZE(dev));
     if (!dev->fb)
         return ESP_ERR_NO_MEM;
 
@@ -290,7 +295,7 @@ esp_err_t ssd1306_init(ssd1306_t *dev)
     CHECK(ssd1306_set_charge_pump_enabled(dev, true));
     if (dev->chip == SH1106_CHIP)
         CHECK(sh1106_set_charge_pump_voltage(dev, SH1106_VOLTAGE_74));
-    CHECK(ssd1306_set_mux_ratio(dev, dev->height - 1));
+    CHECK(ssd1306_set_mux_ratio(dev, mux_ratio));
     CHECK(ssd1306_set_display_offset(dev, 0x0));
     CHECK(ssd1306_set_display_start_line(dev, 0x0));
     if (dev->chip == SSD1306_CHIP)
@@ -321,7 +326,7 @@ esp_err_t ssd1306_flush(ssd1306_t *dev)
 {
     CHECK_ARG(dev && dev->fb);
 
-    size_t len = FRAMEBUF_SIZE(dev);
+    size_t len = SSD1306_FRAMEBUF_SIZE(dev);
     if (dev->chip == SSD1306_CHIP)
     {
         ssd1306_set_column_addr(dev, 0, dev->width - 1);
@@ -330,12 +335,14 @@ esp_err_t ssd1306_flush(ssd1306_t *dev)
 
 #if CONFIG_SSD1306_PROTOCOL_I2C
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    for (size_t i = 0; i < len; i += 16)
-    {
-        if (dev->chip == SH1106_CHIP && i % dev->width == 0)
-            I2C_DEV_CHECK(&dev->i2c_dev, sh1106_go_coordinate(dev, 0, i / dev->width));
-        I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_DATA, dev->fb + i, 16));
-    }
+    if (dev->chip == SSD1306_CHIP)
+        I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_DATA, dev->fb, len));
+    else
+        for (size_t i = 0; i < len / dev->width; i++)
+        {
+            I2C_DEV_CHECK(&dev->i2c_dev, sh1106_go_coordinate(dev, 0, i));
+            I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_DATA, dev->fb + i * dev->width, dev->width));
+        }
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 #endif
 #if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
@@ -678,7 +685,7 @@ esp_err_t ssd1306_clear(ssd1306_t *dev)
 {
     CHECK_ARG(dev && dev->fb);
 
-    memset(dev->fb, 0, FRAMEBUF_SIZE(dev));
+    memset(dev->fb, 0, SSD1306_FRAMEBUF_SIZE(dev));
 
     return ESP_OK;
 }

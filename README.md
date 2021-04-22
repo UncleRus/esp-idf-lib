@@ -198,7 +198,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | Component      | Description                                                             | License | ESP8266 | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------|---------------
 | **hd44780**    | Universal driver for HD44780 LCD display                                | BSD     | Yes     | *No*
-| **ssd1306**    | Driver for SSD1306/SH1106 OLED displays                                 | MIT     | *I2C only* | *Yes*
+| **ssd1306**    | Driver for SSD1306/SSD1309/SH1106 OLED displays                         | MIT     | *I2C only* | *Yes*
 
 ### Other
 
