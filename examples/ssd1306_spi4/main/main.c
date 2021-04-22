@@ -6,7 +6,6 @@
 #include <ssd1306.h>
 #include <driver/spi_master.h>
 #include "image.xbm"
-#include "sdkconfig.h"
 
 static const char *TAG = "ssd1306_spi4_example";
 
@@ -50,12 +49,18 @@ static void task(void *arg)
 
     ESP_ERROR_CHECK(ssd1306_init(&display));
 
+    //ssd1306_set_scan_direction_fwd(&display, false);
+    //ssd1306_set_mem_addr_mode(&display, SSD1306_ADDR_MODE_PAGE);
+    //ssd1306_set_com_lr_remap(&display, false);
+    //ssd1306_set_com_pin_hw_config(&display, 0x32);
+
     ssd1306_clear(&display);
     ssd1306_load_xbm(&display, image_bits);
+//    for (size_t i = 0; i < 10; i++)
+//        ssd1306_set_pixel(&display, i, i, OLED_COLOR_WHITE);
 
     // send frambuffer to display
     ssd1306_flush(&display);
-
 
     while (1)
     {

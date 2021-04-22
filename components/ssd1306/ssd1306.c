@@ -88,10 +88,13 @@ static const char *TAG = "ssd1306";
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
+#define SPI_CHECK(dev, x) do { esp_err_t __; if ((__ = x) != ESP_OK) { spi_device_release_bus(dev); return __; }} while (0)
+#endif
 
 #define FRAMEBUF_SIZE(dev) ((dev)->width * (dev)->height / 8)
 
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
 static esp_err_t spi_send(ssd1306_t *dev, uint32_t dc, const uint8_t *data, size_t length)
 {
     spi_transaction_t trans;
@@ -100,7 +103,12 @@ static esp_err_t spi_send(ssd1306_t *dev, uint32_t dc, const uint8_t *data, size
     trans.length = length * 8;
     trans.tx_buffer = data;
 
+#if CONFIG_SSD1306_PROTOCOL_SPI3
+    trans.cmd = dc & 1;
+#endif
+#if CONFIG_SSD1306_PROTOCOL_SPI4
     gpio_set_level(dev->dc_gpio, dc);
+#endif
 
     return spi_device_polling_transmit(dev->spi_dev, &trans);
 }
@@ -109,13 +117,15 @@ static esp_err_t spi_send(ssd1306_t *dev, uint32_t dc, const uint8_t *data, size
 static esp_err_t send_cmd(ssd1306_t *dev, uint8_t cmd)
 {
     ESP_LOGD(TAG, "Command: 0x%02x", cmd);
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, &cmd, 1));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
+    CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
     CHECK(spi_send(dev, SPI_CMD, &cmd, 1));
+    spi_device_release_bus(dev->spi_dev);
 #endif
     return ESP_OK;
 }
@@ -123,15 +133,17 @@ static esp_err_t send_cmd(ssd1306_t *dev, uint8_t cmd)
 static esp_err_t send_cmd_arg(ssd1306_t *dev, uint8_t cmd, uint8_t arg)
 {
     ESP_LOGD(TAG, "Command: 0x%02x, arg: 0x%02x", cmd, arg);
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, &cmd, 1));
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, &arg, 1));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
+    CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
     CHECK(spi_send(dev, SPI_CMD, &cmd, 1));
     CHECK(spi_send(dev, SPI_CMD, &arg, 1));
+    spi_device_release_bus(dev->spi_dev);
 #endif
     return ESP_OK;
 }
@@ -139,17 +151,19 @@ static esp_err_t send_cmd_arg(ssd1306_t *dev, uint8_t cmd, uint8_t arg)
 static esp_err_t send_cmd_arg2(ssd1306_t *dev, uint8_t cmd, uint8_t arg1, uint8_t arg2)
 {
     ESP_LOGD(TAG, "Command: 0x%02x, args: 0x%02x, 0x%02x", cmd, arg1, arg2);
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, &cmd, 1));
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, &arg1, 1));
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, &arg2, 1));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
+    CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
     CHECK(spi_send(dev, SPI_CMD, &cmd, 1));
     CHECK(spi_send(dev, SPI_CMD, &arg1, 1));
     CHECK(spi_send(dev, SPI_CMD, &arg2, 1));
+    spi_device_release_bus(dev->spi_dev);
 #endif
     return ESP_OK;
 }
@@ -164,12 +178,12 @@ static int sh1106_go_coordinate(ssd1306_t *dev, uint8_t x, uint8_t y)
             SH1106_SET_HIGH_COL_ADDR | (x >> 4)  // Set higher column address
     };
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     CHECK(i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, cmd, 1));
     CHECK(i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, cmd + 1, 1));
     CHECK(i2c_dev_write_reg(&dev->i2c_dev, I2C_CMD, cmd + 2, 1));
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
     CHECK(spi_send(dev, SPI_CMD, cmd, 1));
     CHECK(spi_send(dev, SPI_CMD, cmd + 1, 1));
     CHECK(spi_send(dev, SPI_CMD, cmd + 2, 1));
@@ -180,7 +194,7 @@ static int sh1106_go_coordinate(ssd1306_t *dev, uint8_t x, uint8_t y)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
 esp_err_t ssd1306_init_desc(ssd1306_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev && (addr == SSD1306_I2C_ADDR0 || addr == SSD1306_I2C_ADDR1));
@@ -197,7 +211,7 @@ esp_err_t ssd1306_init_desc(ssd1306_t *dev, i2c_port_t port, uint8_t addr, gpio_
 }
 #endif
 
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4
 esp_err_t ssd1306_init_desc(ssd1306_t *dev, spi_host_device_t host, gpio_num_t cs_gpio, gpio_num_t dc_gpio)
 {
     CHECK_ARG(dev);
@@ -216,14 +230,31 @@ esp_err_t ssd1306_init_desc(ssd1306_t *dev, spi_host_device_t host, gpio_num_t c
 }
 #endif
 
+#if CONFIG_SSD1306_PROTOCOL_SPI3
+esp_err_t ssd1306_init_desc(ssd1306_t *dev, spi_host_device_t host, gpio_num_t cs_gpio)
+{
+    CHECK_ARG(dev);
+
+    memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
+    dev->spi_cfg.spics_io_num = cs_gpio;
+    dev->spi_cfg.clock_speed_hz = SPI_FREQ_HZ;
+    dev->spi_cfg.mode = 0;
+    dev->spi_cfg.queue_size = 1;
+    dev->spi_cfg.command_bits = 1;
+    dev->spi_cfg.flags = SPI_DEVICE_NO_DUMMY;
+
+    return spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
+}
+#endif
+
 esp_err_t ssd1306_free_desc(ssd1306_t *dev)
 {
     CHECK_ARG(dev);
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     return i2c_dev_delete_mutex(&dev->i2c_dev);
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
     return spi_bus_remove_device(dev->spi_dev);
 #endif
 }
@@ -297,7 +328,7 @@ esp_err_t ssd1306_flush(ssd1306_t *dev)
         ssd1306_set_page_addr(dev, 0, dev->height / 8 - 1);
     }
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     for (size_t i = 0; i < len; i += 16)
     {
@@ -307,15 +338,17 @@ esp_err_t ssd1306_flush(ssd1306_t *dev)
     }
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
+    CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
     if (dev->chip == SSD1306_CHIP)
-        CHECK(spi_send(dev, SPI_DATA, dev->fb, len));
+        SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_DATA, dev->fb, len));
     else
         for (size_t i = 0; i < dev->height / 8; i++)
         {
-            CHECK(sh1106_go_coordinate(dev, 0, i));
-            CHECK(spi_send(dev, SPI_DATA, dev->fb + dev->width * i, dev->width));
+            SPI_CHECK(dev->spi_dev, sh1106_go_coordinate(dev, 0, i));
+            SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_DATA, dev->fb + dev->width * i, dev->width));
         }
+    spi_device_release_bus(dev->spi_dev);
 #endif
 
     return ESP_OK;

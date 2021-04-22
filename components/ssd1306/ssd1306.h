@@ -21,14 +21,14 @@
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>
 
-#if HELPER_TARGET_IS_ESP8266 && defined(CONFIG_SSD1306_PROTOCOL_SPI4)
+#if HELPER_TARGET_IS_ESP8266 && (CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3)
 #error ssd1306 driver on ESP8266 only supports I2C protocol
 #endif
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
 #include <i2cdev.h>
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
 #include <driver/gpio.h>
 #include <driver/spi_master.h>
 #endif
@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
 /**
  * I2C addresses
  */
@@ -71,12 +71,14 @@ typedef enum
 typedef struct
 {
     ssd1306_chip_t chip;
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
     i2c_dev_t i2c_dev;
 #endif
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
     spi_device_interface_config_t spi_cfg;
     spi_device_handle_t spi_dev;
+#endif
+#if CONFIG_SSD1306_PROTOCOL_SPI4
     gpio_num_t dc_gpio;
 #endif
     uint8_t width;               //!< Screen width, currently supported 128px, 96px
@@ -113,7 +115,7 @@ typedef enum {
     SSD1306_MODE_FILL,       //!< Fill whole display with color
 } ssd1306_display_mode_t;
 
-#ifdef CONFIG_SSD1306_PROTOCOL_I2C
+#if CONFIG_SSD1306_PROTOCOL_I2C
 /**
  * @brief Initialize I2C device descriptor
  *
@@ -129,7 +131,21 @@ typedef enum {
 esp_err_t ssd1306_init_desc(ssd1306_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 #endif
 
-#ifdef CONFIG_SSD1306_PROTOCOL_SPI4
+#if CONFIG_SSD1306_PROTOCOL_SPI3
+/**
+ * @brief Initialize SPI 3-wires device descriptor
+ *
+ * SPI clock frequency is 8MHz
+ *
+ * @param dev Pointer device descriptor
+ * @param host SPI host (SPI2_HOST/SPI3_HOST)
+ * @param cs_gpio CS GPIO
+ * @return ESP_OK on success
+ */
+esp_err_t ssd1306_init_desc(ssd1306_t *dev, spi_host_device_t host, gpio_num_t cs_gpio);
+#endif
+
+#if CONFIG_SSD1306_PROTOCOL_SPI4
 /**
  * @brief Initialize SPI 4-wires device descriptor
  *
@@ -321,7 +337,7 @@ esp_err_t ssd1306_set_mux_ratio(ssd1306_t *dev, uint8_t ratio);
  * This command also sets the column address pointer to column start
  * address. This pointer is used to define the current read/write column
  * address in graphic display data RAM. If horizontal address increment mode
- * is enabled by ssd1306_set_mem_addr_mode(), after finishing read/write
+ * is enabled by ::ssd1306_set_mem_addr_mode(), after finishing read/write
  * one column data, it is incremented automatically to the next column
  * address. Whenever the column address pointer finishes accessing the
  * end column address, it is reset back to start column address and the

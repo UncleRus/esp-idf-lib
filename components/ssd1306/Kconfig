@@ -7,6 +7,9 @@ menu "SSD1306 display driver"
         config SSD1306_PROTOCOL_I2C
             bool "I2C"
 
+        config SSD1306_PROTOCOL_SPI3
+            bool "3-wire SPI"
+
         config SSD1306_PROTOCOL_SPI4
             bool "4-wire SPI (SPI + D/C)"
     endchoice
