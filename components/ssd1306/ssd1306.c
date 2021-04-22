@@ -124,7 +124,7 @@ static esp_err_t send_cmd(ssd1306_t *dev, uint8_t cmd)
 #endif
 #if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
     CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
-    CHECK(spi_send(dev, SPI_CMD, &cmd, 1));
+    SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_CMD, &cmd, 1));
     spi_device_release_bus(dev->spi_dev);
 #endif
     return ESP_OK;
@@ -141,8 +141,8 @@ static esp_err_t send_cmd_arg(ssd1306_t *dev, uint8_t cmd, uint8_t arg)
 #endif
 #if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
     CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
-    CHECK(spi_send(dev, SPI_CMD, &cmd, 1));
-    CHECK(spi_send(dev, SPI_CMD, &arg, 1));
+    SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_CMD, &cmd, 1));
+    SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_CMD, &arg, 1));
     spi_device_release_bus(dev->spi_dev);
 #endif
     return ESP_OK;
@@ -160,9 +160,9 @@ static esp_err_t send_cmd_arg2(ssd1306_t *dev, uint8_t cmd, uint8_t arg1, uint8_
 #endif
 #if CONFIG_SSD1306_PROTOCOL_SPI4 || CONFIG_SSD1306_PROTOCOL_SPI3
     CHECK(spi_device_acquire_bus(dev->spi_dev, portMAX_DELAY));
-    CHECK(spi_send(dev, SPI_CMD, &cmd, 1));
-    CHECK(spi_send(dev, SPI_CMD, &arg1, 1));
-    CHECK(spi_send(dev, SPI_CMD, &arg2, 1));
+    SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_CMD, &cmd, 1));
+    SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_CMD, &arg1, 1));
+    SPI_CHECK(dev->spi_dev, spi_send(dev, SPI_CMD, &arg2, 1));
     spi_device_release_bus(dev->spi_dev);
 #endif
     return ESP_OK;
