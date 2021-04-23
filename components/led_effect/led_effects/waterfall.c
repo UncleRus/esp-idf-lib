@@ -56,11 +56,11 @@ esp_err_t led_effect_waterfall_init(led_effect_t *state, led_effect_waterfall_mo
 
 esp_err_t led_effect_waterfall_done(led_effect_t *state)
 {
-    CHECK_ARG(state && state->internal);
+    CHECK_ARG(state);
     params_t *params = (params_t *)state->internal;
 
     // free map
-    if (params->map)
+    if (params && params->map)
         free(params->map);
 
     // free internal storage

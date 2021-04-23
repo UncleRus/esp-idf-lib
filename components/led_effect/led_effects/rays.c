@@ -57,21 +57,10 @@ esp_err_t led_effect_rays_set_params(led_effect_t *state, uint8_t speed, uint8_t
 
     params_t *params = (params_t *)state->internal;
     params->speed = speed;
-    params->min_rays = min_rays;
+    params->min_rays = params->num_rays = min_rays;
     params->max_rays = max_rays;
 
     return ESP_OK;
-}
-
-static void fade(led_effect_t *state, uint8_t scale)
-{
-    for (size_t y = 0; y < state->height; y++)
-        for (size_t x = 0; x < state->width; x++)
-        {
-            rgb_t c;
-            led_effect_get_pixel_rgb(state, x, y, &c);
-            led_effect_set_pixel_rgb(state, x, y, rgb_scale(c, scale));
-        }
 }
 
 static void line(led_effect_t *state, uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, rgb_t color)
@@ -104,24 +93,20 @@ esp_err_t led_effect_rays_run(led_effect_t *state)
     params_t *params = (params_t *)state->internal;
 
     // change number of rays
-    if (params->max_rays > params->min_rays && state->frame_num % 10)
+    if (params->max_rays > params->min_rays && !(state->frame_num % 10))
     {
-        if (random8(2))
-        {
+        if (random8_to(2))
             params->num_rays++;
-            if (params->num_rays > params->max_rays)
-                params->num_rays = params->max_rays;
-        }
         else
-        {
             params->num_rays--;
-            if (params->num_rays < params->min_rays)
-                params->num_rays = params->min_rays;
-        }
+        if (params->num_rays < params->min_rays)
+            params->num_rays = params->min_rays;
+        if (params->num_rays > params->max_rays)
+            params->num_rays = params->max_rays;
     }
 
-    params->hue++;
-    fade(state, 40);
+    params->hue += 5;
+    led_effect_fade(state, 40);
     for (uint8_t i = 0; i < params->num_rays; i++)
     {
         uint8_t x1 = beatsin8(4 + params->speed, 0, (state->width - 1), 0, 0);
@@ -131,7 +116,7 @@ esp_err_t led_effect_rays_run(led_effect_t *state)
 
         line(state, x1, x2, y1, y2, hsv2rgb_rainbow(hsv_from_values(i * 255 / params->num_rays + params->hue, 255, 255)));
     }
-    blur2d((rgb_t *)state->frame_buf, state->width, state->height, 8, xy, state);
+    blur2d(state->frame_buf, state->width, state->height, 8, xy, state);
 
     return led_effect_end_frame(state);
 }

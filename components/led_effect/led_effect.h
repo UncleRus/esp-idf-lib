@@ -20,10 +20,20 @@
 extern "C" {
 #endif
 
-#define LED_EFFECT_FRAMEBUF_OFFS(state, x, y) (((state)->width * (y) + (x)) * sizeof(rgb_t))
+#define LED_EFFECT_FRAMEBUF_OFFS(state, x, y) ((state)->width * (y) + (x))
+
+typedef enum {
+    SHIFT_LEFT  = 0,
+    SHIFT_RIGHT,
+    SHIFT_UP,
+    SHIFT_DOWN
+} led_effect_shift_direction_t;
 
 typedef struct led_effect_s led_effect_t;
 
+/**
+ * Renderer callback prototype
+ */
 typedef esp_err_t (*led_effect_render_cb_t)(led_effect_t *state, void *arg);
 
 /**
@@ -31,7 +41,7 @@ typedef esp_err_t (*led_effect_render_cb_t)(led_effect_t *state, void *arg);
  */
 struct led_effect_s
 {
-    uint8_t *frame_buf;
+    rgb_t *frame_buf;
     size_t width;
     size_t height;
     size_t frame_num;
@@ -61,6 +71,22 @@ esp_err_t led_effect_init(led_effect_t *state, size_t width, size_t height, led_
  * @return          ESP_OK on success
  */
 esp_err_t led_effect_free(led_effect_t *state);
+
+/**
+ * @brief Render frambuffer to actual display or LED strip
+ *
+ * Rendering is performed by calling the callback function with passing
+ * it as arguments \p state and \p render_ctx
+ *
+ * @param state      Effect state
+ * @param render_ctx Argument to pass to callback
+ * @return           ESP_OK on success
+ */
+esp_err_t led_effect_render_frame(led_effect_t *state, void *render_ctx);
+
+/**
+ * @name Functions to use in effects
+ */
 
 /**
  * @brief Set RGB color of framebuffer pixel
@@ -123,6 +149,27 @@ esp_err_t led_effect_get_pixel_hsv(led_effect_t *state, size_t x, size_t y, hsv_
 esp_err_t led_effect_clear(led_effect_t *state);
 
 /**
+ * @brief Shift framebuffer
+ *
+ * @param state     Effect state
+ * @param offs      Shift size
+ * @param dir       Shift direction
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_shift(led_effect_t *state, size_t offs, led_effect_shift_direction_t dir);
+
+/**
+ * @brief Fade pixels to black
+ *
+ * rgb_fade(pixel, scale) for all pixels in framebuffer
+ *
+ * @param state     Effect state
+ * @param scale     Amount of scaling
+ * @return          ESP_OK on success
+ */
+esp_err_t led_effect_fade(led_effect_t *state, uint8_t scale);
+
+/**
  * @brief Start frame rendering
  *
  * This function must be called in effects at the beginning of rendering frame
@@ -142,18 +189,6 @@ esp_err_t led_effect_begin_frame(led_effect_t *state);
  */
 esp_err_t led_effect_end_frame(led_effect_t *state);
 
-/**
- * @brief Render frambuffer to actual display or LED strip
- *
- * Rendering is performed by calling the callback function with passing
- * it as arguments state and arg
- *
- * @param state     Effect state
- * @param arg       Argument to pass to callback
- * @return          ESP_OK on success
- */
-esp_err_t led_effect_render(led_effect_t *state, void *arg);
-
 #ifdef __cplusplus
 }
 #endif
@@ -161,6 +196,6 @@ esp_err_t led_effect_render(led_effect_t *state, void *arg);
 /**
  * @defgroup effects
  * @}
- * */
+ **/
 
 #endif /* __LED_EFFECT_H__ */

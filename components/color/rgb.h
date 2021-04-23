@@ -163,6 +163,12 @@ static inline rgb_t rgb_fade_light(rgb_t a, uint8_t fade_factor)
     return rgb_scale_video(a, 255 - fade_factor);
 }
 
+/// rgb_fade_light is a synonym for ::rgb_scale(..., 255 - fade_factor)
+static inline rgb_t rgb_fade(rgb_t a, uint8_t fade_factor)
+{
+    return rgb_scale(a, 255 - fade_factor);
+}
+
 /// Invert each channel of RGB color
 static inline rgb_t rgb_invert(rgb_t a)
 {

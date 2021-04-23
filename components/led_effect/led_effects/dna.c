@@ -97,13 +97,7 @@ esp_err_t led_effect_dna_run(led_effect_t *state)
 
     params->offset += params->speed / 10;
 
-    for (size_t y = 0; y < state->height; y++)
-        for (size_t x = 0; x < state->width; x++)
-        {
-            rgb_t c;
-            led_effect_get_pixel_rgb(state, x, y, &c);
-            led_effect_set_pixel_rgb(state, x, y, rgb_scale(c, 120));
-        }
+    led_effect_fade(state, 130);
 
     for (uint8_t i = 0; i < state->height; i++)
     {
