@@ -36,7 +36,7 @@ typedef enum
 } led_strip_type_t;
 
 /**
- * @struct LED strip descriptor
+ * LED strip descriptor
  */
 typedef struct
 {

@@ -1,10 +1,11 @@
 /**
  * @file crazybees.h
  *
- * @ingroup effects
+ * @defgroup led_effect_crazybees led_effect_crazybees
  * @{
  *
  * Crazy Bees effect
+ *
  * Author: stepko
  */
 #ifndef __LED_EFFECTS_CRAZYBEES_H__

@@ -1,18 +1,18 @@
 /**
  * @file rays.h
  *
- * @ingroup effects
+ * @defgroup led_effect_rays led_effect_rays
  * @{
  *
  * Colored rays effect, based on Yaroslaw Turbin code (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
  * https://editor.soulmatelights.com/gallery/819-colored-bursts
+ *
  * Max supported framebuffer size 256x256
- * Supported RGB framebuffer only
  *
  * Parameters:
- *   speed    - Speed of rays movement, 0 - 50
- *   min_rays - Minimal rays count, 1 - 10
- *   max_rays - Maximal rays count, 10 - 20
+ *   - speed:    Speed of rays movement, 0 - 50
+ *   - min_rays: Minimal rays count, 1 - 10
+ *   - max_rays: Maximal rays count, 10 - 20
  */
 #ifndef __LED_EFFECTS_RAYS_H__
 #define __LED_EFFECTS_RAYS_H__

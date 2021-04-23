@@ -1,10 +1,11 @@
 /**
  * @file noise1.h
  *
- * @ingroup effects
+ * @defgroup led_effect_noise1 led_effect_noise1
  * @{
  *
  * Perlin noise effect
+ *
  * Author: Chuck Sommerville
  */
 #ifndef __LED_EFFECTS_NOISE1_H__

@@ -1,16 +1,17 @@
 /**
  * @file dna.h
  *
- * @ingroup effects
+ * @defgroup led_effect_dna led_effect_dna
  * @{
  *
  * DNA spiral effect, based on Yaroslaw Turbin code (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ *
  * Max effect framebuffer size 256x256
  *
  * Parameters:
- *   speed  - Speed of rotation, 10 - 100
- *   size   - Spiral size, 1 - 10
- *   border - Add white border
+ *   - speed:  Speed of rotation, 10 - 100
+ *   - size:   Spiral size, 1 - 10
+ *   - border: Add white border
  */
 #ifndef __LED_EFFECTS_DNA_H__
 #define __LED_EFFECTS_DNA_H__

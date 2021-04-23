@@ -1,10 +1,11 @@
 /**
  * @file plasma_waves.h
  *
- * @ingroup effects
+ * @defgroup led_effect_plasma_waves led_effect_plasma_waves
  * @{
  *
- * Plasma waves effect.
+ * Plasma waves effect
+ *
  * Author: Edmund "Skorn" Horn
  */
 #ifndef __LED_EFFECTS_PLASMA_WAVES_H__

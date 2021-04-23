@@ -41,14 +41,14 @@ typedef esp_err_t (*led_effect_render_cb_t)(led_effect_t *state, void *arg);
  */
 struct led_effect_s
 {
-    rgb_t *frame_buf;
-    size_t width;
-    size_t height;
-    size_t frame_num;
-    uint64_t last_frame_us;
-    volatile bool busy;
-    led_effect_render_cb_t render; ///< See ::led_effect_render()
-    uint8_t *internal;  // for effect settings, internal vars, palettes and so on
+    rgb_t *frame_buf;              ///< RGB framebuffer
+    size_t width;                  ///< Framebuffer width
+    size_t height;                 ///< Framebuffer height
+    size_t frame_num;              ///< Number of rendered frames
+    uint64_t last_frame_us;        ///< Time of last rendered frame since boot in microseconds
+    volatile bool busy;            ///< true if rendering
+    led_effect_render_cb_t render; ///< See ::led_effect_render_frame()
+    uint8_t *internal;             ///< Buffer for effect settings, internal vars, palettes and so on
 };
 
 /**
@@ -57,7 +57,6 @@ struct led_effect_s
  * @param state     Effect state
  * @param width     Frame width in pixels
  * @param height    Frame height in pixels
- * @param buf_type  Color type of frame buffer
  * @param render_cb Renderer callback function
  *
  * @return          ESP_OK on success
@@ -193,9 +192,6 @@ esp_err_t led_effect_end_frame(led_effect_t *state);
 }
 #endif
 
-/**
- * @defgroup effects
- * @}
- **/
+/**@}*/
 
 #endif /* __LED_EFFECT_H__ */

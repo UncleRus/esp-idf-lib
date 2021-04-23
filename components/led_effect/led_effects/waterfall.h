@@ -1,20 +1,16 @@
 /**
  * @file waterfall.h
  *
- * @ingroup effects
+ * @defgroup led_effect_waterfall led_effect_waterfall
  * @{
  *
  * Waterfall/Fire effect
  *
  * Parameters:
- *     hue       Basic hue for waterfall palette.
- *               Ignored when mode = WATERFALL_FIRE
- *     cooling   How much does the air cool as it rises.
- *               Less cooling = taller flames.
- *               More cooling = shorter flames.
- *               Suggested range 20-100.
- *     sparking  Chance (out of 255) that a new spark will light up.
- *               Suggested range 50-200.
+ *     - hue:      Basic hue for waterfall palette. Ignored when mode = WATERFALL_FIRE
+ *     - cooling:  How much does the air cool as it rises. Less cooling = taller flames,
+ *                 more cooling = shorter flames. Suggested range 20-100.
+ *     - sparking: Chance (out of 255) that a new spark will light up. Suggested range 50-200.
  *
  * Recommended parameters for fire mode: cooling = 90, sparking = 80
  */

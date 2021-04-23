@@ -1,9 +1,9 @@
 /**
  * @file led_effect.h
- * @ingroup led_effect
+ * @defgroup led_effect_animation led_effect_animation
  * @{
  *
- * Simple abstraction of effects on an addressable LED matrix for ESP-IDF
+ * Animation of LED effects
  *
  * Copyright (C) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -36,7 +36,8 @@ typedef struct
 /**
  * @brief Create animation based on LED effect
  *
- * @param animation Pointer to animation descriptor
+ * @param animation    Pointer to animation descriptor
+ * @param state        Pointer to LED effect descriptor
  * @return ESP_OK on success
  */
 esp_err_t led_effect_animation_init(led_effect_animation_t *animation, led_effect_t *state);
@@ -56,7 +57,7 @@ esp_err_t led_effect_animation_play(led_effect_animation_t *animation, uint8_t f
 /**
  * @brief Stop animation playing
  *
- * @param animation Pointer to animation descriptor
+ * @param animation    Pointer to animation descriptor
  * @return ESP_OK on success
  */
 esp_err_t led_effect_animation_stop(led_effect_animation_t *animation);
@@ -64,7 +65,7 @@ esp_err_t led_effect_animation_stop(led_effect_animation_t *animation);
 /**
  * @brief Create animation based on LED effect
  *
- * @param animation Pointer to animation descriptor
+ * @param animation    Pointer to animation descriptor
  * @return ESP_OK on success
  */
 esp_err_t led_effect_animation_free(led_effect_animation_t *animation);

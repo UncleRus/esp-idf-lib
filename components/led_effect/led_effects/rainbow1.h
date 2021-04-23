@@ -1,16 +1,14 @@
 /**
  * @file rainbow1.h
  *
- * @ingroup effects
+ * @defgroup led_effect_rainbow1 led_effect_rainbow1
  * @{
  *
  * Simple rainbow effect
  *
  * Parameters:
- *     scale  Density of rainbows
- *            Suggested range 10-50.
- *     speed  Speed with which the rainbow shimmers
- *            Suggested range 1-50.
+ *     - scale:  Density of rainbows. Suggested range 10-50.
+ *     - speed:  Speed with which the rainbow shimmers. Suggested range 1-50.
  */
 #ifndef __LED_EFFECTS_RAINBOW1_H__
 #define __LED_EFFECTS_RAINBOW1_H__

@@ -5,9 +5,33 @@ led_effect - LED effects library
 
 .. doxygengroup:: led_effect
    :members:
-   :inner:
+   
+Animation
+---------
 
-.. doxygengroup:: effects
-   :inner:
+.. doxygengroup:: led_effect_animation
    :members:
 
+LED effects
+-----------
+
+.. doxygengroup:: led_effect_crazybees
+   :members:
+
+.. doxygengroup:: led_effect_dna
+   :members:
+
+.. doxygengroup:: led_effect_noise1
+   :members:
+
+.. doxygengroup:: led_effect_plasma_waves
+   :members:
+
+.. doxygengroup:: led_effect_rainbow1
+   :members:
+
+.. doxygengroup:: led_effect_rays
+   :members:
+
+.. doxygengroup:: led_effect_waterfall
+   :members:
