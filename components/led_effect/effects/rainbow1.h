@@ -13,7 +13,11 @@
 #ifndef __LED_EFFECTS_RAINBOW1_H__
 #define __LED_EFFECTS_RAINBOW1_H__
 
-#include <led_effect.h>
+#include <framebuffer.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum {
     RAINBOW1_HORIZONTAL = 0,
@@ -21,15 +25,19 @@ typedef enum {
     RAINBOW1_DIAGONAL,
 } led_effect_rainbow1_direction_t;
 
-esp_err_t led_effect_rainbow1_init(led_effect_t *state, led_effect_rainbow1_direction_t direction,
+esp_err_t led_effect_rainbow1_init(framebuffer_t *fb, led_effect_rainbow1_direction_t direction,
         uint8_t scale, uint8_t speed);
 
-esp_err_t led_effect_rainbow1_done(led_effect_t *state);
+esp_err_t led_effect_rainbow1_done(framebuffer_t *fb);
 
-esp_err_t led_effect_rainbow1_set_params(led_effect_t *state, led_effect_rainbow1_direction_t direction,
+esp_err_t led_effect_rainbow1_set_params(framebuffer_t *fb, led_effect_rainbow1_direction_t direction,
         uint8_t scale, uint8_t speed);
 
-esp_err_t led_effect_rainbow1_run(led_effect_t *state);
+esp_err_t led_effect_rainbow1_run(framebuffer_t *fb);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**@}*/
 

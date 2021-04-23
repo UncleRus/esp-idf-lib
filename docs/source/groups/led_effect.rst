@@ -1,19 +1,7 @@
 .. _led_effect:
 
-led_effect - LED effects library
-================================
-
-.. doxygengroup:: led_effect
-   :members:
-   
-Animation
----------
-
-.. doxygengroup:: led_effect_animation
-   :members:
-
-LED effects
------------
+led_effect - LED effects collection
+===================================
 
 .. doxygengroup:: led_effect_crazybees
    :members:

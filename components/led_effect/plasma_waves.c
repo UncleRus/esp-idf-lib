@@ -6,7 +6,7 @@
  */
 #include <lib8tion.h>
 #include <stdlib.h>
-#include "plasma_waves.h"
+#include "effects/plasma_waves.h"
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -37,51 +37,51 @@ typedef struct
     uint8_t speed;
 } params_t;
 
-esp_err_t led_effect_plasma_waves_init(led_effect_t *state, uint8_t speed)
+esp_err_t led_effect_plasma_waves_init(framebuffer_t *fb, uint8_t speed)
 {
-    CHECK_ARG(state);
+    CHECK_ARG(fb);
 
-    state->internal = calloc(1, sizeof(params_t));
-    if (!state->internal)
+    fb->internal = calloc(1, sizeof(params_t));
+    if (!fb->internal)
         return ESP_ERR_NO_MEM;
 
-    return led_effect_plasma_waves_set_params(state, speed);
+    return led_effect_plasma_waves_set_params(fb, speed);
 }
 
-esp_err_t led_effect_plasma_waves_done(led_effect_t *state)
+esp_err_t led_effect_plasma_waves_done(framebuffer_t *fb)
 {
-    CHECK_ARG(state);
+    CHECK_ARG(fb);
 
-    if (state->internal)
-        free(state->internal);
+    if (fb->internal)
+        free(fb->internal);
 
     return ESP_OK;
 }
 
-esp_err_t led_effect_plasma_waves_set_params(led_effect_t *state, uint8_t speed)
+esp_err_t led_effect_plasma_waves_set_params(framebuffer_t *fb, uint8_t speed)
 {
-    CHECK_ARG(state && state->internal);
+    CHECK_ARG(fb && fb->internal);
 
-    params_t *params = (params_t *)state->internal;
+    params_t *params = (params_t *)fb->internal;
     params->speed = scale8_video(256 - speed, 150);
     if (!params->speed) params->speed = 1;
 
     return ESP_OK;
 }
 
-esp_err_t led_effect_plasma_waves_run(led_effect_t *state)
+esp_err_t led_effect_plasma_waves_run(framebuffer_t *fb)
 {
-    CHECK(led_effect_begin_frame(state));
+    CHECK(fb_begin(fb));
 
-    params_t *params = (params_t *)state->internal;
+    params_t *params = (params_t *)fb->internal;
 
-    uint8_t t1 = cos8((42 * state->frame_num) / params->speed);
-    uint8_t t2 = cos8((35 * state->frame_num) / params->speed);
-    uint8_t t3 = cos8((38 * state->frame_num) / params->speed);
+    uint8_t t1 = cos8((42 * fb->frame_num) / params->speed);
+    uint8_t t2 = cos8((35 * fb->frame_num) / params->speed);
+    uint8_t t3 = cos8((38 * fb->frame_num) / params->speed);
 
-    for (uint16_t y = 0; y < state->height; y++)
+    for (uint16_t y = 0; y < fb->height; y++)
     {
-        for (uint16_t x = 0; x < state->width; x++)
+        for (uint16_t x = 0; x < fb->width; x++)
         {
             // Calculate 3 separate plasma waves, one for each color channel
             uint8_t r = cos8((x << 3) + (t1 >> 1) + cos8(t2 + (y << 3)));
@@ -93,9 +93,9 @@ esp_err_t led_effect_plasma_waves_run(led_effect_t *state)
                 .g = exp_gamma[g],
                 .b = exp_gamma[b]
             };
-            led_effect_set_pixel_rgb(state, x, y, c);
+            fb_set_pixel_rgb(fb, x, y, c);
         }
     }
 
-    return led_effect_end_frame(state);
+    return fb_end(fb);
 }

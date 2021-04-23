@@ -1,22 +1,22 @@
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <led_strip.h>
-#include <esp_timer.h>
 #include <esp_log.h>
+
+#include <led_strip.h>
 #include <lib8tion.h>
-#include <led_effect.h>
-#include <led_animation.h>
+#include <framebuffer.h>
+#include <fbanimation.h>
 
-#include <led_effects/noise1.h>
-#include <led_effects/plasma_waves.h>
-#include <led_effects/rainbow1.h>
-#include <led_effects/waterfall.h>
-#include <led_effects/dna.h>
-#include <led_effects/rays.h>
-#include <led_effects/crazybees.h>
+#include <effects/noise1.h>
+#include <effects/plasma_waves.h>
+#include <effects/rainbow1.h>
+#include <effects/waterfall.h>
+#include <effects/dna.h>
+#include <effects/rays.h>
+#include <effects/crazybees.h>
 
-static const char *TAG = "led_matrix";
+static const char *TAG = "led_effect_example";
 
 #define LED_TYPE LED_STRIP_WS2812
 #define LED_GPIO 5
@@ -46,22 +46,22 @@ typedef enum {
     EFFECT_MAX
 } effect_t;
 
-// renderer from led_effect frame buffer to actual LED strip
-// this can be easily adapted to led_strip_spi
-static esp_err_t render_frame(led_effect_t *state, void *arg)
+// renderer from framebuffer to actual LED strip
+// this can be easily adapted to led_strip_spi or any display
+static esp_err_t render_frame(framebuffer_t *fb, void *arg)
 {
     if (!arg)
         return ESP_ERR_INVALID_ARG;
 
     led_strip_t *led_strip = (led_strip_t *)arg;
 
-    for (size_t y = 0; y < state->height; y++)
-        for (size_t x = 0; x < state->width; x++)
+    for (size_t y = 0; y < fb->height; y++)
+        for (size_t x = 0; x < fb->width; x++)
         {
             // calculate strip index of pixel
-            size_t strip_idx = y * state->width + (y % 2 ? state->width - x - 1 : x);
+            size_t strip_idx = y * fb->width + (y % 2 ? fb->width - x - 1 : x);
             // find pixel offset in state frame buffer
-            rgb_t color = state->frame_buf[LED_EFFECT_FRAMEBUF_OFFS(state, x, y)];
+            rgb_t color = fb->data[FB_OFFSET(fb, x, y)];
             // limit brightness and consuming current
             color = rgb_scale_video(color, LED_BRIGHTNESS);
             CHECK(led_strip_set_pixel(led_strip, strip_idx, color));
@@ -84,86 +84,86 @@ static led_strip_t strip = {
 
 static effect_t current_effect = EFFECT_NONE;
 
-static void switch_effect(led_effect_animation_t *animation)
+static void switch_effect(fb_animation_t *animation)
 {
     // stop rendering
     if (current_effect != EFFECT_NONE)
-        led_effect_animation_stop(animation);
+        fb_animation_stop(animation);
 
     // finish current effect
     switch(current_effect)
     {
         case EFFECT_DNA:
-            led_effect_dna_done(animation->state);
+            led_effect_dna_done(animation->fb);
             break;
         case EFFECT_NOISE1:
-            led_effect_noise1_done(animation->state);
+            led_effect_noise1_done(animation->fb);
             break;
         case EFFECT_WATERFALL_FIRE:
         case EFFECT_WATERFALL_SIMPLE:
         case EFFECT_WATERFALL_COLORS:
-            led_effect_waterfall_done(animation->state);
+            led_effect_waterfall_done(animation->fb);
             break;
         case EFFECT_PLASMA_WAVES:
-            led_effect_plasma_waves_done(animation->state);
+            led_effect_plasma_waves_done(animation->fb);
             break;
         case EFFECT_RAINBOW1:
-            led_effect_rainbow1_done(animation->state);
+            led_effect_rainbow1_done(animation->fb);
             break;
         case EFFECT_RAYS:
-            led_effect_rays_done(animation->state);
+            led_effect_rays_done(animation->fb);
             break;
         case EFFECT_CRAZYBEES:
-            led_effect_crazybees_done(animation->state);
+            led_effect_crazybees_done(animation->fb);
             break;
         default:
             break;
     }
 
     // clear framebuffer
-    led_effect_clear(animation->state);
+    fb_clear(animation->fb);
 
     // pick new effect
     current_effect = random8_between(EFFECT_NONE + 1, EFFECT_MAX);
 
     // init new effect
-    led_effect_run_cb_t effect_func = NULL;
+    fb_draw_cb_t effect_func = NULL;
     switch(current_effect)
     {
         case EFFECT_DNA:
-            led_effect_dna_init(animation->state, random8_between(10, 100), random8_between(1, 10), random8_to(2));
+            led_effect_dna_init(animation->fb, random8_between(10, 100), random8_between(1, 10), random8_to(2));
             effect_func = led_effect_dna_run;
             break;
         case EFFECT_NOISE1:
-            led_effect_noise1_init(animation->state, random8_between(10, 100), random8_between(1, 50));
+            led_effect_noise1_init(animation->fb, random8_between(10, 100), random8_between(1, 50));
             effect_func = led_effect_noise1_run;
             break;
         case EFFECT_WATERFALL_FIRE:
-            led_effect_waterfall_init(animation->state, WATERFALL_FIRE, 0, random8_between(20, 120), random8_between(50, 200));
+            led_effect_waterfall_init(animation->fb, WATERFALL_FIRE, 0, random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
             break;
         case EFFECT_WATERFALL_SIMPLE:
-            led_effect_waterfall_init(animation->state, WATERFALL_SIMPLE, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
+            led_effect_waterfall_init(animation->fb, WATERFALL_SIMPLE, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
             break;
         case EFFECT_WATERFALL_COLORS:
-            led_effect_waterfall_init(animation->state, WATERFALL_COLORS, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
+            led_effect_waterfall_init(animation->fb, WATERFALL_COLORS, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
             break;
         case EFFECT_PLASMA_WAVES:
-            led_effect_plasma_waves_init(animation->state, random8_between(50, 255));
+            led_effect_plasma_waves_init(animation->fb, random8_between(50, 255));
             effect_func = led_effect_plasma_waves_run;
             break;
         case EFFECT_RAINBOW1:
-            led_effect_rainbow1_init(animation->state, random8_to(3), random8_between(10, 50), random8_between(1, 50));
+            led_effect_rainbow1_init(animation->fb, random8_to(3), random8_between(10, 50), random8_between(1, 50));
             effect_func = led_effect_rainbow1_run;
             break;
         case EFFECT_RAYS:
-            led_effect_rays_init(animation->state, random8_between(0, 50), random8_between(3, 5), random8_between(5, 10));
+            led_effect_rays_init(animation->fb, random8_between(0, 50), random8_between(3, 5), random8_between(5, 10));
             effect_func = led_effect_rays_run;
             break;
         case EFFECT_CRAZYBEES:
-            led_effect_crazybees_init(animation->state, random8_between(1, 5));
+            led_effect_crazybees_init(animation->fb, random8_between(2, 5));
             effect_func = led_effect_crazybees_run;
             break;
         default:
@@ -171,7 +171,7 @@ static void switch_effect(led_effect_animation_t *animation)
     }
 
     // start rendering
-    led_effect_animation_play(animation, FPS, effect_func, &strip);
+    fb_animation_play(animation, FPS, effect_func, &strip);
 }
 
 void test(void *pvParameters)
@@ -181,12 +181,12 @@ void test(void *pvParameters)
     ESP_LOGI(TAG, "LED strip initialized");
 
     // Setup framebuffer
-    led_effect_t effect;
-    led_effect_init(&effect, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, render_frame);
+    framebuffer_t fb;
+    fb_init(&fb, LED_MATRIX_WIDTH, LED_MATRIX_HEIGHT, render_frame);
 
     // setup animation
-    led_effect_animation_t animation;
-    led_effect_animation_init(&animation, &effect);
+    fb_animation_t animation;
+    fb_animation_init(&animation, &fb);
 
     while (1)
     {

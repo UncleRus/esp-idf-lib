@@ -16,15 +16,23 @@
 #ifndef __LED_EFFECTS_DNA_H__
 #define __LED_EFFECTS_DNA_H__
 
-#include <led_effect.h>
+#include <framebuffer.h>
 
-esp_err_t led_effect_dna_init(led_effect_t *state, uint8_t speed, uint8_t size, bool border);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-esp_err_t led_effect_dna_done(led_effect_t *state);
+esp_err_t led_effect_dna_init(framebuffer_t *fb, uint8_t speed, uint8_t size, bool border);
 
-esp_err_t led_effect_dna_set_params(led_effect_t *state, uint8_t speed, uint8_t size, bool border);
+esp_err_t led_effect_dna_done(framebuffer_t *fb);
 
-esp_err_t led_effect_dna_run(led_effect_t *state);
+esp_err_t led_effect_dna_set_params(framebuffer_t *fb, uint8_t speed, uint8_t size, bool border);
+
+esp_err_t led_effect_dna_run(framebuffer_t *fb);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**@}*/
 

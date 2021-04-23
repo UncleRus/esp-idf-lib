@@ -100,7 +100,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **lib8tion**   | Math functions specifically designed for LED programming                | MIT     | Yes     | -
 | **color**      | Common library for RGB and HSV colors                                   | MIT     | Yes     | -
 | **noise**      | Noise generation functions                                              | MIT     | Yes     | -
-| **led_effect** | LED effects library                                                     | MIT     | Yes     | -
+| **framebuffer** | RGB framebuffer component                                              | MIT     | Yes     | -
 
 ### Real-time clocks
 
@@ -190,6 +190,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 
 | Component      | Description                                                             | License | ESP8266 | Thread safety
 |----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **led_effect** | LED effects collection                                                  | MIT     | Yes     | -
 | **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | *No*    | Yes
 | **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes     | Yes
 
