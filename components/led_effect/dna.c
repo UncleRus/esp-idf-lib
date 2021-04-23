@@ -103,7 +103,7 @@ esp_err_t led_effect_dna_run(framebuffer_t *fb)
         uint16_t x1 = beatsin8(params->speed, 0, fb->width - 1, 0, i * params->size) + beatsin8(params->speed - 7, 0, fb->width - 1, 0, i * params->size + 128);
         uint16_t x2 = beatsin8(params->speed, 0, fb->width - 1, 0, 128 + i * params->size) + beatsin8(params->speed - 7, 0, fb->width - 1, 0, 128 + 64 + i * params->size);
 
-        rgb_t color = hsv2rgb_rainbow(hsv_from_values(i * 128 / (fb->width - 1) + params->offset, 255, 255));
+        rgb_t color = hsv2rgb_rainbow(hsv_from_values(i * 128 / (fb->height - 1) + params->offset, 255, 255));
 
         if ((i + params->offset / 8) & 3)
             horizontal_line(fb, x1 / 2, x2 / 2, i, color, params->border);

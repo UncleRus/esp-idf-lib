@@ -27,6 +27,7 @@ typedef enum {
     WATERFALL_SIMPLE = 0,
     WATERFALL_COLORS,
     WATERFALL_FIRE,
+    WATERFALL_COLD_FIRE,
 } led_effect_waterfall_mode_t;
 
 esp_err_t led_effect_waterfall_init(framebuffer_t *fb, led_effect_waterfall_mode_t mode,

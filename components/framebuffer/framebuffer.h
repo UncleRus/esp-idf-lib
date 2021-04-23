@@ -19,7 +19,9 @@
 extern "C" {
 #endif
 
-#define FB_OFFSET(state, x, y) ((state)->width * (y) + (x))
+#define FB_OFFSET(fb, x, y) ((fb)->width * (y) + (x))
+
+#define FB_SIZE(fb) ((fb)->width * (fb)->height * sizeof(rgb_t))
 
 typedef enum {
     FB_SHIFT_LEFT  = 0,

@@ -101,6 +101,13 @@ esp_err_t led_effect_waterfall_set_params(framebuffer_t *fb, led_effect_waterfal
                     rgb_from_values(255, 255, 0),
                     rgb_from_values(255, 255, 255)); // white
             break;
+        case WATERFALL_COLD_FIRE:
+            rgb_fill_gradient4_rgb(params->palette, PALETTE_SIZE,
+                    rgb_from_values(0, 0, 0),       // black
+                    rgb_from_values(0, 0, 100),
+                    rgb_from_values(0, 200, 255),
+                    rgb_from_values(255, 255, 255)); // white
+            break;
         default:
             return ESP_ERR_NOT_SUPPORTED;
     }
@@ -142,7 +149,8 @@ esp_err_t led_effect_waterfall_run(framebuffer_t *fb)
             // Scale the heat value from 0-255 down to 0-240
             // for best results with color palettes.
             uint8_t color_idx = scale8(params->map[MAP_XY(x, y)], 240);
-            fb_set_pixel_rgb(fb, x, fb->height - 1 - y,
+            bool is_fire = (params->mode == WATERFALL_FIRE || params->mode == WATERFALL_COLD_FIRE);
+            fb_set_pixel_rgb(fb, x, is_fire ? y : fb->height - 1 - y,
                     color_from_palette_rgb(params->palette, PALETTE_SIZE, color_idx, 255, true));
         }
     }

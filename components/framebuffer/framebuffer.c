@@ -3,8 +3,6 @@
 
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-#define BUF_SIZE(fb) ((fb)->width * (fb)->height * sizeof(rgb_t))
-
 static size_t xy(void *ctx, size_t x, size_t y)
 {
     framebuffer_t *fb = (framebuffer_t *)ctx;
@@ -21,7 +19,7 @@ esp_err_t fb_init(framebuffer_t *fb, size_t width, size_t height, fb_render_cb_t
     fb->last_frame_us = 0;
     fb->render = render_cb;
     fb->internal = NULL;
-    fb->data = calloc(BUF_SIZE(fb), 1);
+    fb->data = calloc(FB_SIZE(fb), 1);
     if (!fb->data)
         return ESP_ERR_NO_MEM;
 
@@ -88,7 +86,7 @@ esp_err_t fb_clear(framebuffer_t *fb)
 {
     CHECK_ARG(fb && fb->data);
 
-    memset(fb->data, 0, BUF_SIZE(fb));
+    memset(fb->data, 0, FB_SIZE(fb));
 
     return ESP_OK;
 }
@@ -116,14 +114,14 @@ esp_err_t fb_shift(framebuffer_t *fb, size_t offs, fb_shift_direction_t dir)
                         sizeof(rgb_t) * (fb->width - offs));
             break;
         case FB_SHIFT_UP:
-            memmove(fb->data,
-                    fb->data + offs * fb->width,
-                    BUF_SIZE(fb) - offs * fb->width * sizeof(rgb_t));
-            break;
-        case FB_SHIFT_DOWN:
             memmove(fb->data + offs * fb->width,
                     fb->data,
-                    BUF_SIZE(fb) - offs * fb->width * sizeof(rgb_t));
+                    FB_SIZE(fb) - offs * fb->width * sizeof(rgb_t));
+            break;
+        case FB_SHIFT_DOWN:
+            memmove(fb->data,
+                    fb->data + offs * fb->width,
+                    FB_SIZE(fb) - offs * fb->width * sizeof(rgb_t));
             break;
     }
 

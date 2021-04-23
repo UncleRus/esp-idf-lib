@@ -15,6 +15,9 @@
 #include <effects/dna.h>
 #include <effects/rays.h>
 #include <effects/crazybees.h>
+#include <effects/sparkles1.h>
+#include <effects/matrix.h>
+#include <effects/rain.h>
 
 static const char *TAG = "led_effect_example";
 
@@ -36,12 +39,14 @@ typedef enum {
     EFFECT_DNA,
     EFFECT_NOISE1,
     EFFECT_WATERFALL_FIRE,
-    EFFECT_WATERFALL_SIMPLE,
-    EFFECT_WATERFALL_COLORS,
+    EFFECT_WATERFALL1,
     EFFECT_PLASMA_WAVES,
     EFFECT_RAINBOW1,
     EFFECT_RAYS,
     EFFECT_CRAZYBEES,
+    EFFECT_SPARKLES1,
+    EFFECT_MATRIX,
+    EFFECT_RAIN,
 
     EFFECT_MAX
 } effect_t;
@@ -83,6 +88,7 @@ static led_strip_t strip = {
 };
 
 static effect_t current_effect = EFFECT_NONE;
+static fb_draw_cb_t effect_done = NULL;
 
 static void switch_effect(fb_animation_t *animation)
 {
@@ -91,34 +97,8 @@ static void switch_effect(fb_animation_t *animation)
         fb_animation_stop(animation);
 
     // finish current effect
-    switch(current_effect)
-    {
-        case EFFECT_DNA:
-            led_effect_dna_done(animation->fb);
-            break;
-        case EFFECT_NOISE1:
-            led_effect_noise1_done(animation->fb);
-            break;
-        case EFFECT_WATERFALL_FIRE:
-        case EFFECT_WATERFALL_SIMPLE:
-        case EFFECT_WATERFALL_COLORS:
-            led_effect_waterfall_done(animation->fb);
-            break;
-        case EFFECT_PLASMA_WAVES:
-            led_effect_plasma_waves_done(animation->fb);
-            break;
-        case EFFECT_RAINBOW1:
-            led_effect_rainbow1_done(animation->fb);
-            break;
-        case EFFECT_RAYS:
-            led_effect_rays_done(animation->fb);
-            break;
-        case EFFECT_CRAZYBEES:
-            led_effect_crazybees_done(animation->fb);
-            break;
-        default:
-            break;
-    }
+    if (effect_done)
+        effect_done(animation->fb);
 
     // clear framebuffer
     fb_clear(animation->fb);
@@ -133,38 +113,57 @@ static void switch_effect(fb_animation_t *animation)
         case EFFECT_DNA:
             led_effect_dna_init(animation->fb, random8_between(10, 100), random8_between(1, 10), random8_to(2));
             effect_func = led_effect_dna_run;
+            effect_done = led_effect_dna_done;
             break;
         case EFFECT_NOISE1:
             led_effect_noise1_init(animation->fb, random8_between(10, 100), random8_between(1, 50));
             effect_func = led_effect_noise1_run;
+            effect_done = led_effect_noise1_done;
             break;
         case EFFECT_WATERFALL_FIRE:
-            led_effect_waterfall_init(animation->fb, WATERFALL_FIRE, 0, random8_between(20, 120), random8_between(50, 200));
+            led_effect_waterfall_init(animation->fb, random8_between(2, 4), 0, random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
+            effect_done = led_effect_waterfall_done;
             break;
-        case EFFECT_WATERFALL_SIMPLE:
-            led_effect_waterfall_init(animation->fb, WATERFALL_SIMPLE, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
+        case EFFECT_WATERFALL1:
+            led_effect_waterfall_init(animation->fb, random8_to(2), random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
-            break;
-        case EFFECT_WATERFALL_COLORS:
-            led_effect_waterfall_init(animation->fb, WATERFALL_COLORS, random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
-            effect_func = led_effect_waterfall_run;
+            effect_done = led_effect_waterfall_done;
             break;
         case EFFECT_PLASMA_WAVES:
             led_effect_plasma_waves_init(animation->fb, random8_between(50, 255));
             effect_func = led_effect_plasma_waves_run;
+            effect_done = led_effect_plasma_waves_done;
             break;
         case EFFECT_RAINBOW1:
-            led_effect_rainbow1_init(animation->fb, random8_to(3), random8_between(10, 50), random8_between(1, 50));
+            led_effect_rainbow1_init(animation->fb, random8_to(3), random8_between(10, 50), random8_between(1, 20));
             effect_func = led_effect_rainbow1_run;
+            effect_done = led_effect_rainbow1_done;
             break;
         case EFFECT_RAYS:
             led_effect_rays_init(animation->fb, random8_between(0, 50), random8_between(3, 5), random8_between(5, 10));
             effect_func = led_effect_rays_run;
+            effect_done = led_effect_rays_done;
             break;
         case EFFECT_CRAZYBEES:
             led_effect_crazybees_init(animation->fb, random8_between(2, 5));
             effect_func = led_effect_crazybees_run;
+            effect_done = led_effect_crazybees_done;
+            break;
+        case EFFECT_SPARKLES1:
+            led_effect_sparkles1_init(animation->fb, random8_between(1, 20), random8_between(10, 150));
+            effect_func = led_effect_sparkles1_run;
+            effect_done = led_effect_sparkles1_done;
+            break;
+        case EFFECT_MATRIX:
+            led_effect_matrix_init(animation->fb, 200);//random8_between(10, 100));
+            effect_func = led_effect_matrix_run;
+            effect_done = led_effect_matrix_done;
+            break;
+        case EFFECT_RAIN:
+            led_effect_rain_init(animation->fb, random8_to(2), random8(), random8_to(100), random8_between(100, 200));
+            effect_func = led_effect_rain_run;
+            effect_done = led_effect_rain_done;
             break;
         default:
             break;

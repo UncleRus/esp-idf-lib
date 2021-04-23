@@ -6,6 +6,9 @@ idf_component_register(
          dna.c
          rays.c
          crazybees.c
+         sparkles1.c
+         matrix.c
+         rain.c
     INCLUDE_DIRS .
     REQUIRES framebuffer color lib8tion noise
 )

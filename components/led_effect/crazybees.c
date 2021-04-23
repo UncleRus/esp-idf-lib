@@ -104,7 +104,7 @@ esp_err_t led_effect_crazybees_run(framebuffer_t *fb)
         fb_set_pixel_hsv(fb, params->bees[i].flower_x + 1, params->bees[i].flower_y, c);
         fb_set_pixel_hsv(fb, params->bees[i].flower_x, params->bees[i].flower_y + 1, c);
     }
-    fb_blur2d(fb, 32);
+    fb_blur2d(fb, 16);
 
     return fb_end(fb);
 }
