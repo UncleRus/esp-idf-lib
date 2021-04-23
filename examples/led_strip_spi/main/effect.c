@@ -23,7 +23,7 @@
  * SOFTWARE.
 */
 
-#include "led_effect.h"
+#include "effect.h"
 
 uint32_t led_effect_color_wheel(uint8_t pos)
 {
