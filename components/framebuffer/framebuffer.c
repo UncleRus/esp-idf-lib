@@ -82,6 +82,46 @@ esp_err_t fb_get_pixel_hsv(framebuffer_t *fb, size_t x, size_t y, hsv_t *color)
     return ESP_OK;
 }
 
+#define WU_WEIGHT(a, b) ((uint8_t)(((a) * (b) + (a) + (b)) >> 8))
+
+esp_err_t fb_set_pixelf_rgb(framebuffer_t *fb, float x, float y, rgb_t color)
+{
+    CHECK_ARG(fb && fb->data);
+
+    // extract the fractional parts and derive their inverses
+    uint8_t xx = (x - (int)x) * 255;
+    uint8_t yy = (y - (int)y) * 255;
+    uint8_t ix = 255 - xx;
+    uint8_t iy = 255 - yy;
+
+    // calculate the intensities for each affected pixel
+    uint8_t weights[4] = {
+        WU_WEIGHT(ix, iy),
+        WU_WEIGHT(xx, iy),
+        WU_WEIGHT(ix, yy),
+        WU_WEIGHT(xx, yy)
+    };
+    // multiply the intensities by the colour, and saturating-add them to the pixels
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        int xn = x + (i & 1);
+        int yn = y + ((i >> 1) & 1);
+        rgb_t clr;
+        fb_get_pixel_rgb(fb, xn, yn, &clr);
+        clr.r = qadd8(clr.r, (color.r * weights[i]) >> 8);
+        clr.g = qadd8(clr.g, (color.g * weights[i]) >> 8);
+        clr.b = qadd8(clr.b, (color.b * weights[i]) >> 8);
+        fb_set_pixel_rgb(fb, xn, yn, clr);
+    }
+
+    return ESP_OK;
+}
+
+esp_err_t fb_set_pixelf_hsv(framebuffer_t *fb, float x, float y, hsv_t color)
+{
+    return fb_set_pixelf_rgb(fb, x, y, hsv2rgb_rainbow(color));
+}
+
 esp_err_t fb_clear(framebuffer_t *fb)
 {
     CHECK_ARG(fb && fb->data);

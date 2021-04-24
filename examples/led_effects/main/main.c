@@ -18,6 +18,7 @@
 #include <effects/sparkles1.h>
 #include <effects/matrix.h>
 #include <effects/rain.h>
+#include <effects/fire.h>
 
 static const char *TAG = "led_effect_example";
 
@@ -47,6 +48,7 @@ typedef enum {
     EFFECT_SPARKLES1,
     EFFECT_MATRIX,
     EFFECT_RAIN,
+    EFFECT_FIRE,
 
     EFFECT_MAX
 } effect_t;
@@ -105,6 +107,7 @@ static void switch_effect(fb_animation_t *animation)
 
     // pick new effect
     current_effect = random8_between(EFFECT_NONE + 1, EFFECT_MAX);
+    //current_effect = EFFECT_FIRE;
 
     // init new effect
     fb_draw_cb_t effect_func = NULL;
@@ -164,6 +167,11 @@ static void switch_effect(fb_animation_t *animation)
             led_effect_rain_init(animation->fb, random8_to(2), random8(), random8_to(100), random8_between(100, 200));
             effect_func = led_effect_rain_run;
             effect_done = led_effect_rain_done;
+            break;
+        case EFFECT_FIRE:
+            led_effect_fire_init(animation->fb, random8_to(3));
+            effect_func = led_effect_fire_run;
+            effect_done = led_effect_fire_done;
             break;
         default:
             break;

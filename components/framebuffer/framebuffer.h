@@ -87,8 +87,6 @@ esp_err_t fb_render(framebuffer_t *fb, void *ctx);
 /**
  * @brief Set RGB color of framebuffer pixel
  *
- * If the framebuffer color type is HSV, the color will be converted automatically
- *
  * @param fb        Framebuffer descriptor
  * @param x         X coordinate
  * @param y         Y coordinate
@@ -100,8 +98,6 @@ esp_err_t fb_set_pixel_rgb(framebuffer_t *fb, size_t x, size_t y, rgb_t color);
 /**
  * @brief Set HSV color of framebuffer pixel
  *
- * If the framebuffer color type is RGB, the color will be converted automatically
- *
  * @param fb        Framebuffer descriptor
  * @param x         X coordinate
  * @param y         Y coordinate
@@ -111,9 +107,29 @@ esp_err_t fb_set_pixel_rgb(framebuffer_t *fb, size_t x, size_t y, rgb_t color);
 esp_err_t fb_set_pixel_hsv(framebuffer_t *fb, size_t x, size_t y, hsv_t color);
 
 /**
- * @brief Get RGB color of framebuffer pixel
+ * @brief Set RGB pixel with subpixel resolution
  *
- * If the framebuffer color type is HSV, result will be converted to RGB automatically
+ * @param fb        Framebuffer descriptor
+ * @param x         X coordinate
+ * @param y         Y coordinate
+ * @param color     RGB color
+ * @return          ESP_OK on success
+ */
+esp_err_t fb_set_pixelf_rgb(framebuffer_t *fb, float x, float y, rgb_t color);
+
+/**
+ * @brief Set HSV pixel with subpixel resolution
+ *
+ * @param fb        Framebuffer descriptor
+ * @param x         X coordinate
+ * @param y         Y coordinate
+ * @param color     HSV color
+ * @return          ESP_OK on success
+ */
+esp_err_t fb_set_pixelf_hsv(framebuffer_t *fb, float x, float y, hsv_t color);
+
+/**
+ * @brief Get RGB color of framebuffer pixel
  *
  * @param fb          Framebuffer descriptor
  * @param x           X coordinate
@@ -125,8 +141,6 @@ esp_err_t fb_get_pixel_rgb(framebuffer_t *fb, size_t x, size_t y, rgb_t *color);
 
 /**
  * @brief Get HSV color of framebuffer pixel
- *
- * If the framebuffer color type is RGB, result will be converted to HSV automatically
  *
  * @param fb          Framebuffer descriptor
  * @param x           X coordinate

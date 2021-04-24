@@ -9,6 +9,7 @@ idf_component_register(
          sparkles1.c
          matrix.c
          rain.c
+         fire.c
     INCLUDE_DIRS .
     REQUIRES framebuffer color lib8tion noise
 )
