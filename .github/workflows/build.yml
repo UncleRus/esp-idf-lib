@@ -24,8 +24,7 @@ jobs:
         uses: fkirc/skip-duplicate-actions@v3.4.0
         with:
 
-          # if the content does not change, skip.
-          concurrent_skipping: same_content
+          concurrent_skipping: always
 
           # if the change includes documentation changes only, skip.
           paths_ignore: '["docs/**", "**/*.md"]'
