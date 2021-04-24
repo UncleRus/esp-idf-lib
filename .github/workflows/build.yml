@@ -2,12 +2,38 @@
 name: Build examples
 on:
   push:
-     branches:
-        - master
   pull_request:
      branches:
         - master
 jobs:
+
+  # remove duplicated jobs. requirements are:
+  #
+  # * every push to a branch should trigger jobs
+  # * pull request should trigger jobs
+  # * but when the branch of the PR is in our repository, do not run
+  #   jobs because every pushed commit has been tested by `push` event.
+  #
+  # run the following jobs:
+  #
+  # * when the event is `push`, or
+  # * when the event is `pull_request`, and the PR is from external
+  #   repository
+  #
+  # `pre_job` set `should_skip` output. every job should have a
+  # condition to test it. otherwise, the job will not be skipped.
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        run: |
+          if [ "${{github.event_name}}" == "push" -o "${{github.event.pull_request.head.repo.full_name}}" != "${{github.repository}}" ]; then
+            echo "::set-output name=should_skip:false"
+          else
+            echo "::set-output name=should_skip:true"
+          fi
 
   # XXX create multiple jobs for major versions
   #
@@ -24,6 +50,8 @@ jobs:
   # adopt changes in master.
   build_esp32_v4_x:
     runs-on: ubuntu-latest
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -229,6 +257,8 @@ jobs:
           done
   build_esp32_v3_x:
     runs-on: ubuntu-latest
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -376,6 +406,8 @@ jobs:
 
   build_esp8266:
     runs-on: ubuntu-latest
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -517,6 +549,8 @@ jobs:
 
   build_esp8266_v3_x:
     runs-on: ubuntu-latest
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -669,6 +703,8 @@ jobs:
   # additionally, esp32s2 build requires idf.py. make is not supported.
   build_esp32s2_v4_x:
     runs-on: ubuntu-latest
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
