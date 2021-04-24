@@ -12,7 +12,7 @@ jobs:
   # * every push to a branch should trigger jobs
   # * pull request should trigger jobs
   # * but when the branch of the PR is in our repository, do not run
-  #   jobs because every pushed commit has been tested by `push` event.
+  #   jobs because every pushed commit has been tested by `push` event
   #
   # run the following jobs:
   #
