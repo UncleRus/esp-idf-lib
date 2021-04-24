@@ -28,6 +28,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
+        name: Test if jobs should be skipped
         run: |
           if [ "${{github.event_name}}" == "push" -o "${{github.event.pull_request.head.repo.full_name}}" != "${{github.repository}}" ]; then
             echo "::set-output name=should_skip:false"
