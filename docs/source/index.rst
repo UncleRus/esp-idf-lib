@@ -192,7 +192,6 @@ Addressable LEDs
 .. toctree::
    :maxdepth: 1
 
-   groups/led_effect
    groups/led_strip
    groups/led_strip_spi
 

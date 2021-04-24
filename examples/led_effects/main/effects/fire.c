@@ -6,7 +6,6 @@
  * Author: Yaroslaw Turbin (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
  *
  * https://pastebin.com/jSSVSRi6
- *
  */
 #include <lib8tion.h>
 #include <noise.h>

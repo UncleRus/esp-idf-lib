@@ -4,9 +4,11 @@
  * @defgroup led_effect_dna led_effect_dna
  * @{
  *
- * DNA spiral effect, based on Yaroslaw Turbin code (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ * DNA spiral effect
  *
- * Max effect framebuffer size 256x256
+ * Author: Yaroslaw Turbin (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ *
+ * Max supported framebuffer size is 256x256
  *
  * Parameters:
  *   - speed:  Speed of rotation, 10 - 100

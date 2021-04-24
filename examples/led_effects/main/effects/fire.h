@@ -9,7 +9,6 @@
  * Author: Yaroslaw Turbin (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
  *
  * https://pastebin.com/jSSVSRi6
- *
  */
 #ifndef __LED_EFFECTS_FIRE_H__
 #define __LED_EFFECTS_FIRE_H__

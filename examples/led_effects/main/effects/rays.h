@@ -1,10 +1,10 @@
 /**
  * @file rays.h
  *
- * @defgroup led_effect_rays led_effect_rays
- * @{
+ * Colored rays effect
  *
- * Colored rays effect, based on Yaroslaw Turbin code (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ * Author: Yaroslaw Turbin (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ *
  * https://editor.soulmatelights.com/gallery/819-colored-bursts
  *
  * Max supported framebuffer size is 256x256

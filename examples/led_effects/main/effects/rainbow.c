@@ -1,5 +1,5 @@
 /**
- * @file rainbow1.c
+ * @file rainbow.c
  *
  * Simple rainbow effect
  *
@@ -11,19 +11,19 @@
 #include <noise.h>
 #include <stdlib.h>
 
-#include "effects/rainbow1.h"
+#include "effects/rainbow.h"
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 typedef struct
 {
-    led_effect_rainbow1_direction_t direction;
+    led_effect_rainbow_direction_t direction;
     uint8_t scale;
     uint8_t speed;
 } params_t;
 
-esp_err_t led_effect_rainbow1_init(framebuffer_t *fb, led_effect_rainbow1_direction_t direction,
+esp_err_t led_effect_rainbow_init(framebuffer_t *fb, led_effect_rainbow_direction_t direction,
         uint8_t scale, uint8_t speed)
 {
     CHECK_ARG(fb);
@@ -32,10 +32,10 @@ esp_err_t led_effect_rainbow1_init(framebuffer_t *fb, led_effect_rainbow1_direct
     if (!fb->internal)
         return ESP_ERR_NO_MEM;
 
-    return led_effect_rainbow1_set_params(fb, direction, scale, speed);
+    return led_effect_rainbow_set_params(fb, direction, scale, speed);
 }
 
-esp_err_t led_effect_rainbow1_done(framebuffer_t *fb)
+esp_err_t led_effect_rainbow_done(framebuffer_t *fb)
 {
     CHECK_ARG(fb);
 
@@ -45,7 +45,7 @@ esp_err_t led_effect_rainbow1_done(framebuffer_t *fb)
     return ESP_OK;
 }
 
-esp_err_t led_effect_rainbow1_set_params(framebuffer_t *fb, led_effect_rainbow1_direction_t direction,
+esp_err_t led_effect_rainbow_set_params(framebuffer_t *fb, led_effect_rainbow_direction_t direction,
         uint8_t scale, uint8_t speed)
 {
     CHECK_ARG(fb && fb->internal);
@@ -58,13 +58,13 @@ esp_err_t led_effect_rainbow1_set_params(framebuffer_t *fb, led_effect_rainbow1_
     return ESP_OK;
 }
 
-esp_err_t led_effect_rainbow1_run(framebuffer_t *fb)
+esp_err_t led_effect_rainbow_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 
     params_t *params = (params_t *)fb->internal;
 
-    if (params->direction == RAINBOW1_DIAGONAL)
+    if (params->direction == RAINBOW_DIAGONAL)
     {
         for (size_t x = 0; x < fb->width; x++)
             for (size_t y = 0; y < fb->height; y++)
@@ -80,8 +80,8 @@ esp_err_t led_effect_rainbow1_run(framebuffer_t *fb)
     }
     else
     {
-        size_t outer = params->direction == RAINBOW1_HORIZONTAL ? fb->width : fb->height;
-        size_t inner = params->direction == RAINBOW1_HORIZONTAL ? fb->height : fb->width;
+        size_t outer = params->direction == RAINBOW_HORIZONTAL ? fb->width : fb->height;
+        size_t inner = params->direction == RAINBOW_HORIZONTAL ? fb->height : fb->width;
 
         for (size_t i = 0; i < outer; i++)
         {
@@ -91,7 +91,7 @@ esp_err_t led_effect_rainbow1_run(framebuffer_t *fb)
                 .val = 255
             };
             for (size_t j = 0; j < inner; j++)
-                if (params->direction == RAINBOW1_HORIZONTAL)
+                if (params->direction == RAINBOW_HORIZONTAL)
                     fb_set_pixel_hsv(fb, i, j, color);
                 else
                     fb_set_pixel_hsv(fb, j, i, color);

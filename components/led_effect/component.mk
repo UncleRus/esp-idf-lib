@@ -1,3 +1,0 @@
-COMPONENT_ADD_INCLUDEDIRS = .
-COMPONENT_SRCDIRS = .
-COMPONENT_DEPENDS = framebuffer color lib8tion noise

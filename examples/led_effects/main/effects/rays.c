@@ -1,10 +1,13 @@
 /**
  * @file rays.c
  *
- * Colored rays effect, based on Yaroslaw Turbin code (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ * Colored rays effect
+ *
+ * Author: Yaroslaw Turbin (https://vk.com/ldirko, https://www.reddit.com/user/ldirko/)
+ *
  * https://editor.soulmatelights.com/gallery/819-colored-bursts
  *
- * Max supported framebuffer size 256x256
+ * Max supported framebuffer size is 256x256
  *
  * Parameters:
  *   - speed:    Speed of rays movement, 0 - 50

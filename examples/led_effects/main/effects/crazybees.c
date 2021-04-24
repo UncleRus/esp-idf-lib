@@ -2,7 +2,8 @@
  * @file crazybees.c
  *
  * Crazy Bees effect
- * Author: stepko
+ *
+ * Author: Stepko
  */
 #include <lib8tion.h>
 #include <stdlib.h>

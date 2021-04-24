@@ -8,27 +8,29 @@
 #include <framebuffer.h>
 #include <fbanimation.h>
 
-#include <effects/noise1.h>
+#include <effects/noise.h>
 #include <effects/plasma_waves.h>
-#include <effects/rainbow1.h>
+#include <effects/rainbow.h>
 #include <effects/waterfall.h>
 #include <effects/dna.h>
 #include <effects/rays.h>
 #include <effects/crazybees.h>
-#include <effects/sparkles1.h>
+#include <effects/sparkles.h>
 #include <effects/matrix.h>
 #include <effects/rain.h>
 #include <effects/fire.h>
 
 static const char *TAG = "led_effect_example";
 
-#define LED_TYPE LED_STRIP_WS2812
 #define LED_GPIO 5
+#define LED_TYPE LED_STRIP_WS2812
 #define LED_CHANNEL RMT_CHANNEL_0
+
 #define LED_MATRIX_WIDTH  16
 #define LED_MATRIX_HEIGHT 16
 #define LED_BRIGHTNESS 20 // 0..255
-#define FPS 30
+
+#define FPS 60
 
 #define SWITCH_PERIOD_MS 5000
 
@@ -38,14 +40,14 @@ typedef enum {
     EFFECT_NONE = 0,
 
     EFFECT_DNA,
-    EFFECT_NOISE1,
+    EFFECT_NOISE,
     EFFECT_WATERFALL_FIRE,
-    EFFECT_WATERFALL1,
+    EFFECT_WATERFALL,
     EFFECT_PLASMA_WAVES,
-    EFFECT_RAINBOW1,
+    EFFECT_RAINBOW,
     EFFECT_RAYS,
     EFFECT_CRAZYBEES,
-    EFFECT_SPARKLES1,
+    EFFECT_SPARKLES,
     EFFECT_MATRIX,
     EFFECT_RAIN,
     EFFECT_FIRE,
@@ -106,8 +108,8 @@ static void switch_effect(fb_animation_t *animation)
     fb_clear(animation->fb);
 
     // pick new effect
-    current_effect = random8_between(EFFECT_NONE + 1, EFFECT_MAX);
-    //current_effect = EFFECT_FIRE;
+    if (++current_effect == EFFECT_MAX)
+        current_effect = EFFECT_NONE + 1;
 
     // init new effect
     fb_draw_cb_t effect_func = NULL;
@@ -118,17 +120,17 @@ static void switch_effect(fb_animation_t *animation)
             effect_func = led_effect_dna_run;
             effect_done = led_effect_dna_done;
             break;
-        case EFFECT_NOISE1:
-            led_effect_noise1_init(animation->fb, random8_between(10, 100), random8_between(1, 50));
-            effect_func = led_effect_noise1_run;
-            effect_done = led_effect_noise1_done;
+        case EFFECT_NOISE:
+            led_effect_noise_init(animation->fb, random8_between(10, 100), random8_between(1, 50));
+            effect_func = led_effect_noise_run;
+            effect_done = led_effect_noise_done;
             break;
         case EFFECT_WATERFALL_FIRE:
             led_effect_waterfall_init(animation->fb, random8_between(2, 4), 0, random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
             effect_done = led_effect_waterfall_done;
             break;
-        case EFFECT_WATERFALL1:
+        case EFFECT_WATERFALL:
             led_effect_waterfall_init(animation->fb, random8_to(2), random8_between(1, 255), random8_between(20, 120), random8_between(50, 200));
             effect_func = led_effect_waterfall_run;
             effect_done = led_effect_waterfall_done;
@@ -138,10 +140,10 @@ static void switch_effect(fb_animation_t *animation)
             effect_func = led_effect_plasma_waves_run;
             effect_done = led_effect_plasma_waves_done;
             break;
-        case EFFECT_RAINBOW1:
-            led_effect_rainbow1_init(animation->fb, random8_to(3), random8_between(10, 50), random8_between(1, 20));
-            effect_func = led_effect_rainbow1_run;
-            effect_done = led_effect_rainbow1_done;
+        case EFFECT_RAINBOW:
+            led_effect_rainbow_init(animation->fb, random8_to(3), random8_between(10, 50), random8_between(1, 20));
+            effect_func = led_effect_rainbow_run;
+            effect_done = led_effect_rainbow_done;
             break;
         case EFFECT_RAYS:
             led_effect_rays_init(animation->fb, random8_between(0, 50), random8_between(3, 5), random8_between(5, 10));
@@ -153,13 +155,13 @@ static void switch_effect(fb_animation_t *animation)
             effect_func = led_effect_crazybees_run;
             effect_done = led_effect_crazybees_done;
             break;
-        case EFFECT_SPARKLES1:
-            led_effect_sparkles1_init(animation->fb, random8_between(1, 20), random8_between(10, 150));
-            effect_func = led_effect_sparkles1_run;
-            effect_done = led_effect_sparkles1_done;
+        case EFFECT_SPARKLES:
+            led_effect_sparkles_init(animation->fb, random8_between(1, 20), random8_between(10, 150));
+            effect_func = led_effect_sparkles_run;
+            effect_done = led_effect_sparkles_done;
             break;
         case EFFECT_MATRIX:
-            led_effect_matrix_init(animation->fb, 200);//random8_between(10, 100));
+            led_effect_matrix_init(animation->fb, random8_between(10, 250));
             effect_func = led_effect_matrix_run;
             effect_done = led_effect_matrix_done;
             break;
@@ -205,7 +207,6 @@ void test(void *pvParameters)
 
 void app_main()
 {
-    rand16seed = esp_random();
     led_strip_install();
     xTaskCreate(test, "test", 8192, NULL, 5, NULL);
 }

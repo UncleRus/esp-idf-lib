@@ -1,14 +1,15 @@
 /**
- * @file noise1.c
+ * @file noise.c
  *
  * Perlin noise effect
+ *
  * Author: Chuck Sommerville
  */
 #include <lib8tion.h>
 #include <noise.h>
 #include <stdlib.h>
 
-#include "effects/noise1.h"
+#include "noise.h"
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -22,7 +23,7 @@ typedef struct
     uint8_t hue;
 } params_t;
 
-esp_err_t led_effect_noise1_init(framebuffer_t *fb, uint8_t scale, uint8_t speed)
+esp_err_t led_effect_noise_init(framebuffer_t *fb, uint8_t scale, uint8_t speed)
 {
     CHECK_ARG(fb);
 
@@ -30,10 +31,10 @@ esp_err_t led_effect_noise1_init(framebuffer_t *fb, uint8_t scale, uint8_t speed
     if (!fb->internal)
         return ESP_ERR_NO_MEM;
 
-    return led_effect_noise1_set_params(fb, scale, speed);
+    return led_effect_noise_set_params(fb, scale, speed);
 }
 
-esp_err_t led_effect_noise1_done(framebuffer_t *fb)
+esp_err_t led_effect_noise_done(framebuffer_t *fb)
 {
     CHECK_ARG(fb);
 
@@ -43,7 +44,7 @@ esp_err_t led_effect_noise1_done(framebuffer_t *fb)
     return ESP_OK;
 }
 
-esp_err_t led_effect_noise1_set_params(framebuffer_t *fb, uint8_t scale, uint8_t speed)
+esp_err_t led_effect_noise_set_params(framebuffer_t *fb, uint8_t scale, uint8_t speed)
 {
     CHECK_ARG(fb && fb->internal);
 
@@ -54,7 +55,7 @@ esp_err_t led_effect_noise1_set_params(framebuffer_t *fb, uint8_t scale, uint8_t
     return ESP_OK;
 }
 
-esp_err_t led_effect_noise1_run(framebuffer_t *fb)
+esp_err_t led_effect_noise_run(framebuffer_t *fb)
 {
     CHECK(fb_begin(fb));
 

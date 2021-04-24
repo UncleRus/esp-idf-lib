@@ -6,7 +6,7 @@
  *
  * Crazy Bees effect
  *
- * Author: stepko
+ * Author: Stepko
  */
 #ifndef __LED_EFFECTS_CRAZYBEES_H__
 #define __LED_EFFECTS_CRAZYBEES_H__
