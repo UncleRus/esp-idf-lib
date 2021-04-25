@@ -482,7 +482,6 @@ jobs:
           fetch-depth: 0
 
       - name: Install python requirements (pip)
-        if: ${{ ! startsWith(matrix.branch, 'v3.3') }}
         run: |
 
           # XXX upgrade pyOpenSSL because older pyOpenSSL caused issues in
@@ -556,6 +555,7 @@ jobs:
           - make
         branch:
           - v3.4
+          - v3.3
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -587,7 +587,18 @@ jobs:
           GCC_PREFIX="xtensa-lx106-elf"
           GCC_FILE="${GCC_PREFIX}-gcc"
           TOOLCHAIN_DIR="${HOME}/esp32"
-          TOOLCHAIN_FILE="xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz"
+          case "${{ matrix.branch }}" in
+          v3.3)
+            TOOLCHAIN_FILE="xtensa-lx106-elf-linux64-1.22.0-100-ge567ec7-5.2.0.tar.gz"
+            ;;
+          v3.4)
+            TOOLCHAIN_FILE="xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz"
+            ;;
+          *)
+            echo "unknown matrix.branch ${{ matrix.branch }}"
+            exit 1
+            ;;
+          esac
           REPO_DIR=`pwd`
           EXAMPLE_DIR="${REPO_DIR}/examples"
           DISTFILE_DIR="${HOME}/distfiles"
@@ -625,7 +636,6 @@ jobs:
           fetch-depth: 0
 
       - name: Install python requirements (pip)
-        if: ${{ ! startsWith(matrix.branch, 'v3.3') }}
         run: |
 
           # XXX upgrade pyOpenSSL because older pyOpenSSL caused issues in
