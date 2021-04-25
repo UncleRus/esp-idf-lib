@@ -2,12 +2,34 @@
 name: Build examples
 on:
   push:
-     branches:
-        - master
   pull_request:
      branches:
         - master
+
+  # include workflow_dispatch to enable manual trigger from Web UI.
+  workflow_dispatch:
 jobs:
+  pre_build:
+
+    # A job to see if the entrire jobs should be skipped. each job for a
+    # target should have:
+    #
+    # needs: pre_build
+    # if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.0
+        with:
+          concurrent_skipping: same_content
+
+          # if the change includes documentation changes only, skip.
+          paths_ignore: '["docs/**", "**/*.md"]'
+
+          # but do not skip if the triggered event is one of these.
+          do_not_skip: '["workflow_dispatch", "schedule", "pull_request"]'
 
   # XXX create multiple jobs for major versions
   #
@@ -23,6 +45,8 @@ jobs:
   # are many duplications. but no need to modify the entire build process to
   # adopt changes in master.
   build_esp32_v4_x:
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -229,6 +253,8 @@ jobs:
           done
   build_esp32_v3_x:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -376,6 +402,8 @@ jobs:
 
   build_esp8266:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
@@ -385,6 +413,149 @@ jobs:
           - make
         branch:
           - master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          SDK_NAME="ESP8266_RTOS_SDK"
+          GCC_PREFIX="xtensa-lx106-elf"
+          GCC_FILE="${GCC_PREFIX}-gcc"
+          TOOLCHAIN_DIR="${HOME}/esp32"
+          TOOLCHAIN_FILE="xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz"
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          DISTFILE_DIR="${HOME}/distfiles"
+          __PROJECT_PATH=`pwd`
+
+          # XXX actions/checkout does not allow to checkout a repository other
+          # than under __PROJECT_PATH
+          IDF_PATH="${__PROJECT_PATH}/idf"
+          echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+
+          # cache-idf-tools needs PROJECT_DISTFILE_DIR
+          echo "::set-output name=PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+
+          # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
+          echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
+          echo "__PROJECT_GCC_PREFIX=${GCC_PREFIX}" >> ${GITHUB_ENV}
+          echo "__PROJECT_SDK_NAME=${SDK_NAME}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}" >> ${GITHUB_ENV}
+          echo "__PROJECT_DISTFILE_DIR=${DISTFILE_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_PATH=${__PROJECT_PATH}" >> ${GITHUB_ENV}
+          echo "__PROJECT_BUILD_COMMAND=${__PROJECT_BUILD_COMMAND}" >> ${GITHUB_ENV}
+          echo "__PROJECT_BUILD_COMMAND_ARG=${__PROJECT_BUILD_COMMAND_ARG}" >> ${GITHUB_ENV}
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/ESP8266_RTOS_SDK
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+          # XXX git.eclipse.org does not allow to fetch a commit. fetch all
+          # the commits.
+          fetch-depth: 0
+
+      - name: Install python requirements (pip)
+        if: ${{ ! startsWith(matrix.branch, 'v3.3') }}
+        run: |
+
+          # XXX upgrade pyOpenSSL because older pyOpenSSL caused issues in
+          # the past. this might not be true anymore.
+          python -m pip install --user --upgrade pyOpenSSL
+          python -m pip install --user -r ${IDF_PATH}/requirements.txt
+
+      - name: Create __PROJECT_DISTFILE_DIR
+        run: |
+          mkdir -p "${__PROJECT_DISTFILE_DIR}"
+
+      - name: Cache toolchain
+        id: cache-idf-tools
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_DISTFILE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-esp8266-cache-tools
+
+      - name: Download toolchain if it does not exist
+        run: |
+          if [ ! -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" ]; then
+            wget -O "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}" "https://dl.espressif.com/dl/${__PROJECT_TOOLCHAIN_FILE}"
+          fi
+
+      - name: Extract the toolchain
+        run: |
+          mkdir -p "${__PROJECT_TOOLCHAIN_DIR}"
+          tar -xz -C "${__PROJECT_TOOLCHAIN_DIR}" -f "${__PROJECT_DISTFILE_DIR}/${__PROJECT_TOOLCHAIN_FILE}"
+
+      - name: Setup ccache
+        run: |
+          __PROJECT_CCACHE_BIN_DIR="${HOME}/ccache_bin"
+          mkdir -p "${__PROJECT_CCACHE_BIN_DIR}"
+          (cd "${__PROJECT_CCACHE_BIN_DIR}" && ln -s /usr/bin/ccache "${__PROJECT_GCC_FILE}")
+          echo "PATH=${__PROJECT_CCACHE_BIN_DIR}:$PATH:${__PROJECT_TOOLCHAIN_DIR}/${__PROJECT_GCC_PREFIX}/bin" >> ${GITHUB_ENV}
+          echo "CCACHE_BASEDIR=${__PROJECT_EXAMPLE_DIR}" >> ${GITHUB_ENV}
+          echo "CCACHE_NOHASHDIR=true" >> ${GITHUB_ENV}
+
+      - name: Build (make)
+        if: ${{ matrix.build_method == 'make' }}
+        run: |
+
+          # make sure gcc is in $PATH
+          echo ${PATH}
+          ${__PROJECT_GCC_FILE} --version
+
+          IGNORE_FILE="ci-ignore-esp8266"
+
+          # these drivers do not compile for ESP8266 yet
+          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip"
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              make defconfig
+              make -j$(nproc)
+            fi
+          done
+
+  build_esp8266_v3_x:
+    runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    strategy:
+      matrix:
+        build_method:
+
+          # XXX build examples with make only
+          # idf.py in ESP8266 RTOS SDK is broken in many ways.
+          - make
+        branch:
+          - v3.4
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -528,6 +699,8 @@ jobs:
   # additionally, esp32s2 build requires idf.py. make is not supported.
   build_esp32s2_v4_x:
     runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         build_method:
