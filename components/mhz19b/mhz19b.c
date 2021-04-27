@@ -208,14 +208,15 @@ esp_err_t mhz19b_start_calibration(mhz19b_dev_t *dev)
 
 esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_t b4, uint8_t b5, uint8_t b6, uint8_t b7)
 {
-    CHECK_ARG(dev);
+    CHECK_ARG(dev && dev->buf);
 
     uint8_t txBuffer[MHZ19B_SERIAL_RX_BYTES] = { 0xFF, 0x01, cmd, b3, b4, b5, b6, b7, 0x00 };
 
     // Check initialized
-    if ((dev->buf == NULL) || (!uart_is_driver_installed(dev->uart_port))) {
+#if HELPER_TARGET_IS_ESP32
+    if (!uart_is_driver_installed(dev->uart_port))
         return ESP_ERR_INVALID_STATE;
-    }
+#endif
 
     // Add CRC Byte
     txBuffer[8] = mhz19b_calc_crc(txBuffer);
