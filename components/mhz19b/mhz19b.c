@@ -213,7 +213,7 @@ esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_
     uint8_t txBuffer[MHZ19B_SERIAL_RX_BYTES] = { 0xFF, 0x01, cmd, b3, b4, b5, b6, b7, 0x00 };
 
     // Check initialized
-#if HELPER_TARGET_IS_ESP32
+#if HELPER_TARGET_IS_ESP32 && ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
     if (!uart_is_driver_installed(dev->uart_port))
         return ESP_ERR_INVALID_STATE;
 #endif
