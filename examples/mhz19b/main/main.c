@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <esp_log.h>
 #include <mhz19b.h>
 
@@ -7,7 +8,6 @@
 
 #define MHZ19B_TX 12
 #define MHZ19B_RX 13
-
 
 void app_main(void)
 {
