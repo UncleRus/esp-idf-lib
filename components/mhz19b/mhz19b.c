@@ -40,7 +40,9 @@ esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gp
     };
     CHECK(uart_driver_install(uart_port, MHZ19B_SERIAL_BUF_LEN * 2, 0, 0, NULL, 0));
     CHECK(uart_param_config(uart_port, &uart_config));
+#if HELPER_TARGET_IS_ESP32
     CHECK(uart_set_pin(uart_port, tx_gpio, rx_gpio, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+#endif
 
     dev->uart_port = uart_port;
     // buffer for the incoming data
