@@ -25,7 +25,7 @@ void app_main(void)
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
 
-	mhz19b_get_version(&dev, version, 5);
+	mhz19b_get_version(&dev, version);
 	ESP_LOGI(TAG, "MHZ-19B firmware version: %s", version);
 	ESP_LOGI(TAG, "MHZ-19B set range and autocal");
 
@@ -45,7 +45,7 @@ void app_main(void)
 	}
 
     while (1) {
-		mhz19b_read_CO2(&dev, &co2);
+		mhz19b_read_co2(&dev, &co2);
 		ESP_LOGI(TAG, "CO2: %d", co2);
 		vTaskDelay(5000 / portTICK_RATE_MS);
     }

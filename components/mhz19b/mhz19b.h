@@ -7,6 +7,7 @@
  *
  * Inspired from https://github.com/Erriez/ErriezMHZ19B
  *
+ * Copyright (C) 2020 Erriez <https://github.com/Erriez>
  * Copyright (C) 2021 David Douard <david.douard@sdfa3.org>
  *
  * BSD Licensed as described in the file LICENSE
@@ -66,18 +67,18 @@ typedef struct
 typedef enum {
     MHZ19B_RANGE_2000 = 2000,            // 2000 ppm
     MHZ19B_RANGE_5000 = 5000,            // 5000 ppm (Default)
-} MHZ19B_range_e;
+} mhz19b_range_t;
 
 
 /**
  * @brief Initialize device descriptor
  *
-
  * @param dev Pointer to the sensor device data structure
  * @param uart_port UART poert number
  * @param tx_gpio GPIO pin number for TX
  * @param rx_gpio GPIO pin number for RX
- * @returns ESP_OK on success
+ *
+ * @return ESP_OK on success
  */
 esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gpio, gpio_num_t rx_gpio);
 
@@ -85,14 +86,28 @@ esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gp
  * @brief Free device descriptor
  *
  * @param dev Pointer to the sensor device data structure
- * @returns ESP_OK on success
+ *
+ * @return ESP_OK on success
  */
 esp_err_t mhz19b_free(mhz19b_dev_t *dev);
 
-// Detect sensor by checking range response
+/**
+ * @brief Detect sensor by checking range response
+ *
+ * @param dev Pointer to the sensor device data structure
+ *
+ * @return true if sensor is detected
+ */
 bool mhz19b_detect(mhz19b_dev_t *dev);
 
-// Minimum wait time after power-on
+/**
+ * @brief Check if sensor is warming up
+ *
+ * @param dev Pointer to the sensor device data structure
+ * @param smart_warming_up Smart check
+ *
+ * @return true if sensor is warming up
+ */
 bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up);
 
 /**
@@ -102,7 +117,7 @@ bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up);
  *
  * @param dev Pointer to the sensor device data structure
  *
- * @returns true if ready to call readCO2()
+ * @return true if ready to call ::mhz19b_read_co2()
  */
 bool mhz19b_is_ready(mhz19b_dev_t *dev);
 
@@ -111,24 +126,28 @@ bool mhz19b_is_ready(mhz19b_dev_t *dev);
  *
  * @param dev Pointer to the sensor device data structure
  * @param co2 co2 level (output)
+ *      <0
+ *          MH-Z19B response error codes.
+ *      0..399
+ *          ppmIncorrect values. Minimum value starts at 400ppm outdoor fresh air.
+ *      400..1000 ppm
+ *          Concentrations typical of occupied indoor spaces with good air exchange.
+ *      1000..2000 ppm
+ *          Complaints of drowsiness and poor air quality. Ventilation is required.
+ *      2000..5000 ppm
+ *          Headaches, sleepiness and stagnant, stale, stuffy air. Poor concentration, loss of
+ *          attention, increased heart rate and slight nausea may also be present.\n
+ *          Higher values are extremely dangerous and cannot be measured.
  *
- * @retval <0
- *      MH-Z19B response error codes.
- * @retval 0..399 ppm
- *      Incorrect values. Minimum value starts at 400ppm outdoor fresh air.
- * @retval 400..1000 ppm
- *      Concentrations typical of occupied indoor spaces with good air exchange.
- * @retval 1000..2000 ppm
- *      Complaints of drowsiness and poor air quality. Ventilation is required.
- * @retval 2000..5000 ppm
- *      Headaches, sleepiness and stagnant, stale, stuffy air. Poor concentration, loss of
- *      attention, increased heart rate and slight nausea may also be present.\n
- *      Higher values are extremely dangerous and cannot be measured.
+ * @return ESP_OK on success
  */
-esp_err_t mhz19b_read_CO2(mhz19b_dev_t *dev, int16_t *co2);
+esp_err_t mhz19b_read_co2(mhz19b_dev_t *dev, int16_t *co2);
 
 /**
  * @brief Get firmware version (NOT DOCUMENTED)
+ *
+ * @details
+ *      This is an undocumented command, but most sensors returns ASCII "0430 or "0443".
  *
  * @param dev Pointer to the sensor device data structure
  * @param version
@@ -137,12 +156,9 @@ esp_err_t mhz19b_read_CO2(mhz19b_dev_t *dev, int16_t *co2);
  * @param versionLen
  *      Number of characters including NULL of version buffer.
  *
- * @details
- *      This is an undocumented command, but most sensors returns ASCII "0430 or "0443".
- *
- * @returns ESP_OK on success
+ * @return ESP_OK on success
  */
-esp_err_t mhz19b_get_version(mhz19b_dev_t *dev, char *version, uint8_t versionLen);
+esp_err_t mhz19b_get_version(mhz19b_dev_t *dev, char *version);
 
 /**
  * @brief Set CO2 range
@@ -150,23 +166,21 @@ esp_err_t mhz19b_get_version(mhz19b_dev_t *dev, char *version, uint8_t versionLe
  * @param dev Pointer to the sensor device data structure
  * @param range Range of the sensor (2000 or 5000, in ppm)
  *
- * @returns
- *      ESP_OK on success
+ * @return ESP_OK on success
  */
-esp_err_t mhz19b_set_range(mhz19b_dev_t *dev, MHZ19B_range_e range);
+esp_err_t mhz19b_set_range(mhz19b_dev_t *dev, mhz19b_range_t range);
 
 /**
  * @brief Get CO2 range in PPM (NOT DOCUMENTED)
- *
- * @param dev Pointer to the sensor device data structure
- * @param range Current value of the range of the sensor (output)
  *
  * @details
  *      This function verifies valid read ranges of 2000 or 5000 ppm.\n
  *      Note: Other ranges may be returned, but are undocumented and marked as invalid.
  *
- * @returns
- *      ESP_OK on success
+ * @param dev Pointer to the sensor device data structure
+ * @param range Current value of the range of the sensor (output)
+ *
+ * @return ESP_OK on success
  */
 esp_err_t mhz19b_get_range(mhz19b_dev_t *dev, uint16_t *range);
 
@@ -178,8 +192,7 @@ esp_err_t mhz19b_get_range(mhz19b_dev_t *dev, uint16_t *range);
  *      true: Automatic calibration on.\n
  *      false: Automatic calibration off.
  *
- * @returns
- *      ESP_OK on success
+ * @return ESP_OK on success
  */
 esp_err_t mhz19b_set_auto_calibration(mhz19b_dev_t *dev, bool calibration_on);
 
@@ -189,8 +202,7 @@ esp_err_t mhz19b_set_auto_calibration(mhz19b_dev_t *dev, bool calibration_on);
  * @param dev Pointer to the sensor device data structure
  * @param calibration_on (output)
  *
- * @returns
- *      ESP_OK on success
+ * @return ESP_OK on success
  */
 esp_err_t mhz19b_get_auto_calibration(
 	mhz19b_dev_t *dev, bool *calibration_on); // (NOT DOCUMENTED)
@@ -205,8 +217,7 @@ esp_err_t mhz19b_get_auto_calibration(
  *
  * @param dev Pointer to the sensor device data structure
  *
- * @returns
- *      ESP_OK on success
+ * @return ESP_OK on success
  */
 esp_err_t mhz19b_start_calibration(mhz19b_dev_t *dev);
 
@@ -232,12 +243,10 @@ esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd,
 /**
  * @brief Calculate CRC on 8 data Bytes buffer
  *
- * @param data
- *      Buffer pointer to calculate CRC.
- * @returns
- *      Calculated 8-bit CRC.
+ * @param data Buffer pointer to calculate CRC.
+ * @return Calculated 8-bit CRC.
  */
-uint8_t mhz19b_calc_CRC(uint8_t *data);
+uint8_t mhz19b_calc_crc(uint8_t *data);
 
 #ifdef __cplusplus
 }

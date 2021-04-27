@@ -5,6 +5,7 @@
  *
  * Inspired from https://github.com/Erriez/ErriezMHZ19B
  *
+ * Copyright (C) 2020 Erriez <https://github.com/Erriez>
  * Copyright (C) 2021 David Douard <david.douard@sdfa3.org>
  *
  * BSD Licensed as described in the file LICENSE
@@ -23,10 +24,9 @@ static const char *TAG = "mhz19b";
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-
 esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gpio, gpio_num_t rx_gpio)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     uart_config_t uart_config = {
         .baud_rate = 9600,
@@ -34,15 +34,19 @@ esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gp
         .parity    = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
         .source_clk = UART_SCLK_APB,
+#endif
     };
-	CHECK(uart_driver_install(uart_port, MHZ19B_SERIAL_BUF_LEN * 2, 0, 0, NULL, 0));
-	CHECK(uart_param_config(uart_port, &uart_config));
-	CHECK(uart_set_pin(uart_port, tx_gpio, rx_gpio, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    CHECK(uart_driver_install(uart_port, MHZ19B_SERIAL_BUF_LEN * 2, 0, 0, NULL, 0));
+    CHECK(uart_param_config(uart_port, &uart_config));
+    CHECK(uart_set_pin(uart_port, tx_gpio, rx_gpio, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
     dev->uart_port = uart_port;
     // buffer for the incoming data
-    dev->buf = (uint8_t *) malloc(MHZ19B_SERIAL_BUF_LEN);
+    dev->buf = malloc(MHZ19B_SERIAL_BUF_LEN);
+    if (!dev->buf)
+        return ESP_ERR_NO_MEM;
     dev->last_value = -1;
     dev->last_ts = esp_timer_get_time();
     return ESP_OK;
@@ -50,7 +54,7 @@ esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gp
 
 esp_err_t mhz19b_free(mhz19b_dev_t *dev)
 {
-    CHECK_ARG(dev);
+    CHECK_ARG(dev && dev->buf);
 
     free(dev->buf);
     dev->buf = NULL;
@@ -59,13 +63,12 @@ esp_err_t mhz19b_free(mhz19b_dev_t *dev)
 
 bool mhz19b_detect(mhz19b_dev_t *dev)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     uint16_t range;
     // Check valid PPM range
-    if ((mhz19b_get_range(dev, &range) == ESP_OK) && (range > 0)) {
+    if ((mhz19b_get_range(dev, &range) == ESP_OK) && (range > 0))
         return true;
-    }
 
     // Sensor not detected, or invalid range returned
     // Try recover by calling setRange(MHZ19B_RANGE_5000);
@@ -74,7 +77,7 @@ bool mhz19b_detect(mhz19b_dev_t *dev)
 
 bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     // Wait at least 3 minutes after power-on
     if (esp_timer_get_time() < MHZ19B_WARMING_UP_TIME_US)
@@ -86,11 +89,11 @@ bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up)
             int16_t co2, last_co2;
             last_co2 = dev->last_value;
             // Sensor returns valid data after CPU reset and keep sensor powered
-            CHECK(mhz19b_read_CO2(dev, &co2));
-            if ((last_co2 != -1) && (last_co2 != co2)) {
+            if (mhz19b_read_co2(dev, &co2) != ESP_OK)
+                return false;
+            if ((last_co2 != -1) && (last_co2 != co2))
                 // CO2 value changed since last read, no longer warming-up
                 return false;
-            }
         }
         // Warming-up
         return true;
@@ -102,7 +105,7 @@ bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up)
 
 bool mhz19b_is_ready(mhz19b_dev_t *dev)
 {
-	CHECK_ARG(dev);
+    if (!dev) return false;
 
     // Minimum CO2 read interval (Built-in LED flashes)
     if ((esp_timer_get_time() - dev->last_ts) > MHZ19B_READ_INTERVAL_MS) {
@@ -112,57 +115,43 @@ bool mhz19b_is_ready(mhz19b_dev_t *dev)
     return false;
 }
 
-esp_err_t mhz19b_read_CO2(mhz19b_dev_t *dev, int16_t *co2)
+esp_err_t mhz19b_read_co2(mhz19b_dev_t *dev, int16_t *co2)
 {
-	CHECK_ARG(dev);
-    CHECK_ARG(co2);
+    CHECK_ARG(dev && co2);
 
-    esp_err_t result;
     // Send command "Read CO2 concentration"
-    result = mhz19b_send_command(dev, MHZ19B_CMD_READ_CO2, 0, 0, 0, 0, 0);
+    CHECK(mhz19b_send_command(dev, MHZ19B_CMD_READ_CO2, 0, 0, 0, 0, 0));
 
-    // Check result
-    if (result == ESP_OK) {
-        // 16-bit CO2 value in response Bytes 2 and 3
-        *co2 = (dev->buf[2] << 8) | dev->buf[3];
-        dev->last_ts = esp_timer_get_time();
-        dev->last_value = *co2;
-    }
-    return result;
+    // 16-bit CO2 value in response Bytes 2 and 3
+    *co2 = (dev->buf[2] << 8) | dev->buf[3];
+    dev->last_ts = esp_timer_get_time();
+    dev->last_value = *co2;
+
+    return ESP_OK;
 }
 
-esp_err_t mhz19b_get_version(mhz19b_dev_t *dev, char *version, uint8_t version_len)
+esp_err_t mhz19b_get_version(mhz19b_dev_t *dev, char *version)
 {
-	CHECK_ARG(dev);
-	CHECK_ARG(version);
-
-    esp_err_t result;
-
-    // Argument check
-    if (version_len < 5) {
-		return ESP_ERR_INVALID_ARG;
-    }
+    CHECK_ARG(dev && version);
 
     // Clear version
     memset(version, 0, 5);
 
     // Send command "Read firmware version" (NOT DOCUMENTED)
-    result = mhz19b_send_command(dev, MHZ19B_CMD_GET_VERSION, 0, 0, 0, 0, 0);
+    CHECK(mhz19b_send_command(dev, MHZ19B_CMD_GET_VERSION, 0, 0, 0, 0, 0));
 
-    // Check result
-    if (result == ESP_OK) {
-        // Copy 4 ASCII characters to version array like "0443"
-        for (uint8_t i = 0; i < 4; i++) {
-            // Version in response Bytes 2..5
-            version[i] = dev->buf[i + 2];
-        }
+    // Copy 4 ASCII characters to version array like "0443"
+    for (uint8_t i = 0; i < 4; i++) {
+        // Version in response Bytes 2..5
+        version[i] = dev->buf[i + 2];
     }
-    return result;
+
+    return ESP_OK;
 }
 
-esp_err_t mhz19b_set_range(mhz19b_dev_t *dev, MHZ19B_range_e range)
+esp_err_t mhz19b_set_range(mhz19b_dev_t *dev, mhz19b_range_t range)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     // Send "Set range" command
     return mhz19b_send_command(dev, MHZ19B_CMD_SET_RANGE,
@@ -171,29 +160,24 @@ esp_err_t mhz19b_set_range(mhz19b_dev_t *dev, MHZ19B_range_e range)
 
 esp_err_t mhz19b_get_range(mhz19b_dev_t *dev, uint16_t *range)
 {
-	CHECK_ARG(dev);
-	CHECK_ARG(range);
+    CHECK_ARG(dev && range);
 
-    esp_err_t result;
     // Send command "Read range" (NOT DOCUMENTED)
-    result = mhz19b_send_command(dev, MHZ19B_CMD_GET_RANGE, 0, 0, 0, 0, 0);
+    CHECK(mhz19b_send_command(dev, MHZ19B_CMD_GET_RANGE, 0, 0, 0, 0, 0));
 
-    // Check result
-    if (result == ESP_OK) {
-        // Range is in Bytes 4 and 5
-        *range = (dev->buf[4] << 8) | dev->buf[5];
+    // Range is in Bytes 4 and 5
+    *range = (dev->buf[4] << 8) | dev->buf[5];
 
-        // Check range according to documented specification
-        if ((*range != MHZ19B_RANGE_2000) && (*range != MHZ19B_RANGE_5000)) {
-            result = ESP_ERR_INVALID_RESPONSE;
-        }
-    }
-    return result;
+    // Check range according to documented specification
+    if ((*range != MHZ19B_RANGE_2000) && (*range != MHZ19B_RANGE_5000))
+        return ESP_ERR_INVALID_RESPONSE;
+
+    return ESP_OK;
 }
 
 esp_err_t mhz19b_set_auto_calibration(mhz19b_dev_t *dev, bool calibration_on)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     // Send command "Set Automatic Baseline Correction (ABC logic function)"
     return mhz19b_send_command(dev, MHZ19B_CMD_SET_AUTO_CAL, (calibration_on ? 0xA0 : 0x00), 0, 0, 0, 0);
@@ -201,24 +185,20 @@ esp_err_t mhz19b_set_auto_calibration(mhz19b_dev_t *dev, bool calibration_on)
 
 esp_err_t mhz19b_get_auto_calibration(mhz19b_dev_t *dev, bool *calibration_on)
 {
-	CHECK_ARG(dev);
-	CHECK_ARG(calibration_on);
-    esp_err_t result;
+    CHECK_ARG(dev && calibration_on);
 
     // Send command "Get Automatic Baseline Correction (ABC logic function)" (NOT DOCUMENTED)
-    result = mhz19b_send_command(dev, MHZ19B_CMD_GET_AUTO_CAL, 0, 0, 0, 0, 0);
+    CHECK(mhz19b_send_command(dev, MHZ19B_CMD_GET_AUTO_CAL, 0, 0, 0, 0, 0));
 
-    // Check result
-    if (result == ESP_OK) {
-        // Response is located in Byte 7: 0 = off, 1 = on
-        *calibration_on = dev->buf[7] & 0x01;
-    }
-    return result;
+    // Response is located in Byte 7: 0 = off, 1 = on
+    *calibration_on = dev->buf[7] & 0x01;
+
+    return ESP_OK;
 }
 
 esp_err_t mhz19b_start_calibration(mhz19b_dev_t *dev)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     // Send command "Zero Point Calibration"
     return mhz19b_send_command(dev, MHZ19B_CMD_CAL_ZERO_POINT, 0, 0, 0, 0, 0);
@@ -226,10 +206,9 @@ esp_err_t mhz19b_start_calibration(mhz19b_dev_t *dev)
 
 esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_t b4, uint8_t b5, uint8_t b6, uint8_t b7)
 {
-	CHECK_ARG(dev);
+    CHECK_ARG(dev);
 
     uint8_t txBuffer[MHZ19B_SERIAL_RX_BYTES] = { 0xFF, 0x01, cmd, b3, b4, b5, b6, b7, 0x00 };
-    esp_err_t result = ESP_OK;
 
     // Check initialized
     if ((dev->buf == NULL) || (!uart_is_driver_installed(dev->uart_port))) {
@@ -237,7 +216,7 @@ esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_
     }
 
     // Add CRC Byte
-    txBuffer[8] = mhz19b_calc_CRC(txBuffer);
+    txBuffer[8] = mhz19b_calc_crc(txBuffer);
 
     // Clear receive buffer
     uart_flush(dev->uart_port);
@@ -257,21 +236,21 @@ esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_
 
     // Check received Byte[0] == 0xFF and Byte[1] == transmit command
     if ((dev->buf[0] != 0xFF) || (dev->buf[1] != cmd))
-        result = ESP_ERR_INVALID_RESPONSE;
+        return ESP_ERR_INVALID_RESPONSE;
 
     // Check received Byte[8] CRC
-    if (dev->buf[8] != mhz19b_calc_CRC(dev->buf))
-        result = ESP_ERR_INVALID_CRC;
+    if (dev->buf[8] != mhz19b_calc_crc(dev->buf))
+        return ESP_ERR_INVALID_CRC;
 
     // Return result
-    return result;
+    return ESP_OK;
 }
 
 // ----------------------------------------------------------------------------
 // Private functions
 // ----------------------------------------------------------------------------
 
-uint8_t mhz19b_calc_CRC(uint8_t *data)
+uint8_t mhz19b_calc_crc(uint8_t *data)
 {
     uint8_t crc = 0;
 

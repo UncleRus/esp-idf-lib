@@ -141,6 +141,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 |----------------|-------------------------------------------------------------------------|---------|---------|---------------
 | **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes     | Yes
 | **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes     | Yes
+| **mhz19b**     | Driver for MH-Z19B NDIR CO2 sensor                                      | BSD     | Yes     | *No*
 
 ### ADC/DAC
 
@@ -234,3 +235,5 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 - [Lucio Tarantino](https://github.com/dianlight), developer of ADS111x driver
 - [Julian Dörner](https://github.com/juliandoerner), developer of TSL2591 driver
 - [FastLED community](https://github.com/FastLED), developers of `lib8tion`, `color` and `noise` libraries
+- [Erriez](https://github.com/Erriez), developer of MH-Z19B driver
+- [David Douard](https://github.com/douardda), developer of MH-Z19B driver
