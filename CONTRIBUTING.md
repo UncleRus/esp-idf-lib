@@ -226,6 +226,38 @@ The CI builds your code twice; with `idf.py` and with `GNU make`. Both must be
 successful. In ESP8266 RTOS SDK, `idf.py` is lagged behind from the one in
 `esp-idf`. For ESP8266 target, the CI builds examples with `GNU make` only.
 
+Check return codes (most of functions in `esp-idf`), return values (e.g.
+`malloc(3)`), or `errno` (e.g. some standard C functions).  Propagate the
+error by returning it from your function. An example:
+
+```c
+#include <esp_err.h>
+#include <esp_log.h>
+
+esp_err_t do_something()
+{
+    esp_err_t err;
+
+    err = foo();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE("bar", "foo(): %s", esp_err_to_name(err);
+        goto fail;
+    }
+fail:
+    return err;
+}
+```
+
+Note that newer `esp-idf` supports useful macros for error handling, such as
+`ESP_GOTO_ON_ERROR` (see
+[Error Handling](https: //docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/error-handling.html)),
+but older versions do not have them yet.
+
+Check given arguments in functions, and return an appropriate error from one
+of predefined errors (see
+[Error Codes Reference](https: //docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/error-codes.html)).
+
 ### Writing a commit message
 
 When you commit, prefix the first line of your commit message with `foo:`,
