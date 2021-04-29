@@ -14,6 +14,7 @@
     * [Crating an Issue](#crating-an-issue)
     * [Creating a feature branch in your fork and develop](#creating-a-feature-branch-in-your-fork-and-develop)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
+    * [Writing a commit message](#writing-a-commit-message)
     * [Creating a Pull Request](#creating-a-pull-request)
 * [Licenses](#licenses)
     * [Acceptable licenses](#acceptable-licenses)
@@ -155,13 +156,15 @@ git checkout -b my-feature
 ````
 
 Write your code. Test the code in your physical test environment.  Commit your
-changes and push them to your remote fork on GitHub
+changes and push them to your remote fork on GitHub.
 
 ```console
 git add path/to/files
 git commit -v
 git push --set-upstream origin my-feature
 ````
+
+See also [Writing a commit message](#writing-a-commit-message).
 
 At this point, our CI workflows will run to test the changes. The test
 workflows include:
@@ -222,6 +225,51 @@ build method is considered as legacy, it is still a supported build method.
 The CI builds your code twice; with `idf.py` and with `GNU make`. Both must be
 successful. In ESP8266 RTOS SDK, `idf.py` is lagged behind from the one in
 `esp-idf`. For ESP8266 target, the CI builds examples with `GNU make` only.
+
+### Writing a commit message
+
+When you commit, prefix the first line of your commit message with `foo:`,
+where `foo` is the name of component you are working on. Sometimes, it is not
+possible because you are working on multiple components, i.e. fixing common
+bugs in multiple components. In such cases, use `bugfix:`. Other commonly used
+prefix words are:
+
+- `feature:` for features, or improvements, in multiple components
+- `ci:` for fixes or improvements in the CI process
+- `doc:` for fixes and improvements in the documentation
+
+These prefix words are for conventional purposes. Use common sense and make
+the commit message clear so that others can understand what the change is.
+
+The rest of the first line should start with a verb. Examples:
+
+```text
+foo: fix typos
+```
+
+```text
+foo: resolve race condition in bar()
+```
+
+The first line should make sense when reading _"When you merge this, it will
+`$THE_FIRST_LINE`"_.
+
+The second line of the commit message must be an empty line.
+
+In the rest of the commit message, write details of the change if necessary.
+Explain what it does _and_ *why*.  The lines in the commit message should be
+limited to 72 characters or less where possible.
+
+Include a reference to an Issue when the commit fixes an Issue.
+
+```text
+fixes #$ISSUE_NUMBER
+```
+
+When an Issue number or a Pull Request number is prefixed with certain
+keywords, the referenced Issue or Pull Request will be closed. See [Linking a
+pull request to an issue using a keyword](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
+for the supported keywords.
 
 ### Creating a Pull Request
 
