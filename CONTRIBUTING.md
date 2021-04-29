@@ -212,7 +212,7 @@ document how).
 Your code assumes a single SDK. `esp-idf-lib` supports `master` and stable
 versions of `esp-idf` and `ESP8266 RTOS SDK`. Generally, the SDKs retain
 backward compatibilities, but sometimes not. Make sure to use `if` C
-preprocessor macro to support different versions. `esp_idf_lib_helpers`
+preprocessor macro to support different versions. `[esp_idf_lib_helpers](components/esp_idf_lib_helpers)`
 component can help you.  `ESP8266 RTOS SDK` shares many functions and
 libraries, backported from `esp-idf`, but they are not identical. `I2C`
 drivers written with [`i2cdev`](components/i2cdev) should work fine on ESP32
@@ -241,7 +241,7 @@ esp_err_t do_something()
     err = foo();
     if (err != ESP_OK)
     {
-        ESP_LOGE("bar", "foo(): %s", esp_err_to_name(err);
+        ESP_LOGE("bar", "foo(): %s", esp_err_to_name(err));
         goto fail;
     }
 fail:
@@ -251,12 +251,12 @@ fail:
 
 Note that newer `esp-idf` supports useful macros for error handling, such as
 `ESP_GOTO_ON_ERROR` (see
-[Error Handling](https: //docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/error-handling.html)),
+[Error Handling](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/error-handling.html)),
 but older versions do not have them yet.
 
 Check given arguments in functions, and return an appropriate error from one
 of predefined errors (see
-[Error Codes Reference](https: //docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/error-codes.html)).
+[Error Codes Reference](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/error-codes.html)).
 
 ### Writing a commit message
 
