@@ -46,8 +46,7 @@ Please include how to reproduce the bug in the Issue. The more context, the
 better. For example:
 
 - The _full_ error message in text format and the entire code (comment with
-  `&#96;&#96;&#96;` for short code, use [Gist](https://gist.github.com) for
-  long code)
+  ` ``` ` for short code, use [Gist](https://gist.github.com) for long code)
 - The circuit diagram
 - Captured signals by an oscilloscope or a signal analyser ([sigrok](https://sigrok.org/))
 
@@ -124,8 +123,8 @@ _Feature branch workflow_ is adopted in our development.
 [Git Feature Branch Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow)
 by `atlassian` explains the workflow in details.
 
-Fork the repository and clone it on your machine. See [Fork a repo](https:
-//docs.github.com/en/github/getting-started-with-github/fork-a-repo).
+Fork the repository and clone it on your machine.
+See [Fork a repo](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo).
 
 Create a feature branch in your fork from the `master` branch.
 
@@ -134,7 +133,7 @@ git checkout master
 ```
 Check out the feature branch.
 
-```cosole
+```console
 git checkout -b my-feature
 ````
 
@@ -161,7 +160,7 @@ merge your changes to `master` branch, all the tests must pass.
 Make sure you are working on the latest `master` of `esp-idf-lib`. To sync the
 `master` in your fork and the latest `master` of `esp-idf-lib`, run:
 
-```cosole
+```console
 git checkout master
 git fetch upstream
 git reset --hard upstream/master
