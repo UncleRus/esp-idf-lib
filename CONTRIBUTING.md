@@ -8,6 +8,7 @@
     * [Submitting a fix](#submitting-a-fix)
     * [Writing documentation](#writing-documentation)
     * [Suggesting enhancements](#suggesting-enhancements)
+    * [Promoting the project](#promoting-the-project)
     * [Writing code](#writing-code)
 * [Development Life Cycle](#development-life-cycle)
     * [Crating an Issue](#crating-an-issue)
@@ -28,10 +29,11 @@ you_. We appreciate your efforts and contributions. Here is possible
 contributions you can make.
 
 * [Submitting a bug report](#submitting-a-bug-report)
-* [Writing documentation](#submitting-a-fix)
+* [Submitting a fix](#submitting-a-fix)
+* [Writing documentation](#writing-documentation)
 * [Suggesting enhancements](#suggesting-enhancements)
-* Writing code
-* Promoting the project
+* [Promoting the project](#promoting-the-project)
+* [Writing code](#writing-code)
 
 ### Submitting a bug report
 
@@ -62,8 +64,8 @@ homework. The homework include:
 
 If you found a bug and a fix for it, please create a bug report before
 creating a Pull Request unless the bug is subtle, typos, or easy to reproduce
-and fix. Make sure to read [Development Life Cycle] as a Pull Request must
-meet the same standards documented in the section.
+and fix. Make sure to read [Development Life Cycle](#development-life-cycle)
+as a Pull Request must meet the same standards documented in the section.
 
 ### Writing documentation
 
@@ -92,10 +94,18 @@ a request for new driver. It is more likely to happen when:
 - the chip is easily available
 - the chip is affordable
 
+### Promoting the project
+
+If you find the projetc useful, we are interested in what you did with
+`esp-idf-lib`, and _how_ you did it.
+
+- Writing a blog post about your porject with `esp-idf-lib`
+- Mentioning the project in SNS
+
 ### Writing code
 
 If you can write a driver for new chip, that would be great. Please read
-[Development Life Cycle].
+[Development Life Cycle](#development-life-cycle).
 
 ## Development Life Cycle
 
