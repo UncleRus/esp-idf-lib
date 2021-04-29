@@ -58,7 +58,14 @@ homework. The homework include:
 - Reading the data sheets
 - Reading [the official documentation of `esp-idf`](https://docs.espressif.com/projects/esp-idf)
   (it's good, really)
-- Understanding C language in general (TODO add resources here)
+- Understanding C language in general
+
+For introductory C tutorials, see:
+
+- [C Tutorial](https://www.tutorialspoint.com/cprogramming/) by
+  `Tutorialspoint`
+- [C Programming](https://en.wikibooks.org/wiki/C_Programming) by
+  `Wikibooks`
 
 ### Submitting a fix
 
