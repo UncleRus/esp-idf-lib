@@ -210,6 +210,12 @@ and ESP8266, while SPI drivers need serious workarounds to support ESP8266.
 [`led_strip_spi`](components/led_strip_spi) attempted to support both, but you
 might want to write a different driver for each.
 
+Your code assumes a single build method, such as `idf.py`. Although `GNU make`
+build method is considered as legacy, it is still a supported build method.
+The CI builds your code twice; with `idf.py` and with `GNU make`. Both must be
+successful. In ESP8266 RTOS SDK, `idf.py` is lagged behind from the one in
+`esp-idf`. For ESP8266 target, the CI builds examples with `GNU make` only.
+
 ### Creating a Pull Request
 
 When your code is ready to be merged, and all the tests have passed in the CI,
