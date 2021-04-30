@@ -14,6 +14,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * @file lm75.c
+ *
+ * ESP-IDF driver for LM75, a digital temperature sensor and thermal watchdog.
+ *
+ * The driver depends on i2cdev library in `esp-idf-lib`.
+ *
+ * The driver was written using LM75B.
+ */
 #include <esp_log.h>
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>

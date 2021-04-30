@@ -3,7 +3,7 @@
  *
  * ESP-IDF driver for SGP40 Indoor Air Quality Sensor for VOC Measurements
  *
- * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */

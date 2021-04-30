@@ -1,10 +1,4 @@
-/**
- * @file sensirion_voc_algorithm.h
- * @defgroup sgp40 sgp40
- * @{
- *
- * Library for calculating concentration of volatile organic compounds
- *
+/*
  * Copyright (c) 2020, Sensirion AG
  * All rights reserved.
  *
@@ -33,6 +27,14 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * @file sensirion_voc_algorithm.h
+ * @defgroup sgp40 sgp40
+ * @{
+ *
+ * Library for calculating concentration of volatile organic compounds
  */
 
 #ifndef VOCALGORITHM_H_
