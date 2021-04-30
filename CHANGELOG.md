@@ -2,7 +2,7 @@
 
 ## v.0.8.0
 
-#### Features
+### Features
 
 - (wiegand) Wiegand protocol receiver
 - (lib8tion) Math functions specifically designed for LED programming (port from FastLED)
@@ -15,7 +15,7 @@
 - (ci) Support ESP8266 RTOS SDK v3.3
 - (doc) Added initial version of CONTRIBUTING.md
 
-#### Bugfixes
+### Bugfixes
 
 - (sht3x) Fixed documentation
 - (ds18x20) Fixed ds18x20_scan_devices(), new example
@@ -28,30 +28,28 @@
 - (refactoring) Updated component makefiles and CMakeLists
 - (i2cdev) Added option to disable all mutexes
 
-
 ## v.0.7.3
 
-#### Features
+### Features
 
 - (led_strip_spi) #156 SPI-based driver for SK9822/APA102 LED strips
 - (ds3502) #160 Driver for nonvolatile digital potentiometer DS3502
 - (sht4x) #165 Driver for SHT4x temperature and humidity sensor
 
-#### Bugfixes
+### Bugfixes
 
 - (pca9685) b633f86 Speed-ups
 - (max7219) #159 Add "minus" sign and fix maximum brightness
 
-
 ## v.0.7.2
 
-#### Features
+### Features
 
 - (tsl2591) #149 Driver for light-to-digital converter TSL2591
 - (sgp40) #137 Driver for SGP40 Indoor Air Quality Sensor
 - (ccs811) #67 Driver for AMS CCS811 digital gas sensor
 
-#### Bugfixes
+### Bugfixes
 
 - (ci) #147 Cache Espressif tools
 - (ci) #155 Update v4.2 branch
@@ -63,15 +61,14 @@
 - (doc) Multiple fixes
 - (pca9685) ce8f3fa Fix possible race condition
 
-
 ## v.0.7.1
 
-#### Features
+### Features
 
 - (mcp960x) #141 Driver + example for MCP960X/L0X/RL0X
 - (tsys01) #142 Driver + example for TSYS01
 
-#### Bugfixes
+### Bugfixes
 
 - (qmc5883l) dd17522 Fix possible race condition
 - (tca95x5) #144 Copy-paste error, add example
@@ -82,7 +79,7 @@
 
 ## v.0.7
 
-#### Features
+### Features
 
 - (ina260) #126 Driver for INA260 precision digital current and power monitor
 - (rda5807m) #25 Driver for single-chip broadcast FM radio tuner RDA5807M
@@ -90,21 +87,21 @@
 
 ## v.0.6.1
 
-#### Bugfixes
+### Bugfixes
 
 - (ina219) #100 Potential error in ina219_get_gain
 - (bme680) #121 Pressure calculation for bme680 gives wrong results
 
 ## v.0.6
 
-#### Features
+### Features
 
 - (ci) #116 Port CI process from Travis CI to GitHub Actions
 - (ci) Update CI build tools
 - (ads111x) #117 Support of ADS101x on top ADS111x
 - (led_strip) #120 Smart LED strips support
 
-#### Bugfixes
+### Bugfixes
 
 - (ds1307) #110 wrong squarewave frequency returned
 - (sht3x, hmc5883l, hx711) #118 SHT3x measurements fail after 72min
@@ -113,10 +110,10 @@
 
 ## v.0.5-beta
 
-#### Features
+### Features
 
 - (mcp342x) #92 Driver for ADC MCP3426/MCP3427/MCP3428
 
-#### Bugfixes
+### Bugfixes
 
 - (ds1302) #97 Fix critical section exit
