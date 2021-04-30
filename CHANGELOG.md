@@ -25,6 +25,7 @@
 - (led_strip) White component for RGBW strips now calculated automatically
 - (led_strip) Fixed bug in led_strip_set_pixels()
 - (led_strip) Added support for global brightness for ESP-IDF >= v4.4
+- (led_strip) Improved stability for WS2812B
 - (refactoring) Updated component makefiles and CMakeLists
 - (i2cdev) Added option to disable all mutexes
 
