@@ -1,5 +1,34 @@
 # Changelog
 
+## v.0.8.0
+
+#### Features
+
+- (wiegand) Wiegand protocol receiver
+- (lib8tion) Math functions specifically designed for LED programming (port from FastLED)
+- (color) Common library for RGB and HSV colors (port from FastLED)
+- (noise) Noise generation functions (port from FastLED)
+- (framebuffer) RGB framebuffer and animation component
+- (mhz19b) Added support for the MH-Z19B CO2 sensor
+- (ci) Dropped support for ESP-IDF < v3.5
+- (ci) Preliminary and untested support for ESP32-C3
+- (ci) Support ESP8266 RTOS SDK v3.3
+- (doc) Added initial version of CONTRIBUTING.md
+
+#### Bugfixes
+
+- (sht3x) Fixed documentation
+- (ds18x20) Fixed ds18x20_scan_devices(), new example
+- (ultrasonic) Added more precise measurement functions
+- (led_strip_spi) Fixed SPI buffer limitation for ESP8266
+- (led_strip) Fixed buffer overflow error for RGBW strips
+- (led_strip) White component for RGBW strips now calculated automatically
+- (led_strip) Fixed bug in led_strip_set_pixels()
+- (led_strip) Added support for global brightness for ESP-IDF >= v4.4
+- (refactoring) Updated component makefiles and CMakeLists
+- (i2cdev) Added option to disable all mutexes
+
+
 ## v.0.7.3
 
 #### Features
@@ -12,6 +41,7 @@
 
 - (pca9685) b633f86 Speed-ups
 - (max7219) #159 Add "minus" sign and fix maximum brightness
+
 
 ## v.0.7.2
 
