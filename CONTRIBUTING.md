@@ -254,11 +254,13 @@ clang-format10 -i components/example/example.c
 We use [the default `markdownlint` rules](https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md)
 with some non-defaults. Our style can be found in [`.mdlstyle.rb`](.mdlstyle.rb).
 
-| Rule                                 | non-default options                          |
-| ------------------------------------ | -------------------------------------------- |
-| `MD003` - Header style               | use `#` for headers                          |
-| `MD007` - Unordered list indentation | indent with 4 spaces                         |
-| `MD013` - Line length                | ignore line length in code blocks and tables |
+| Rule                                 | non-default options                            |
+| ------------------------------------ | ---------------------------------------------- |
+| `MD003` - Header style               | use `#` for headers                            |
+| `MD007` - Unordered list indentation | indent with 4 spaces                           |
+| `MD013` - Line length                | ignore line length in code blocks and tables   |
+| `MD024` - Multiple headers with the same content | `allow_different_nesting` is true  |
+| `MD029` - Ordered list item prefix   | `style` is `ordered`, i.e. incremental numbers |
 
 In the CI, we use ruby version of `markdownlint`, or [`mdl`](https://rubygems.org/gems/mdl/)
 gem, but [markdownlint for node.js](https://github.com/DavidAnson/markdownlint)
