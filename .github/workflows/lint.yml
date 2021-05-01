@@ -36,7 +36,7 @@ jobs:
 
           # install the latest stable. the package in official Ubuntu
           # repository is not always up-to-date.
-          CLANG_VERSION_STABLE="11"
+          CLANG_VERSION_STABLE="10"
           CODE_NAME=`lsb_release -sc`
           echo "CLANG_VERSION_STABLE=${CLANG_VERSION_STABLE}" >> ${GITHUB_ENV}
 
