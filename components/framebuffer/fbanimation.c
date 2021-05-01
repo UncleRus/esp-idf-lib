@@ -71,7 +71,6 @@ esp_err_t fb_animation_init(fb_animation_t *animation, framebuffer_t *fb)
         .arg = animation,
         .callback = display_frame,
         .dispatch_method = ESP_TIMER_TASK,
-        .skip_unhandled_events = true,
     };
     return esp_timer_create(&timer_args, &animation->timer);
 }
