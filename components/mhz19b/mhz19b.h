@@ -72,7 +72,8 @@ typedef struct
 
 //! Fixed 9 Bytes response
 #define MHZ19B_SERIAL_RX_BYTES          9
-#define MHZ19B_SERIAL_BUF_LEN           16
+//! 128 is the minimal value the UART driver will accept (at least on esp32)
+#define MHZ19B_SERIAL_BUF_LEN           128
 
 //! Response timeout between 15..120 ms at 9600 baud works reliable for all commands
 #define MHZ19B_SERIAL_RX_TIMEOUT_MS     120
