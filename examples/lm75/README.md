@@ -1,4 +1,4 @@
-## What the example does
+# What the example does
 
 The example application initializes LM75 device. In a loop, it reads
 temperature value from the device, prints it to the console. During the loop,
@@ -24,14 +24,14 @@ For ESP32, no additional configuration is necessary.
 
 For ESP8266, the following non-default configuration is necessary.
 
-```
+```text
 # [Component config] > [Newlib] > [newlib level], set `normal`
 CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL=y
 ```
 
 ## Example output
 
-```
+```console
 I (71) boot: Partition Table:
 I (76) boot: ## Label            Usage          Type ST Offset   Length
 I (87) boot:  0 nvs              WiFi data        01 02 00009000 00006000

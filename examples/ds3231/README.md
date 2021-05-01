@@ -1,9 +1,9 @@
-## What the example does
+# What the example does
 
 The example sets (hard-coded) date and time. In the loop, it reads temperature
 and time from the device, prints them to the serial console.
 
-```
+```console
 I (28) boot: ESP-IDF v4.0-dev-1446-g6b169d473 2nd stage bootloader
 I (28) boot: compile time 19:12:04
 I (29) boot: Enabling RNG early entropy source...

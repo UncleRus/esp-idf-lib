@@ -1,13 +1,17 @@
 # FAQ
 
-- [How to debug I2C-based drivers?](#how-to-debug-i2c-based-drivers)
-- [Why are semaphores used in i2cdev routines?](#why-are-semaphores-mutexes-used-in-ic2dev-routines)
-- [How can I connect multiple I2C devices?](#how-can-i-connect-multiple-i2c-devices)
-- [How can I change frequency of I2C clock?](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
-- [How to use internal pull-up resistors?](#how-to-use-internal-pull-up-resistors)
-- [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+<!-- vim-markdown-toc GFM -->
 
-### How to debug I2C-based drivers?
+* [How to debug I2C-based drivers?](#how-to-debug-i2c-based-drivers)
+* [Why are semaphores (mutexes) used in i2cdev routines?](#why-are-semaphores-mutexes-used-in-i2cdev-routines)
+* [How can I connect multiple I2C devices?](#how-can-i-connect-multiple-i2c-devices)
+* [How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
+* [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
+* [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+
+<!-- vim-markdown-toc -->
+
+## How to debug I2C-based drivers?
 
 Common causes of I2C issues are:
 
@@ -37,7 +41,7 @@ can decode I2C signals and display I2C transactions in human-readable way.
 If the driver does not work after these steps, please [let us
 know](https://github.com/UncleRus/esp-idf-lib/issues).
 
-### Why are semaphores (mutexes) used in i2cdev routines?
+## Why are semaphores (mutexes) used in i2cdev routines?
 
 i2cdev uses two types of mutexes: port and transactional.
 
@@ -75,15 +79,15 @@ xTaskCreate(task2, "task2", ....);
 These mutexes are used when single device operation requires several I2C
 transactions in a row.
 
-### How can I connect multiple I2C devices?
+## How can I connect multiple I2C devices?
 
 With i2cdev, you can use almost any way to connect I2C devices.
 
 For example, in the case of using SSD1306 and two MCP3428s, I would recommend
 connecting them like this:
 
-- 2 GPIO outputs on ESP32 for dedicated screen connection via I2C bus 0
-- 2 GPIO outputs to the second I2C bus, to which 2 MCP3428 are connected with
+* 2 GPIO outputs on ESP32 for dedicated screen connection via I2C bus 0
+* 2 GPIO outputs to the second I2C bus, to which 2 MCP3428 are connected with
   different addresses.
 
 If you need to connect more than one sensor with the same addresses and there
@@ -92,7 +96,7 @@ outputs instead of using the I2C multiplexer. i2cdev will take care of
 reconfiguring I2C driver to the according outputs when you exchange data
 with these devices.
 
-### How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.
+## How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.
 
 You can change the frequency after initializing the device handler, like this:
 
@@ -112,7 +116,7 @@ ESP_ERROR_CHECK(ads111x_set_data_rate(&dev, ADS111X_DATA_RATE_32)); // 32 sample
 ...
 ```
 
-### How to use internal pull-up resistors
+## How to use internal pull-up resistors
 
 Just enable them in `i2c_dev_t` config. For example:
 
@@ -126,9 +130,9 @@ ESP_ERROR_CHECK(ads111x_init_desc(&dev, addr, I2C_PORT, SDA_GPIO, SCL_GPIO));
 ...
 ```
 
-### Can I use I2C device drivers from interrupts?
+## Can I use I2C device drivers from interrupts?
 
-With default configuration you can't. Since the drivers use mutexes, this will crash the system.
-But you can disable use of any I2C mutexes (both port and device) in configuration: just enable
-CONFIG_I2CDEV_NOLOCK. Keep in mind that after enabling this option all i2c device drivers 
-will become non-thread safe.
+With default configuration you can't. Since the drivers use mutexes, this will
+crash the system.  But you can disable use of any I2C mutexes (both port and
+device) in configuration: just enable CONFIG_I2CDEV_NOLOCK. Keep in mind that
+after enabling this option all i2c device drivers will become non-thread safe.

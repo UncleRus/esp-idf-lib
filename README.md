@@ -4,7 +4,8 @@
 [![Build the documentation](https://github.com/UncleRus/esp-idf-lib/workflows/Build%20the%20documentation/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions?query=workflow%3A%22Build+the+documentation%22)
 [![Docs Status](https://readthedocs.org/projects/esp-idf-lib/badge/?version=latest&style=flat)](https://esp-idf-lib.readthedocs.io/en/latest/)
 
-Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf) and [ESP8266 RTOS SDK](https://github.com/espressif/ESP8266_RTOS_SDK).
+Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf)
+and [ESP8266 RTOS SDK](https://github.com/espressif/ESP8266_RTOS_SDK).
 
 Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-rtos).
 
@@ -16,10 +17,11 @@ Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 | ESP32-S2 *[1]* | ESP-IDF            | master, v4.x, v.3.3.5
 | ESP8266  *[2]* | ESP8266 RTOS SDK   | master, v3.3
 
-[1] *Use "`idf.py set-target esp32s2`" before "`idf.py menuconfig`" to change the chip type.*
+[1] *Use "`idf.py set-target esp32s2`" before "`idf.py menuconfig`" to change
+the chip type.*
 
-[2] *Due to the incompatibility of ESP8266 drivers and hardware, some libraries are not*
-*supported on ESP8266 (see "ESP8266" column in the tables).*
+[2] *Due to the incompatibility of ESP8266 drivers and hardware, some
+libraries are not* *supported on ESP8266 (see "ESP8266" column in the tables).*
 
 ## How to use
 
@@ -29,7 +31,7 @@ Clone this repository somewhere, e.g.:
 
 ```Shell
 cd ~/myprojects/esp
-git clone https://github.com/UncleRus/esp-idf-lib.git 
+git clone https://github.com/UncleRus/esp-idf-lib.git
 ```
 
 Add path to components in your project makefile, e.g:
@@ -82,7 +84,8 @@ EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip
 include $(IDF_PATH)/make/project.mk
 ```
 
-See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples) or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/examples).
+See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples)
+or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/examples).
 
 ## Documentation
 
@@ -209,7 +212,6 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 | **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes     | Yes
 | **wiegand**    | Wiegand protocol receiver                                               | BSD     | Yes     | *No*
 
-
 ## Library maintainers
 
 - [Ruslan V. Uss](https://github.com/UncleRus)
@@ -217,10 +219,12 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 
 ## Credits
 
-- [Tomoyuki Sakurai](https://github.com/trombik), developer of the LM75 and SK9822/APA102 drivers,
-  author of the RTOS SDK ESP82666 support, master CI
-- [Gunar Schorcht](https://github.com/gschorcht), developer of SHT3x, BME680 and CCS811 drivers
-- [Brian Schwind](https://github.com/bschwind), developer of TS2561 and TSL4531 drivers
+- [Tomoyuki Sakurai](https://github.com/trombik), developer of the LM75 and
+  SK9822/APA102 drivers, author of the RTOS SDK ESP82666 support, master CI
+- [Gunar Schorcht](https://github.com/gschorcht), developer of SHT3x, BME680
+  and CCS811 drivers
+- [Brian Schwind](https://github.com/bschwind), developer of TS2561 and
+  TSL4531 drivers
 - [Andrej Krutak](https://github.com/andree182), developer of BH1750 driver
 - Frank Bargstedt, developer of BMP180 driver
 - [sheinz](https://github.com/sheinz), developer of BMP280 driver
@@ -234,6 +238,7 @@ See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/exampl
 - [Pham Ngoc Thanh](https://github.com/panoti), developer of PCF8591 driver
 - [Lucio Tarantino](https://github.com/dianlight), developer of ADS111x driver
 - [Julian Dörner](https://github.com/juliandoerner), developer of TSL2591 driver
-- [FastLED community](https://github.com/FastLED), developers of `lib8tion`, `color` and `noise` libraries
+- [FastLED community](https://github.com/FastLED), developers of `lib8tion`,
+  `color` and `noise` libraries
 - [Erriez](https://github.com/Erriez), developer of MH-Z19B driver
 - [David Douard](https://github.com/douardda), developer of MH-Z19B driver
