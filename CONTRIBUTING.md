@@ -39,8 +39,8 @@ contributions you can make.
 
 ### Submitting a bug report
 
-In embedded device development, finding bugs is more difficult than other
-software development. There are too many uncontrollable factors; physical
+In embedded device development, finding bugs is more difficult than in other
+software development. There are too many uncontrollable factors: physical
 environment, counterfeit IC chips, deviations in revisions and variations,
 difficulties in automations. Even if the bug turned out to be not a bug, such
 report is still appreciated as it is another proof that the code works as
@@ -105,7 +105,7 @@ a request for new driver. It is more likely to happen when:
 
 ### Promoting the project
 
-If you find the projetc useful, we are interested in what you did with
+If you find the project useful, we are interested in what you did with
 `esp-idf-lib`, and _how_ you did it.
 
 - Writing a blog post about your porject with `esp-idf-lib`
@@ -120,7 +120,7 @@ If you can write a driver for new chip, that would be great. Please read
 
 In this section, a typical development life cycle is explained.
 
-### Crating an Issue
+### Creating an Issue
 
 If you are working on a new driver, or an existing one, please create an
 Issue, and assign the Issue to yourself.
@@ -248,25 +248,25 @@ clang-format10 -i components/example/example.c
 
 ### Typical issues you will face in developments
 
-Your code assumes a single target, such as `esp32`. `esp-idf-lib` supports
+**Your code assumes a single target, such as `esp32`**. `esp-idf-lib` supports
 other targets, notably `esp8266`. Make sure the driver supports various other
 targets. If it cannot, such as the peripheral is not available on the target
 chip, your code should bailout during the build by using `#error` C
 preprocessor macro, and your driver must be excluded from the CI (TODO
 document how).
 
-Your code assumes a single SDK. `esp-idf-lib` supports `master` and stable
+**Your code assumes a single SDK**. `esp-idf-lib` supports `master` and stable
 versions of `esp-idf` and `ESP8266 RTOS SDK`. Generally, the SDKs retain
 backward compatibilities, but sometimes not. Make sure to use `if` C
-preprocessor macro to support different versions. `[esp_idf_lib_helpers](components/esp_idf_lib_helpers)`
-component can help you.  `ESP8266 RTOS SDK` shares many functions and
+preprocessor macro to support different versions. [`esp_idf_lib_helpers`](components/esp_idf_lib_helpers)
+component can help you. `ESP8266 RTOS SDK` shares many functions and
 libraries, backported from `esp-idf`, but they are not identical. `I2C`
 drivers written with [`i2cdev`](components/i2cdev) should work fine on ESP32
 and ESP8266, while SPI drivers need serious workarounds to support ESP8266.
 [`led_strip_spi`](components/led_strip_spi) attempted to support both, but you
 might want to write a different driver for each.
 
-Your code assumes a single build method, such as `idf.py`. Although `GNU make`
+**Your code assumes a single build method, such as `idf.py`**. Although `GNU make`
 build method is considered as legacy, it is still a supported build method.
 The CI builds your code twice; with `idf.py` and with `GNU make`. Both must be
 successful. In ESP8266 RTOS SDK, `idf.py` is lagged behind from the one in
@@ -355,14 +355,14 @@ When your code is ready to be merged, and all the tests have passed in the CI,
 create a Pull Request. Before creating a Pull Request, make sure:
 
 1. You compiled the code and the build succeeded
-1. You pushed the changes to your remote fork and the CI passed
-1. Functions, macros, data types are documented in the code
-1. An example application is provided under [`examples`](examples)
-1. You compiled the example code and the example application ran on a
+2. You pushed the changes to your remote fork and the CI passed
+3. Functions, macros, data types are documented in the code
+4. An example application is provided under [`examples`](examples)
+5. You compiled the example code and the example application ran on a
    physical device as expected and documented
-1. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
+6. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
    by including the license at the top of file
-1. One of your commits in the feature branch, or the PR itself, mentions Issue
+7. One of your commits in the feature branch, or the PR itself, mentions Issue
    number so that the Issue will be automatically closed when the PR is merged
 
 From this point, you should avoid to `git rebase` your feature branch.
@@ -385,8 +385,8 @@ We accept permissive licenses such as:
 
 ### Acceptable license for new code
 
-New code is the one you own (you wrote it from scratch).  The preferred
-license to be applied to new code is a simplified ISC License.  The license
+New code is the one you own (you wrote it from scratch). The preferred
+license to be applied to new code is a simplified ISC License. The license
 must be included at the top in every files as long as practically possible.
 The following is a preferred wording of the license.
 
