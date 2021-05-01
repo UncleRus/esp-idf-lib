@@ -24,7 +24,6 @@ static const char *TAG = "led_effect_example";
 
 #define LED_GPIO 5
 #define LED_TYPE LED_STRIP_WS2812
-#define LED_CHANNEL RMT_CHANNEL_0
 
 #define LED_MATRIX_WIDTH  16
 #define LED_MATRIX_HEIGHT 16
@@ -84,11 +83,7 @@ static led_strip_t strip = {
     .type = LED_TYPE,
     .length = LED_MATRIX_WIDTH * LED_MATRIX_HEIGHT,
     .gpio = LED_GPIO,
-    .channel = LED_CHANNEL,
     .buf = NULL,
-#ifdef LED_STIRP_BRIGNTNESS
-    .brightness = 0xff
-#endif
 };
 
 static effect_t current_effect = EFFECT_NONE;

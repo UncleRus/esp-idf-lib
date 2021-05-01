@@ -5,7 +5,6 @@
 
 #define LED_TYPE LED_STRIP_WS2812
 #define LED_GPIO 5
-#define LED_CHANNEL RMT_CHANNEL_0
 
 static const rgb_t colors[] = {
     { .r = 0x0f, .g = 0x0f, .b = 0x0f },
@@ -23,11 +22,7 @@ void test(void *pvParameters)
         .type = LED_TYPE,
         .length = CONFIG_LED_STRIP_LEN,
         .gpio = LED_GPIO,
-        .channel = LED_CHANNEL,
         .buf = NULL,
-#ifdef LED_STIRP_BRIGNTNESS
-        .brightness = 255
-#endif
     };
 
     ESP_ERROR_CHECK(led_strip_init(&strip));
