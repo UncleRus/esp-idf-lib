@@ -1,6 +1,7 @@
 # How to contribute to `esp-idf-lib`
 
 ## Table of Contents
+
 <!-- vim-markdown-toc GFM -->
 
 * [Possible contributions](#possible-contributions)
@@ -13,7 +14,8 @@
 * [Development Life Cycle](#development-life-cycle)
     * [Creating an Issue](#creating-an-issue)
     * [Creating a feature branch in your fork and develop](#creating-a-feature-branch-in-your-fork-and-develop)
-    * [Code style](#code-style)
+    * [C Code style](#c-code-style)
+    * [`markdown` Code style](#markdown-code-style)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
     * [Writing a commit message](#writing-a-commit-message)
     * [Creating a Pull Request](#creating-a-pull-request)
@@ -49,24 +51,24 @@ expected in a different environment.
 Please include how to reproduce the bug in the Issue. The more context, the
 better. For example:
 
-- The _full_ error message in text format and the entire code (comment with
+* The _full_ error message in text format and the entire code (comment with
   ` ``` ` for short code, use [Gist](https://gist.github.com) for long code)
-- The circuit diagram
-- Captured signals by an oscilloscope or a signal analyser ([sigrok](https://sigrok.org/))
+* The circuit diagram
+* Captured signals by an oscilloscope or a signal analyser ([sigrok](https://sigrok.org/))
 
 A question as a bug report is okay but we expect bug reporters to do their
 homework. The homework include:
 
-- Reading the data sheets
-- Reading [the official documentation of `esp-idf`](https://docs.espressif.com/projects/esp-idf)
+* Reading the data sheets
+* Reading [the official documentation of `esp-idf`](https://docs.espressif.com/projects/esp-idf)
   (it's good, really)
-- Understanding C language in general
+* Understanding C language in general
 
 For introductory C tutorials, see:
 
-- [C Tutorial](https://www.tutorialspoint.com/cprogramming/) by
+* [C Tutorial](https://www.tutorialspoint.com/cprogramming/) by
   `Tutorialspoint`
-- [C Programming](https://en.wikibooks.org/wiki/C_Programming) by
+* [C Programming](https://en.wikibooks.org/wiki/C_Programming) by
   `Wikibooks`
 
 ### Submitting a fix
@@ -99,17 +101,17 @@ issue is optional).
 While we are not always able to write a driver for a chip, we still appreciate
 a request for new driver. It is more likely to happen when:
 
-- the chip is _cool_
-- the chip is easily available
-- the chip is affordable
+* the chip is _cool_
+* the chip is easily available
+* the chip is affordable
 
 ### Promoting the project
 
 If you find the project useful, we are interested in what you did with
 `esp-idf-lib`, and _how_ you did it.
 
-- Writing a blog post about your porject with `esp-idf-lib`
-- Mentioning the project in SNS
+* Writing a blog post about your porject with `esp-idf-lib`
+* Mentioning the project in SNS
 
 ### Writing code
 
@@ -150,6 +152,7 @@ Create a feature branch in your fork from the `master` branch.
 ```console
 git checkout master
 ```
+
 Check out the feature branch.
 
 ```console
@@ -170,10 +173,10 @@ See also [Writing a commit message](#writing-a-commit-message).
 At this point, our CI workflows will run to test the changes. The test
 workflows include:
 
-- building the documentation,
-- building all examples for all supported targets with all supported
+* building the documentation,
+* building all examples for all supported targets with all supported
   `esp-idf` versions, and
-- linting code and documentation
+* linting code and documentation
 
 You can see the test results in `Actions` page on your GitHub fork. To
 merge your changes to `master` branch, all the tests must pass.
@@ -201,26 +204,26 @@ Note that `git rebase` rewrites the commit history. You should avoid `git
 rebase` after you asked someone to review your code because the reviewer needs
 additional steps to ensure the review result is included.
 
-### Code style
+### C Code style
 
 We use a style for source files based on [LLVM Coding Standards](https://llvm.org/docs/CodingStandards.html)
 except some cases, notably brace wrapping. Here is a brief list of the styles.
 
-- Use `snake_case`, not `CamelCase`
-- Use `SNAKE_CASE` in uppercase for macro name, e.g. `MACRO_NAME`.
-- Use spaces. The indent width is four
-- Use `\n`, or `LF` for line breaks
-- Use `//` for inline comments. Use `/* */` for multi line comments after an
+* Use `snake_case`, not `CamelCase`
+* Use `SNAKE_CASE` in uppercase for macro name, e.g. `MACRO_NAME`.
+* Use spaces. The indent width is four
+* Use `\n`, or `LF` for line breaks
+* Use `//` for inline comments. Use `/* */` for multi line comments after an
   empty line
-- Break before braces in *most cases* (functions, conditionals, control
+* Break before braces in *most cases* (functions, conditionals, control
   statements, etc)
-- Always check given arguments
-- Always check return code, return value, or `errno`
-- Return `esp_err_t` from functions where possible
-- Document public functions, data types, and macros in header files
-- Use suffix `_t` for `typedef`, e.g. `foo_t`
-- Use suffix `_cb_t` for function `typedef`, e.g.`my_function_cb_t`
-- Use suffix `_s` for `struct`, e.g. `my_struct_s`
+* Always check given arguments
+* Always check return code, return value, or `errno`
+* Return `esp_err_t` from functions where possible
+* Document public functions, data types, and macros in header files
+* Use suffix `_t` for `typedef`, e.g. `foo_t`
+* Use suffix `_cb_t` for function `typedef`, e.g.`my_function_cb_t`
+* Use suffix `_s` for `struct`, e.g. `my_struct_s`
 
 The style should be followed for all new code. In general, code can be
 considered "new code" when it makes up about 50% or more of the file(s)
@@ -244,6 +247,38 @@ To format your code in-place, run:
 
 ```console
 clang-format10 -i components/example/example.c
+```
+
+### `markdown` Code style
+
+We use [the default `markdownlint` rules](https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md)
+with some non-defaults. Our style can be found in [`.mdlstyle.rb`](.mdlstyle.rb).
+
+| Rule                                 | non-default options                          |
+| ------------------------------------ | -------------------------------------------- |
+| `MD003` - Header style               | use `#` for headers                          |
+| `MD007` - Unordered list indentation | indent with 4 spaces                         |
+| `MD013` - Line length                | ignore line length in code blocks and tables |
+
+In the CI, we use ruby version of `markdownlint`, or [`mdl`](https://rubygems.org/gems/mdl/)
+gem, but [markdownlint for node.js](https://github.com/DavidAnson/markdownlint)
+should also work.
+
+To test `markdown` style of a file, you need:
+
+* `ruby` 2.6
+* `bundler` 2.x
+
+```console
+bundle install
+bundle exec mdl path/to/file
+```
+
+The output shows path to the file, line number, and the rule.  An example
+output is shown below.
+
+```console
+examples/led_strip_spi/README.md:30: MD040 Fenced code blocks should have a language specified
 ```
 
 ### Typical issues you will face in developments
@@ -312,9 +347,9 @@ possible because you are working on multiple components, i.e. fixing common
 bugs in multiple components. In such cases, use `bugfix:`. Other commonly used
 prefix words are:
 
-- `feature:` for features, or improvements, in multiple components
-- `ci:` for fixes or improvements in the CI process
-- `doc:` for fixes and improvements in the documentation
+* `feature:` for features, or improvements, in multiple components
+* `ci:` for fixes or improvements in the CI process
+* `doc:` for fixes and improvements in the documentation
 
 These prefix words are for conventional purposes. Use common sense and make
 the commit message clear so that others can understand what the change is.
@@ -379,9 +414,9 @@ anyone and for any purpose.
 
 We accept permissive licenses such as:
 
-- ISC License
-- MIT License
-- BSD License
+* ISC License
+* MIT License
+* BSD License
 
 ### Acceptable license for new code
 
@@ -412,9 +447,9 @@ The following is a preferred wording of the license.
 
 We do NOT accept `copyleft` licenses such as:
 
-- GPL License
-- LGPL License
-- GNU Affero General Public License (AGPL)
+* GPL License
+* LGPL License
+* GNU Affero General Public License (AGPL)
 
 We do NOT accept _long_ licenses. A license is considered as _long_ when
 it has more than four clauses.
@@ -422,5 +457,5 @@ it has more than four clauses.
 We do NOT accept protective licenses that have additional restrictions, such
 as:
 
-- Apache license version 2 or later
-- various so-called _Shareware_ or _Freeware_
+* Apache license version 2 or later
+* various so-called _Shareware_ or _Freeware_

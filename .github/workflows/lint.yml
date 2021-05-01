@@ -76,3 +76,21 @@ jobs:
             git diff --color
             exit 1
           fi
+  mdl:
+    runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+          bundler-cache: true
+
+      - name: Run Markdown lint tool
+        run: |
+          bundle exec mdl -g .
