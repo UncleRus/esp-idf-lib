@@ -207,9 +207,10 @@ We use a style for source files based on [LLVM Coding Standards](https://llvm.or
 except some cases, notably brace wrapping. Here is a brief list of the styles.
 
 - Use `snake_case`, not `CamelCase`
+- Use `SNAKE_CASE` in uppercase for macro name, e.g. `MACRO_NAME`.
 - Use spaces. The indent width is four
-- Use `\r\n`, or `CR + LF` for line breaks
-- Use `\\` for inline comments. Use `/* */` for multi line comments after an
+- Use `\n`, or `LF` for line breaks
+- Use `//` for inline comments. Use `/* */` for multi line comments after an
   empty line
 - Break before braces in *most cases* (functions, conditionals, control
   statements, etc)
@@ -217,6 +218,9 @@ except some cases, notably brace wrapping. Here is a brief list of the styles.
 - Always check return code, return value, or `errno`
 - Return `esp_err_t` from functions where possible
 - Document public functions, data types, and macros in header files
+- Use suffix `_t` for `typedef`, e.g. `foo_t`
+- Use suffix `_cb_t` for function `typedef`, e.g.`my_function_cb_t`
+- Use suffix `_s` for `struct`, e.g. `my_struct_s`
 
 The style should be followed for all new code. In general, code can be
 considered "new code" when it makes up about 50% or more of the file(s)

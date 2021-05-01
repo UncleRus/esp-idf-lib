@@ -7,7 +7,7 @@ BasedOnStyle: LLVM
 
 BreakBeforeBraces: Custom
 BraceWrapping:
-    AfterClass: false
+    AfterClass: true
     AfterControlStatement: true
     AfterEnum: true
     AfterFunction: true
@@ -20,4 +20,4 @@ BraceWrapping:
     IndentBraces: false
 IndentWidth: 4
 IndentCaseLabels: true
-UseCRLF: true
+UseCRLF: false
