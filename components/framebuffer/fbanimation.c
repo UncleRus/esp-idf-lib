@@ -51,7 +51,7 @@ static void display_frame(void *ctx)
         return;
     }
     // render frame
-    fb_render(animation->fb, animation->render_ctx);
+    res = fb_render(animation->fb, animation->render_ctx);
     if (res != ESP_OK)
     {
         ESP_LOGE(TAG, "Error rendering frame %d (%s)", res, esp_err_to_name(res));
@@ -70,7 +70,8 @@ esp_err_t fb_animation_init(fb_animation_t *animation, framebuffer_t *fb)
     esp_timer_create_args_t timer_args = {
         .arg = animation,
         .callback = display_frame,
-        .dispatch_method = ESP_TIMER_TASK
+        .dispatch_method = ESP_TIMER_TASK,
+        .skip_unhandled_events = true,
     };
     return esp_timer_create(&timer_args, &animation->timer);
 }
