@@ -13,6 +13,7 @@
 * [Development Life Cycle](#development-life-cycle)
     * [Crating an Issue](#crating-an-issue)
     * [Creating a feature branch in your fork and develop](#creating-a-feature-branch-in-your-fork-and-develop)
+    * [Code style](#code-style)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
     * [Writing a commit message](#writing-a-commit-message)
     * [Creating a Pull Request](#creating-a-pull-request)
@@ -199,6 +200,47 @@ git push -f
 Note that `git rebase` rewrites the commit history. You should avoid `git
 rebase` after you asked someone to review your code because the reviewer needs
 additional steps to ensure the review result is included.
+
+### Code style
+
+We use a style for source files based on [LLVM Coding Standards](https://llvm.org/docs/CodingStandards.html)
+except some cases, notably brace wrapping. Here is a brief list of the styles.
+
+- Use `snake_case`, not `CamelCase`
+- Use spaces. The indent width is four
+- Use `\r\n`, or `CR + LF` for line breaks
+- Use `\\` for inline comments. Use `/* */` for multi line comments after an
+  empty line
+- Break before braces in *most cases* (functions, conditionals, control
+  statements, etc)
+- Always check given arguments
+- Always check return code, return value, or `errno`
+- Return `esp_err_t` from functions where possible
+- Document public functions, data types, and macros in header files
+
+The style should be followed for all new code. In general, code can be
+considered "new code" when it makes up about 50% or more of the file(s)
+involved. This is enough to break precedents in the existing code and use the
+current style guidelines.
+
+See an example source files under [`components/exmaple`](components/example)
+and, for complete rules, see [`.clang-format`](.clang-format) and the output
+of `clang-format --dump-config`.
+
+New code will be tested in the CI, using `clang-format` (currently `LLVM`
+version 10).
+
+To format your code without modifying the code, run:
+
+```console
+clang-format10 components/example/example.c
+```
+
+To format your code in-place, run:
+
+```console
+clang-format10 -i components/example/example.c
+```
 
 ### Typical issues you will face in developments
 
