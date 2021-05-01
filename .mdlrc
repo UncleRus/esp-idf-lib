@@ -1,0 +1,3 @@
+# configuration file for `mdl` command line options
+
+style "#{File.dirname(__FILE__)}/.mdlstyle.rb"

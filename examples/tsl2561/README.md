@@ -1,9 +1,9 @@
-## What the example does
+# What the example does
 
 The example continually prints illuminance in lux to serial console. An
 example:
 
-```
+```console
 I (43) boot: ESP-IDF v3.2-18-gf1b9e15b-dirty 2nd stage bootloader
 I (43) boot: compile time 15:41:21
 I (44) qio_mode: Enabling default flash chip QIO
@@ -25,8 +25,8 @@ I (281) system_api: Base MAC address is not set, read default base MAC address f
 I (291) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
 I (481) phy_init: phy ver: 1055_12
 I (491) reset_reason: RTC reset 2 wakeup 0 store 0, reason is 2
-I (491) gpio: GPIO[4]| InputEn: 0| OutputEn: 1| OpenDrain: 1| Pullup: 0| Pulldown: 0| Intr:0 
-I (501) gpio: GPIO[5]| InputEn: 0| OutputEn: 1| OpenDrain: 1| Pullup: 0| Pulldown: 0| Intr:0 
+I (491) gpio: GPIO[4]| InputEn: 0| OutputEn: 1| OpenDrain: 1| Pullup: 0| Pulldown: 0| Intr:0
+I (501) gpio: GPIO[5]| InputEn: 0| OutputEn: 1| OpenDrain: 1| Pullup: 0| Pulldown: 0| Intr:0
 Found TSL2561 in package T/FN/CL
 Lux: 1245
 Lux: 1252

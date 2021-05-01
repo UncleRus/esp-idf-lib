@@ -1,9 +1,9 @@
-## What the example does
+# What the example does
 
 The example continually prints illuminance in lux to serial console and reacts to
 als and als no persistence interrupts.
 
-```
+```console
 I (33) boot: ESP-IDF v4.3-dev-2136-gb0150615d 2nd stage bootloader
 I (33) boot: compile time 14:49:46
 I (33) boot: chip revision: 1

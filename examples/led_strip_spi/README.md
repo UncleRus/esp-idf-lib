@@ -27,7 +27,7 @@ default is 8 pixels.
 direction of data flow is correct. The `GPIO`s must be connected to the first
 LED. My strip has arrows on the strip like below.
 
-```
+```text
 --------------------- Data flow ------------------>
 
                   .--------------------------.

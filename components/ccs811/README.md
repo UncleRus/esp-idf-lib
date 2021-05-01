@@ -1,6 +1,6 @@
-# Driver for the ams CCS811 digital gas sensor for monitoring indoor air quality.
+# Driver for the ams CCS811 digital gas sensor for monitoring indoor air quality
 
-The driver is for the usage with the ESP-IDF. 
+The driver is for the usage with the ESP-IDF.
 
 ## About the sensor
 
@@ -70,18 +70,18 @@ if (ccs811_init(&sensor) == ESP_OK)
 **Please note:**
 
 1. After setting the mode, the sensor is in conditioning period that needs up
-to 20 minutes, before accurate readings are generated, see the data sheet for
-more details.
+   to 20 minutes, before accurate readings are generated, see the data sheet for
+   more details.
 
 2. During the early-live (burn-in) period, the CCS811 sensor should run for
-48 hours in the selected mode of operation to ensure sensor performance is
-stable, see the datasheet for more details.
+   48 hours in the selected mode of operation to ensure sensor performance is
+   stable, see the datasheet for more details.
 
 3. When the sensor operating mode is changed to a new mode with a lower sample
-rate, e.g., from *Pulse Heating Mode* (`CCS811_MODE_10S`) to *Low Power Pulse
-Heating Mode* (`CCS811_MODE_60S`), it should be placed in *Idle, Low Current
-Mode* (`CCS811_MODE_IDLE`) for at least 10 minutes before enabling the new
-mode.
+   rate, e.g., from *Pulse Heating Mode* (`CCS811_MODE_10S`) to *Low Power Pulse
+   Heating Mode* (`CCS811_MODE_60S`), it should be placed in *Idle, Low Current
+   Mode* (`CCS811_MODE_IDLE`) for at least 10 minutes before enabling the new
+   mode.
 
 When a sensor operating mode is changed to a new mode with a higher sample
 rate, e.g., from *Low Power Pulse Heating Mode* (`CCS811_MODE_60S`) to
@@ -126,14 +126,14 @@ are returned and the error code CCS811_ERR_NO_NEW_DATA.
 **Please note:**
 
 1. In *Constant Power Mode* with measurements every 250 ms (`CCS811_MODE_250MS`)
-only raw data are available.
+   only raw data are available.
 
 2. The rate of fetching data must not be greater than the rate of measurement.
-Due to the sensor mode timing tolerance of 2 %, the rate of fetching data
-should be lower than the measurement rate.
+   Due to the sensor mode timing tolerance of 2 %, the rate of fetching data
+   should be lower than the measurement rate.
 
 3. If the function is called and no new data are available, the results of the
-latest measurement are returned and error code CCS811_ERR_NO_NEW_DATA is set.
+   latest measurement are returned and error code CCS811_ERR_NO_NEW_DATA is set.
 
 ### Compensation
 
@@ -162,7 +162,9 @@ reference resistor (R_REF). Function `ccs811_get_ntc_resistance()` can be used
 to fetch the current resistance of R_NTC. It uses the resistance of R_REF and
 measured voltages V_REF and V_NTV with the following equation:
 
+```text
           R_NTC = R_REF / V_REF * V_NTC
+```
 
 Using the data sheet of the NTC, the ambient temperature can be calculated. See
 application note ams AN000372 for more details. For example, with Adafruit
@@ -226,9 +228,9 @@ The interrupt is disabled by default and can be enabled with function
 `ccs811_set_eco2_thresholds()`. The ranges are defined by parameters *low* and
 *high* as following
 
-  - **LOW** - below parameter value *low*
-  - **MEDIUM** - between parameter values *low* and *high*
-  - **HIGH** - above parameter value *high* is range **HIGH**.
+- **LOW** - below parameter value *low*
+- **MEDIUM** - between parameter values *low* and *high*
+- **HIGH** - above parameter value *high* is range **HIGH**.
 
 If all parameters have valid values, the function sets the thresholds and
 enables the data ready interrupt. Using 0 for all parameters disables the

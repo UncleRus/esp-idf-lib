@@ -2,10 +2,9 @@
 
 Forked from [original driver by Gunar Schorcht](https://github.com/gschorcht/bme680-esp-idf).
 
-The driver supports multiple BME680 sensors which are connected
-to the same or different I2C interfaces with different addresses.
-
-*SPI interface is not supported yet*
+The driver supports multiple BME680 sensors which are connected to the same or
+different I2C interfaces with different addresses.  *SPI interface is not
+supported yet*.
 
 It is for the usage with the ESP8266 and [ESP8266 RTOS SDK](https://github.com/espressif/ESP8266_RTOS_SDK)
 or ESP32 and [ESP-IDF](https://github.com/espressif/esp-idf.git).
@@ -17,7 +16,7 @@ pressure, humidity and gas sensors in only one unit.
 
 ## Communication interface
 
-The BME680 sensor can be connected using I2C. 
+The BME680 sensor can be connected using I2C.
 
 The I2C interface supports data rates up to 1 Mbps (ESP-IDF limitation). It is
 possible to connect multiple BME680 sensors with different I2C slave addresses
@@ -32,13 +31,13 @@ BME680 operates in two different modes, the **sleep mode** and the
 
 The sensor starts after power-up automatically in the *sleep mode* where it
 does not perform any measurement and consumes only 0.15 μA. Measurements are
-only done in *forced mode*. 
+only done in *forced mode*.
 
 **Please note:** There are two further undocumented modes, the *parallel* and
 the *sequential* mode. They can't be supported by the driver, since it is
 not clear what they do and how to use them.
 
-#### Measurement cylce
+### Measurement cylce
 
 To perform measurements, the BME680 sensor has to be triggered to switch to
 the **forced mode**. In this mode, it performs exactly one measurement of
@@ -57,15 +56,13 @@ To avoid the blocking of the user task during measurements, the measurement
 process is therefore separated into the following steps:
 
 1. Trigger the sensor with function `bme680_force_measurement()` to switch
-to *forced mode* in which it performs exactly one THPG measurement cycle.
-
+   to *forced mode* in which it performs exactly one THPG measurement cycle.
 2. Wait the measurement duration using function `vTaskDelay()` and the value
-returned from function `bme680_get_measurement_duration()` or wait as long
-as function `bme680_is_measuring` returns true.
-
+   returned from function `bme680_get_measurement_duration()` or wait as long
+   as function `bme680_is_measuring` returns true.
 3. Fetch the results as fixed point values with function
-`bme680_get_results_fixed()` or as floating point values with function
-`bme680_get_results_float()`.
+   `bme680_get_results_fixed()` or as floating point values with function
+   `bme680_get_results_float()`.
 
 ```C
 ...
@@ -84,7 +81,9 @@ if (bme680_force_measurement(sensor) == ESP_OK) // STEP 1
 }
 ...
 ```
+
 Alternatively, busy waiting can be realized using function `bme680_is_measuring()`.
+
 ```C
 ...
 if (bme680_force_measurement(sensor) == ESP_OK) // STEP 1
@@ -93,7 +92,7 @@ if (bme680_force_measurement(sensor) == ESP_OK) // STEP 1
     bool busy;
     do
     {
-    	ESP_ERROR_CHECK(bme680_is_measuring(sensor, &busy));
+        ESP_ERROR_CHECK(bme680_is_measuring(sensor, &busy));
     }
     while(busy);
 
@@ -125,7 +124,7 @@ Once the sensor has finished the measurement raw data are available at the senso
 Either function `bme680_get_results_fixed()` or function
 `bme680_get_results_float()` can be used to fetch the results. Both functions
 read raw data from the sensor and converts them into utilizable fixed point or
-floating point sensor values. 
+floating point sensor values.
 
 **Please note:** Conversion of raw sensor data into the final sensor values is
 based on very complex calculations that use a large number of calibration
@@ -155,18 +154,18 @@ are returned:
 | humidity       | 0           | 0.0
 | gas_resistance | 0           | 0.0
 
-
 ## Measurement settings
 
 The sensor allows to change a lot of measurement parameters.
 
-#### Oversampling rates
+### Oversampling rates
 
-To increase the resolution of raw sensor data, the sensor supports oversampling
-for temperature,  pressure, and humidity measurements. Using function
-`bme680_set_oversampling_rates()`, individual **oversampling rates** can be
-defined for these measurements. With an oversampling rate *osr*, the resolution
-of the according raw sensor data can be increased from 16 bit to 16+ld(*osr*) bit. 
+To increase the resolution of raw sensor data, the sensor supports
+oversampling for temperature,  pressure, and humidity measurements. Using
+function `bme680_set_oversampling_rates()`, individual **oversampling rates**
+can be defined for these measurements. With an oversampling rate *osr*, the
+resolution of the according raw sensor data can be increased from 16 bit to
+16+ld(*osr*) bit.
 
 Possible oversampling rates are 1x (default by the driver) 2x, 4x, 8x and 16x.
 It is also possible to define an oversampling rate of 0. This **deactivates**
@@ -179,7 +178,7 @@ ESP_ERROR_CHECK(bme680_set_oversampling_rates(sensor, osr_4x, osr_2x, osr_none))
 ...
 ```
 
-#### IIR Filter
+### IIR Filter
 
 The sensor also integrates an internal IIR filter (low pass filter) to reduce
 short-term changes in sensor output values caused by external disturbances.
@@ -205,7 +204,7 @@ bme680_set_filter_size(sensor, iir_size_0);
 ...
 ```
 
-#### Heater profile
+### Heater profile
 
 For the gas measurement, the sensor integrates a heater. Parameters for this
 heater are defined by **heater profiles**. The sensor supports up to 10 such
@@ -244,6 +243,7 @@ heater profiles for successive TPHG measurements using function
 
 For example, if there were 5 heater profiles defined with following code
 during the setup
+
 ```C
 bme680_set_heater_profile(sensor, 0, 200, 100);
 bme680_set_heater_profile(sensor, 1, 250, 120);
@@ -271,7 +271,7 @@ while (1)
     uint32_t duration;
     bme680_get_measurement_duration(sensor, &duration);
 
-    // trigger the sensor to start one TPHG measurement cycle 
+    // trigger the sensor to start one TPHG measurement cycle
     if (bme680_force_measurement(sensor) == ESP_OK)
     {
         vTaskDelay(duration);
@@ -285,7 +285,7 @@ while (1)
 ...
 ```
 
-#### Ambient temperature
+### Ambient temperature
 
 The heater resistance calculation algorithm takes into account the ambient
 temperature of the sensor. Using function `bme680_set_ambient_temperature()`,
@@ -311,7 +311,7 @@ configurations.
 
 First figure shows the configuration with only one sensor at I2C bus 0.
 
-```
+```text
  +------------------+   +----------+
  | ESP8266 / ESP32  |   | BME680   |
  |                  |   |          |
@@ -323,7 +323,7 @@ First figure shows the configuration with only one sensor at I2C bus 0.
 Next figure shows a possible configuration with two I2C buses. In that case,
 the sensors can have same or different I2C slave addresses.
 
-```
+```text
  +------------------+   +----------+
  | ESP8266 / ESP32  |   | BME680_1 |
  |                  |   |          |

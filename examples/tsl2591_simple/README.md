@@ -1,9 +1,9 @@
-## What the example does
+# What the example does
 
 The example continually prints illuminance in lux to serial console. An
 example:
 
-```
+```console
 I (33) boot: ESP-IDF v4.3-dev-2136-gb0150615d 2nd stage bootloader
 I (33) boot: compile time 14:46:52
 I (33) boot: chip revision: 1

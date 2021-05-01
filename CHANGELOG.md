@@ -5,7 +5,8 @@
 ### Features
 
 - (wiegand) Wiegand protocol receiver
-- (lib8tion) Math functions specifically designed for LED programming (port from FastLED)
+- (lib8tion) Math functions specifically designed for LED programming (port
+  from FastLED)
 - (color) Common library for RGB and HSV colors (port from FastLED)
 - (noise) Noise generation functions (port from FastLED)
 - (framebuffer) RGB framebuffer and animation component
@@ -106,7 +107,7 @@
 
 - (ds1307) #110 wrong squarewave frequency returned
 - (sht3x, hmc5883l, hx711) #118 SHT3x measurements fail after 72min
-- (pca9685) d4f5e35 Fix full on/off 
+- (pca9685) d4f5e35 Fix full on/off
 - (ina219) Typo fix
 
 ## v.0.5-beta
