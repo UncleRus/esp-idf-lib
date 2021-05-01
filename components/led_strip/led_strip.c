@@ -64,10 +64,10 @@ static const char *TAG = "led_strip";
 
 #define LED_STRIP_RMT_CLK_DIV 2
 
-#define WS2812_T0H_NS   350
+#define WS2812_T0H_NS   400
 #define WS2812_T0L_NS   1000
 #define WS2812_T1H_NS   1000
-#define WS2812_T1L_NS   350
+#define WS2812_T1L_NS   400
 
 #define SK6812_T0H_NS   300
 #define SK6812_T0L_NS   900
@@ -113,7 +113,7 @@ static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t s
     while (size < src_size && num < wanted_num)
     {
 #ifdef LED_STIRP_BRIGNTNESS
-        uint8_t b = scale8_video(*psrc, brightness);
+        uint8_t b = brightness != 255 ? scale8_video(*psrc, brightness) : *psrc;
 #else
         uint8_t b = *psrc;
 #endif
