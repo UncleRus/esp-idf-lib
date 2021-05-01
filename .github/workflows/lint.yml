@@ -93,4 +93,18 @@ jobs:
 
       - name: Run Markdown lint tool
         run: |
-          bundle exec mdl -g .
+          # XXX check known files and directory instead of all files.
+          #
+          # this workaround is necessary because of several issues:
+          #
+          # * `mdl` does not support `ignore files or directories`.
+          # * `mdl` does not support inline ignore
+          # * `FAQ.md` has headings whose texts are too long
+          #
+          # relates issues:
+          #
+          # * https://github.com/markdownlint/markdownlint/issues/167
+          # * https://github.com/markdownlint/markdownlint/issues/16
+          #
+          # bundle exec mdl -i -g .
+          bundle exec mdl -i README.md CHANGELOG.md components examples
