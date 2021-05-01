@@ -11,7 +11,7 @@
     * [Promoting the project](#promoting-the-project)
     * [Writing code](#writing-code)
 * [Development Life Cycle](#development-life-cycle)
-    * [Crating an Issue](#crating-an-issue)
+    * [Creating an Issue](#creating-an-issue)
     * [Creating a feature branch in your fork and develop](#creating-a-feature-branch-in-your-fork-and-develop)
     * [Code style](#code-style)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
