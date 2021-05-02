@@ -162,6 +162,10 @@ git checkout -b my-feature
 Write your code. Test the code in your physical test environment.  Commit your
 changes and push them to your remote fork on GitHub.
 
+[`components/example`](components/example) has an example component, and
+[`examples/example`](examples/example) has an example application for the
+`example` component.
+
 ```console
 git add path/to/files
 git commit -v
@@ -224,6 +228,7 @@ except some cases, notably brace wrapping. Here is a brief list of the styles.
 * Use suffix `_t` for `typedef`, e.g. `foo_t`
 * Use suffix `_cb_t` for function `typedef`, e.g.`my_function_cb_t`
 * Use suffix `_s` for `struct`, e.g. `my_struct_s`
+* Wrap numbers in macro definition with parenthesis, e.g. `#define N_FOO (1)`
 
 The style should be followed for all new code. In general, code can be
 considered "new code" when it makes up about 50% or more of the file(s)
