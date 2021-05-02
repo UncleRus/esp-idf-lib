@@ -63,7 +63,6 @@
 static const char *TAG = "led_strip";
 
 #define LED_STRIP_RMT_CLK_DIV 2
-#define RMT_CHANNEL RMT_CHANNEL_0
 
 #define WS2812_T0H_NS   400
 #define WS2812_T0L_NS   1000
@@ -106,9 +105,18 @@ static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t s
     size_t num = 0;
     uint8_t *psrc = (uint8_t *)src;
     rmt_item32_t *pdest = dest;
+#ifdef LED_STRIP_BRIGHTNESS
+    led_strip_t *strip;
+    esp_err_t r = rmt_translator_get_context(item_num, (void **)&strip);
+    uint8_t brightness = r == ESP_OK ? strip->brightness : 255;
+#endif
     while (size < src_size && num < wanted_num)
     {
+#ifdef LED_STRIP_BRIGHTNESS
+        uint8_t b = brightness != 255 ? scale8_video(*psrc, brightness) : *psrc;
+#else
         uint8_t b = *psrc;
+#endif
         for (int i = 0; i < 8; i++)
         {
             // MSB first
@@ -186,9 +194,8 @@ esp_err_t led_strip_init(led_strip_t *strip)
         return ESP_ERR_NO_MEM;
     }
 
-    rmt_config_t config = RMT_DEFAULT_CONFIG_TX(strip->gpio, RMT_CHANNEL);
+    rmt_config_t config = RMT_DEFAULT_CONFIG_TX(strip->gpio, strip->channel);
     config.clk_div = LED_STRIP_RMT_CLK_DIV;
-    config.mem_block_num = 8; // maximal RMT blocks or it will interfere with WiFi
 
     CHECK(rmt_config(&config));
     CHECK(rmt_driver_install(config.channel, 0, 0));
@@ -210,6 +217,10 @@ esp_err_t led_strip_init(led_strip_t *strip)
             return ESP_ERR_NOT_SUPPORTED;
     }
     CHECK(rmt_translator_init(config.channel, f));
+#ifdef LED_STRIP_BRIGHTNESS
+    // No support for translator context prior to ESP-IDF 4.4
+    CHECK(rmt_translator_set_context(config.channel, strip));
+#endif
 
     return ESP_OK;
 }
@@ -219,7 +230,7 @@ esp_err_t led_strip_free(led_strip_t *strip)
     CHECK_ARG(strip && strip->buf);
     free(strip->buf);
 
-    CHECK(rmt_driver_uninstall(RMT_CHANNEL));
+    CHECK(rmt_driver_uninstall(strip->channel));
 
     return ESP_OK;
 }
@@ -228,23 +239,23 @@ esp_err_t led_strip_flush(led_strip_t *strip)
 {
     CHECK_ARG(strip && strip->buf);
 
-    CHECK(rmt_wait_tx_done(RMT_CHANNEL, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
+    CHECK(rmt_wait_tx_done(strip->channel, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
     ets_delay_us(50);
-    return rmt_write_sample(RMT_CHANNEL, strip->buf,
+    return rmt_write_sample(strip->channel, strip->buf,
                             strip->length * COLOR_SIZE(strip), false);
 }
 
 bool led_strip_busy(led_strip_t *strip)
 {
     if (!strip) return false;
-    return rmt_wait_tx_done(RMT_CHANNEL, 0) == ESP_ERR_TIMEOUT;
+    return rmt_wait_tx_done(strip->channel, 0) == ESP_ERR_TIMEOUT;
 }
 
 esp_err_t led_strip_wait(led_strip_t *strip, TickType_t timeout)
 {
     CHECK_ARG(strip);
 
-    return rmt_wait_tx_done(RMT_CHANNEL, timeout);
+    return rmt_wait_tx_done(strip->channel, timeout);
 }
 
 esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)

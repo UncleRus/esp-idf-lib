@@ -84,6 +84,9 @@ static led_strip_t strip = {
     .length = LED_MATRIX_WIDTH * LED_MATRIX_HEIGHT,
     .gpio = LED_GPIO,
     .buf = NULL,
+#ifdef LED_STRIP_BRIGHTNESS
+    .brightness = 255,
+#endif
 };
 
 static effect_t current_effect = EFFECT_NONE;
