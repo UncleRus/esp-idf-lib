@@ -850,3 +850,21 @@ jobs:
               idf.py --ccache build
             fi
           done
+  all_build:
+    # a meta job that requires all of the above so that repository
+    # admin can choose a single test name in "Require status checks to pass
+    # before merging". A trick obtained from:
+    #
+    # https://github.com/jazzband/pip-tools/issues/1085#issuecomment-619172509
+    name: All build
+    runs-on: ubuntu-latest
+    needs:
+      - build_esp32_v4_x
+      - build_esp32_v3_x
+      - build_esp8266
+      - build_esp8266_v3_x
+      - build_esp32s2_v4_x
+    steps:
+      - name:
+        run: |
+          echo "All builds finished"
