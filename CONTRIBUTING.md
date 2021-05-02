@@ -162,6 +162,10 @@ git checkout -b my-feature
 Write your code. Test the code in your physical test environment.  Commit your
 changes and push them to your remote fork on GitHub.
 
+[`components/example`](components/example) has an example component, and
+[`examples/example`](examples/example) has an example application for the
+`example` component.
+
 ```console
 git add path/to/files
 git commit -v
