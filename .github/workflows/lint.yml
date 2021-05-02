@@ -16,9 +16,6 @@ jobs:
         with:
           concurrent_skipping: same_content
 
-          # if the change includes documentation changes only, skip.
-          paths_ignore: '["docs/**", "**/*.md"]'
-
           # but do not skip if the triggered event is one of these.
           do_not_skip: '["workflow_dispatch", "schedule"]'
   clang_format:
@@ -62,12 +59,7 @@ jobs:
           # this allows contributors to run this workflow in their forks.
           BASE_REF="origin/master"
 
-          # when the event is `pull_request`, use the target ref to merge
-          # into.
-          if [ ! -z "${GITHUB_BASE_REF}" ]; then
-            BASE_REF="${GITHUB_BASE_REF}"
-          fi
-          git diff -U0 --no-color ${BASE_REF}...HEAD . | "${CLANG_FORMAT_DIFF}" -i -p1
+          git diff -U0 --no-color ${BASE_REF} | "${CLANG_FORMAT_DIFF}" -i -p1
 
           # see if there are no changes to be committed, and print suggested
           # changes in colour if there are

@@ -1,4 +1,4 @@
-# `example` example
+# Example application for `example` component
 
 ## What the example does
 
