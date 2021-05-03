@@ -76,10 +76,10 @@ typedef enum {
 /**
  * @brief Initialize device descriptor
  *
- * @param dev Device descriptor
- * @param port I2C port
- * @param sda_gpio SDA GPIO pin
- * @param scl_gpio SCL GPIO pin
+ * @param dev       Device descriptor
+ * @param port      I2C port
+ * @param sda_gpio  SDA GPIO pin
+ * @param scl_gpio  SCL GPIO pin
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
@@ -109,8 +109,8 @@ esp_err_t si7021_reset(i2c_dev_t *dev);
  *  - SI7021
  *  - SHT2x
  *
- * @param dev Device descriptor
- * @param[out] on true if heater enabled
+ * @param dev      Device descriptor
+ * @param[out] on  `true` if heater enabled
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_heater(i2c_dev_t *dev, bool *on);
@@ -125,8 +125,8 @@ esp_err_t si7021_get_heater(i2c_dev_t *dev, bool *on);
  *  - SI7021
  *  - SHT2x
  *
- * @param dev Device descriptor
- * @param on if true, heater will be enabled
+ * @param dev   Device descriptor
+ * @param on    if `true`, heater will be enabled
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_set_heater(i2c_dev_t *dev, bool on);
@@ -140,8 +140,8 @@ esp_err_t si7021_set_heater(i2c_dev_t *dev, bool on);
  *  - SI7020
  *  - SI7021
  *
- * @param dev Device descriptor
- * @param[out] level Heater current, see datasheet
+ * @param dev         Device descriptor
+ * @param[out] level  Heater current, see datasheet
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_heater_current(i2c_dev_t *dev, uint8_t *level);
@@ -155,8 +155,8 @@ esp_err_t si7021_get_heater_current(i2c_dev_t *dev, uint8_t *level);
  *  - SI7020
  *  - SI7021
  *
- * @param dev Device descriptor
- * @param level Heater current, see datasheet
+ * @param dev       Device descriptor
+ * @param level     Heater current, see datasheet
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_set_heater_current(i2c_dev_t *dev, uint8_t level);
@@ -164,8 +164,8 @@ esp_err_t si7021_set_heater_current(i2c_dev_t *dev, uint8_t level);
 /**
  * @brief Get measurement resolution
  *
- * @param dev Device descriptor
- * @param[out] r Resolution
+ * @param dev       Device descriptor
+ * @param[out] r    Resolution
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_resolution(i2c_dev_t *dev, si7021_resolution_t *r);
@@ -173,8 +173,8 @@ esp_err_t si7021_get_resolution(i2c_dev_t *dev, si7021_resolution_t *r);
 /**
  * @brief Set measurement resolution
  *
- * @param dev Device descriptor
- * @param r Resolution
+ * @param dev   Device descriptor
+ * @param r     Resolution
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_set_resolution(i2c_dev_t *dev, si7021_resolution_t r);
@@ -182,8 +182,8 @@ esp_err_t si7021_set_resolution(i2c_dev_t *dev, si7021_resolution_t r);
 /**
  * @brief Measure temperature
  *
- * @param dev Device descriptor
- * @param[out] t Temperature, deg. Celsius
+ * @param dev     Device descriptor
+ * @param[out] t  Temperature, deg. Celsius
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_measure_temperature(i2c_dev_t *dev, float *t);
@@ -191,8 +191,8 @@ esp_err_t si7021_measure_temperature(i2c_dev_t *dev, float *t);
 /**
  * @brief Measure relative humidity
  *
- * @param dev Device descriptor
- * @param[out] rh Relative humidity, %
+ * @param dev       Device descriptor
+ * @param[out] rh   Relative humidity, %
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_measure_humidity(i2c_dev_t *dev, float *rh);
@@ -207,9 +207,9 @@ esp_err_t si7021_measure_humidity(i2c_dev_t *dev, float *rh);
  *  - SI7021
  *  - SHT2x
  *
- * @param dev Device descriptor
- * @param[out] serial Serial no.
- * @param sht2x_mode true for SHT2x devices
+ * @param dev          Device descriptor
+ * @param[out] serial  Serial no.
+ * @param sht2x_mode   `true` for SHT2x devices
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_serial(i2c_dev_t *dev, uint64_t *serial, bool sht2x_mode);
@@ -223,8 +223,8 @@ esp_err_t si7021_get_serial(i2c_dev_t *dev, uint64_t *serial, bool sht2x_mode);
  *  - SI7020
  *  - SI7021
  *
- * @param dev Device descriptor
- * @param[out] id Device model
+ * @param dev       Device descriptor
+ * @param[out] id   Device model
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_device_id(i2c_dev_t *dev, si7021_device_id_t *id);

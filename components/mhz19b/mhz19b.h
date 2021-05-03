@@ -57,10 +57,10 @@ extern "C" {
  */
 typedef struct
 {
-    uart_port_t uart_port;  // UART port used to communicate
-    uint8_t *buf;           // read buffer attached to this device
-    int16_t last_value;     // last read value
-    int64_t last_ts;        // timestamp of the last sensor co2 level reading
+    uart_port_t uart_port;  ///< UART port used to communicate
+    uint8_t *buf;           ///< read buffer attached to this device
+    int16_t last_value;     ///< last read value
+    int64_t last_ts;        ///< timestamp of the last sensor co2 level reading
 } mhz19b_dev_t;
 
 //! 3 minutes warming-up time after power-on before valid data returned
@@ -79,23 +79,23 @@ typedef struct
 #define MHZ19B_SERIAL_RX_TIMEOUT_MS     120
 
 // Documented commands
-#define MHZ19B_CMD_SET_AUTO_CAL         0x79 // set auto calibration on/off
-#define MHZ19B_CMD_READ_CO2             0x86 // read CO2 concentration
-#define MHZ19B_CMD_CAL_ZERO_POINT       0x87 // calibrate zero point at 400ppm
-#define MHZ19B_CMD_CAL_SPAN_PIONT       0x88 // calibrate span point (NOT IMPLEMENTED)
-#define MHZ19B_CMD_SET_RANGE            0x99 // set detection range
+#define MHZ19B_CMD_SET_AUTO_CAL         0x79 ///< set auto calibration on/off
+#define MHZ19B_CMD_READ_CO2             0x86 ///< read CO2 concentration
+#define MHZ19B_CMD_CAL_ZERO_POINT       0x87 ///< calibrate zero point at 400ppm
+#define MHZ19B_CMD_CAL_SPAN_PIONT       0x88 ///< calibrate span point (NOT IMPLEMENTED)
+#define MHZ19B_CMD_SET_RANGE            0x99 ///< set detection range
 
 // Not documented commands
-#define MHZ19B_CMD_GET_AUTO_CAL         0x7D // get auto calibration status (NOT DOCUMENTED)
-#define MHZ19B_CMD_GET_RANGE            0x9B // get range detection (NOT DOCUMENTED)
-#define MHZ19B_CMD_GET_VERSION          0xA0 // get firmware version (NOT DOCUMENTED)
+#define MHZ19B_CMD_GET_AUTO_CAL         0x7D ///< get auto calibration status (NOT DOCUMENTED)
+#define MHZ19B_CMD_GET_RANGE            0x9B ///< get range detection (NOT DOCUMENTED)
+#define MHZ19B_CMD_GET_VERSION          0xA0 ///< get firmware version (NOT DOCUMENTED)
 
 /**
  * @brief PPM range
  */
 typedef enum {
-    MHZ19B_RANGE_2000 = 2000,            // 2000 ppm
-    MHZ19B_RANGE_5000 = 5000,            // 5000 ppm (Default)
+    MHZ19B_RANGE_2000 = 2000,            ///< 2000 ppm
+    MHZ19B_RANGE_5000 = 5000,            ///< 5000 ppm (Default)
 } mhz19b_range_t;
 
 
@@ -154,19 +154,14 @@ bool mhz19b_is_ready(mhz19b_dev_t *dev);
  * @brief Read CO2 from sensor
  *
  * @param dev Pointer to the sensor device data structure
- * @param co2 co2 level (output)
- *      <0
- *          MH-Z19B response error codes.
- *      0..399
- *          ppmIncorrect values. Minimum value starts at 400ppm outdoor fresh air.
- *      400..1000 ppm
- *          Concentrations typical of occupied indoor spaces with good air exchange.
- *      1000..2000 ppm
- *          Complaints of drowsiness and poor air quality. Ventilation is required.
- *      2000..5000 ppm
- *          Headaches, sleepiness and stagnant, stale, stuffy air. Poor concentration, loss of
- *          attention, increased heart rate and slight nausea may also be present.\n
- *          Higher values are extremely dangerous and cannot be measured.
+ * @param[out] co2 CO2 level
+ *      - < 0: MH-Z19B response error codes.
+ *      - 0..399 ppm: Incorrect values. Minimum value starts at 400ppm outdoor fresh air.
+ *      - 400..1000 ppm: Concentrations typical of occupied indoor spaces with good air exchange.
+ *      - 1000..2000 ppm: Complaints of drowsiness and poor air quality. Ventilation is required.
+ *      - 2000..5000 ppm: Headaches, sleepiness and stagnant, stale, stuffy air. Poor concentration, loss of
+ *        attention, increased heart rate and slight nausea may also be present.
+ *      - Higher values are extremely dangerous and cannot be measured.
  *
  * @return ESP_OK on success
  */
@@ -179,11 +174,9 @@ esp_err_t mhz19b_read_co2(mhz19b_dev_t *dev, int16_t *co2);
  *      This is an undocumented command, but most sensors returns ASCII "0430 or "0443".
  *
  * @param dev Pointer to the sensor device data structure
- * @param version
+ * @param[out] version
  *      Returned character pointer to version (must be at least 5 Bytes)\n
  *      Only valid when return is set to ESP_OK.
- * @param versionLen
- *      Number of characters including NULL of version buffer.
  *
  * @return ESP_OK on success
  */
@@ -218,18 +211,18 @@ esp_err_t mhz19b_get_range(mhz19b_dev_t *dev, uint16_t *range);
  *
  * @param dev Pointer to the sensor device data structure
  * @param calibration_on
- *      true: Automatic calibration on.\n
- *      false: Automatic calibration off.
+ *      - true: Automatic calibration on.
+ *      - false: Automatic calibration off.
  *
  * @return ESP_OK on success
  */
 esp_err_t mhz19b_set_auto_calibration(mhz19b_dev_t *dev, bool calibration_on);
 
 /**
- * @brief Get status automatic calibration (NOT DOCUMENTED)
+ * @brief Get status of automatic calibration (NOT DOCUMENTED)
  *
  * @param dev Pointer to the sensor device data structure
- * @param calibration_on (output)
+ * @param[out] calibration_on Automatic calibration status
  *
  * @return ESP_OK on success
  */
@@ -242,7 +235,7 @@ esp_err_t mhz19b_get_auto_calibration(
  * @details
  *      The sensor must be powered-up for at least 20 minutes in fresh air at 400ppm room
  *      temperature. Then call this function once to execute self calibration.\n
- *      Recommended to use this function when auto calibrate turned off.
+ *      Recommended to use this function when auto calibration is off.
  *
  * @param dev Pointer to the sensor device data structure
  *
@@ -255,7 +248,7 @@ esp_err_t mhz19b_start_calibration(mhz19b_dev_t *dev);
  *
  * @details
  *      Send command to sensor and read response, protected with a receive timeout.\n
- *      Result is available in public rxBuffer[9].
+ *      Result is available in the device descriptor buffer.
  *
  * @param dev Pointer to the sensor device data structure
  * @param cmd Command Byte

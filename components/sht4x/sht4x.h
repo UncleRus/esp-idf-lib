@@ -141,9 +141,9 @@ esp_err_t sht4x_reset(sht4x_t *dev);
  * This function is the easiest way to use the sensor. It is most suitable
  * for users that don't want to have the control on sensor details.
  *
- * Please note: The function delays the calling task up to 1.1 s to wait for
- * the  the measurement results. This might lead to problems when the function
- * is called from a software timer callback function.
+ * @note The function delays the calling task up to 1.1 s to wait for
+ *       the measurement results. This might lead to problems when the function
+ *       is called from a software timer callback function.
  *
  * @param dev         Device descriptor
  * @param temperature Temperature in degree Celsius

@@ -146,9 +146,9 @@ esp_err_t sht3x_set_heater(sht3x_t *dev, bool enable);
  * This function is the easiest way to use the sensor. It is most suitable
  * for users that don't want to have the control on sensor details.
  *
- * Please note: The function delays the calling task up to 30 ms to wait for
- * the  the measurement results. This might lead to problems when the function
- * is called from a software timer callback function.
+ * @note The function delays the calling task up to 30 ms to wait for
+ *       the measurement results. This might lead to problems when function
+ *       is called from a software timer callback function.
  *
  * @param dev         Device descriptor
  * @param temperature Temperature in degree Celsius
@@ -166,8 +166,8 @@ esp_err_t sht3x_measure(sht3x_t *dev, float *temperature, float *humidity);
  * duration in RTOS ticks directly to wait with function `vTaskDelay()` until
  * the measurement results can be fetched.
  *
- * Please note: The duration only depends on repeatability level. Therefore,
- * it can be considered as constant for a repeatability.
+ * @note The duration only depends on repeatability level. Therefore,
+ *       it can be considered as constant for a repeatability.
  *
  * @param repeat    Repeatability, see type ::sht3x_repeat_t
  * @return          Measurement duration given in RTOS ticks
@@ -191,9 +191,9 @@ uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
  * automatically performs all subsequent measurements. The rate of periodic
  * measurements can be 10, 4, 2, 1 or 0.5 measurements per second (mps).
  *
- * Please note: Due to inaccuracies in timing of the sensor, the user task
- * should fetch the results at a lower rate. The rate of the periodic
- * measurements is defined by the parameter *mode*.
+ * @note Due to inaccuracies in timing of the sensor, the user task
+ *       should fetch the results at a lower rate. The rate of the periodic
+ *       measurements is defined by the parameter \p mode.
  *
  * @param dev       Device descriptor
  * @param mode      Measurement mode, see type ::sht3x_mode_t
