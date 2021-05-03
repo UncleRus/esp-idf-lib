@@ -212,6 +212,12 @@ jobs:
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
               idf.py --ccache build
+
+              if [ -d "${__PROJECT_EXAMPLE_DIR}/${i}/test" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${i}/test"
+                echo "Building ${i}/test..."
+                idf.py --ccache build
+              fi
             fi
           done
 
@@ -248,7 +254,13 @@ jobs:
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
               make defconfig
-              make
+              make -j$(nproc)
+              if [ -d "${__PROJECT_EXAMPLE_DIR}/${i}/test" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${i}/test"
+                echo "Building ${i}/test..."
+                make defconfig
+                make -j$(nproc)
+              fi
             fi
           done
   build_esp32_v3_x:
@@ -398,6 +410,12 @@ jobs:
               make defconfig
               make -j$(nproc)
             fi
+            if [ -d "${__PROJECT_EXAMPLE_DIR}/${i}/test" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}/test"
+              echo "Building ${i}/test..."
+              make defconfig
+              make -j$(nproc)
+            fi
           done
 
   build_esp8266:
@@ -540,6 +558,8 @@ jobs:
               make defconfig
               make -j$(nproc)
             fi
+            # XXX do not run unit test because ESP8266 RTOS does not have
+            # unity yet.
           done
 
   build_esp8266_v3_x:
@@ -694,6 +714,8 @@ jobs:
               make defconfig
               make -j$(nproc)
             fi
+            # XXX do not run unit test because ESP8266 RTOS does not have unity
+            # yet.
           done
 
   # XXX esp32s2 support was introduced in v4.2. older esp-idf does not install
@@ -847,6 +869,11 @@ jobs:
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
+              idf.py --ccache build
+            fi
+            if [ -d "${__PROJECT_EXAMPLE_DIR}/${i}/test" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}/test"
+              echo "Building ${i}/test..."
               idf.py --ccache build
             fi
           done

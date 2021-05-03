@@ -1,0 +1,2 @@
+# required as the unit test application waits in busy-loop.
+CONFIG_ESP_TASK_WDT=n
