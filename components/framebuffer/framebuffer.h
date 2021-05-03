@@ -37,6 +37,8 @@
 
 #include <esp_err.h>
 #include <color.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,9 +72,9 @@ struct framebuffer_s
     size_t height;                 ///< Framebuffer height
     size_t frame_num;              ///< Number of rendered frames
     uint64_t last_frame_us;        ///< Time of last rendered frame since boot in microseconds
-    volatile bool busy;            ///< true if rendering
     fb_render_cb_t render;         ///< See ::fb_render()
     uint8_t *internal;             ///< Buffer for effect settings, internal vars, palettes and so on
+    SemaphoreHandle_t mutex;
 };
 
 /**

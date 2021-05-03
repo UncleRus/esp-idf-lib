@@ -34,6 +34,7 @@
 #include "framebuffer.h"
 
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK(x) do { esp_err_t __; if ((__ = (x)) != ESP_OK) return __; } while (0)
 
 static size_t xy(void *ctx, size_t x, size_t y)
 {
@@ -51,7 +52,10 @@ esp_err_t fb_init(framebuffer_t *fb, size_t width, size_t height, fb_render_cb_t
     fb->last_frame_us = 0;
     fb->render = render_cb;
     fb->internal = NULL;
-    fb->data = calloc(FB_SIZE(fb), 1);
+    fb->mutex = xSemaphoreCreateMutex();
+    if (!fb->mutex)
+        return ESP_ERR_NO_MEM;
+    fb->data = calloc(1, FB_SIZE(fb));
     if (!fb->data)
         return ESP_ERR_NO_MEM;
 
@@ -64,6 +68,8 @@ esp_err_t fb_free(framebuffer_t *fb)
 
     if (fb->data)
         free(fb->data);
+    if (fb->mutex)
+        vSemaphoreDelete(fb->mutex);
 
     return ESP_OK;
 }
@@ -72,10 +78,12 @@ esp_err_t fb_render(framebuffer_t *fb, void *render_ctx)
 {
     CHECK_ARG(fb && fb->data && fb->render);
 
-    if (fb->busy)
+    if (xSemaphoreTake(fb->mutex, 0) != pdTRUE)
         return ESP_ERR_INVALID_STATE;
+    CHECK(fb->render(fb, render_ctx));
+    xSemaphoreGive(fb->mutex);
 
-    return fb->render(fb, render_ctx);
+    return ESP_OK;
 }
 
 esp_err_t fb_set_pixel_rgb(framebuffer_t *fb, size_t x, size_t y, rgb_t color)
@@ -138,7 +146,7 @@ esp_err_t fb_set_pixelf_rgb(framebuffer_t *fb, float x, float y, rgb_t color)
     {
         int xn = x + (i & 1);
         int yn = y + ((i >> 1) & 1);
-        rgb_t clr;
+        rgb_t clr = { 0 };
         fb_get_pixel_rgb(fb, xn, yn, &clr);
         clr.r = qadd8(clr.r, (color.r * weights[i]) >> 8);
         clr.g = qadd8(clr.g, (color.g * weights[i]) >> 8);
@@ -223,10 +231,8 @@ esp_err_t fb_begin(framebuffer_t *fb)
 {
     CHECK_ARG(fb);
 
-    if (fb->busy)
+    if (xSemaphoreTake(fb->mutex, 0) != pdTRUE)
         return ESP_ERR_INVALID_STATE;
-
-    fb->busy = true;
 
     return ESP_OK;
 }
@@ -237,7 +243,7 @@ esp_err_t fb_end(framebuffer_t *fb)
 
     fb->frame_num++;
     fb->last_frame_us = esp_timer_get_time();
-    fb->busy = false;
+    xSemaphoreGive(fb->mutex);
 
     return ESP_OK;
 }
