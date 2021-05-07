@@ -34,7 +34,8 @@ cd ~/myprojects/esp
 git clone https://github.com/UncleRus/esp-idf-lib.git
 ```
 
-Add path to components in your project makefile, e.g:
+Add path to components in your [project makefile](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system-legacy.html),
+e.g:
 
 ```Makefile
 PROJECT_NAME := my-esp-project
@@ -42,7 +43,7 @@ EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
 include $(IDF_PATH)/make/project.mk
 ```
 
-or in CMakeLists.txt:
+or in [CMakeLists.txt](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html):
 
 ```CMake
 cmake_minimum_required(VERSION 3.5)
@@ -75,7 +76,8 @@ cd ~/myprojects/esp
 git clone https://github.com/UncleRus/esp-idf-lib.git
 ```
 
-Add path to components in your project makefile, e.g:
+Add path to components in your [project makefile](https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/api-guides/build-system.html),
+e.g:
 
 ```Makefile
 PROJECT_NAME := my-esp-project
