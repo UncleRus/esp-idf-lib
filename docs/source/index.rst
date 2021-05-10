@@ -196,6 +196,14 @@ Addressable LEDs
    groups/led_strip
    groups/led_strip_spi
 
+Input controls
+==============
+.. toctree::
+   :maxdepth: 1
+
+   groups/button
+   groups/encoder
+
 Other
 =====
 .. toctree::
@@ -205,7 +213,6 @@ Other
    groups/max7219
    groups/pca9685
    groups/ultrasonic
-   groups/encoder
    groups/tda74xx
    groups/rda5807m
    groups/tca9548
