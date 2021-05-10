@@ -206,7 +206,6 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **button**     | HW timer-based driver for GPIO buttons                                  | BSD     | Yes     | Yes
 | **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes     | Yes
 
-
 ### Other
 
 | Component      | Description                                                             | License | ESP8266 | Thread safety
