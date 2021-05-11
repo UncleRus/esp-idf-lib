@@ -199,6 +199,13 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **led_strip**  | RMT-based driver for WS2812B/SK6812/APA106 LED strips                   | MIT     | *No*    | Yes
 | **led_strip_spi** | SPI-based driver for SK9822/APA102 LED strips                        | MIT     | Yes     | Yes
 
+### Input controls
+
+| Component      | Description                                                             | License | ESP8266 | Thread safety
+|----------------|-------------------------------------------------------------------------|---------|---------|---------------
+| **button**     | HW timer-based driver for GPIO buttons                                  | BSD     | Yes     | Yes
+| **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes     | Yes
+
 ### Other
 
 | Component      | Description                                                             | License | ESP8266 | Thread safety
@@ -208,7 +215,6 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **pca9685**    | Driver for 16-channel, 12-bit PWM PCA9685                               | BSD     | Yes     | Yes
 | **max7219**    | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                 | BSD     | *No*    | Yes
 | **tda74xx**    | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                   | MIT     | Yes     | Yes
-| **encoder**    | HW timer-based driver for incremental rotary encoders                   | BSD     | Yes     | Yes
 | **tca9548**    | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch           | BSD     | Yes     | Yes
 | **rda5807m**   | Driver for single-chip broadcast FM radio tuner RDA5807M                | BSD     | Yes     | Yes
 | **ds3502**     | Driver for nonvolatile digital potentiometer DS3502                     | MIT     | Yes     | Yes
