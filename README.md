@@ -146,7 +146,8 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |----------------|-------------------------------------------------------------------------|---------|---------|---------------
 | **sgp40**      | SGP40 Indoor Air Quality Sensor for VOC Measurements                    | BSD     | Yes     | Yes
 | **ccs811**     | Driver for AMS CCS811 digital gas sensor                                | BSD     | Yes     | Yes
-| **mhz19b**     | Driver for MH-Z19B NDIR CO2 sensor                                      | BSD     | Yes     | *No*
+| **mhz19b**     | Driver for MH-Z19B NDIR CO₂ sensor                                      | BSD     | Yes     | *No*
+| **scd4x**      | Driver for SCD40/SCD41 miniature CO₂ sensor                             | BSD     | Yes     | Yes
 
 ### ADC/DAC
 
