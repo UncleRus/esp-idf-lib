@@ -154,7 +154,7 @@ static esp_err_t execute_cmd(i2c_dev_t *dev, uint16_t cmd, uint32_t timeout_ms,
             ets_delay_us(timeout_ms * 1000);
     }
     if (in_data && in_words)
-        CHECK(read_resp(dev, in_data, in_words));
+        I2C_DEV_CHECK(dev, read_resp(dev, in_data, in_words));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
