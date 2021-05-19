@@ -9,6 +9,7 @@
 #include <sgp40.h>
 #include <string.h>
 #include <esp_err.h>
+#include <esp_log.h>
 
 /* float is used in printf(). you need non-default configuration in
  * sdkconfig for ESP8266, which is enabled by default for this
@@ -26,6 +27,8 @@
 #if defined(CONFIG_IDF_TARGET_ESP32S2)
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
+
+static const char *TAG = "sgp40-example";
 
 #define SHT_ADDR SHT3X_I2C_ADDR_GND
 
@@ -47,22 +50,22 @@ static const char *voc_index_name(int32_t voc_index)
 
 void task(void *pvParamters)
 {
-    sht3x_t sht;
+//    sht3x_t sht;
     sgp40_t sgp;
 
     // setup SHT3x
-    memset(&sht, 0, sizeof(sht));
-    ESP_ERROR_CHECK(sht3x_init_desc(&sht, 0, SHT_ADDR, SDA_GPIO, SCL_GPIO));
-    ESP_ERROR_CHECK(sht3x_init(&sht));
-    // Start periodic measurements with 2 measurements per second.
-    ESP_ERROR_CHECK(sht3x_start_measurement(&sht, SHT3X_PERIODIC_2MPS, SHT3X_HIGH));
-    printf("!!!! Humidity sensor initilalized\n");
+//    memset(&sht, 0, sizeof(sht));
+//    ESP_ERROR_CHECK(sht3x_init_desc(&sht, 0, SHT_ADDR, SDA_GPIO, SCL_GPIO));
+//    ESP_ERROR_CHECK(sht3x_init(&sht));
+//    // Start periodic measurements with 2 measurements per second.
+//    ESP_ERROR_CHECK(sht3x_start_measurement(&sht, SHT3X_PERIODIC_2MPS, SHT3X_HIGH));
+//    ESP_LOGI(TAG, "Humidity sensor initilalized");
 
     // setup SGP40
     memset(&sgp, 0, sizeof(sgp));
     ESP_ERROR_CHECK(sgp40_init_desc(&sgp, 0, SDA_GPIO, SCL_GPIO));
     ESP_ERROR_CHECK(sgp40_init(&sgp));
-    printf("!!!! SGP40 initilalized. Serial: %04X %04X %04X\n",
+    ESP_LOGI(TAG, "SGP40 initilalized. Serial: 0x%04x%04x%04x",
             sgp.serial[0], sgp.serial[1], sgp.serial[2]);
 
     // Wait until all set up
@@ -72,14 +75,15 @@ void task(void *pvParamters)
     while (1)
     {
         // Get the RHT values
-        float temperature, humidity;
-        ESP_ERROR_CHECK(sht3x_get_results(&sht, &temperature, &humidity));
+//        float temperature, humidity;
+//        ESP_ERROR_CHECK(sht3x_get_results(&sht, &temperature, &humidity));
+        float temperature = 25, humidity = 30;
 
         // Feed it to SGP40
         int32_t voc_index;
         ESP_ERROR_CHECK(sgp40_measure_voc(&sgp, humidity, temperature, &voc_index));
 
-        printf("!!!! %.2f °C, %.2f %%, VOC index: %d, Air is [%s]\n",
+        ESP_LOGI(TAG, "%.2f °C, %.2f %%, VOC index: %d, Air is [%s]",
                 temperature, humidity, voc_index, voc_index_name(voc_index));
 
         // Wait until 1 seconds (VOC cycle time) are over.
