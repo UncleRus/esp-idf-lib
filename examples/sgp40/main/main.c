@@ -50,16 +50,16 @@ static const char *voc_index_name(int32_t voc_index)
 
 void task(void *pvParamters)
 {
-//    sht3x_t sht;
+    sht3x_t sht;
     sgp40_t sgp;
 
     // setup SHT3x
-//    memset(&sht, 0, sizeof(sht));
-//    ESP_ERROR_CHECK(sht3x_init_desc(&sht, 0, SHT_ADDR, SDA_GPIO, SCL_GPIO));
-//    ESP_ERROR_CHECK(sht3x_init(&sht));
-//    // Start periodic measurements with 2 measurements per second.
-//    ESP_ERROR_CHECK(sht3x_start_measurement(&sht, SHT3X_PERIODIC_2MPS, SHT3X_HIGH));
-//    ESP_LOGI(TAG, "Humidity sensor initilalized");
+    memset(&sht, 0, sizeof(sht));
+    ESP_ERROR_CHECK(sht3x_init_desc(&sht, 0, SHT_ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sht3x_init(&sht));
+    // Start periodic measurements with 2 measurements per second.
+    ESP_ERROR_CHECK(sht3x_start_measurement(&sht, SHT3X_PERIODIC_2MPS, SHT3X_HIGH));
+    ESP_LOGI(TAG, "Humidity sensor initilalized");
 
     // setup SGP40
     memset(&sgp, 0, sizeof(sgp));
@@ -75,9 +75,8 @@ void task(void *pvParamters)
     while (1)
     {
         // Get the RHT values
-//        float temperature, humidity;
-//        ESP_ERROR_CHECK(sht3x_get_results(&sht, &temperature, &humidity));
-        float temperature = 25, humidity = 30;
+        float temperature, humidity;
+        ESP_ERROR_CHECK(sht3x_get_results(&sht, &temperature, &humidity));
 
         // Feed it to SGP40
         int32_t voc_index;
