@@ -138,7 +138,8 @@ static inline esp_err_t send_cmd_nolock(sht4x_t *dev, uint8_t cmd)
 
 static inline esp_err_t read_res_nolock(sht4x_t *dev, sht4x_raw_data_t res)
 {
-    esp_err_t r = i2c_dev_read(&dev->i2c_dev, NULL, 0, res, SHT4X_RAW_DATA_SIZE);
+    CHECK(i2c_dev_read(&dev->i2c_dev, NULL, 0, res, SHT4X_RAW_DATA_SIZE));
+
     ESP_LOGD(TAG, "Got response %02x %02x %02x %02x %02x %02x",
             res[0], res[1], res[2], res[3], res[4], res[5]);
 
@@ -148,7 +149,7 @@ static inline esp_err_t read_res_nolock(sht4x_t *dev, sht4x_raw_data_t res)
         return ESP_ERR_INVALID_CRC;
     }
 
-    return r;
+    return ESP_OK;
 }
 
 static esp_err_t send_cmd(sht4x_t *dev, uint8_t cmd)
@@ -224,7 +225,7 @@ esp_err_t sht4x_init(sht4x_t *dev)
     dev->heater = SHT4X_HEATER_OFF;
 
     sht4x_raw_data_t s;
-    CHECK(exec_cmd(dev, CMD_SERIAL, 0, s));
+    CHECK(exec_cmd(dev, CMD_SERIAL, pdMS_TO_TICKS(10), s));
     dev->serial = ((uint32_t)s[0] << 24) | ((uint32_t)s[1] << 16) | ((uint32_t)s[3] << 8) | s[4];
 
     return sht4x_reset(dev);
