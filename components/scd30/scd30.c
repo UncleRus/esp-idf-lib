@@ -173,9 +173,9 @@ static esp_err_t execute_cmd(i2c_dev_t *dev, uint16_t cmd, uint32_t timeout_ms,
     dev->addr = SCD30_I2C_ADDR;
     dev->cfg.sda_io_num = sda_gpio;
     dev->cfg.scl_io_num = scl_gpio;
-//#if HELPER_TARGET_IS_ESP32
+#if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
-//#endif
+#endif
 
     return i2c_dev_create_mutex(dev);
 }
