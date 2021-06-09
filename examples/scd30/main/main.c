@@ -11,8 +11,8 @@ static const char *TAG = "scd30-example";
 #define SDA_GPIO 4
 #define SCL_GPIO 5
 #else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#define SDA_GPIO 14
+#define SCL_GPIO 15
 #endif
 
 #if defined(CONFIG_IDF_TARGET_ESP32S2)
@@ -26,12 +26,12 @@ void task(void *pvParameters)
     ESP_ERROR_CHECK(scd30_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
 
     uint16_t version, major_ver, minor_ver;
-    //ESP_ERROR_CHECK(scd30_read_firmware_version(&dev, &version));
+    ESP_ERROR_CHECK(scd30_read_firmware_version(&dev, &version));
 
-    //major_ver = (version >> 8) & 0xf;
-    //minor_ver = version & 0xf;
+    major_ver = (version >> 8) & 0xf;
+    minor_ver = version & 0xf;
 
-    //ESP_LOGI(TAG, "SCD30 Firmware Version: %d.%d", major_ver, minor_ver);
+    ESP_LOGI(TAG, "SCD30 Firmware Version: %d.%d", major_ver, minor_ver);
 
     ESP_LOGI(TAG, "Starting continuous measurement");
     ESP_ERROR_CHECK(scd30_trigger_continuous_measurement(&dev, 0));
