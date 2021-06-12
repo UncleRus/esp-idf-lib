@@ -40,7 +40,7 @@
 #include <string.h>
 #include <esp_err.h>
 
-#define I2C_FREQ_HZ 400000 // 400kHz
+#define I2C_FREQ_HZ 100000 // 100kHz
 
 #define I2C_ADDR_SEQ 0x10
 #define I2C_ADDR_IDX 0x11
@@ -268,9 +268,9 @@ esp_err_t rda5807m_get_state(rda5807m_t *dev, rda5807m_state_t *state)
     CHECK(read_registers_bulk(dev, r, 6));
     CHECK(read_register(dev, REG_CTRL, &ctrl));
 
-    if (ctrl & BIT_CTRL_SEEK) state->seek_status = RDA5807M_SEEK_STARTED;
-    else if (r[0] & BIT_RA_SF) state->seek_status = RDA5807M_SEEK_FAILED;
+    if (r[0] & BIT_RA_SF) state->seek_status = RDA5807M_SEEK_FAILED;
     else if (r[0] & BIT_RA_STC) state->seek_status = RDA5807M_SEEK_COMPLETE;
+    else if (ctrl & BIT_CTRL_SEEK) state->seek_status = RDA5807M_SEEK_STARTED;
     else state->seek_status = RDA5807M_SEEK_NONE;
 
     state->frequency = (r[0] & MASK_RA_READCHAN) * spacings[dev->spacing] + band_limits[dev->band].lower;

@@ -87,10 +87,10 @@ typedef enum {
  * Seek status
  */
 typedef enum {
-    RDA5807M_SEEK_NONE = 0, //!< No seeking stations currently
-    RDA5807M_SEEK_STARTED,  //!< Seeking in progress
-    RDA5807M_SEEK_COMPLETE, //!< Seeking complete
-    RDA5807M_SEEK_FAILED    //!< Seeking failed - no stations with RSSI > threshold found
+    RDA5807M_SEEK_NONE = 0, //!< There is currently no station seek
+    RDA5807M_SEEK_STARTED,  //!< Seeking is in progress
+    RDA5807M_SEEK_COMPLETE, //!< Seeking is complete
+    RDA5807M_SEEK_FAILED    //!< Seeking is failed - no stations with RSSI > threshold found
 } rda5807m_seek_status_t;
 
 /**
