@@ -154,14 +154,14 @@ esp_err_t aht_get_data(aht_t *dev, float *temperature, float *humidity)
 
     if (humidity)
     {
-        uint32_t raw = ((uint32_t)buf[1] << 16) | ((uint32_t)buf[2] << 8) | (buf[3] >> 4);
-        *humidity = (float)raw / 1048576.0f;
+        uint32_t raw = ((uint32_t)buf[1] << 12) | ((uint32_t)buf[2] << 4) | (buf[3] >> 4);
+        *humidity = (float)raw * 100 / 0x100000;
     }
 
     if (temperature)
     {
         uint32_t raw = ((uint32_t)(buf[3] & 0x0f) << 16) | ((uint32_t)buf[4] << 8) | buf[5];
-        *temperature = (float)raw * 0.000191f - 50;
+        *temperature = (float)raw * 200 / 0x100000 - 50;
     }
 
     return ESP_OK;
