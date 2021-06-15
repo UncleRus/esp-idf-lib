@@ -119,6 +119,7 @@ Humidity & temperature sensors
    groups/mcp9808
    groups/mcp960x
    groups/tsys01
+   groups/aht
    
 Pressure sensors
 ================
