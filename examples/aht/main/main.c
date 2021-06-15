@@ -33,6 +33,13 @@ void task(void *pvParameters)
     ESP_ERROR_CHECK(aht_init_desc(&dev, AHT_I2C_ADDRESS_GND, 0, SDA_GPIO, SCL_GPIO));
     ESP_ERROR_CHECK(aht_init(&dev));
 
+    bool calibrated;
+    ESP_ERROR_CHECK(aht_get_status(&dev, NULL, &calibrated));
+    if (calibrated)
+        ESP_LOGI(TAG, "Sensor calibrated");
+    else
+        ESP_LOGW(TAG, "Sensor not calibrated!");
+
     float temperature, humidity;
 
     while (1)

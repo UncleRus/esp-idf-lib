@@ -43,16 +43,19 @@
 
 static const char *TAG = "aht";
 
-#define CMD_INIT_1X     (0xe1)
-#define CMD_INIT_20     (0xbe)
-#define CMD_RESET       (0xba)
-#define CMD_MODE_NORMAL (0xa8)
-#define CMD_START_MEAS  (0xac)
+#define CMD_CALIBRATE_1X      (0xe1)
+#define CMD_CALIBRATE_20      (0xbe)
+#define CMD_RESET             (0xba)
+#define CMD_MODE_NORMAL       (0xa8)
+#define CMD_START_MEASUREMENT (0xac)
 
-#define ARG_INIT_NORMAL (0x00)
-#define ARG_INIT_CYCLE  (0x20)
-#define ARG_INIT_CAL    (0x08)
-#define ARG_MEAS_DATA   (0x33)
+#define ARG_MODE_NORMAL    (0x00)
+#define ARG_MODE_CYCLE     (0x20)
+#define ARG_MODE_CALIBRATE (0x08)
+#define ARG_MEAS_DATA      (0x33)
+
+#define BIT_STATUS_BUSY BIT(7)
+#define BIT_STATUS_CAL  BIT(3)
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -68,8 +71,8 @@ static esp_err_t send_cmd_nolock(aht_t *dev, uint8_t cmd0, uint8_t cmd1, uint8_t
 
 static esp_err_t setup_nolock(aht_t *dev)
 {
-    return send_cmd_nolock(dev, dev->type == AHT_TYPE_AHT1x ? CMD_INIT_1X : CMD_INIT_20,
-            (dev->mode == AHT_MODE_NORMAL ? ARG_INIT_NORMAL : ARG_INIT_CYCLE) | ARG_INIT_CAL, 0, 350);
+    return send_cmd_nolock(dev, dev->type == AHT_TYPE_AHT1x ? CMD_CALIBRATE_1X : CMD_CALIBRATE_20,
+            (dev->mode == AHT_MODE_NORMAL ? ARG_MODE_NORMAL : ARG_MODE_CYCLE) | ARG_MODE_CALIBRATE, 0, 350);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,15 +132,18 @@ esp_err_t aht_reset(aht_t *dev)
     return ESP_OK;
 }
 
-esp_err_t aht_get_status(aht_t *dev, bool *busy)
+esp_err_t aht_get_status(aht_t *dev, bool *busy, bool *calibrated)
 {
-    CHECK_ARG(dev && busy);
+    CHECK_ARG(dev && (busy || calibrated));
 
     uint8_t status;
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read(&dev->i2c_dev, NULL, 0, &status, 1));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-    *busy = status & 0x80;
+    if (busy)
+        *busy = (status & BIT_STATUS_BUSY) != 0;
+    if (calibrated)
+        *calibrated = (status & BIT_STATUS_CAL) != 0;
 
     return ESP_OK;
 }
@@ -148,7 +154,7 @@ esp_err_t aht_get_data(aht_t *dev, float *temperature, float *humidity)
 
     uint8_t buf[6];
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, send_cmd_nolock(dev, CMD_START_MEAS, ARG_MEAS_DATA, 0, 80));
+    I2C_DEV_CHECK(&dev->i2c_dev, send_cmd_nolock(dev, CMD_START_MEASUREMENT, ARG_MEAS_DATA, 0, 80));
     I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read(&dev->i2c_dev, NULL, 0, buf, 6));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 

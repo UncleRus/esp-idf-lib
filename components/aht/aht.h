@@ -78,9 +78,9 @@ typedef struct
 /**
  * @brief Initialize device descriptor
  *
- * @param dev Device descriptor
- * @param addr Device I2C address
- * @param port I2C port
+ * @param dev      Device descriptor
+ * @param addr     Device I2C address
+ * @param port     I2C port
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
  * @return `ESP_OK` on success
@@ -115,12 +115,15 @@ esp_err_t aht_reset(aht_t *dev);
  * @brief Get device status
  *
  * @param dev Device descriptor
- * @param[out] busy Busy flag
- *                  - true: device currently measuring
- *                  - false: device in indle mode
+ * @param[out] busy       Busy flag
+ *                        - true: device currently measuring
+ *                        - false: device in indle mode
+ * @param[out] calibrated Calibration success flag
+ *                        - true: sensor calibrated
+ *                        - false: sensor not calibrated
  * @return `ESP_OK` on success
  */
-esp_err_t aht_get_status(aht_t *dev, bool *busy);
+esp_err_t aht_get_status(aht_t *dev, bool *busy, bool *calibrated);
 
 /**
  * @brief Get temperature and relative humidity
