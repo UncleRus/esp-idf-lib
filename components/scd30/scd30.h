@@ -75,11 +75,9 @@ esp_err_t scd30_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, 
 esp_err_t scd30_free_desc(i2c_dev_t *dev);
 
 /**
- * @brief Start periodic measurement.
+ * @brief Trigger continuous  measurement.
  *
- * Signal update interval is 5 seconds.
- *
- * @note This command is only available in idle mode.
+ * Signal update interval default is 2 seconds.
  *
  * @param dev           Device descriptor
  * @param p_comp        Optional ambient pressure compensation in mBar, 0 to deactivate 
@@ -208,9 +206,7 @@ esp_err_t scd30_set_forced_recalibration_value(i2c_dev_t *dev,
 /**
  * @brief Get temperature offset in ticks.
  *
- * The temperature offset represents the difference between the measured
- * temperature by the SCD4x and the actual ambient temperature. Per default,
- * the temperature offset is set to 4°C.
+ * Get the current temperature offset value saved in non-volatile memory.  
  *
  * @note Only available in idle mode.
  *
@@ -224,9 +220,7 @@ esp_err_t scd30_get_temperature_offset_ticks(i2c_dev_t *dev, uint16_t *t_offset)
 /**
  * @brief Get temperature offset in °C.
  *
- * See ::scd4x_get_temperature_offset_ticks() for more details.
- *
- * @note Only available in idle mode.
+ * See ::scd30_get_temperature_offset_ticks() for more details.
  *
  * @param dev      Device descriptor
  * @param t_offset Temperature offset in degrees Celsius (°C)
@@ -237,15 +231,8 @@ esp_err_t scd30_get_temperature_offset(i2c_dev_t *dev, float *t_offset);
 /**
  * @brief Set temperature offset in ticks.
  *
- * Setting the temperature offset of the SCD4x inside the customer device
- * correctly allows the user to leverage the RH and T output signal. Note
- * that the temperature offset can depend on various factors such as the
- * SCD4x measurement mode, self-heating of close components, the ambient
- * temperature and air flow. Thus, the SCD4x temperature offset should be
- * determined inside the customer device under its typical operation and in
- * thermal equilibrium.
- *
- * @note Only available in idle mode.
+ * Set the temperature offset value to be saved in non-volatile memory.
+ * The last set value will be used for temperature offset compensation after repowering.
  *
  * @param dev      Device descriptor
  * @param t_offset Temperature offset.
@@ -257,8 +244,7 @@ esp_err_t scd30_set_temperature_offset_ticks(i2c_dev_t *dev, uint16_t t_offset);
 /**
  * @brief Set temperature offset in °C.
  *
- * See ::scd4x_set_temperature_offset_ticks() for more details.
- *
+ * See ::scd30_set_temperature_offset_ticks() for more details.
  *
  * @param dev      Device descriptor
  * @param t_offset Temperature offset in degrees Celsius (°C)
@@ -285,7 +271,6 @@ esp_err_t scd30_get_sensor_altitude(i2c_dev_t *dev, uint16_t *altitude);
  *
  * Note that setting a sensor altitude to the sensor overrides any pressure
  * compensation based on a previously set ambient pressure.
- *
  *
  * @param dev      Device descriptor.
  * @param altitude Sensor altitude in meters.
@@ -322,4 +307,4 @@ esp_err_t scd30_soft_reset(i2c_dev_t *dev);
 
 /**@}*/
 
-#endif /* __SCD4X_H__ */
+#endif /* __SCD3O_H__ */

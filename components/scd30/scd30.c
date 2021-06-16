@@ -162,10 +162,9 @@ static esp_err_t execute_cmd(i2c_dev_t *dev, uint16_t cmd, uint32_t timeout_ms,
     return ESP_OK;
 }
 
-    ///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
-    esp_err_t
-    scd30_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t scd30_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
 
