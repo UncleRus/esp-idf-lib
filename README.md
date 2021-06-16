@@ -130,6 +130,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mcp9808**    | Driver for MCP9808, precision digital temperature sensor                | BSD     | Yes     | Yes
 | **mcp960x**    | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter   | BSD     | Yes     | Yes
 | **tsys01**     | Driver for precision digital temperature sensor TSYS01                  | BSD     | Yes     | Yes
+| **aht**        | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor            | BSD     | Yes     | Yes
 
 ### Pressure sensors
 

@@ -58,6 +58,7 @@ jobs:
           - v4.0.2
           - v4.1
           - v4.2.1
+          - v4.3
         target:
           - esp32
     steps:
@@ -111,7 +112,7 @@ jobs:
           v4.2-*)
             TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
             ;;
-          v4.2|v4.2.*)
+          v4.2|v4.2.*|v4.3)
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           master)
