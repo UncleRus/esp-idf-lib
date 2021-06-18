@@ -70,9 +70,9 @@ static inline bool rgb_is_zero(rgb_t a)
 static inline rgb_t rgb_from_code(uint32_t color_code)
 {
     rgb_t res = {
-        .r = (color_code >> 16) & 0xff,
-        .g = (color_code >> 8) & 0xff,
-        .b = color_code & 0xff,
+        .r = (uint8_t)((color_code >> 16) & 0xff),
+        .g = (uint8_t)((color_code >> 8) & 0xff),
+        .b = (uint8_t)(color_code & 0xff),
     };
     return res;
 }
@@ -183,22 +183,22 @@ static inline rgb_t rgb_scale_video(rgb_t a, uint8_t scaledown)
 /// rgb_fade_light is a synonym for rgb_scale_video(..., 255 - fade_factor)
 static inline rgb_t rgb_fade_light(rgb_t a, uint8_t fade_factor)
 {
-    return rgb_scale_video(a, 255 - fade_factor);
+    return rgb_scale_video(a, ~fade_factor);
 }
 
 /// rgb_fade_light is a synonym for rgb_scale(..., 255 - fade_factor)
 static inline rgb_t rgb_fade(rgb_t a, uint8_t fade_factor)
 {
-    return rgb_scale(a, 255 - fade_factor);
+    return rgb_scale(a, ~fade_factor);
 }
 
 /// Invert each channel of RGB color
 static inline rgb_t rgb_invert(rgb_t a)
 {
     rgb_t res = {
-        .r = 255 - a.r,
-        .g = 255 - a.g,
-        .b = 255 - a.b,
+        .r = ~a.r,
+        .g = ~a.g,
+        .b = ~a.b,
     };
     return res;
 }
@@ -228,9 +228,9 @@ static inline rgb_t rgb_max_brightness(rgb_t a, uint8_t limit)
 
     uint16_t factor = ((uint16_t)(limit) * 256) / max;
     rgb_t res = {
-        .r = (a.r * factor) / 256,
-        .g = (a.g * factor) / 256,
-        .b = (a.b * factor) / 256,
+        .r = (uint8_t)((a.r * factor) / 256),
+        .g = (uint8_t)((a.g * factor) / 256),
+        .b = (uint8_t)((a.b * factor) / 256),
     };
     return res;
 }
@@ -252,9 +252,9 @@ static inline rgb_t rgb_lerp8(rgb_t a, rgb_t b, fract8 frac)
 static inline rgb_t rgb_lerp16(rgb_t a, rgb_t b, fract16 frac)
 {
     rgb_t res = {
-        .r = lerp16by16(a.r, b.r, frac),
-        .g = lerp16by16(a.g, b.g, frac),
-        .b = lerp16by16(a.b, b.b, frac),
+        .r = (uint8_t)lerp16by16(a.r, b.r, frac),
+        .g = (uint8_t)lerp16by16(a.g, b.g, frac),
+        .b = (uint8_t)lerp16by16(a.b, b.b, frac),
     };
     return res;
 }
