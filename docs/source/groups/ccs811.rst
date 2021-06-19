@@ -11,7 +11,7 @@ The CCS811 is an ultra-low power digital sensor which detects
 that. The sensor allows to
 
 - convert raw sensor data to Total Volatile Organic Compound (TVOC) and
-  equivalent CO2 (eCO2),
+  equivalent CO₂ (eCO2),
 - compensate gas readings due to temperature and humidity using an external
   sensor,
 - trigger interrupts when new measurement results are available or eCO2 value

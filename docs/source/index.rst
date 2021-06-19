@@ -140,6 +140,7 @@ Air quality/Gas sensors
    groups/ccs811
    groups/mhz19b
    groups/scd4x
+   groups/scd30
 
 ADC/DAC
 =======
