@@ -42,6 +42,10 @@
 #include <i2cdev.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RDA5807M_RSSI_MAX    0x3f
 #define RDA5807M_SEEK_TH_DEF 0x08
 #define RDA5807M_SEEK_TH_MAX 0x0f
@@ -339,6 +343,10 @@ esp_err_t rda5807m_seek_start(rda5807m_t *dev, bool up, bool wrap, uint8_t thres
  * @return `ESP_OK` on success
  */
 esp_err_t rda5807m_seek_stop(rda5807m_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**@}*/
 
