@@ -12,7 +12,7 @@
 #define SCL_GPIO 17
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -54,7 +54,7 @@ void qmc5883l_test(void *pvParameters)
         else
             printf("Could not read QMC5883L data\n");
 
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(250));
     }
 }
 

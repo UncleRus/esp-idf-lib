@@ -54,7 +54,7 @@ void test(void *pvParameters)
     {
         mcp23x17_set_level(&dev, 8, on);
         on = !on;
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

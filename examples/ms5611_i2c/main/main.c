@@ -14,7 +14,7 @@
 #define SCL_GPIO 17
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -36,7 +36,7 @@ void ms5611_test(void *pvParameters)
         // we can change oversampling ratio at any time:
         // dev.osr = MS5611_OSR_256
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
         if (ms5611_get_sensor_data(&dev, &pressure, &temperature) != ESP_OK)
         {
             printf("Temperature/pressure reading failed\n");

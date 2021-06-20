@@ -43,7 +43,7 @@ void test(void *pvParameters)
             printf("Error %d: %s\n", r, esp_err_to_name(r));
 
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

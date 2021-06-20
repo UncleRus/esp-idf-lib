@@ -34,7 +34,7 @@ void ds3231_test(void *pvParameters)
     {
         float temp;
 
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(250));
 
         if (ds3231_get_temp_float(&dev, &temp) != ESP_OK)
         {

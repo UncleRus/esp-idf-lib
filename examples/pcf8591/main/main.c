@@ -13,7 +13,7 @@
 #endif
 #define ADDR PCF8591_DEFAULT_ADDRESS
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -26,7 +26,7 @@ void pcf8591_test(void *pvParameters)
 
     while (1)
     {
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
         esp_err_t res;
         uint8_t val;
         if ((res = pcf8591_read(&dev, PCF8591_IC_4_SINGLES, 3, &val)) != ESP_OK)

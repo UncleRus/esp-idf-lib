@@ -35,7 +35,7 @@
 #define SCL_GPIO 17
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -64,7 +64,7 @@ void task(void *pvParameters)
         printf("SHT3x Sensor: %.2f °C, %.2f %%\n", temperature, humidity);
 
         // wait until 5 seconds are over
-        vTaskDelayUntil(&last_wakeup, 5000 / portTICK_PERIOD_MS);
+        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(5000));
     }
 }
 
@@ -100,7 +100,7 @@ void task(void *pvParameters)
         printf("SHT3x Sensor: %.2f °C, %.2f %%\n", temperature, humidity);
 
         // wait until 5 seconds are over
-        vTaskDelayUntil(&last_wakeup, 5000 / portTICK_PERIOD_MS);
+        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(5000));
     }
 }
 
@@ -134,7 +134,7 @@ void task(void *pvParameters)
             printf("Could not get results: %d (%s)", res, esp_err_to_name(res));
 
         // Wait until 2 seconds (cycle time) are over.
-        vTaskDelayUntil(&last_wakeup, 2000 / portTICK_PERIOD_MS);
+        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(2000));
     }
 }
 

@@ -16,7 +16,7 @@
 #define SCL_GPIO 19
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -53,21 +53,21 @@ static void isr_task(void *arg)
             if (als_intr & !als_np_intr)
             {
                 printf("ALS interrupt\n");
-                vTaskDelay(2000 / portTICK_PERIOD_MS);
+                vTaskDelay(pdMS_TO_TICKS(2000));
                 ESP_LOGI(TAG, "Clear ALS Interrupt flag.\n");
                 ESP_ERROR_CHECK(tsl2591_clear_als_intr(dev));
             }
             else if (!als_intr & als_np_intr)
             {
                 printf("ALS no persist interrupt\n");
-                vTaskDelay(4000 / portTICK_PERIOD_MS);
+                vTaskDelay(pdMS_TO_TICKS(4000));
                 ESP_LOGI(TAG, "Clear ALS NP interrupt flag.\n");
                 ESP_ERROR_CHECK(tsl2591_clear_als_np_intr(dev));
             }
             else
             {
                 printf("ALS and ALS NP interrupt\n");
-                vTaskDelay(6000 / portTICK_PERIOD_MS);
+                vTaskDelay(pdMS_TO_TICKS(6000));
                 ESP_LOGI(TAG, "Clear both interrupts.\n");
                 ESP_ERROR_CHECK(tsl2591_clear_both_intr(dev));
             }
@@ -78,14 +78,14 @@ static void isr_task(void *arg)
 void tsl2591_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "tsl2591 task started.");
-    tsl2591_t *dev = (tsl2591_t*) pvParameters;
+    tsl2591_t *dev = (tsl2591_t *) pvParameters;
     uint16_t channel0, channel1;
     float lux;
 
     assert(dev != NULL);
     while (1)
     {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
         ESP_ERROR_CHECK(tsl2591_get_channel_data(dev, &channel0, &channel1));
         ESP_ERROR_CHECK(tsl2591_calculate_lux(dev, channel0, channel1, &lux));
         printf("Channel 0: 0x%x\n", channel0);
@@ -133,12 +133,12 @@ void app_main()
     ESP_LOGI(TAG, "Start integration cycle.");
     ESP_ERROR_CHECK(tsl2591_set_power_status(dev, TSL2591_POWER_ON));
     ESP_ERROR_CHECK(tsl2591_set_als_status(dev, TSL2591_ALS_ON));
-    vTaskDelay(600 / portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(600));
 
     // Setup external interrupt on pin INTR_PIN
     gpio_config_t io_conf;
     io_conf.intr_type = GPIO_INTR_NEGEDGE;
-    io_conf.pin_bit_mask = (1ULL<<INTR_PIN);
+    io_conf.pin_bit_mask = (1ULL << INTR_PIN);
     io_conf.pull_up_en = 1; // tsl2591 active low interrupt.
     io_conf.pull_down_en = 0;
     io_conf.mode = GPIO_MODE_INPUT;
@@ -147,11 +147,11 @@ void app_main()
     isr_evt_queue = xQueueCreate(10, sizeof(tsl2591_t *));
 
     gpio_install_isr_service(0);
-    gpio_isr_handler_add(INTR_PIN, isr_handler, (void*) dev);
+    gpio_isr_handler_add(INTR_PIN, isr_handler, (void *) dev);
 
     ESP_LOGI(TAG, "Dispatch isr_task.");
     xTaskCreate(isr_task, "interrupt_task", 2048, NULL, 10, NULL);
     ESP_LOGI(TAG, "Dispatch tsl2591_task.");
-    xTaskCreatePinnedToCore(tsl2591_task, "tsl2591_test", 8192, (void*) dev, 5, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(tsl2591_task, "tsl2591_test", 8192, (void *)dev, 5, NULL, APP_CPU_NUM);
 }
 

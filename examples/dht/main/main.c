@@ -31,7 +31,7 @@ void dht_test(void *pvParameters)
 
         // If you read the sensor data too often, it will heat up
         // http://www.kandrsmith.org/RJS/Misc/Hygrometers/dht_sht_how_fast.html
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 }
 

@@ -75,7 +75,7 @@ void task(void *pvParameters)
             if (dev.mask.wf & (1 << (3 - WARNING_CHANNEL)))
                 warning = true;
 
-            vTaskDelay(20 / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(20));
 
         } while (!(dev.mask.cvrf)); // check if measure done
 #else
@@ -101,7 +101,7 @@ void task(void *pvParameters)
         }
         warning = false ;
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

@@ -10,7 +10,7 @@
 #define PORT 0
 #define ADDR BME680_I2C_ADDR_0
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -59,7 +59,7 @@ void bme680_test(void *pvParameters)
                         values.temperature, values.humidity, values.pressure, values.gas_resistance);
         }
         // passive waiting until 1 second is over
-        vTaskDelayUntil(&last_wakeup, 1000 / portTICK_PERIOD_MS);
+        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(1000));
     }
 }
 
