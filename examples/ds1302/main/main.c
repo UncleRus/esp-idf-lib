@@ -43,7 +43,7 @@ void ds1302_test(void *pvParameters)
         printf("%04d-%02d-%02d %02d:%02d:%02d\n", time.tm_year + 1900 /*Add 1900 for better readability*/, time.tm_mon + 1,
             time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

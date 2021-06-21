@@ -14,7 +14,7 @@
 #endif
 #define ADDR BH1750_ADDR_LO
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -35,7 +35,7 @@ void test(void *pvParameters)
         else
             printf("Lux: %d\n", lux);
 
-        vTaskDelay(200 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
 

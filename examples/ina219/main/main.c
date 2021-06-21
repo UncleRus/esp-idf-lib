@@ -48,7 +48,7 @@ void task(void *pvParameters)
         printf("VBUS: %.04f V, VSHUNT: %.04f mV, IBUS: %.04f mA, PBUS: %.04f mW\n",
                 bus_voltage, shunt_voltage * 1000, current * 1000, power * 1000);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

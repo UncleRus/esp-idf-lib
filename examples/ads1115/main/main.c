@@ -16,7 +16,7 @@
 #define SCL_GPIO 17
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -76,7 +76,7 @@ void ads111x_test(void *pvParameters)
         for (size_t i = 0; i < DEV_COUNT; i++)
             measure(i);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

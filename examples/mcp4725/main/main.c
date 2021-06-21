@@ -60,7 +60,7 @@ void task(void *pvParameters)
         ESP_ERROR_CHECK(mcp4725_set_voltage(&dev, VDD, vout, false));
 
         // It will be very low freq wave
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

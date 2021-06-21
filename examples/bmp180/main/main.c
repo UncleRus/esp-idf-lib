@@ -13,7 +13,7 @@
 #define SCL_GPIO 17
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -40,7 +40,7 @@ void bmp180_test(void *pvParameters)
              */
             printf("Temperature: %.2f degrees Celsius; Pressure: %d Pa\n", temp, pressure);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

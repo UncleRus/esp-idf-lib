@@ -51,7 +51,7 @@ void tda74xx_test(void *pvParameters)
         ESP_ERROR_CHECK(tda74xx_set_volume(&dev, vol));
         if (++vol > 0)
             vol = -48;
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(250));
     }
 }
 

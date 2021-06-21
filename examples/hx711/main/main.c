@@ -26,7 +26,7 @@ void test(void *pvParameters)
         if (r == ESP_OK)
             break;
         printf("Could not initialize HX711: %d (%s)\n", r, esp_err_to_name(r));
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 
     // read from device
@@ -49,7 +49,7 @@ void test(void *pvParameters)
 
         printf("Raw data: %d\n", data);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 

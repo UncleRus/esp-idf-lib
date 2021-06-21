@@ -13,7 +13,7 @@
 #define SCL_GPIO 19
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -29,7 +29,7 @@ void tsl2591_test(void *pvParameters)
     esp_err_t res;
     while (1)
     {
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(100));
 
         if ((res = tsl2591_get_lux(&dev, &lux)) != ESP_OK)
             printf("Could not read lux value: %d\n", res);

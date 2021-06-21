@@ -47,18 +47,19 @@ void lcd_test(void *pvParameters)
     hd44780_switch_backlight(&lcd, true);
 
     uint8_t direction = 1;
-    while (1) {
+    while (1)
+    {
         direction ^= 1;
         hd44780_gotoxy(&lcd, 0, 0);
         hd44780_puts(&lcd, direction ? "LEFT scroll " : "RIGHT scroll");
 
-        for (uint8_t i = 0; i < 16; i++) {
-            if (direction) {
+        for (uint8_t i = 0; i < 16; i++)
+        {
+            if (direction)
                 hd44780_scroll_left(&lcd);
-            } else {
+            else
                 hd44780_scroll_right(&lcd);
-            }
-            vTaskDelay(500 / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(500));
         }
     }
 }

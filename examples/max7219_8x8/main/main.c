@@ -3,7 +3,7 @@
 #include <freertos/task.h>
 #include <max7219.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -15,12 +15,6 @@
 #define PIN_NUM_MOSI 19
 #define PIN_NUM_CLK  18
 #define PIN_NUM_CS   5
-
-#define CHECK(expr, msg) \
-    while ((res = expr) != ESP_OK) { \
-        printf(msg "\n", res); \
-        vTaskDelay(250 / portTICK_RATE_MS); \
-    }
 
 static const uint64_t symbols[] = {
     0x383838fe7c381000, // arrows
@@ -57,8 +51,7 @@ void task(void *pvParameter)
        .max_transfer_sz = 0,
        .flags = 0
     };
-    CHECK(spi_bus_initialize(HOST, &cfg, 1),
-            "Could not initialize SPI bus: %d");
+    ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));
 
     // Configure device
     max7219_t dev = {
@@ -66,10 +59,9 @@ void task(void *pvParameter)
        .digits = 0,
        .mirrored = true
     };
-    CHECK(max7219_init_desc(&dev, HOST, PIN_NUM_CS),
-            "Could not initialize MAX7129 descriptor: %d");
-    CHECK(max7219_init(&dev),
-            "Could not initialize MAX7129: %d");
+    ESP_ERROR_CHECK(max7219_init_desc(&dev, HOST, PIN_NUM_CS));
+    ESP_ERROR_CHECK(max7219_init(&dev))
+    ;
     size_t offs = 0;
     while (1)
     {
@@ -77,9 +69,9 @@ void task(void *pvParameter)
 
         for (uint8_t c = 0; c < CASCADE_SIZE; c ++)
             max7219_draw_image_8x8(&dev, c, (uint8_t *)symbols + c * 8 + offs);
-        vTaskDelay(SCROLL_DELAY / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(SCROLL_DELAY));
 
-        if (++ offs == symbols_size)
+        if (++offs == symbols_size)
             offs = 0;
     }
 }
@@ -88,4 +80,3 @@ void app_main()
 {
     xTaskCreatePinnedToCore(task, "task", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL, APP_CPU_NUM);
 }
-

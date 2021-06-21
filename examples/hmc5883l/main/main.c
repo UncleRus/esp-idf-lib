@@ -12,7 +12,7 @@
 #define SCL_GPIO 17
 #endif
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -22,16 +22,12 @@ void hmc5883l_test(void *pvParameters)
     memset(&dev, 0, sizeof(hmc5883l_dev_t));
 
     ESP_ERROR_CHECK(hmc5883l_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
-    while (hmc5883l_init(&dev) != ESP_OK)
-    {
-        printf("HMC5883L not found\n");
-        vTaskDelay(250 / portTICK_PERIOD_MS);
-    }
+    ESP_ERROR_CHECK(hmc5883l_init(&dev));
 
-    hmc5883l_set_opmode(&dev, HMC5883L_MODE_CONTINUOUS);
-    hmc5883l_set_samples_averaged(&dev, HMC5883L_SAMPLES_8);
-    hmc5883l_set_data_rate(&dev, HMC5883L_DATA_RATE_07_50);
-    hmc5883l_set_gain(&dev, HMC5883L_GAIN_1090);
+    ESP_ERROR_CHECK(hmc5883l_set_opmode(&dev, HMC5883L_MODE_CONTINUOUS));
+    ESP_ERROR_CHECK(hmc5883l_set_samples_averaged(&dev, HMC5883L_SAMPLES_8));
+    ESP_ERROR_CHECK(hmc5883l_set_data_rate(&dev, HMC5883L_DATA_RATE_07_50));
+    ESP_ERROR_CHECK(hmc5883l_set_gain(&dev, HMC5883L_GAIN_1090));
 
     while (1)
     {
@@ -45,7 +41,7 @@ void hmc5883l_test(void *pvParameters)
         else
             printf("Could not read HMC5883L data\n");
 
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(250));
     }
 }
 

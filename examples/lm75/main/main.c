@@ -31,7 +31,7 @@
 #endif
 #define I2C_PORT 0
 
-#if defined(CONFIG_IDF_TARGET_ESP32S2)
+#ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
@@ -108,7 +108,7 @@ void lm75_task(void *pvParameters)
     ESP_LOGI(TAG, "Starting the loop");
     while (1) {
         shutdown ^= 1;
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
         if (shutdown) {
             ESP_ERROR_CHECK(lm75_shutdown(&dev));
         } else {
@@ -120,7 +120,7 @@ void lm75_task(void *pvParameters)
          */
         printf("Operation mode: %s\n", shutdown ? "shutdown" : "normal");
         for (int i = 0; i < 10; i++) {
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(1000));
             if (lm75_read_temperature(&dev, &temperature) != ESP_OK) {
                 ESP_LOGE(TAG, "failed to read_temperature()");
                 continue;

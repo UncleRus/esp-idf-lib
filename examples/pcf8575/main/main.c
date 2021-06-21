@@ -34,7 +34,7 @@ void test(void *pvParameters)
         // write value to port
         pcf8575_port_write(&pcf8575, port_val);
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
