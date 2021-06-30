@@ -129,6 +129,40 @@ esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait);
 esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature);
 
 /**
+ * @brief Read the value from the last CONVERT_T operation (ds18b20 version).
+ *
+ * This should be called after ds18x20_measure() to fetch the result of the
+ * temperature measurement.
+ *
+ * @param pin         The GPIO pin connected to the ds18x20 device
+ * @param addr        The 64-bit address of the device to read. This can be set
+ *                    to ::DS18X20_ANY to read any device on the bus (but note
+ *                    that this will only work if there is exactly one device
+ *                    connected, or they will corrupt each others' transmissions)
+ * @param temperature The temperature in degrees Celsius
+ *
+ * @returns `ESP_OK` if the command was successfully issued
+ */
+esp_err_t ds18b20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature);
+
+/**
+ * @brief Read the value from the last CONVERT_T operation (ds18s20 version).
+ *
+ * This should be called after ds18x20_measure() to fetch the result of the
+ * temperature measurement.
+ *
+ * @param pin         The GPIO pin connected to the ds18x20 device
+ * @param addr        The 64-bit address of the device to read. This can be set
+ *                    to ::DS18X20_ANY to read any device on the bus (but note
+ *                    that this will only work if there is exactly one device
+ *                    connected, or they will corrupt each others' transmissions)
+ * @param temperature The temperature in degrees Celsius
+ *
+ * @returns `ESP_OK` if the command was successfully issued
+ */
+esp_err_t ds18s20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature);
+
+/**
  * @brief Read the value from the last CONVERT_T operation for multiple devices.
  *
  * This should be called after ds18x20_measure() to fetch the result of the
@@ -143,6 +177,28 @@ esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *t
  * @returns `ESP_OK` if all temperatures were fetched successfully
  */
 esp_err_t ds18x20_read_temp_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, float *result_list);
+
+/** Perform a ds18x20_measure() followed by ds18s20_read_temperature()
+ *
+ *  @param pin         The GPIO pin connected to the ds18s20 device
+ *  @param addr        The 64-bit address of the device to read. This can be set
+ *                     to ::DS18X20_ANY to read any device on the bus (but note
+ *                     that this will only work if there is exactly one device
+ *                     connected, or they will corrupt each others' transmissions)
+ *  @param temperature The temperature in degrees Celsius
+ */
+esp_err_t ds18s20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature);
+
+/** Perform a ds18x20_measure() followed by ds18b20_read_temperature()
+ *
+ *  @param pin         The GPIO pin connected to the ds18x20 device
+ *  @param addr        The 64-bit address of the device to read. This can be set
+ *                     to ::DS18X20_ANY to read any device on the bus (but note
+ *                     that this will only work if there is exactly one device
+ *                     connected, or they will corrupt each others' transmissions)
+ *  @param temperature The temperature in degrees Celsius
+ */
+esp_err_t ds18b20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature);
 
 /** Perform a ds18x20_measure() followed by ds18x20_read_temperature()
  *

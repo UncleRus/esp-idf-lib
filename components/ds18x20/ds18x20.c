@@ -133,7 +133,7 @@ esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *
     return ESP_OK;
 }
 
-esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t ds18b20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);
 
@@ -144,15 +144,53 @@ esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *t
 
     temp = scratchpad[1] << 8 | scratchpad[0];
 
-    if ((uint8_t)addr == DS18B20_FAMILY_ID)
-        *temperature = ((float)temp * 625.0) / 10000;
-    else
-    {
-        temp = ((temp & 0xfffe) << 3) + (16 - scratchpad[6]) - 4;
-        *temperature = ((float)temp * 625.0) / 10000 - 0.25;
-    }
+    *temperature = ((float)temp * 625.0) / 10000;
 
     return ESP_OK;
+}
+
+esp_err_t ds18s20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+{
+    CHECK_ARG(temperature);
+
+    uint8_t scratchpad[8];
+    int16_t temp;
+
+    CHECK(ds18x20_read_scratchpad(pin, addr, scratchpad));
+
+    temp = scratchpad[1] << 8 | scratchpad[0];
+
+    temp = ((temp & 0xfffe) << 3) + (16 - scratchpad[6]) - 4;
+    *temperature = ((float)temp * 625.0) / 10000 - 0.25;
+
+    return ESP_OK;
+}
+
+esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+{
+    if ((uint8_t)addr == DS18B20_FAMILY_ID) {
+        return ds18b20_read_temperature(pin, addr, temperature);
+    }
+    else
+    {
+        return ds18s20_read_temperature(pin, addr, temperature);
+    }
+}
+
+esp_err_t ds18b20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+{
+    CHECK_ARG(temperature);
+
+    CHECK(ds18x20_measure(pin, addr, true));
+    return ds18b20_read_temperature(pin, addr, temperature);
+}
+
+esp_err_t ds18s20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+{
+    CHECK_ARG(temperature);
+
+    CHECK(ds18x20_measure(pin, addr, true));
+    return ds18s20_read_temperature(pin, addr, temperature);
 }
 
 esp_err_t ds18x20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
