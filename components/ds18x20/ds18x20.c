@@ -133,6 +133,49 @@ esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *
     return ESP_OK;
 }
 
+esp_err_t ds18x20_write_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *buffer)
+{
+    CHECK_ARG(buffer);
+
+    if (!onewire_reset(pin))
+        return ESP_ERR_INVALID_RESPONSE;
+
+    if (addr == DS18X20_ANY)
+        onewire_skip_rom(pin);
+    else
+        onewire_select(pin, addr);
+    onewire_write(pin, ds18x20_WRITE_SCRATCHPAD);
+
+    for (int i = 0; i < 3; i++)
+        onewire_write(pin, buffer[i]);
+
+    return ESP_OK;
+}
+
+esp_err_t ds18x20_copy_scratchpad(gpio_num_t pin, ds18x20_addr_t addr)
+{
+    if (!onewire_reset(pin))
+        return ESP_ERR_INVALID_RESPONSE;
+
+    if (addr == DS18X20_ANY)
+        onewire_skip_rom(pin);
+    else
+        onewire_select(pin, addr);
+
+    PORT_ENTER_CRITICAL;
+    onewire_write(pin, ds18x20_COPY_SCRATCHPAD);
+    // For parasitic devices, power must be applied within 10us after issuing
+    // the convert command.
+    onewire_power(pin);
+    PORT_EXIT_CRITICAL;
+
+    // And then it needs to keep that power up for 10ms.
+    SLEEP_MS(10);
+    onewire_depower(pin);
+
+    return ESP_OK;
+}
+
 esp_err_t ds18b20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);

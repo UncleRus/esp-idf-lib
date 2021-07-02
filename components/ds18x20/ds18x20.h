@@ -241,6 +241,35 @@ esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_li
  */
 esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *buffer);
 
+/**
+ * @brief Write the scratchpad data for a particular ds18x20 device.
+ *
+ * @param pin     The GPIO pin connected to the ds18x20 device
+ * @param addr    The 64-bit address of the device to write. This can be set
+ *                to ::DS18X20_ANY to read any device on the bus (but note
+ *                that this will only work if there is exactly one device
+ *                connected, or they will corrupt each others' transmissions)
+ * @param buffer  An 3-byte buffer to hold the data to write
+ *
+ * @returns `ESP_OK` if the command was successfully issued
+ */
+esp_err_t ds18x20_write_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *buffer);
+
+/**
+ * @brief Issue the copy scratchpad command, copying current scratchpad to
+ *        EEPROM.
+ *
+ * @param pin     The GPIO pin connected to the ds18x20 device
+ * @param addr    The 64-bit address of the device to command. This can be set
+ *                to ::DS18X20_ANY to read any device on the bus (but note
+ *                that this will only work if there is exactly one device
+ *                connected, or they will corrupt each others' transmissions)
+ *
+ * @returns `ESP_OK` if the command was successfully issued
+ */
+esp_err_t ds18x20_copy_scratchpad(gpio_num_t pin, ds18x20_addr_t addr);
+
+
 #ifdef __cplusplus
 }
 #endif
