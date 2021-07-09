@@ -150,6 +150,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mhz19b**     | Driver for MH-Z19B NDIR CO₂ sensor                                      | BSD     | Yes     | *No*
 | **scd4x**      | Driver for SCD40/SCD41 miniature CO₂ sensor                             | BSD     | Yes     | Yes
 | **scd30**      | Driver for SCD30 CO₂ sensor                                             | BSD     | Yes     | Yes
+| **sfa3x**      | Driver for SFA30 formaldehyde detection module                          | BSD     | Yes     | Yes
 
 ### ADC/DAC
 
