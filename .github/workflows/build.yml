@@ -116,7 +116,7 @@ jobs:
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           master)
-            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
+            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
             ;;
           *)
             echo "Unknown matrix.branch: ${{ matrix.branch }}"
@@ -766,7 +766,7 @@ jobs:
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           master)
-            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
+            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
             ;;
           *)
             echo "Unknown matrix.branch: ${{ matrix.branch }}"
