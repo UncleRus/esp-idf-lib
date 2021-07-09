@@ -104,7 +104,7 @@ jobs:
           TOOLCHAIN_DIR="${HOME}/.espressif/tools"
           case "${{ matrix.branch }}" in
           v4.0.2)
-            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           v4.1)
             TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
@@ -113,7 +113,7 @@ jobs:
             TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
             ;;
           v4.2|v4.2.*|v4.3)
-            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           master)
             TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
@@ -123,9 +123,6 @@ jobs:
             exit 1
             ;;
           esac
-          
-          echo "Toolchain version: ${TOOLCHAIN_VERSION}"
-          
           REPO_DIR=`pwd`
           EXAMPLE_DIR="${REPO_DIR}/examples"
           DISTFILE_DIR="${HOME}/distfiles"
@@ -757,7 +754,7 @@ jobs:
           TOOLCHAIN_DIR="${HOME}/.espressif/tools"
           case "${{ matrix.branch }}" in
           v4.0.2)
-            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           v4.1)
             TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
@@ -765,8 +762,8 @@ jobs:
           v4.2-*)
             TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
             ;;
-          v4.2|v4.2.*|v4.3)
-            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
+          v4.2|v4.2.*)
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           master)
             TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
