@@ -1,5 +1,27 @@
 # Changelog
 
+## v.0.8.1
+
+### Features
+
+- (button) Driver for GPIO button with debouncing
+- (scd30) Driver for SCD30 CO₂ sensor
+- (scd4x) Driver for SCD40/SCD41 miniature CO₂ sensor
+- (aht) Driver for AHT10/AHT15/AHT20 temperature and humidity sensor
+
+### Bugfixes
+
+- (mzh19b) Fixed bug with serial buffer length used by the driver
+- (framebuffer) Used a mutex instead of flag, fixed "maybe-uninitialized"
+- (sgp40) Multiple bugs fixed
+- (sht4x) Added 10ms timout for reading serial number
+- (rda5807m) Default I2C clock lowered, example added
+- (color) Fix build with c++
+- (examples) Fixed build of examples for single core ESP32s (S2/C3)
+- (ds18x20) Added split 18B20/18S20 reads to allow for use of DS18X20_ANY
+  without flubbing the conversion on an 18B20
+- (ds18x20) Added scratchpad write and copy commands
+
 ## v.0.8.0
 
 ### Features

@@ -15,9 +15,10 @@ Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 |----------------|--------------------|-----------------------
 | ESP32          | ESP-IDF            | master, v4.x, v.3.3.5
 | ESP32-S2 *[1]* | ESP-IDF            | master, v4.x, v.3.3.5
+| ESP32-C3 *[1]* | ESP-IDF            | master, v4.x, v.3.3.5
 | ESP8266  *[2]* | ESP8266 RTOS SDK   | master, v3.3
 
-[1] *Use "`idf.py set-target esp32s2`" before "`idf.py menuconfig`" to change
+[1] *Use "`idf.py set-target esp32s2`" or "`idf.py set-target esp32c3`" before "`idf.py menuconfig`" to change
 the chip type.*
 
 [2] *Due to the incompatibility of ESP8266 drivers and hardware, some
