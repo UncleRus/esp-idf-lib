@@ -477,11 +477,15 @@ esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev,
 {
     CHECK_ARG(dev);
 
-    uint16_t temp = (temperature + 25) * 512;   // -25 °C maps to 0
-    uint16_t hum = humidity * 512;
+    uint16_t hum_conv = humidity * 512.0f + 0.5f;
+    uint16_t temp_conv = (temperature + 25.0f) * 512.0f + 0.5f;
+    
 
     // fill environmental data
-    uint8_t data[4] = { temp >> 8, temp & 0xff, hum >> 8, hum & 0xff };
+    uint8_t data[4] = {
+        (uint8_t)((hum_conv >> 8) & 0xFF), (uint8_t)(hum_conv & 0xFF),
+        (uint8_t)((temp_conv >> 8) & 0xFF), (uint8_t)(temp_conv & 0xFF)
+    };
 
     // send environmental data to the sensor
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
