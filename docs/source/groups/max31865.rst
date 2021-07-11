@@ -1,0 +1,8 @@
+.. _max31865:
+
+max31865 - Driver for MAX31865 resistance converter for platinum RTDs
+=====================================================================
+
+.. doxygengroup:: max31865
+   :members:
+
