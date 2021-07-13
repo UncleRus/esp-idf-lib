@@ -68,7 +68,7 @@ void task(void *pvParameter)
         printf("---------- draw\n");
 
         for (uint8_t c = 0; c < CASCADE_SIZE; c ++)
-            max7219_draw_image_8x8(&dev, c, (uint8_t *)symbols + c * 8 + offs);
+            max7219_draw_image_8x8(&dev, c * 8, (uint8_t *)symbols + c * 8 + offs);
         vTaskDelay(pdMS_TO_TICKS(SCROLL_DELAY));
 
         if (++offs == symbols_size)
