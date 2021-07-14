@@ -141,6 +141,7 @@ Air quality/Gas sensors
    groups/mhz19b
    groups/scd4x
    groups/scd30
+   groups/sfa3x
 
 ADC/DAC
 =======
