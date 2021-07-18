@@ -159,9 +159,11 @@ esp_err_t bmp280_init_desc(bmp280_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
 
     dev->i2c_dev.port = port;
     dev->i2c_dev.addr = addr;
+    dev->i2c_dev.timeout_ticks = 0;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
 #if HELPER_TARGET_IS_ESP32
+    dev->i2c_dev.cfg.clk_flags = 0;
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
