@@ -89,19 +89,6 @@ static esp_err_t write_reg_8(max31865_t *dev, uint8_t reg, uint8_t val)
     return spi_device_transmit(dev->spi_dev, &t);
 }
 
-//static esp_err_t write_reg_16(max31865_t *dev, uint8_t reg, uint16_t val)
-//{
-//    spi_transaction_t t;
-//    memset(&t, 0, sizeof(spi_transaction_t));
-//
-//    uint8_t tx[] = { reg | 0x80, (uint8_t)(val >> 8), (uint8_t)val };
-//
-//    t.tx_buffer = tx;
-//    t.length = sizeof(tx) * 8;
-//
-//    return spi_device_transmit(dev->spi_dev, &t);
-//}
-
 static esp_err_t read_reg_8(max31865_t *dev, uint8_t reg, uint8_t *val)
 {
     spi_transaction_t t;
@@ -148,8 +135,9 @@ esp_err_t max31865_init_desc(max31865_t *dev, spi_host_device_t host, gpio_num_t
     memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
     dev->spi_cfg.spics_io_num = cs_pin;
     dev->spi_cfg.clock_speed_hz = CLOCK_SPEED_HZ;
-    dev->spi_cfg.mode = 0;
+    dev->spi_cfg.mode = 1;
     dev->spi_cfg.queue_size = 1;
+    dev->spi_cfg.cs_ena_pretrans = 1;
     //dev->spi_cfg.flags = SPI_DEVICE_NO_DUMMY;
 
     return spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
@@ -299,6 +287,7 @@ esp_err_t max31865_detect_fault_auto(max31865_t *dev)
     uint8_t tmp;
     do
     {
+        // FIXME endless loop
         CHECK(read_reg_8(dev, REG_CONFIG, &tmp));
     }
     while (tmp & MASK_CONFIG_FAULT);
