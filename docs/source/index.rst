@@ -191,6 +191,7 @@ GPIO expanders
    groups/tca95x5
    groups/mcp23008
    groups/mcp23x17
+   groups/pca9557
    
 Addressable LEDs
 ================
