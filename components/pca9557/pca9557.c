@@ -28,7 +28,7 @@
 /**
  * @file pca9557.c
  *
- * ESP-IDF driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus
+ * ESP-IDF driver for PCA9557 remote 8-bit I/O expander for I2C-bus
  *
  * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
