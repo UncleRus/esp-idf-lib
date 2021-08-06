@@ -196,6 +196,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **tca95x5**    | Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus      | BSD     | Yes     | Yes
 | **mcp23008**   | Driver for 8-bit I2C GPIO expander MCP23008                             | BSD     | Yes     | Yes
 | **mcp23x17**   | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17              | BSD     | *No*    | Yes
+| **pca9557**    | Driver for PCA9557 remote 8-bit I/O expander for I2C-bus                | BSD     | Yes     | Yes
 
 ### Addressable LEDs
 

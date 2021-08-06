@@ -1,0 +1,8 @@
+.. _pca9557:
+
+pca9557 - Driver for PCA9557 remote 8-bit I/O expander for I2C-bus
+==================================================================
+
+.. doxygengroup:: pca9557
+   :members:
+
