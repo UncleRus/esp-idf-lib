@@ -30,7 +30,7 @@
  * @defgroup pca9557 pca9557
  * @{
  *
- * ESP-IDF driver for PCA9557 remote 8-bit I/O expander for I2C-bus
+ * ESP-IDF driver for PCA9537/PCA9557 remote 4/8-bit I/O expanders for I2C-bus
  *
  * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -47,6 +47,7 @@
 extern "C" {
 #endif
 
+#define PCA9537_I2C_ADDR      0x49
 #define PCA9557_I2C_ADDR_BASE 0x18
 
 /**
