@@ -79,6 +79,7 @@ struct button_s
     uint8_t pressed_level;          //!< Logic level of pressed button
     bool autorepeat;                //!< Enable autorepeat
     button_event_cb_t callback;     //!< Button callback
+    void *ctx;                      //!< User data
     struct {
         button_state_t state;
         uint32_t pressed_time;
