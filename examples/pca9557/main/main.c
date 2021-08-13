@@ -27,8 +27,8 @@ void test(void *pvParameters)
 
     ESP_ERROR_CHECK(pca9557_init_desc(&dev, 0, ADDR, SDA_GPIO, SCL_GPIO));
 
-    // Setup IO0-IO3 as inputs, IO4-IO7 as outputs
-    ESP_ERROR_CHECK(pca9557_port_set_mode(&dev, 0x0f));
+    // Setup IO0 as input, IO1-IO7 as outputs
+    ESP_ERROR_CHECK(pca9557_port_set_mode(&dev, 0x01));
 
     // blink on IO3 and read IO0
     bool on = true;
