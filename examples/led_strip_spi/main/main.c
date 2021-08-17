@@ -81,6 +81,33 @@ fail:
     return err;
 }
 
+static esp_err_t fade_scroll(led_strip_spi_t *strip)
+{
+    static uint8_t pos = 0;
+    static const uint8_t brightness_curve[] = {0, 10, 22, 43, 70, 100, 70, 43, 22, 10};
+    esp_err_t err = ESP_FAIL;
+    rgb_t color;
+    uint8_t brightness;
+
+    color.r = 255;
+    color.b = 0;
+    color.g = 0;
+
+    for (int i = 0; i < N_PIXEL; i++) {
+        uint8_t tmp = (i + pos) % sizeof(brightness_curve); 
+        brightness =  brightness_curve[tmp];
+        err = led_strip_spi_set_pixel_brightness(strip, i, color, brightness);
+        if (err != ESP_OK) {
+            ESP_LOGE(TAG, "led_strip_spi_set_pixel_brightness(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    }
+    ESP_LOGI(TAG, "pos: %d", pos);
+    pos += 1;
+fail:
+    return err;
+}
+
 void test(void *pvParameters)
 {
     led_strip_spi_t strip = LED_STRIP_SPI_DEFAULT();
@@ -101,7 +128,6 @@ void test(void *pvParameters)
     /* turn off all LEDs */
     ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
     while (1) {
-
         /* rainbow */
         for (int i = 0; i < 255; i++) {
             ESP_ERROR_CHECK(rainbow(&strip));
@@ -125,6 +151,15 @@ void test(void *pvParameters)
 
             vTaskDelay(pdMS_TO_TICKS(10));
         }
+
+        /* fade scroll */
+        for (int i = 0; i < 2048; i++) {
+            ESP_ERROR_CHECK(fade_scroll(&strip));
+            ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
+
+            vTaskDelay(pdMS_TO_TICKS(50));
+        }
+
     }
 }
 

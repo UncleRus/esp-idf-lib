@@ -317,18 +317,33 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
 
 esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int index, const rgb_t color)
 {
-#if CONFIG_LED_STRIP_SPI_USING_SK9822
-    return led_strip_spi_set_pixel_sk9822(strip, index, color);
-#endif
-    return ESP_ERR_NOT_SUPPORTED;
+    return led_strip_spi_set_pixel_brightness(strip, index, color, LED_STRIP_SPI_MAX_BRIGHTNESS);
 }
 
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data)
 {
+    return led_strip_spi_set_pixels_brightness(strip, start, len, data, LED_STRIP_SPI_MAX_BRIGHTNESS);
+}
+
+esp_err_t led_strip_spi_fill(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color)
+{
+    return led_strip_spi_fill_brightness(strip, start, len, color, LED_STRIP_SPI_MAX_BRIGHTNESS);
+}
+
+esp_err_t led_strip_spi_set_pixel_brightness(led_strip_spi_t *strip, const int index, const rgb_t color, const uint8_t brightness)
+{
+#if CONFIG_LED_STRIP_SPI_USING_SK9822
+    return led_strip_spi_set_pixel_sk9822(strip, index, color, brightness);
+#endif
+    return ESP_ERR_NOT_SUPPORTED;
+}
+
+esp_err_t led_strip_spi_set_pixels_brightness(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data, const uint8_t brightness)
+{
     esp_err_t err = ESP_FAIL;
 
     for (int i = 0; i < len; i++) {
-        err = led_strip_spi_set_pixel(strip, start + i, data);
+        err = led_strip_spi_set_pixel_brightness(strip, start + i, data, brightness);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "led_strip_spi_set_pixel(): %s", esp_err_to_name(err));
             goto fail;
@@ -338,12 +353,12 @@ fail:
     return err;
 }
 
-esp_err_t led_strip_spi_fill(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color)
+esp_err_t led_strip_spi_fill_brightness(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color, const uint8_t brightness)
 {
     CHECK_ARG(strip && len && start + len <= strip->length);
 
     for (size_t i = start; i < len; i++) {
-        CHECK(led_strip_spi_set_pixel(strip, i, color));
+        CHECK(led_strip_spi_set_pixel_brightness(strip, i, color, brightness));
     }
     return ESP_OK;
 }
