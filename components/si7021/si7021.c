@@ -45,7 +45,7 @@
 
 static const char *TAG = "si7021";
 
-#define DELAY_MS 50  // fixed delay
+#define DELAY_MS 100  // fixed delay (100 ms for SHT20)
 
 #define CMD_MEAS_RH_HOLD     0xe5 // not used, can't stretch clock
 #define CMD_MEAS_RH_NOHOLD   0xf5
