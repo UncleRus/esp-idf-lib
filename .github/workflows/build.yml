@@ -54,11 +54,14 @@ jobs:
           - idf
           - make
         branch:
+
+          # for supported versions by espressif, see:
+          # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/versions.html
           - master
-          - v4.0.2
-          - v4.1
+          - v4.0.3
+          - v4.1.2
           - v4.2.2
-          - v4.3
+          - v4.3.1
         target:
           - esp32
     steps:
@@ -103,17 +106,17 @@ jobs:
           GCC_FILE="${GCC_PREFIX}-gcc"
           TOOLCHAIN_DIR="${HOME}/.espressif/tools"
           case "${{ matrix.branch }}" in
-          v4.0.2)
+          v4.0.*)
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
-          v4.1)
-            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
-            ;;
-          v4.2-*)
-            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
-            ;;
-          v4.2|v4.2.*|v4.3)
+          v4.1.*)
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
+            ;;
+          v4.2.*)
+            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
+            ;;
+          v4.3.*)
+            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
             ;;
           master)
             TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
@@ -717,8 +720,11 @@ jobs:
         build_method:
           - idf
         branch:
+
+          # esp32s2 support since v4.2.x
           - master
-          - v4.2
+          - v4.2.2
+          - v4.3.1
         target:
           - esp32s2
     steps:
@@ -748,36 +754,10 @@ jobs:
       - name: Set environment variables
         id: set_env
         run: |
-          SDK_NAME="esp-idf"
-          GCC_PREFIX="xtensa-${{ matrix.target }}-elf"
-          GCC_FILE="${GCC_PREFIX}-gcc"
           TOOLCHAIN_DIR="${HOME}/.espressif/tools"
-          case "${{ matrix.branch }}" in
-          v4.0.2)
-            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
-            ;;
-          v4.1)
-            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
-            ;;
-          v4.2-*)
-            TOOLCHAIN_VERSION="esp-2020r2-8.2.0"
-            ;;
-          v4.2|v4.2.*)
-            TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
-            ;;
-          master)
-            TOOLCHAIN_VERSION="esp-2021r1-8.4.0"
-            ;;
-          *)
-            echo "Unknown matrix.branch: ${{ matrix.branch }}"
-            exit 1
-            ;;
-          esac
           REPO_DIR=`pwd`
           EXAMPLE_DIR="${REPO_DIR}/examples"
-          DISTFILE_DIR="${HOME}/distfiles"
           __PROJECT_PATH=`pwd`
-
           IDF_PATH="${__PROJECT_PATH}/idf"
 
           # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
@@ -785,18 +765,7 @@ jobs:
 
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
-
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
-          echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
-          echo "__PROJECT_GCC_PREFIX=${GCC_PREFIX}" >> ${GITHUB_ENV}
-          echo "__PROJECT_SDK_NAME=${SDK_NAME}" >> ${GITHUB_ENV}
-          echo "__PROJECT_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}" >> ${GITHUB_ENV}
-          echo "__PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> ${GITHUB_ENV}
-          echo "__PROJECT_TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION}" >> ${GITHUB_ENV}
-          echo "__PROJECT_DISTFILE_DIR=${DISTFILE_DIR}" >> ${GITHUB_ENV}
-          echo "__PROJECT_PATH=${__PROJECT_PATH}" >> ${GITHUB_ENV}
-          echo "__PROJECT_BUILD_COMMAND=${__PROJECT_BUILD_COMMAND}" >> ${GITHUB_ENV}
-          echo "__PROJECT_BUILD_COMMAND_ARG=${__PROJECT_BUILD_COMMAND_ARG}" >> ${GITHUB_ENV}
 
       - name: Checkout the SDK
         uses: actions/checkout@v2
@@ -825,10 +794,10 @@ jobs:
           path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
           key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools
 
-      - name: Run idf_tools.py install
+      - name: Run install.sh
         if: ${{ steps.cache-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
         run: |
-          ${IDF_PATH}/tools/idf_tools.py install
+          ${IDF_PATH}/install.sh
 
       - name: Run idf_tools.py install-python-env
         run: |
