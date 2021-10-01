@@ -71,6 +71,12 @@
 #define MASK_TIMER_CTRL_TD 0x03
 #define MASK_ALARM 0x7f
 
+#define MASK_MIN  0x7f
+#define MASK_HOUR 0x3f
+#define MASK_MDAY 0x3f
+#define MASK_WDAY 0x07
+#define MASK_MON  0x1f
+
 #define BV(x) ((uint8_t)(1 << (x)))
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
@@ -164,8 +170,8 @@ esp_err_t pcf8563_set_time(i2c_dev_t *dev, struct tm *time)
         dec2bcd(time->tm_sec),
         dec2bcd(time->tm_min),
         dec2bcd(time->tm_hour),
-        dec2bcd(time->tm_wday),
         dec2bcd(time->tm_mday),
+        dec2bcd(time->tm_wday),
         dec2bcd(time->tm_mon + 1) | (ovf ? BV(BIT_YEAR_CENTURY) : 0),
         dec2bcd(time->tm_year - (ovf ? 200 : 100))
     };
@@ -188,12 +194,12 @@ esp_err_t pcf8563_get_time(i2c_dev_t *dev, struct tm *time, bool *valid)
     I2C_DEV_GIVE_MUTEX(dev);
 
     *valid = data[0] & BV(BIT_VL) ? false : true;
-    time->tm_sec = bcd2dec(data[0] & ~BV(BIT_VL));
-    time->tm_min = bcd2dec(data[1]);
-    time->tm_hour = bcd2dec(data[2]);
-    time->tm_wday = bcd2dec(data[3]);
-    time->tm_mday = bcd2dec(data[4]);
-    time->tm_mon = bcd2dec(data[5] & ~BV(BIT_YEAR_CENTURY)) - 1;
+    time->tm_sec  = bcd2dec(data[0] & ~BV(BIT_VL));
+    time->tm_min  = bcd2dec(data[1] & MASK_MIN);
+    time->tm_hour = bcd2dec(data[2] & MASK_HOUR);
+    time->tm_mday = bcd2dec(data[3] & MASK_MDAY);
+    time->tm_wday = bcd2dec(data[4] & MASK_WDAY);
+    time->tm_mon  = bcd2dec(data[5] & MASK_MON) - 1;
     time->tm_year = bcd2dec(data[6]) + (data[5] & BV(BIT_YEAR_CENTURY) ? 200 : 100);
 
     return ESP_OK;
