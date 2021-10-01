@@ -60,3 +60,5 @@ sdkconfig
 /.settings/
 /.pydevproject
 /__garbage__/
+/.vscode/
+/esp-idf-lib.code-workspace
