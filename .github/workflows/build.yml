@@ -214,6 +214,9 @@ jobs:
           for i in $(ls -d *); do
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              # FIXME Remove this workaround when esp-idf issue #7621 will be fixed
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=n" >> sdkconfig.defaults
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=n" >> sdkconfig.defaults
               echo "Building ${i}..."
               idf.py --ccache build
             fi
@@ -251,6 +254,9 @@ jobs:
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
+              # FIXME Remove this workaround when esp-idf issue #7621 will be fixed
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=n" >> sdkconfig.defaults
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=n" >> sdkconfig.defaults
               make defconfig
               make -j$(nproc)
             fi
@@ -796,6 +802,9 @@ jobs:
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
               cd "${__PROJECT_EXAMPLE_DIR}/${i}"
               echo "Building ${i}..."
+              # FIXME Remove this workaround when esp-idf issue #7621 will be fixed
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=n" >> sdkconfig.defaults
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=n" >> sdkconfig.defaults
               idf.py --ccache build
             fi
           done
