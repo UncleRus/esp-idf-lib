@@ -124,7 +124,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **dht**        | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021   | BSD     | Yes     | *No*
 | **sht3x**      | Driver for Sensirion SHT3x digital temperature and humidity sensor      | BSD     | Yes     | Yes
 | **sht4x**      | Driver for Sensirion SHT4x digital temperature and humidity sensor      | BSD     | Yes     | Yes
-| **si7021**     | Driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and compatible             | BSD     | Yes     | Yes
+| **si7021**     | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible             | BSD     | Yes     | Yes
 | **ds18x20**    | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs    | BSD     | Yes     | *No*
 | **max31725**   | Driver for MAX31725/MAX31726 temperature sensors                        | BSD     | Yes     | Yes
 | **lm75**       | Driver for LM75, a digital temperature sensor and thermal watchdog      | ISC     | Yes     | Yes

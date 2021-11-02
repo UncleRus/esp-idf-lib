@@ -1,6 +1,6 @@
 .. _si7021:
 
-si7021 - Driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and compatible
+si7021 - Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible
 ====================================================================
 
 .. doxygengroup:: si7021
