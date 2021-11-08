@@ -44,7 +44,7 @@
 extern "C" {
 #endif
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 3, 0)
 #define LED_STRIP_BRIGHTNESS 1
 #endif
 
