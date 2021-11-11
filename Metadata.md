@@ -1,5 +1,8 @@
 # Metadata
 
+This document describes metadata used in the project. The status of the
+document is beta.
+
 ## Purpose
 
 The purpose of metadata in the project is to automate works in development and
@@ -94,6 +97,23 @@ Examples:
 ```yaml
 name: trombik
 year: 2021
+```
+
+## Group
+
+| Name | Type | Description | Required |
+|------|------|-------------|----------|
+| `name` | `String` | A unique ID of the group | Yes |
+| `description` | Description of the group | Yes |
+
+`name` should be short, and memorable. Use `-` as a word separator. It must
+not include spaces (`[0-9a-zA-Z]` in regular expression).
+
+An example:
+
+```yaml
+name: adc-dac
+description: ADC/DAC libraries
 ```
 
 ## Components
