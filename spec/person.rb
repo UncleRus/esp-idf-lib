@@ -5,6 +5,7 @@ require "yaml"
 # A class that repesents Peson
 class Person
   def initialize(hash)
+    raise ArgumentError, "Person must be a hash, but got `#{hash.class}`" unless hash.kind_of?(Hash)
     @metadata = hash
     raise ArgumentError, "name is missing: hash: #{hash.inspect}" unless @metadata.key?("name")
   end

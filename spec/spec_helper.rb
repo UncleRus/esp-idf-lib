@@ -2,11 +2,13 @@
 
 require "rspec"
 require "yaml"
-require_relative "component"
+require_relative "metadata"
 
 @component_dir = File.expand_path(File.join(File.dirname(__FILE__), "../components"))
 
 def components
   directories = Dir.children(Dir.new(@component_dir)).map { |c| File.join(@component_dir, c) }
-  directories.select { |d| File.directory?(d) }.map { |path| Component.new(path) }
+  directories = directories.select { |d| File.directory?(d) }
+  directories = directories.take(5) if ENV["DEVELOPER"]
+  directories.map { |path| Metadata.new(path) }
 end

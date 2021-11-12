@@ -7,100 +7,101 @@ require_relative "license"
 require_relative "group"
 
 class Component
-  # path: path to component root directory
-  def initialize(path)
-    raise ArgumentError, "path is missing" unless path
+  # Component represents a component in metadata. it is not a `component` in
+  # esp-idf. a metadata may contain multiple Components. usually, an esp-idf
+  # component has one `component` and its metadata usually contains one
+  # Component. but a project, such as `esp-idf-lib` repository, may have
+  # multiple `components`.
 
-    @path = path
-    @name = File.basename(path)
-    raise ArgumentError, "path `#{path}` does not have basename" if @name.empty?
+  # a list of valid keys. some values of keys are simply String or Integer
+  # object. others are objects, or resources, defined in the specification.
+  VALID_KEYS = %w[
+    name
+    description
+    group
+    groups
+    code_owners
+    depends
+    thread_safe
+    targets
+    licenses
+    copyrights
+  ].freeze
+
+  def initialize(hash)
+    validate_keys(hash)
+    @metadata = hash
+    @name = name
   end
 
-  attr_reader :path, :name
+  attr_reader :metadata
+
+  def validate_keys(hash)
+    # validate basic constraints only. the classes are for tests in spec
+    # files, providing readable tests and results. the actual specification is
+    # in the spec files, not in classes. rspec is more readable and maintainable
+    # than ruby code.
+    #
+    # maybe, if these classes are found to be useful, create a gem of the
+    # classes and specification tests in the gem. until then, keep the classes
+    # simple so that others can maintain the specification.
+    raise ArgumentError, "missing name" unless hash.key?("name")
+    raise ArgumentError, "empty name" if hash["name"].empty?
+
+    hash.each_key do |k|
+      raise ArgumentError, "unknown key: `#{k}`" unless VALID_KEYS.include?(k)
+    end
+  end
 
   def to_s
-    name
+    metadata["name"]
   end
 
-  def metadata
-    return @metadata if @metadata
-
-    @metadata = YAML.safe_load(File.read(File.join(path, ".eil.yml")))
-  end
-
-  def name?
-    metadata.key?("name")
-  end
-
-  def description?
-    metadata.key?("description")
-  end
-
-  def description
-    metadata["description"]
-  end
-
-  def group?
-    metadata.key?("group")
-  end
-
+  # special keys that return instances of classes.
   def group
     Group.new(metadata["group"])
-  end
-
-  def groups?
-    metadata.key?("groups")
   end
 
   def groups
     metadata["groups"].map { |g| Group.new(g) }
   end
 
-  def code_owners?
-    metadata.key?("code_owners")
-  end
-
   def code_owners
     metadata["code_owners"].map { |p| Person.new(p) }
-  end
-
-  def depends?
-    metadata.key?("depends")
-  end
-
-  def depends
-    metadata["depends"]
-  end
-
-  def thread_safe?
-    metadata.key?("thread_safe")
-  end
-
-  def thread_safe
-    metadata["thread_safe"]
-  end
-
-  def targets?
-    metadata.key?("targets")
   end
 
   def targets
     metadata["targets"].map { |t| Target.new(t) }
   end
 
-  def licenses?
-    metadata.key?("licenses")
-  end
-
   def licenses
     metadata["licenses"].map { |l| License.new(l) }
   end
 
-  def copyrights?
-    metadata.key?("copyrights")
-  end
-
   def copyrights
     metadata["copyrights"].map { |c| Copyright.new(c) }
+  end
+
+  def valid_key_with_question?(name)
+    name.to_s.end_with?("?") && VALID_KEYS.include?(name.to_s.chop)
+  end
+
+  def valid_key?(name)
+    VALID_KEYS.include?(name.to_s)
+  end
+
+  def method_missing(name, *args, &block)
+    # name?, description?, etc
+    return metadata.key?(name.to_s.chop) if valid_key_with_question?(name)
+    # name, description
+    return metadata[name.to_s] if valid_key?(name)
+
+    super
+  end
+
+  def respond_to_missing?(name, include_private = false)
+    # when name is not something we don't know, do `super`, i.e. raising
+    # unknown methods error.
+    super unless valid_key_with_question?(name) || valid_key?(name)
   end
 end
