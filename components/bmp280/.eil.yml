@@ -3,9 +3,10 @@ components:
   - name: bmp280
     description: |
       Driver for BMP280/BME280 digital pressure sensor
-    group: pressure
+    group:
+      name: pressure
     groups:
-      - temperature
+      - name: temperature
     code_owners:
       - name: UncleRus
     depends:

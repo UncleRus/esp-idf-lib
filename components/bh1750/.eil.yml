@@ -2,7 +2,8 @@
 components:
   - name: bh1750
     description: Driver for BH1750 light sensor
-    group: light
+    group:
+      name: light
     groups: []
     code_owners:
       - name: UncleRus

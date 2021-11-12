@@ -3,7 +3,8 @@ components:
   - name: bmp180
     description: |
       Driver for BMP180 digital pressure sensor
-    group: pressure
+    group:
+      name: pressure
     groups: []
     code_owners:
       - name: UncleRus

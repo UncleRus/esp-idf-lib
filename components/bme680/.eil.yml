@@ -3,10 +3,11 @@ components:
   - name: bme680
     description: |
       Driver for BME680 digital environmental sensor
-    group: temperature
+    group:
+      name: temperature
     groups:
-      - humidity
-      - pressure
+      - name: humidity
+      - name: pressure
     code_owners:
       - name: UncleRus
     depends:
