@@ -33,14 +33,17 @@ holder and, a code owner.
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
-| `name` | `String` | A unique ID string of the person. Use GitHub account if the person has one | Yes |
-| `full_name` | `String` | Full name of the person | Yes |
-| `gh_id` | `String` | GitHub account name | No |
+| `name` | `String` | A unique ID string of the person. Use GitHub account or GitHub project if the person has one | Yes |
+| `full_name` | `String` | Full name of the person or the project | No |
+| `gh_id` | `String` | GitHub account name or project name | No |
 | `email` | `String` | Email address of the person | No |
 | `website` | `String` | Web site URL | No |
 
-As `Person` must have a full name because it is used to identify the source of
-code.
+When any of `gh_id`, `email`, or `website` is not available, `person` must
+have a full name because it is used to identify the source of code.
+
+If the person does not have `gh_id`, use the full name for `name`. For example,
+when the full name is "Foo Bar", use `name: FooB`.
 
 `Person` should have one or more of optional keys so that one can contact the
 person.
@@ -104,10 +107,10 @@ year: 2021
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
 | `name` | `String` | A unique ID of the group | Yes |
-| `description` | Description of the group | Yes |
+| `description` | `String` | Description of the group | Yes |
 
 `name` should be short, and memorable. Use `-` as a word separator. It must
-not include spaces (`[0-9a-zA-Z]` in regular expression).
+not include spaces (`[0-9a-zA-Z]+` in regular expression).
 
 An example:
 
@@ -130,8 +133,11 @@ description: ADC/DAC libraries
 | `group` | `String` | The primary group name of the component. | Yes |
 | `groups` | A list of `String` | Optional list of `group` | No |
 | `code_owners` | A list of `person` | A list of `code_owners` | No |
-| `depends` | A list of component `name` that the component depends on. | No |
-| `thread_safe` | `Strnig` | One of `yes` and `no` | No |
+| `depends` | A list of component | Zero or more of `component` that the component depends on | No |
+| `thread_safe` | `Strnig` | One of `yes`, `no`, and `N/A` | No |
 | `targets` | A list of `target` | One or more of supported `target` | Yes |
 | `licenses` | A list of `license` | One or more of licenses used in the component | Yes |
 | `copyrights` | A list of `copyright` | One or more of copyright holder | Yes |
+
+FIXME `depends` must be a list because some drivers have conditional `REQUIRES`
+in `CMakeLists.txt`.
