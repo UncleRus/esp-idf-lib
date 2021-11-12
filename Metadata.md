@@ -20,16 +20,26 @@ An example path: `components/ads111x/.eil.yml`.
 
 ### `persons.yml`
 
-TBW
+`persons.yml` is a YAML file that contains list of `Person`s.
 
 ### `groups.yml`
 
-TBW
+`gorups.yml` is a YAML file that contains list of `Group`s.
 
-## Person
+
+## Resources
+
+Resources defined here represents various objects used in the metadata.
+
+A resource has unique `name` as a primary key.
+
+When referring to a resource in another resource, use `name` as key and its
+value to identify the resource.
+
+### Person
 
 A `Person` represents a person. `Person` is used to describe a copyrights
-holder and, a code owner.
+holder and a code owner. A `Person` must be defined in `persons.yml` file.
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
@@ -64,7 +74,7 @@ full_name: Foo `bar` buz
 # XXX other keys are optional, but strongly recommended.
 ```
 
-## Target
+### Target
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
@@ -76,7 +86,7 @@ An example:
 name: esp32
 ```
 
-## License
+### License
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
@@ -88,11 +98,11 @@ An example:
 name: BSD-3-Clause
 ```
 
-## Copyright
+### Copyright
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
-| `name` | `String` | `name` of `person` of the copyrights holder. See also `person`. The name must be available in `persons.yml` | Yes |
+| `name` | `Person` | Copyrights holder. See also `Person`. | Yes |
 | `year` | `Integer` | Registration year of the copyrights | Yes |
 
 Examples:
@@ -102,7 +112,10 @@ name: trombik
 year: 2021
 ```
 
-## Group
+### Group
+
+A `Group` represents a group of `Component`s. A `Group` must be in
+`groups.yml`.
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
@@ -119,25 +132,34 @@ name: adc-dac
 description: ADC/DAC libraries
 ```
 
-## Components
+### Metadata
 
-`components` includes one or more of `component`. The metadata file must have
-`components` as a top level key.
+`Metadata` is the content of `.eil.yml`. `Metadata` includes non-empty list of
+`Component` under `component` top level key.
 
-## Component
+An example:
+
+```yaml
+---
+components:
+  - name: foo
+  # ... other keys go here ...
+```
+
+### Component
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
 | `name` | `String` | The name of the component. Must be unique. | Yes |
 | `description` | `String` | A short description of the component. | Yes |
-| `group` | `String` | The primary group name of the component. | Yes |
-| `groups` | A list of `String` | Optional list of `group` | No |
-| `code_owners` | A list of `person` | A list of `code_owners` | No |
-| `depends` | A list of component | Zero or more of `component` that the component depends on | No |
-| `thread_safe` | `Strnig` | One of `yes`, `no`, and `N/A` | No |
-| `targets` | A list of `target` | One or more of supported `target` | Yes |
-| `licenses` | A list of `license` | One or more of licenses used in the component | Yes |
-| `copyrights` | A list of `copyright` | One or more of copyright holder | Yes |
+| `group` | `Group` | The primary group name of the component. | Yes |
+| `groups` | A list of `Group` | A list of zero or more of `Group` | No |
+| `code_owners` | A list of `Person` | A list of one or more of `Person` | Yes |
+| `depends` | A list of `Component` | Zero or more of `component` that the component depends on | No |
+| `thread_safe` | `Strnig` | One of `yes`, `no`, and `N/A` | Yes |
+| `targets` | A list of `Target` | One or more of supported `target` | Yes |
+| `licenses` | A list of `License` | One or more of licenses used in the component | Yes |
+| `copyrights` | A list of `Copyright` | One or more of copyright holder | Yes |
 
 FIXME `depends` must be a list because some drivers have conditional `REQUIRES`
 in `CMakeLists.txt`.
