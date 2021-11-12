@@ -27,6 +27,9 @@
 - name: current
   description: Current and power sensors
 
+- name: magnetic
+  description: Magnetic sensors
+
 - name: light
   description: Light sensors
 

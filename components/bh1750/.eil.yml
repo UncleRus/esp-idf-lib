@@ -6,7 +6,7 @@ components:
     groups: []
     code_owners:
       - name: UncleRus
-    depneds:
+    depends:
       - name: i2cdev
       - name: log
       - name: esp_idf_lib_helpers

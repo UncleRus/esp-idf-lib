@@ -2,17 +2,17 @@
 components:
   - name: aht
     description: |
-      Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC
+      Driver for AHT10/AHT15/AHT20 temperature and humidity sensor
     group: temperature
     groups:
       - humidity
     code_owners:
       - name: UncleRus
-    depneds:
+    depends:
       - name: i2cdev
       - name: log
       - name: esp_idf_lib_helpers
-    thread_safe: no
+    thread_safe: yes
     targets:
       - name: esp32
       - name: esp8266

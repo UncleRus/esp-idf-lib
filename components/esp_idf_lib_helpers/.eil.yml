@@ -1,20 +1,21 @@
 ---
 components:
-  - name: color
+  - name: esp_idf_lib_helpers
     description: |
-      Common library for RGB and HSV colors
+      Common support library for esp-idf-lib
     group: common
     groups: []
     code_owners:
       - name: UncleRus
+      - name: trombik
     depends:
-      - name: lib8tion
-    thread_safe: N/A
+      - name: freertos
+    thread_safe: n/a
     targets:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: MIT
+      - name: ISC
     copyrights:
-      - name: FastLED
-        year: 2013
+      - name: trombik
+        year: 2019

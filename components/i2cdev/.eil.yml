@@ -1,16 +1,15 @@
 ---
 components:
-  - name: bmp280
+  - name: i2cdev
     description: |
-      Driver for BMP280/BME280 digital pressure sensor
-    group: pressure
-    groups:
-      - temperature
+      ESP-IDF I2C master thread-safe utilities
+    group: common
+    groups: []
     code_owners:
       - name: UncleRus
     depends:
-      - name: i2cdev
-      - name: log
+      - name: driver
+      - name: freertos
       - name: esp_idf_lib_helpers
     thread_safe: yes
     targets:
@@ -21,5 +20,3 @@ components:
     copyrights:
       - name: UncleRus
         year: 2018
-      - name: sheinz
-        year: 2016

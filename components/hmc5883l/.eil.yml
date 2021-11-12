@@ -1,11 +1,10 @@
 ---
 components:
-  - name: bmp280
+  - name: hmc5883l
     description: |
-      Driver for BMP280/BME280 digital pressure sensor
-    group: pressure
-    groups:
-      - temperature
+      Driver for 3-axis digital compass HMC5883L
+    group: magnetic
+    groups: []
     code_owners:
       - name: UncleRus
     depends:
@@ -17,9 +16,7 @@ components:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: MIT
+      - name: BSD-3-Clause
     copyrights:
       - name: UncleRus
-        year: 2018
-      - name: sheinz
         year: 2016

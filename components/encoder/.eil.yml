@@ -1,16 +1,16 @@
 ---
 components:
-  - name: ccs811
+  - name: encoder
     description: |
-      Driver for AMS CCS811 digital gas sensor
-    group: temperature
+      HW timer-based driver for incremental rotary encoders
+    group: rtc
     groups: []
     code_owners:
       - name: UncleRus
     depends:
-      - name: i2cdev
+      - name: driver
+      - name: freertos
       - name: log
-      - name: esp_idf_lib_helpers
     thread_safe: yes
     targets:
       - name: esp32
@@ -19,6 +19,4 @@ components:
       - name: BSD-3-Clause
     copyrights:
       - name: UncleRus
-        year: 2021
-      - name: gschorcht
-        year: 2017
+        year: 2019

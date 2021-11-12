@@ -1,20 +1,20 @@
 ---
 components:
-  - name: button
+  - name: hd44780
     description: |
-      HW timer-based driver for GPIO buttons
-    group: input
+      Driver for HD44780 compatible LCD text displays
+    group: misc
     groups: []
     code_owners:
       - name: UncleRus
     depends:
       - name: driver
-    thread_safe: yes
+    thread_safe: no
     targets:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: MIT
+      - name: BSD-3-Clause
     copyrights:
       - name: UncleRus
-        year: 2021
+        year: 2016

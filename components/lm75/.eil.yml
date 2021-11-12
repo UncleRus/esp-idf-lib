@@ -1,12 +1,12 @@
 ---
 components:
-  - name: ccs811
+  - name: lm75
     description: |
-      Driver for AMS CCS811 digital gas sensor
+      ESP-IDF driver for LM75, a digital temperature sensor and thermal watchdog
     group: temperature
     groups: []
     code_owners:
-      - name: UncleRus
+      - name: trombik
     depends:
       - name: i2cdev
       - name: log
@@ -18,7 +18,5 @@ components:
     licenses:
       - name: BSD-3-Clause
     copyrights:
-      - name: UncleRus
-        year: 2021
-      - name: gschorcht
-        year: 2017
+      - name: trombik
+        year: 2019
