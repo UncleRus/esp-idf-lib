@@ -40,6 +40,14 @@ class Component
     metadata["description"]
   end
 
+  def group?
+    metadata.key?("group")
+  end
+
+  def group
+    Group.new(metadata["group"])
+  end
+
   def groups?
     metadata.key?("groups")
   end
