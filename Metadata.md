@@ -110,7 +110,7 @@ year: 2021
 | `description` | `String` | Description of the group | Yes |
 
 `name` should be short, and memorable. Use `-` as a word separator. It must
-not include spaces (`[0-9a-zA-Z]+` in regular expression).
+not include spaces (`[0-9a-zA-Z-]+` in regular expression).
 
 An example:
 
