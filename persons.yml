@@ -1,0 +1,50 @@
+---
+- name: UncleRus
+  email: unclerus@gmail.com
+  full_name: Ruslan V. Uss
+  gh_id: UncleRus
+
+- name: trombik
+  email: y@trombik.org
+  full_name: Tomoyuki Sakurai
+  gh_id: trombik
+
+- name: dianlight
+  full_name: Lucio Tarantino
+  gh_id: dianlight
+
+- name: Andrej
+  full_name: Andrej Krutak
+  email: dev@andree.sk
+
+- name: gschorcht
+  full_name: Gunar Schorcht
+  gh_id: gschorcht
+
+- name: FrankB
+  full_name: Frank Bargstedt
+
+- name: sheinz
+  gh_id: sheinz
+
+- name: FastLED
+  gh_id: FastLED
+  full_name: FastLED project
+
+- name: jsuiker
+  gh_id: jsuiker
+
+- name: PavelM
+  email: merzlyakovpavel@gmail.com
+
+- name: AlexS
+  email: foogod@gmail.com
+
+- name: GrzegorzH
+  email: ghetman@gmail.com
+
+- name: BhuvanchandraD
+  email: bhuvanchandra.dv@gmail.com
+
+- name: RichardA
+  email: richardaburton@gmail.com

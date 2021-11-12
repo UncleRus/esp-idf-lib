@@ -1,0 +1,24 @@
+---
+components:
+  - name: bmp180
+    description: |
+      Driver for BMP180 digital pressure sensor
+    group: pressure
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depneds:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - name: UncleRus
+        year: 2018
+      - name: FrankB
+        year: 2015
