@@ -163,3 +163,43 @@ components:
 
 FIXME `depends` must be a list because some drivers have conditional `REQUIRES`
 in `CMakeLists.txt`.
+
+## Validating metadata of components
+
+The current implementation uses `ruby` and `rspec` ruby gem to validate
+metadata in all components.
+
+Requirements are:
+
+* `ruby` 2.7 (other version should also work)
+* [`bundler`](https://bundler.io/)
+
+After installing requirements, run:
+
+```console
+bundle install
+```
+
+To validate metadata, run:
+
+```console
+bundle exec rake rspec
+```
+
+The implementation uses `rspec` to validate metadata because:
+
+1. the output is readable
+2. requires less `ruby` knowledge to maintain the spec than validating
+   everything in ruby code
+3. porting tests to other languages is easier than porting ruby code
+
+Under `spec` directory, there are:
+
+* `spec_helper.rb`, which is a helper for the test
+* `*_spec.rb`, which is a test script
+* other ruby files, such as `person.rb`, which are class definitions used in
+  the test
+
+The ruby classes for the test validate minimum requirements only, such as the
+`.eil.yml` file exists, or a resource has a required primary key. Actual
+test should be performed in `*_spec.rb` files.
