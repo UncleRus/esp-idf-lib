@@ -12,5 +12,5 @@ end
 
 desc "Run rspec"
 task :rspec do
-  sh "rspec"
+  sh "rspec --format d"
 end
