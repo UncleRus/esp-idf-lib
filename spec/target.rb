@@ -5,12 +5,28 @@ require "yaml"
 # A class that represents build target
 
 class Target
-  def initialize(hash)
-    raise ArgumentError, "expects Hash, but got `#{hash.class}`" unless hash.kind_of?(Hash)
-    raise ArgumentError, "name is missing" unless hash.key?("name")
+  VALID_KEYS = %w[name].freeze
 
-    @name = hash["name"]
+  def initialize(hash)
+    raise ArgumentError, "expects Hash, but got `#{hash.class}`" unless hash.is_a?(Hash)
+    validate_keys(hash)
+
+    @metadata = hash
   end
 
-  attr_reader :name
+  attr_reader :metadata
+
+  def validate_keys(hash)
+    hash.each_key do |k|
+      raise ArgumentError, "unknown key: `#{k}`. valid keys are: #{VALID_KEYS.join(' ')}" unless VALID_KEYS.include? k
+    end
+  end
+
+  def name?
+    metadata.key?("name")
+  end
+
+  def name
+    metadata["name"]
+  end
 end
