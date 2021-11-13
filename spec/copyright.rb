@@ -4,20 +4,27 @@ require_relative "person"
 
 class Copyright
   def initialize(hash)
+    raise ArgumentError, "expect Hash, got `#{hash.class}`" unless hash.is_a?(Hash)
+    raise ArgumentError, "missing key `name`" unless hash.key?("name")
+
     @metadata = hash
-    raise ArgumentError, "missing argument `name`" unless hash.key?("name")
-    raise ArgumentError, "missing argument `year`" unless hash.key?("year")
   end
 
+  attr_reader :metadata
+
   def name
-    metadata["name"]
+    Person.new("name" => metadata["name"])
+  end
+
+  def name?
+    metadata.key?("name")
   end
 
   def year
     metadata["year"]
   end
 
-  def author
-    Person.new(name)
+  def year?
+    metadata.key?("year")
   end
 end
