@@ -22,44 +22,52 @@ metadata_array.each do |m|
           expect { subject }.not_to raise_error
         end
 
-        it "has name" do
-          expect(subject.name?).to be true
-        end
-
-        it "has String name" do
-          expect(subject.name).to be_kind_of(String)
-        end
-
-        it "has non-empty name" do
-          expect(subject.name).not_to be_empty
-        end
-
-        it "has description" do
-          expect(subject.description?).to be true
-        end
-
-        it "has String description" do
-          expect(subject.description).to be_kind_of(String)
-        end
-
-        it "has a primary group" do
-          expect(subject.group?).to be true
-        end
-
-        it "has a valid primary group" do
-          expect { subject.group }.not_to raise_error
-        end
-
-        context "when it has one or more groups" do
-          it "has zero or more of groups" do
-            skip "it has no groups" unless subject.groups?
-            expect(subject.groups.length).to be >= 0
+        describe "name" do
+          it "has name" do
+            expect(subject.name?).to be true
           end
 
-          it "has valid groups" do
-            skip "it has no groups" unless subject.groups?
-            skip "it has zero group" if subject.groups? && subject.groups.empty?
-            expect { subject.groups }.not_to raise_error
+          it "has String name" do
+            expect(subject.name).to be_kind_of(String)
+          end
+
+          it "has non-empty name" do
+            expect(subject.name).not_to be_empty
+          end
+        end
+
+        describe "description" do
+          it "has description" do
+            expect(subject.description?).to be true
+          end
+
+          it "has String description" do
+            expect(subject.description).to be_kind_of(String)
+          end
+        end
+
+        describe "group" do
+          it "has a primary group" do
+            expect(subject.group?).to be true
+          end
+
+          it "has a valid primary group" do
+            expect { subject.group }.not_to raise_error
+          end
+        end
+
+        describe "groups" do
+          context "when it has one or more groups" do
+            it "has zero or more of groups" do
+              skip "it has no groups" unless subject.groups?
+              expect(subject.groups.length).to be >= 0
+            end
+
+            it "has valid groups" do
+              skip "it has no groups" unless subject.groups?
+              skip "it has zero group" if subject.groups? && subject.groups.empty?
+              expect { subject.groups }.not_to raise_error
+            end
           end
         end
 
@@ -76,66 +84,74 @@ metadata_array.each do |m|
           end
         end
 
-        it "has thread_safe" do
-          expect(subject.thread_safe?).to be true
-        end
+        describe "thread_safe" do
+          it "has thread_safe" do
+            expect(subject.thread_safe?).to be true
+          end
 
-        it "has valid values of thread_safe" do
-          expect(VALID_THREAD_SAFE_VALUES).to include subject.thread_safe
-        end
-
-        it "has targets" do
-          expect(subject.targets?).to be true
-        end
-
-        it "has valid targets" do
-          expect { subject.targets }.not_to raise_error
-        end
-
-        it "has licenses" do
-          expect(subject.licenses?).to be true
-        end
-
-        it "has valid licenses" do
-          expect { subject.licenses }.not_to raise_error
-        end
-
-        it "has one or more of licenses" do
-          expect(subject.licenses.length).to be >= 1
-        end
-
-        it "has copyrights" do
-          expect(subject.copyrights?).to be true
-        end
-
-        it "has valid copyrights" do
-          expect { subject.copyrights }.not_to raise_error
-        end
-
-        it "has one or more of copyrights" do
-          expect(subject.copyrights.length).to be >= 1
-        end
-
-        it "has only one of  name or author in copyrights" do
-          subject.copyrights.each do |copyright|
-            expect(copyright.name? && copyright.author?).to be false
+          it "has valid values of thread_safe" do
+            expect(VALID_THREAD_SAFE_VALUES).to include subject.thread_safe
           end
         end
 
-        context "when a copyright has author" do
-          it "has valid Person as copyright author" do
+        describe "targets" do
+          it "has targets" do
+            expect(subject.targets?).to be true
+          end
+
+          it "has valid targets" do
+            expect { subject.targets }.not_to raise_error
+          end
+        end
+
+        describe "licenses" do
+          it "has licenses" do
+            expect(subject.licenses?).to be true
+          end
+
+          it "has valid licenses" do
+            expect { subject.licenses }.not_to raise_error
+          end
+
+          it "has one or more of licenses" do
+            expect(subject.licenses.length).to be >= 1
+          end
+        end
+
+        describe "copyrights" do
+          it "has copyrights" do
+            expect(subject.copyrights?).to be true
+          end
+
+          it "has valid copyrights" do
+            expect { subject.copyrights }.not_to raise_error
+          end
+
+          it "has one or more of copyrights" do
+            expect(subject.copyrights.length).to be >= 1
+          end
+        end
+
+        describe "each copyright" do
+          it "has only one of  name or author in copyrights" do
             subject.copyrights.each do |copyright|
-              skip "no author in copyright" unless copyright.author?
-              expect(copyright.author).to be_a Person
+              expect(copyright.name? && copyright.author?).to be false
             end
           end
-        end
 
-        context "when a copyright has name" do
-          it "has valid Person as copyright author" do
-            subject.copyrights.each do |copyright|
-              skip "no name in copyright" unless copyright.name?
-              expect(copyright.name).to be_a Person
+          context "when a copyright has author" do
+            it "has valid Person as copyright author" do
+              subject.copyrights.select { |c| c.author? }.each do |copyright|
+                expect(copyright.author).to be_a Person
+              end
+            end
+          end
+
+          context "when a copyright has name" do
+            it "has valid Person as copyright author" do
+              subject.copyrights.select { |c| c.name? }.each  do |copyright|
+                expect(copyright.name).to be_a Person
+              end
             end
           end
         end
