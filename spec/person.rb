@@ -6,14 +6,31 @@ require "yaml"
 class Person
   PERSON_FILE = File.expand_path(File.join(File.dirname("__FILE__"), "persons.yml")).freeze
 
-  def initialize(hash)
-    raise ArgumentError, "Person must be a hash, but got `#{hash.class}`" unless hash.is_a?(Hash)
-    raise ArgumentError, "name is missing: hash: #{hash.inspect}" unless hash.key?("name")
+  def initialize(arg)
+    validate_arg(arg)
+    validate_keys(arg) if arg.is_a? Hash
 
-    @metadata = lookup_person(hash["name"])
+    name = if arg.is_a? String
+             arg
+           else
+             arg["name"]
+           end
+    @metadata = lookup_person(name)
   end
 
   attr_reader :metadata, :persons
+
+  def validate_keys(hash)
+    raise ArgumentError, "missing key: `name`" unless hash.key?("name")
+  end
+
+  def valid_arg_class?(arg)
+    arg.is_a?(String) || arg.is_a?(Hash)
+  end
+
+  def validate_arg(arg)
+    raise ArgumentError, "String or dict is ecpected, but got `#{arg.class}`" unless valid_arg_class?(arg)
+  end
 
   def load_person_file
     File.read(PERSON_FILE)

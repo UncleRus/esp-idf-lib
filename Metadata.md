@@ -34,7 +34,21 @@ Resources defined here represents various objects used in the metadata.
 A resource has unique `name` as a primary key.
 
 When referring to a resource in another resource, use `name` as key and its
-value to identify the resource.
+value to identify the resource. As a shorthand, you may use the name of a
+resource as `String`. In this case, the value is assumed to be `name: $VALUE`.
+
+When a resource expects a `Person` as a value,
+
+```yaml
+foo:
+  name: trombik
+```
+
+This is a shorthand version of the above example:
+
+```yaml
+foo: trombik
+```
 
 ### Person
 

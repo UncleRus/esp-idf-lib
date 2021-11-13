@@ -3,18 +3,26 @@
 class Group
   VALID_KEYS = %w[name description].freeze
 
-  def initialize(hash)
-    raise ArgumentError, "group must be a hash, but got #{hash.class}" unless hash.is_a? Hash
-    raise ArgumentError, "missing key `name`" unless hash.key?("name")
+  def initialize(arg)
+    validate_arg(arg)
+    validate_keys(arg) if arg.is_a? Hash
 
-    validate_keys(hash)
-    @metadata = hash
+    @metadata = if arg.is_a? String
+                  { "name" => arg }
+                else
+                  arg
+                end
   end
 
-  def validate_keys(hash)
-    hash.each_key do |k|
+  def validate_keys(arg)
+    arg.each_key do |k|
       raise ArgumentError, "unknown key: `#{k}`. valid keys are: #{VALID_KEYS.join(' ')}" unless VALID_KEYS.include? k
     end
+    raise ArgumentError, "a key, `name` is required, but missing" unless arg.key?("name")
+  end
+
+  def validate_arg(arg)
+    raise ArgumentError, "argument must be String or Hash" unless arg.is_a?(String) || arg.is_a?(Hash)
   end
 
   def name?

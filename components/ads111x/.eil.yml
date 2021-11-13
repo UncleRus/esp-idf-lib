@@ -3,13 +3,11 @@ components:
   - name: ads111x
     description: |
       Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC
-    group:
-      name: adc-dac
+    group: adc-dac
     groups: []
-    code_owners:
-      - name: UncleRus
+    code_owners: UncleRus
     depends:
-      - name: i2cdev
+      - i2cdev
       - name: log
       - name: esp_idf_lib_helpers
     thread_safe: yes
