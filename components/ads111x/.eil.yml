@@ -19,7 +19,8 @@ components:
     licenses:
       - name: BSD-3-Clause
     copyrights:
-      - name: UncleRus
+      - author:
+          name: UncleRus
         year: 2016
       - name: dianlight
         year: 2020

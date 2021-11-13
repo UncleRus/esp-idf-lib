@@ -3,11 +3,14 @@
 require_relative "person"
 
 class Copyright
-  VALID_KEYS = %w[name year]
+  VALID_KEYS = %w[
+    author
+    name
+    year
+  ]
 
   def initialize(hash)
     raise ArgumentError, "expect Hash, got `#{hash.class}`" unless hash.is_a?(Hash)
-    raise ArgumentError, "missing key `name`" unless hash.key?("name")
 
     validate_keys(hash)
     @metadata = hash
@@ -19,6 +22,14 @@ class Copyright
     hash.each_key do |k|
       raise ArgumentError, "unknown key: `#{k}`. valid keys are: #{VALID_KEYS.join(' ')}" unless VALID_KEYS.include? k
     end
+  end
+
+  def author?
+    metadata.key?("author")
+  end
+
+  def author
+    Person.new(metadata["author"])
   end
 
   def name

@@ -102,13 +102,24 @@ name: BSD-3-Clause
 
 | Name | Type | Description | Required |
 |------|------|-------------|----------|
-| `name` | `Person` | Copyrights holder. See also `Person`. | Yes |
+| `author` | `Person` | Copyrights holder. See also `Person`. | No |
+| `name` | `String` | The value of `name` of `Person`. A shorthand for `author` | No |
 | `year` | `Integer` | Registration year of the copyrights | Yes |
+
+`Copyright` must have only one of `author` and `name`, not both.
 
 Examples:
 
 ```yaml
 name: trombik
+year: 2021
+```
+
+The above example is a shorthand form of:
+
+```yaml
+author:
+  name: trombik
 year: 2021
 ```
 

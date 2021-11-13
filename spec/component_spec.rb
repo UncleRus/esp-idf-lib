@@ -116,11 +116,30 @@ metadata_array.each do |m|
           expect(subject.copyrights.length).to be >= 1
         end
 
-        it "has Person in all copyrights" do
+        it "has only one of  name or author in copyrights" do
           subject.copyrights.each do |copyright|
-            expect(copyright.name).to be_a Person
+            expect(copyright.name? && copyright.author?).to be false
           end
         end
+
+        context "when a copyright has author" do
+          it "has valid Person as copyright author" do
+            subject.copyrights.each do |copyright|
+              skip "no author in copyright" unless copyright.author?
+              expect(copyright.author).to be_a Person
+            end
+          end
+        end
+
+        context "when a copyright has name" do
+          it "has valid Person as copyright author" do
+            subject.copyrights.each do |copyright|
+              skip "no name in copyright" unless copyright.name?
+              expect(copyright.name).to be_a Person
+            end
+          end
+        end
+
       end
     end
   end
