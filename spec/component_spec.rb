@@ -5,7 +5,7 @@ require_relative "spec_helper"
 VALID_THREAD_SAFE_VALUES = [true, false, "N/A"].freeze
 
 # rubocop:disable Metrics/BlockLength
-components.each do |m|
+metadata_array.each do |m|
   RSpec.describe "metadata #{m}" do
     it "has components" do
       expect(m.components?).to be true
@@ -114,6 +114,12 @@ components.each do |m|
 
         it "has one or more of copyrights" do
           expect(subject.copyrights.length).to be >= 1
+        end
+
+        it "has Person in all copyrights" do
+          subject.copyrights.each do |copyright|
+            expect(copyright.name).to be_a Person
+          end
         end
       end
     end
