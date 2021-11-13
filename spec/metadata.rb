@@ -20,7 +20,11 @@ class Metadata
   def metadata
     return @metadata if @metadata
 
-    @metadata = YAML.safe_load(File.read(File.join(path, ".eil.yml")))
+    file = File.join(path, ".eil.yml")
+    @metadata = YAML.safe_load(File.read(file))
+  rescue StandardError => e
+    warn "failed to open `#{file}`. does component `#{File.basename(path)}` have `.eil.yml` file?"
+    raise e
   end
 
   def components?
