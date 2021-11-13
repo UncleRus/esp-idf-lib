@@ -10,7 +10,7 @@ components:
       - name: trombik
     depends:
       - name: freertos
-    thread_safe: n/a
+    thread_safe: N/A
     targets:
       - name: esp32
       - name: esp8266
