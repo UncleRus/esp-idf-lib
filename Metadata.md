@@ -231,3 +231,42 @@ Under `spec` directory, there are:
 The ruby classes for the test validate minimum requirements only, such as the
 `.eil.yml` file exists, or a resource has a required primary key. Actual
 test should be performed in `*_spec.rb` files.
+
+## Known issues
+
+### conditional `depends`
+
+Some `CMakeLists.txt` conditionally sets `REQUIRES`. `depends` does not handle
+the following case.
+
+```yaml
+# for esp32
+depends:
+  - name: driver
+  - name: freertos
+  - name: log
+```
+
+```yaml
+# for esp8266
+depends:
+  - name: esp8266
+  - name: freertos
+  - name: log
+```
+
+A possible solution:
+
+```yaml
+depends:
+  - name: driver
+    target:
+      - name: esp32
+      - name: esp32s2
+      - name: esp32c3
+  - name: esp8266
+    target:
+      - name: esp8266
+  - name: freertos
+  - name: log
+```
