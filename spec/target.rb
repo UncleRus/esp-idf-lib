@@ -6,6 +6,7 @@ require "yaml"
 
 class Target
   VALID_KEYS = %w[name].freeze
+  TARGETS_FILE = File.expand_path(File.join(File.dirname("__FILE__"), "..", "targets.yml")).freeze
 
   def initialize(arg)
     validate_arg(arg)
@@ -39,5 +40,26 @@ class Target
 
   def name
     metadata["name"]
+  end
+
+  def load_file
+    File.read(TARGETS_FILE)
+  end
+
+  def parse(string)
+    YAML.safe_load(string)
+  rescue StandardError => e
+    warn "failed to parse #{TARGETS_FILE} as YAML"
+    raise e
+  end
+
+  def targets
+    return @targets if @targets
+
+    @targets = parse(load_file)
+  end
+
+  def lookup(name)
+    targets.select { |t| t.name == name }
   end
 end

@@ -20,12 +20,15 @@ An example path: `components/ads111x/.eil.yml`.
 
 ### `persons.yml`
 
-`persons.yml` is a YAML file that contains list of `Person`s.
+`persons.yml` is a YAML file that contains a list of `Person`s.
 
 ### `groups.yml`
 
-`gorups.yml` is a YAML file that contains list of `Group`s.
+`groups.yml` is a YAML file that contains a list of `Group`s.
 
+### `targets.yml`
+
+`targets.yml` is a YAML file that contains a list of `Target`s.
 
 ## Resources
 
