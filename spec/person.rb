@@ -37,6 +37,14 @@ class Person
     person.first
   end
 
+  def name?
+    metadata.key?("name")
+  end
+
+  def name
+    metadata["name"]
+  end
+
   def full_name?
     metadata.key?("full_name")
   end

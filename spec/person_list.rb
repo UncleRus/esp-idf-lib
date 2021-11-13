@@ -2,8 +2,8 @@
 
 require "yaml"
 
-class GroupList
-  # path to `groups.yml`
+class PersonList
+  # path to `persons.yml`
   def initialize(arg)
     @path = File.expand_path(arg)
   end
