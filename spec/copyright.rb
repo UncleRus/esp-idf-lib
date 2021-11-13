@@ -7,7 +7,7 @@ class Copyright
     author
     name
     year
-  ]
+  ].freeze
 
   def initialize(hash)
     raise ArgumentError, "expect Hash, got `#{hash.class}`" unless hash.is_a?(Hash)
