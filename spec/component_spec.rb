@@ -71,16 +71,23 @@ metadata_array.each do |m|
           end
         end
 
-        context "when it has depends" do
-          it "has zero or more of depends" do
-            skip "it has no depends" unless subject.depends?
-            expect(subject.depends.length).to be >= 0
-          end
+        describe "depends" do
+          # XXX `depends` needs better tests because `depends` has zero or
+          # more of components, and some components are one in our components,
+          # others are one in esp-idf. we need to know one in `depends`
+          # actually exists. other resources, such as `People` resolves the
+          # issue by having a list of `People`.
+          context "when it has depends" do
+            it "has zero or more of depends" do
+              skip "it has no depends" unless subject.depends?
+              expect(subject.depends.length).to be >= 0
+            end
 
-          it "has valid depends" do
-            skip "it has no depends" unless subject.depends?
-            skip "it has zero depends" if subject.depends? && subject.depends.empty?
-            expect { subject.depends }.not_to raise_error
+            it "has valid depends" do
+              skip "it has no depends" unless subject.depends?
+              skip "it has zero depends" if subject.depends? && subject.depends.empty?
+              expect { subject.depends }.not_to raise_error
+            end
           end
         end
 
@@ -141,7 +148,7 @@ metadata_array.each do |m|
 
           context "when a copyright has author" do
             it "has valid Person as copyright author" do
-              subject.copyrights.select { |c| c.author? }.each do |copyright|
+              subject.copyrights.select(&:author?).each do |copyright|
                 expect(copyright.author).to be_a Person
               end
             end
@@ -149,13 +156,12 @@ metadata_array.each do |m|
 
           context "when a copyright has name" do
             it "has valid Person as copyright author" do
-              subject.copyrights.select { |c| c.name? }.each  do |copyright|
+              subject.copyrights.select(&:name?).each do |copyright|
                 expect(copyright.name).to be_a Person
               end
             end
           end
         end
-
       end
     end
   end
