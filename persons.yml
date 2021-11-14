@@ -77,3 +77,10 @@
 - name: juliandoerner
   gh_id: juliandoerner
   full_name: Julian Doerner
+
+- name: Erriez
+  gh_id: Erriez
+
+- name: DavidD
+  full_name: David Douard
+  email: david.douard@sdfa3.org
