@@ -62,3 +62,10 @@
 - name: PhamNgocT
   # GH account exists, but not sure that is the correct one
   email: pnt239@gmail.com
+
+- name: Sensirion
+  gh_id: Sensirion
+
+- name: nated0g
+  gh_id: nated0g
+  full_name: Nate Usher
