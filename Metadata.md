@@ -163,7 +163,7 @@ description: ADC/DAC libraries
 ### Metadata
 
 `Metadata` is the content of `.eil.yml`. `Metadata` includes non-empty list of
-`Component` under `component` top level key.
+`Component` under `components` top level key.
 
 An example:
 
