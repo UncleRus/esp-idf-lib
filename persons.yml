@@ -51,3 +51,14 @@
 
 - name: Zaltora
   gh_id: Zaltora
+
+- name: BernhardG
+  email: Bernhard.Guillon@begu.org
+
+- name: zeroday
+  # GH account does not exist
+  email: zeroday@nodemcu.com
+
+- name: PhamNgocT
+  # GH account exists, but not sure that is the correct one
+  email: pnt239@gmail.com
