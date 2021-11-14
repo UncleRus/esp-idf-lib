@@ -9,6 +9,5 @@ require_relative "metadata"
 def metadata_array
   directories = Dir.children(Dir.new(@component_dir)).map { |c| File.join(@component_dir, c) }
   directories = directories.select { |d| File.directory?(d) }
-  directories = directories.take(5) if ENV["DEVELOPER"]
   directories.map { |path| Metadata.new(path) }
 end
