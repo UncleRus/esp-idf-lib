@@ -69,3 +69,11 @@
 - name: nated0g
   gh_id: nated0g
   full_name: Nate Usher
+
+- name: bschwind
+  gh_id: bschwind
+  full_name: Brian Schwind
+
+- name: juliandoerner
+  gh_id: juliandoerner
+  full_name: Julian Doerner
