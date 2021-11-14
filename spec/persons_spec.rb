@@ -25,6 +25,10 @@ RSpec.describe "Person list metadata #{file}" do
         has_contact = subject.email? || subject.gh_id? || subject.full_name? || subject.website?
         expect(has_contact).to be true
       end
+
+      it "is unique in persons.yml" do
+        expect(persons.lookup(subject.name).length).to be 1
+      end
     end
   end
 end
