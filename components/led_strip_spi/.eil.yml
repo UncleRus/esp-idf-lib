@@ -4,7 +4,7 @@ components:
     description: SPI-based driver for SK9822/APA102 LED strips
     group: common
     groups: []
-    code_owners: UncleRus
+    code_owners: trombik
     depends:
       # XXX conditional depends
       - name: log

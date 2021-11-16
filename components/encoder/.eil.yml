@@ -3,7 +3,7 @@ components:
   - name: encoder
     description: |
       HW timer-based driver for incremental rotary encoders
-    group: rtc
+    group: input
     groups: []
     code_owners:
       - name: UncleRus

@@ -8,7 +8,6 @@ components:
     code_owners:
       - name: UncleRus
     depends:
-      - name: i2cdev
       - name: log
       - name: esp_idf_lib_helpers
       - name: onewire

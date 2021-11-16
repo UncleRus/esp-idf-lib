@@ -3,7 +3,8 @@ components:
   - name: scd30
     description: Driver for SCD30 CO₂ sensor
     group: air-quality
-    groups: []
+    groups:
+      - name: gas
     code_owners: UncleRus
     depends:
       - i2cdev

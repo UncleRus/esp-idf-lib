@@ -3,8 +3,9 @@ components:
   - name: ccs811
     description: |
       Driver for AMS CCS811 digital gas sensor
-    group: temperature
-    groups: []
+    group: air-quality
+    groups:
+      - name: gas
     code_owners:
       - name: UncleRus
     depends:

@@ -9,7 +9,6 @@ components:
       - name: UncleRus
     depends:
       - name: i2cdev
-      - name: log
       - name: esp_idf_lib_helpers
     thread_safe: yes
     targets:

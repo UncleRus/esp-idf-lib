@@ -1,7 +1,7 @@
 ---
 components:
   - name: sht3x
-    description: Driver for Sensirion SHT3x digital temperature and humidity sensor
+    description: Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor
     group: temperature
     groups:
       - name: humidity

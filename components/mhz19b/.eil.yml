@@ -2,8 +2,9 @@
 components:
   - name: mhz19b
     description: Driver for MH-Z19B NDIR CO₂ sensor
-    group: ait-quality
-    groups: []
+    group: air-quality
+    groups:
+      - gas
     code_owners: UncleRus
     depends:
       - log

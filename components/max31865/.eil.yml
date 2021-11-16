@@ -1,10 +1,9 @@
 ---
 components:
   - name: max31865
-    description: Driver for MAX31725/MAX31726 temperature sensors
+    description: Driver for MAX31865 resistance converter for platinum RTDs
     group: temperature
-    groups:
-      - name: humidity
+    groups: []
     code_owners: UncleRus
     depends:
       - driver
@@ -12,7 +11,6 @@ components:
     thread_safe: yes
     targets:
       - name: esp32
-      - name: esp8266
     licenses:
       - name: BSD-3-Clause
     copyrights:

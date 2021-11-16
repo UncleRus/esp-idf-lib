@@ -2,9 +2,8 @@
 components:
   - name: max31725
     description: Driver for MAX31725/MAX31726 temperature sensors
-    group: humidity
-    groups:
-      - name: temperature
+    group: temperature
+    groups: []
     code_owners: UncleRus
     depends:
       - i2cdev

@@ -1,7 +1,7 @@
 ---
 components:
   - name: mcp9808
-    description: Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428
+    description: Driver for MCP9808 Digital Temperature Sensor
     group: temperature
     groups: []
     code_owners: UncleRus

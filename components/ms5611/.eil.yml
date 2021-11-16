@@ -3,7 +3,8 @@ components:
   - name: ms5611
     description: Driver for barometic pressure sensor MS5611-01BA03
     group: pressure
-    groups: []
+    groups:
+      - name: temperature
     code_owners: UncleRus
     depends:
       - i2cdev

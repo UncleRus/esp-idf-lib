@@ -1,7 +1,7 @@
 ---
 components:
   - name: ina260
-    description: Driver for INA219/INA220 bidirectional current/power monitor
+    description: Driver for INA260 precision digital current and power monitor
     group: current
     groups: []
     code_owners: UncleRus

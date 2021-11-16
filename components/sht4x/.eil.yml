@@ -2,7 +2,7 @@
 components:
   - name: sht4x
     description: |
-      Driver for Sensirion SHT4x digital temperature and humidity sensor
+      Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor
     group: temperature
     groups:
       - name: humidity
