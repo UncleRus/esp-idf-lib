@@ -90,10 +90,15 @@ class Component
     VALID_KEYS.include?(name.to_s)
   end
 
+  def description
+    # if description contains newline, remove it
+    metadata["description"].split("\n").join(" ")
+  end
+
   def method_missing(name, *args, &block)
     # name?, description?, etc
     return metadata.key?(name.to_s.chop) if valid_key_with_question?(name)
-    # name, description
+    # name, etc
     return metadata[name.to_s] if valid_key?(name)
 
     super
@@ -103,5 +108,10 @@ class Component
     # when name is not something we don't know, do `super`, i.e. raising
     # unknown methods error.
     super unless valid_key_with_question?(name) || valid_key?(name)
+  end
+
+  def group_of?(arg)
+    group_name = arg.respond_to?(:name) ? arg.name : arg
+    group.name == group_name || groups.map(&:name).include?(group_name)
   end
 end
