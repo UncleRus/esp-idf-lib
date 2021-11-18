@@ -1,0 +1,21 @@
+---
+components:
+  - name: pcf8574
+    description: Driver for PCF8574 remote 8-bit I/O expander for I2C-bus
+    group: gpio
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2018

@@ -1,0 +1,21 @@
+---
+components:
+  - name: esp_idf_lib_helpers
+    description: |
+      Common support library for esp-idf-lib
+    group: common
+    groups: []
+    code_owners:
+      - name: UncleRus
+      - name: trombik
+    depends:
+      - name: freertos
+    thread_safe: N/A
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: ISC
+    copyrights:
+      - name: trombik
+        year: 2019

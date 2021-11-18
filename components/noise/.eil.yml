@@ -1,0 +1,19 @@
+---
+components:
+  - name: noise
+    description: Noise generation functions
+    group: common
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - lib8tion
+    thread_safe: N/A
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - author:
+          name: FastLED
+        year: 2013
