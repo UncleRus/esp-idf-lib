@@ -10,4 +10,8 @@ class License
   def name
     @metadata["name"]
   end
+
+  def to_s
+    name
+  end
 end

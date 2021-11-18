@@ -40,4 +40,8 @@ class Group
   def description
     @metadata["description"]
   end
+
+  def to_s
+    @metadata["name"]
+  end
 end
