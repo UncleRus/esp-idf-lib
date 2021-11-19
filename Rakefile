@@ -31,7 +31,6 @@ task :readme do
   # * take all components under "components" key
   # * flatten the list of components
   # * create a Component from the item
-  # * sort by name
   all_components = Dir.children("components")
                       .select { |f| File.directory?(File.join("components", f)) }
                       .map { |c| File.join("components", c, ".eil.yml") }
@@ -40,7 +39,6 @@ task :readme do
                       .map { |y| y["components"] }
                       .flatten
                       .map { |c| Component.new(c) }
-                      .sort_by!(&:name)
   markdown = ERB.new(template, trim_mode: "%-").result(binding)
   puts markdown
 end
