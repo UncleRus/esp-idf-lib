@@ -2,7 +2,7 @@
 components:
   - name: lm75
     description: |
-      ESP-IDF driver for LM75, a digital temperature sensor and thermal watchdog
+      Driver for LM75, a digital temperature sensor and thermal watchdog
     group: temperature
     groups: []
     code_owners:
@@ -16,7 +16,7 @@ components:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: BSD-3-Clause
+      - name: BSD-3
     copyrights:
       - name: trombik
         year: 2019

@@ -44,6 +44,7 @@ GEM
 
 PLATFORMS
   amd64-freebsd-14
+  ruby
   x86_64-linux
 
 DEPENDENCIES

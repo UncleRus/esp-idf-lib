@@ -1,7 +1,7 @@
 ---
 components:
   - name: sgp40
-    description: SGP40 Indoor Air Quality Sensor for VOC Measurements
+    description: Driver for SGP40 Indoor Air Quality Sensor for VOC Measurements
     group: air-quality
     groups: []
     code_owners: UncleRus
@@ -14,7 +14,7 @@ components:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: BSD-3-Clause
+      - name: BSD-3
     copyrights:
       - author:
           name: UncleRus

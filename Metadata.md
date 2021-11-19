@@ -112,7 +112,7 @@ name: esp32
 An example:
 
 ```yaml
-name: BSD-3-Clause
+name: BSD-3
 ```
 
 ### Copyright
@@ -200,7 +200,7 @@ in `CMakeLists.txt`.
 `README.md`, run:
 
 ```console
-bundle execc rake readme
+bundle exec rake readme
 ```
 
 ## Validating metadata of components

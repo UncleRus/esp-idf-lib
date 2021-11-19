@@ -99,16 +99,16 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 <% groups.sort_by!(&:description).each do |g| %>
 ### <%= g.description %>
 
-| Component                | Description                                                                      | License      | Supported on       | Thread safety
-|--------------------------|----------------------------------------------------------------------------------|--------------|--------------------|--------------
+| Component                | Description                                                                      | License | Supported on       | Thread safety
+|--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 <%
     components = all_components.select { |c| c.group_of?(g.name) }.sort_by!(&:name).each do |c|
       name = format("%-24s", "**#{c.name}**")
       description = format("%-80s", c.description)
-      licenses = format("%-12s", c.licenses.map(&:name).join(", "))
+      licenses = format("%-7s", c.licenses.map(&:name).join(", "))
       supported_on = format("%-18s", c.targets.map { |t| "`#{t.name}`" }.join(", "))
 -%>
-| <%= name %> | <%= description %> | <%= licenses %> | <%= supported_on %> | <%= c.thread_safe? ? "Yes" : "No" %>
+| <%= name %> | <%= description %> | <%= licenses %> | <%= supported_on %> | <%= c.thread_safe ? "Yes" : "No" %>
 <%   end -%>
 <% end -%>
 
