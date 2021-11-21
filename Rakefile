@@ -14,3 +14,31 @@ desc "Run rspec"
 task :rspec do
   sh "rspec --format d"
 end
+
+desc "Update README.md"
+task :readme do
+  require "erb"
+  require_relative "spec/group_list"
+  require_relative "spec/component"
+
+  template = File.read("README.md.erb")
+  groups = GroupList.new("groups.yml").all
+
+  # * select if it is a directory
+  # * make path to metadata file
+  # * read it
+  # * parse it as YAML
+  # * take all components under "components" key
+  # * flatten the list of components
+  # * create a Component from the item
+  all_components = Dir.children("components")
+                      .select { |f| File.directory?(File.join("components", f)) }
+                      .map { |c| File.join("components", c, ".eil.yml") }
+                      .map { |f| File.read(f) }
+                      .map { |f| YAML.safe_load(f) }
+                      .map { |y| y["components"] }
+                      .flatten
+                      .map { |c| Component.new(c) }
+  markdown = ERB.new(template, trim_mode: "%-").result(binding)
+  puts markdown
+end

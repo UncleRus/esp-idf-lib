@@ -38,28 +38,28 @@ RSpec.describe "Group list metadata #{file}" do
     describe "Group #{group}" do
       subject { group }
 
-      it "is a dict" do
-        expect(group).to be_a Hash
+      it "is a Group" do
+        expect(group).to be_a Group
       end
 
       it "has name as a key" do
-        expect(group.key?("name")).to be true
+        expect(group.name?).to be true
       end
 
       it "has non-empty name" do
-        expect(group["name"]).not_to be_empty
+        expect(group.name).not_to be_empty
       end
 
       it "has description as a key" do
-        expect(group.key?("description")).to be true
+        expect(group.description?).to be true
       end
 
       it "has non-empty description" do
-        expect(group["description"]).not_to be_empty
+        expect(group.description).not_to be_empty
       end
 
       it "is a unique group" do
-        expect(groups.lookup(group["name"]).length).to be 1
+        expect(groups.lookup(group.name).length).to be 1
       end
     end
   end

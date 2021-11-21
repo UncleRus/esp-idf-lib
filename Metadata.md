@@ -112,7 +112,7 @@ name: esp32
 An example:
 
 ```yaml
-name: BSD-3-Clause
+name: BSD-3
 ```
 
 ### Copyright
@@ -191,6 +191,17 @@ components:
 
 FIXME `depends` must be a list because some drivers have conditional `REQUIRES`
 in `CMakeLists.txt`.
+
+## Usages of metadata in the project
+
+### `README.md`
+
+`README.md` is generated from the metadata and `README.md.erb`. To update
+`README.md`, run:
+
+```console
+bundle exec rake readme
+```
 
 ## Validating metadata of components
 

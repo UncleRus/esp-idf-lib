@@ -18,6 +18,7 @@
     * [`markdown` Code style](#markdown-code-style)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
     * [Writing a commit message](#writing-a-commit-message)
+    * [Updating README.md](#updating-readmemd)
     * [Creating a Pull Request](#creating-a-pull-request)
 * [Licenses](#licenses)
     * [Acceptable licenses](#acceptable-licenses)
@@ -390,6 +391,19 @@ When an Issue number or a Pull Request number is prefixed with certain
 keywords, the referenced Issue or Pull Request will be closed. See [Linking a
 pull request to an issue using a keyword](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
 for the supported keywords.
+
+### Updating README.md
+
+Each component has a `.eil.yml` file in its component directory. The file is a
+metadata file of the component. If you change the file, you need to update the
+`README.md` in the project root directory. The `README.md` is generated from
+the metadata and a template, `README.md.erb`. Generate `README.md` by:
+
+```console
+bundle exec rake readme
+```
+
+See also [`Metadata.md`](Metadata.md).
 
 ### Creating a Pull Request
 

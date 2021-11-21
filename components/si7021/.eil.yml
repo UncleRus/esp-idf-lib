@@ -2,7 +2,8 @@
 components:
   - name: si7021
     description: |
-      Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible
+      Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature
+      and humidity sensors
     group: temperature
     groups:
       - name: humidity
@@ -16,7 +17,7 @@ components:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: BSD-3-Clause
+      - name: BSD-3
     copyrights:
       - author:
           name: UncleRus

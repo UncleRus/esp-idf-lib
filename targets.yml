@@ -2,6 +2,4 @@
 
 - name: esp32
 
-- name: esp32s2
-
-- name: esp32c3
+- name: esp8266

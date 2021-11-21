@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "yaml"
+require_relative "group"
 
 class GroupList
   # path to `groups.yml`
@@ -25,10 +26,10 @@ class GroupList
   end
 
   def all
-    metadata
+    metadata.map { |g| Group.new(g) }
   end
 
   def lookup(name)
-    metadata.select { |g| g["name"] == name }
+    metadata.select { |g| g["name"] == name }.map { |g| Group.new(g) }
   end
 end

@@ -16,7 +16,7 @@ components:
       - name: esp32
       - name: esp8266
     licenses:
-      - name: BSD-3-Clause
+      - name: BSD-3
     copyrights:
       - name: UncleRus
         year: 2018

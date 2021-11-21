@@ -2,7 +2,7 @@
 components:
   - name: led_strip_spi
     description: SPI-based driver for SK9822/APA102 LED strips
-    group: common
+    group: led
     groups: []
     code_owners: trombik
     depends:

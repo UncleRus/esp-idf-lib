@@ -15,7 +15,7 @@ components:
       - name: esp32
       - esp8266
     licenses:
-      - name: BSD-3-Clause
+      - name: BSD-3
     copyrights:
       - author:
           name: UncleRus
