@@ -1,0 +1,21 @@
+---
+components:
+  - name: rda5807m
+    description: Driver for single-chip broadcast FM radio tuner RDA5807M
+    group: misc
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2018

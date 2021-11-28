@@ -1,0 +1,19 @@
+---
+components:
+  - name: max31865
+    description: Driver for MAX31865 resistance converter for platinum RTDs
+    group: temperature
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - driver
+      - log
+    thread_safe: yes
+    targets:
+      - name: esp32
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2021

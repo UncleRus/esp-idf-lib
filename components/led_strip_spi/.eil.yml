@@ -1,0 +1,25 @@
+---
+components:
+  - name: led_strip_spi
+    description: SPI-based driver for SK9822/APA102 LED strips
+    group: led
+    groups: []
+    code_owners: trombik
+    depends:
+      # XXX conditional depends
+      - name: log
+      - name: color
+      - name: esp_idf_lib_helpers
+    thread_safe: N/A
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2020
+      - author:
+          name: trombik
+        year: 2021

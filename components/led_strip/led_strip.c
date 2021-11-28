@@ -218,7 +218,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
     }
     CHECK(rmt_translator_init(config.channel, f));
 #ifdef LED_STRIP_BRIGHTNESS
-    // No support for translator context prior to ESP-IDF 4.4
+    // No support for translator context prior to ESP-IDF 4.3
     CHECK(rmt_translator_set_context(config.channel, strip));
 #endif
 

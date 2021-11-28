@@ -1,0 +1,26 @@
+---
+components:
+  - name: ds3231
+    description: |
+      Driver for DS1337 RTC and DS3231 high precision RTC module
+    group: rtc
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - name: UncleRus
+        year: 2018
+      - name: BhuvanchandraD
+        year: 2016
+      - name: RichardA
+        year: 2015

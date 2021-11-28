@@ -31,7 +31,6 @@
  * MIT Licensed as described in the file LICENSE
  */
 
-#include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>

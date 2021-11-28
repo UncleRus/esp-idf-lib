@@ -1,0 +1,22 @@
+---
+components:
+  - name: hx711
+    description: |
+      Driver for HX711 24-bit ADC for weigh scales
+    group: adc-dac
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: driver
+      - name: freertos
+      - name: esp_idf_lib_helpers
+    thread_safe: no
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2019

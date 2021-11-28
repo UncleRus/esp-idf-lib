@@ -1,0 +1,21 @@
+---
+components:
+  - name: mcp342x
+    description: Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428
+    group: adc-dac
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2019

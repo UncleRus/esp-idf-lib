@@ -1,0 +1,21 @@
+---
+components:
+  - name: tsl2591
+    description: Driver for light-to-digital converter TSL2591
+    group: light
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - author:
+          name: juliandoerner
+        year: 2020

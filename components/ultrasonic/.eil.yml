@@ -1,0 +1,22 @@
+---
+components:
+  - name: ultrasonic
+    description: Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05
+    group: misc
+    groups: []
+    code_owners: UncleRus
+    depends:
+      # XXX conditional depends
+      - driver
+      - freertos
+      - esp_idf_lib_helpers
+    thread_safe: no
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2016

@@ -1,0 +1,21 @@
+---
+components:
+  - name: mcp23x17
+    description: Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17
+    group: gpio
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - driver
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2018

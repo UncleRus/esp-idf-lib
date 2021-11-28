@@ -1,0 +1,20 @@
+---
+components:
+  - name: hd44780
+    description: |
+      Driver for HD44780 compatible LCD text displays
+    group: misc
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: driver
+    thread_safe: no
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2016

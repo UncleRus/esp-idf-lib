@@ -1,0 +1,20 @@
+---
+components:
+  - name: color
+    description: |
+      Common library for RGB and HSV colors
+    group: common
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: lib8tion
+    thread_safe: N/A
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - name: FastLED
+        year: 2013

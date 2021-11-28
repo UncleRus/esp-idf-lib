@@ -30,7 +30,7 @@
  * @defgroup si7021 si7021
  * @{
  *
- * ESP-IDF driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and
+ * ESP-IDF driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and
  * compatible temperature and humidity sensors
  *
  * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>

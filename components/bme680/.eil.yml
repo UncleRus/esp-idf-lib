@@ -1,0 +1,27 @@
+---
+components:
+  - name: bme680
+    description: |
+      Driver for BME680 digital environmental sensor
+    group:
+      name: pressure
+    groups:
+      - name: humidity
+      - name: temperature
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2019
+      - name: gschorcht
+        year: 2017
