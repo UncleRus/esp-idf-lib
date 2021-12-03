@@ -1,0 +1,25 @@
+---
+components:
+  - name: ms5611
+    description: Driver for barometic pressure sensor MS5611-01BA03
+    group: pressure
+    groups:
+      - name: temperature
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2018
+      - author:
+          name: BernhardG
+        year: 2016

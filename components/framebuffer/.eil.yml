@@ -1,0 +1,20 @@
+---
+components:
+  - name: framebuffer
+    description: RGB framebuffer component
+    group: common
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - name: log
+      - name: color
+    thread_safe: N/A
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2021

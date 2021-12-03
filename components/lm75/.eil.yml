@@ -1,0 +1,22 @@
+---
+components:
+  - name: lm75
+    description: |
+      Driver for LM75, a digital temperature sensor and thermal watchdog
+    group: temperature
+    groups: []
+    code_owners:
+      - name: trombik
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: trombik
+        year: 2019

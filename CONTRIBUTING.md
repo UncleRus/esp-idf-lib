@@ -18,6 +18,7 @@
     * [`markdown` Code style](#markdown-code-style)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
     * [Writing a commit message](#writing-a-commit-message)
+    * [Updating README.md](#updating-readmemd)
     * [Creating a Pull Request](#creating-a-pull-request)
 * [Licenses](#licenses)
     * [Acceptable licenses](#acceptable-licenses)
@@ -391,6 +392,19 @@ keywords, the referenced Issue or Pull Request will be closed. See [Linking a
 pull request to an issue using a keyword](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
 for the supported keywords.
 
+### Updating README.md
+
+Each component has a `.eil.yml` file in its component directory. The file is a
+metadata file of the component. If you change the file, you need to update the
+`README.md` in the project root directory. The `README.md` is generated from
+the metadata and a template, `README.md.erb`. Generate `README.md` by:
+
+```console
+bundle exec rake readme
+```
+
+See also [`Metadata.md`](Metadata.md).
+
 ### Creating a Pull Request
 
 When your code is ready to be merged, and all the tests have passed in the CI,
@@ -421,9 +435,12 @@ anyone and for any purpose.
 
 We accept permissive licenses such as:
 
-* ISC License
-* MIT License
-* BSD License
+* [ISC](https://spdx.org/licenses/ISC.html) License
+* [MIT](https://spdx.org/licenses/MIT.html) License
+* [BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html) License
+
+A list of licenses are available at
+[SPDX License List](https://spdx.org/licenses/).
 
 ### Acceptable license for new code
 
@@ -434,6 +451,8 @@ The following is a preferred wording of the license.
 
 ```c
 /*
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
  *
  * Permission to use, copy, modify, and distribute this software for any
@@ -449,6 +468,12 @@ The following is a preferred wording of the license.
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
  ```
+
+Add `SPDX-License-Identifier: $YOUR_LICENSE` to your license header.
+`$YOUR_LICENSE` is a SPDX License Identifier.
+
+* [ISC](https://spdx.org/licenses/ISC.html)
+* [BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html)
 
 ### Unacceptable licenses
 

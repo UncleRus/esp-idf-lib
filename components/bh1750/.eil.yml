@@ -1,0 +1,24 @@
+---
+components:
+  - name: bh1750
+    description: Driver for BH1750 light sensor
+    group:
+      name: light
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2018
+      - name: Andrej
+        year: 2017

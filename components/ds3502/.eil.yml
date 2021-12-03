@@ -1,0 +1,21 @@
+---
+components:
+  - name: ds3502
+    description: |
+      Driver for nonvolatile digital potentiometer DS3502
+    group: misc
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: i2cdev
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2021

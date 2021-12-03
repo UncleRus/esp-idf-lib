@@ -1,0 +1,26 @@
+---
+components:
+  - name: dht
+    description: |
+      Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021
+    group: humidity
+    groups:
+      - name: temperature
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: log
+      - name: esp_idf_lib_helpers
+      - name: freertos
+      - name: driver
+    thread_safe: no
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2018
+      - name: jsuiker
+        year: 2016

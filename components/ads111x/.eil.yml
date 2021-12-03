@@ -1,0 +1,24 @@
+---
+components:
+  - name: ads111x
+    description: |
+      Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC
+    group: adc-dac
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2016
+      - name: dianlight
+        year: 2020

@@ -1,0 +1,21 @@
+---
+components:
+  - name: ina260
+    description: Driver for INA260 precision digital current and power monitor
+    group: current
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2020

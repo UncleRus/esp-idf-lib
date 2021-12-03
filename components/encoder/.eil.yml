@@ -1,0 +1,22 @@
+---
+components:
+  - name: encoder
+    description: |
+      HW timer-based driver for incremental rotary encoders
+    group: input
+    groups: []
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: driver
+      - name: freertos
+      - name: log
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2019
