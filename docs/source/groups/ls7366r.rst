@@ -1,0 +1,2 @@
+.. doxygengroup:: ls7366r
+   :members:

@@ -208,6 +208,7 @@ Input controls
 
    groups/button
    groups/encoder
+   groups/ls7366r
 
 Other
 =====
