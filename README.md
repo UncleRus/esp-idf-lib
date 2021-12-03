@@ -174,6 +174,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **button**               | HW timer-based driver for GPIO buttons                                           | MIT     | `esp32`, `esp8266` | Yes
 | **encoder**              | HW timer-based driver for incremental rotary encoders                            | BSD-3   | `esp32`, `esp8266` | Yes
+| **ls7366r**              | Driver for LSI LS7366R quadrature counter                                        | MIT     | `esp32`            | Yes
 
 ### LED drivers
 
@@ -283,3 +284,4 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Erriez](https://github.com/Erriez), developer of MH-Z19B driver
 - [David Douard](https://github.com/douardda), developer of MH-Z19B driver
 - [Nate Usher](https://github.com/nated0g), developer of SCD30 driver
+- [Josh Kallus](https://github.com/Jkallus), developer of LS7366R driver
