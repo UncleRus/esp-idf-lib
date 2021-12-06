@@ -174,7 +174,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **button**               | HW timer-based driver for GPIO buttons                                           | MIT     | `esp32`, `esp8266` | Yes
 | **encoder**              | HW timer-based driver for incremental rotary encoders                            | BSD-3   | `esp32`, `esp8266` | Yes
-| **ls7366r**              | Driver for LSI LS7366R quadrature counter                                        | MIT     | `esp32`            | Yes
+| **ls7366r**              | Driver for LS7366R Quadrature Encoder Counter                                    | MIT     | `esp32`            | Yes
 
 ### LED drivers
 
