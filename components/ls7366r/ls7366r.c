@@ -1,5 +1,39 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2021 Joshua Kallus <joshk.kallus3@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * @file ls7366r.c
+ *
+ * ESP-IDF driver for LS7366R Quadrature Encoder Counter
+ *
+ * Datasheet: https://lsicsi.com/datasheets/LS7366R.pdf
+ *
+ * Copyright (c) 2021 Joshua Kallus <joshk.kallus3@gmail.com>
+ *
+ * MIT Licensed as described in the file LICENSE
+ */
 #include "ls7366r.h"
-#include "string.h"
+#include <string.h>
 
 // Registers
 #define REG_MDR0 0x08
@@ -146,45 +180,45 @@ static esp_err_t write_dtr(spi_device_handle_t spi, uint8_t* data, uint8_t lengt
 	return write_data(spi, CMD_WR | REG_DTR, data, length);
 }
 
-static esp_err_t load_cntr(spi_device_handle_t spi)
-{
-	return write_command(spi, CMD_LOAD | REG_CNTR);
-}
-
-static esp_err_t load_otr(spi_device_handle_t spi)
-{
-	return write_command(spi, CMD_LOAD | REG_OTR);
-}
-
-static esp_err_t read_mdr0(spi_device_handle_t spi, uint8_t *data)
-{
-	return read_register(spi, CMD_RD | REG_MDR0, data);	
-}
+//static esp_err_t load_cntr(spi_device_handle_t spi)
+//{
+//	return write_command(spi, CMD_LOAD | REG_CNTR);
+//}
+//
+//static esp_err_t load_otr(spi_device_handle_t spi)
+//{
+//	return write_command(spi, CMD_LOAD | REG_OTR);
+//}
+//
+//static esp_err_t read_mdr0(spi_device_handle_t spi, uint8_t *data)
+//{
+//	return read_register(spi, CMD_RD | REG_MDR0, data);
+//}
 
 static esp_err_t read_mdr1(spi_device_handle_t spi, uint8_t *data)
 {
 	return read_register(spi, CMD_RD | REG_MDR1, data);
 }
 
-static esp_err_t read_otr(spi_device_handle_t spi, int32_t *data)
-{
-	esp_err_t ret;
-	uint8_t data_buf[4];
-	uint32_t result;
-	
-	ret = read_data(spi, CMD_RD | REG_OTR, data_buf, 4);
-	result = data_buf[0];
-	
-	for (uint8_t cnt = 1; cnt < 4; cnt++)
-	{
-		result <<= 8;
-		result |= data_buf[cnt];
-	}
-	
-	*data = result;
-	return ret;
-}
-
+//static esp_err_t read_otr(spi_device_handle_t spi, int32_t *data)
+//{
+//	esp_err_t ret;
+//	uint8_t data_buf[4];
+//	uint32_t result;
+//
+//	ret = read_data(spi, CMD_RD | REG_OTR, data_buf, 4);
+//	result = data_buf[0];
+//
+//	for (uint8_t cnt = 1; cnt < 4; cnt++)
+//	{
+//		result <<= 8;
+//		result |= data_buf[cnt];
+//	}
+//
+//	*data = result;
+//	return ret;
+//}
+//
 static esp_err_t read_cntr(spi_device_handle_t spi, int32_t* data)
 {
 	esp_err_t ret;
@@ -203,20 +237,20 @@ static esp_err_t read_cntr(spi_device_handle_t spi, int32_t* data)
 	return ret;
 }
 
-static esp_err_t read_str(spi_device_handle_t spi, uint8_t* data)
-{
-	return read_register(spi, CMD_RD | REG_STR, data);
-}
-
-static esp_err_t clear_mdr0(spi_device_handle_t spi)
-{
-	return write_command(spi, CMD_CLR | REG_MDR0);
-}
-
-static esp_err_t clear_mdr1(spi_device_handle_t spi)
-{
-	return write_command(spi, CMD_CLR | REG_MDR1);
-}
+//static esp_err_t read_str(spi_device_handle_t spi, uint8_t* data)
+//{
+//	return read_register(spi, CMD_RD | REG_STR, data);
+//}
+//
+//static esp_err_t clear_mdr0(spi_device_handle_t spi)
+//{
+//	return write_command(spi, CMD_CLR | REG_MDR0);
+//}
+//
+//static esp_err_t clear_mdr1(spi_device_handle_t spi)
+//{
+//	return write_command(spi, CMD_CLR | REG_MDR1);
+//}
 
 static esp_err_t clear_cntr(spi_device_handle_t spi)
 {

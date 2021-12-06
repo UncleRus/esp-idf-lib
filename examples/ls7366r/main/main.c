@@ -3,12 +3,12 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <freertos/Queue.h>
+#include <freertos/queue.h>
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
 
-#include "LS7366R.h"
+#include "ls7366r.h"
 
 
 #define TEST_PIN 25
