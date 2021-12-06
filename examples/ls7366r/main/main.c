@@ -88,7 +88,7 @@ void app_main(void)
 		.flags = 0
 	};
 	
-	ESP_ERROR_CHECK(spi_bus_initialize(LS7366R_HOST, &cfg, SPI_DMA_DISABLED));
+	ESP_ERROR_CHECK(spi_bus_initialize(LS7366R_HOST, &cfg, 0));
 	ls7366r_t dev;
 	ESP_ERROR_CHECK(ls7366r_init_desc(&dev, LS7366R_HOST, PIN_NUM_CS));
 	ESP_ERROR_CHECK(ls7366r_set_config(&dev, &config));
