@@ -55,7 +55,7 @@ void task(void *pvParameters)
     TickType_t last_wakeup = xTaskGetTickCount();
 
     // get the measurement duration for high repeatability;
-    uint8_t duration = sht4x_get_measurement_duration(dev);
+    uint8_t duration = sht4x_get_measurement_duration(&dev);
 
     while (1)
     {
