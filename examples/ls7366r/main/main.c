@@ -8,6 +8,7 @@
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <ls7366r.h>
+#include <esp_idf_lib_helpers.h>
 
 
 #define TEST_PIN 25
@@ -15,7 +16,12 @@
 #define GPIO_OUTPUT_PIN_SEL (1ULL << TEST_PIN)
 #define GPIO_INPUT_PIN_SEL (1ULL << INTR_PIN)
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
 #define LS7366R_HOST SPI3_HOST
+#else
+#define LS7366R_HOST VSPI_HOST
+#endif
+
 #define PIN_NUM_MISO 19
 #define PIN_NUM_MOSI 23
 #define PIN_NUM_SCLK 18
