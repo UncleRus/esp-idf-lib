@@ -7,8 +7,7 @@
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
-
-#include "ls7366r.h"
+#include <ls7366r.h>
 
 
 #define TEST_PIN 25
@@ -16,7 +15,7 @@
 #define GPIO_OUTPUT_PIN_SEL (1ULL << TEST_PIN)
 #define GPIO_INPUT_PIN_SEL (1ULL << INTR_PIN)
 
-#define LS7366R_HOST VSPI_HOST
+#define LS7366R_HOST SPI3_HOST
 #define PIN_NUM_MISO 19
 #define PIN_NUM_MOSI 23
 #define PIN_NUM_SCLK 18
@@ -129,6 +128,4 @@ void app_main(void)
 		ESP_LOGI(TAG, "Count: %d", count);
 		vTaskDelay(500 / portTICK_PERIOD_MS);
 	}
-	
-	
 }
