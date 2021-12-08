@@ -214,6 +214,8 @@ esp_err_t led_strip_init(led_strip_t *strip)
             break;
         default:
             ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
+            if (strip->buf)
+                free(strip->buf);
             return ESP_ERR_NOT_SUPPORTED;
     }
     CHECK(rmt_translator_init(config.channel, f));
