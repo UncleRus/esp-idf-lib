@@ -185,7 +185,7 @@ void led_strip_install()
 
 esp_err_t led_strip_init(led_strip_t *strip)
 {
-    CHECK_ARG(strip && strip->length > 0);
+    CHECK_ARG(strip && strip->length > 0 && strip->type < LED_STRIP_TYPE_MAX);
 
     strip->buf = calloc(strip->length, COLOR_SIZE(strip));
     if (!strip->buf)
@@ -213,10 +213,7 @@ esp_err_t led_strip_init(led_strip_t *strip)
             f = apa106_rmt_adapter;
             break;
         default:
-            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-            if (strip->buf)
-                free(strip->buf);
-            return ESP_ERR_NOT_SUPPORTED;
+            break;
     }
     CHECK(rmt_translator_init(config.channel, f));
 #ifdef LED_STRIP_BRIGHTNESS
@@ -242,7 +239,7 @@ esp_err_t led_strip_flush(led_strip_t *strip)
     CHECK_ARG(strip && strip->buf);
 
     CHECK(rmt_wait_tx_done(strip->channel, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
-    ets_delay_us(50);
+    ets_delay_us(CONFIG_LED_STRIP_PAUSE_LENGTH);
     return rmt_write_sample(strip->channel, strip->buf,
                             strip->length * COLOR_SIZE(strip), false);
 }

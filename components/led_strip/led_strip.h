@@ -55,7 +55,9 @@ typedef enum
 {
     LED_STRIP_WS2812 = 0,
     LED_STRIP_SK6812,
-    LED_STRIP_APA106
+    LED_STRIP_APA106,
+
+    LED_STRIP_TYPE_MAX
 } led_strip_type_t;
 
 /**

@@ -3,4 +3,15 @@ menu "LED strip"
 config LED_STRIP_FLUSH_TIMEOUT
     int "Strip flush timeout, ms"
     default 1000
+
+config LED_STRIP_PAUSE_LENGTH
+	int "Delay between flushes, us"
+	default 50
+	help
+		This delay is between the sending full data to the all LEDs in strip.
+		Without this delay, a bug with "missing" pixels is possible: 
+		if delay between calls to led_strip_flush() is small, the LEDs consider
+		the new data package sent to all LEDs in strip to be a continuation of
+		the previous one.
+    
 endmenu
