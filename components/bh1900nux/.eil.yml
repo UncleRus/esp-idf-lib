@@ -1,0 +1,21 @@
+---
+components:
+  - name: bh1900nux
+    description: Driver for BH1900NUX temperature sensor
+    group: temperature
+    groups: []
+    code_owners: UncleRus
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: UncleRus
+        year: 2021
