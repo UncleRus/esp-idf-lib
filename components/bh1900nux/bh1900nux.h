@@ -43,7 +43,7 @@
 #include <i2cdev.h>
 #include <esp_err.h>
 
-#define BH1900NUX_I2C_ADDR_BASE 0x40 //!< See full list in datasheet
+#define BH1900NUX_I2C_ADDR_BASE 0x48 //!< See full list in datasheet
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,6 +76,24 @@ typedef enum {
 } bh1900nux_mode_t;
 
 /**
+ * Delay between measurements in continuous mode
+ */
+typedef enum {
+    BH1900NUX_WT_0 = 0, //!< 186240 * 16 / 450000 ~ 6.622s (Fosc = 450kHz)
+    BH1900NUX_WT_1,     //!< 186240 * 4 / 450000 ~ 1.655s (Fosc = 450kHz)
+    BH1900NUX_WT_2,     //!< 186240 / 450000 ~ 0.414s (Fosc = 450kHz)
+    BH1900NUX_WT_3,     //!< 93120 / 450000 ~ 0.207s (Fosc = 450kHz)
+} bh1900nux_wait_time_t;
+
+/**
+ * Device descriptor
+ */
+typedef struct {
+    i2c_dev_t i2c_dev;
+    bh1900nux_mode_t mode;
+} bh1900nux_t;
+
+/**
  * @brief Initialize device descriptor
  *
  * @param dev Device descriptor
@@ -85,7 +103,7 @@ typedef enum {
  * @param scl_gpio SCL GPIO
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t bh1900nux_init_desc(bh1900nux_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
@@ -93,96 +111,97 @@ esp_err_t bh1900nux_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpi
  * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_free_desc(i2c_dev_t *dev);
+esp_err_t bh1900nux_free_desc(bh1900nux_t *dev);
+
+/**
+ * @brief Set device operating mode
+ *
+ * @param dev Device descriptor
+ * @param mode Operating mode
+ * @return `ESP_OK` on success
+ */
+esp_err_t bh1900nux_set_mode(bh1900nux_t *dev, bh1900nux_mode_t mode);
 
 /**
  * @brief Read current device config
  *
  * @param dev Device descriptor
- * @param[out] mode Operating mode
- * @param[out] fmt Data format
+ * @param[out] wt Delay between measurements
  * @param[out] fq Fault queue size
- * @param[out] op OS polarity
- * @param[out] om OS mode
+ * @param[out] op ALERT pin polarity
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_get_config(i2c_dev_t *dev, bh1900nux_mode_t *mode, bh1900nux_fault_queue_t *fq, bh1900nux_alert_polarity_t *ap);
+esp_err_t bh1900nux_get_config(bh1900nux_t *dev, bh1900nux_wait_time_t *wt, bh1900nux_fault_queue_t *fq, bh1900nux_alert_polarity_t *ap);
 
 /**
  * @brief Configure device
  *
  * @param dev Device descriptor
- * @param mode Operating mode
- * @param fmt Data format
+ * @param wt Delay between measurements
  * @param fq Fault queue size
- * @param op OS polarity
- * @param om OS mode
+ * @param ap ALERT pin polarity
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_set_config(i2c_dev_t *dev, bh1900nux_mode_t mode, bh1900nux_fault_queue_t fq, bh1900nux_alert_polarity_t ap);
+esp_err_t bh1900nux_set_config(bh1900nux_t *dev, bh1900nux_wait_time_t wt, bh1900nux_fault_queue_t fq, bh1900nux_alert_polarity_t ap);
 
 /**
  * @brief Made a single-shot measurement
  *
  * Works only when device is in shutdown mode.
- * Measurement time is ~50 ms.
  *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
- * @param fmt Data format
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_one_shot(i2c_dev_t *dev, float *temp);
+esp_err_t bh1900nux_one_shot(bh1900nux_t *dev, float *temp);
 
 /**
  * @brief Read temperature register
  *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
- * @param fmt Data format
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_get_temperature(i2c_dev_t *dev, float *temp, bh1900nux_data_format_t fmt);
+esp_err_t bh1900nux_get_temperature(bh1900nux_t *dev, float *temp);
 
 /**
- * @brief Read OS threshold temperature
+ * @brief Read lower temperature limit register
  *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
- * @param fmt Data format
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_get_os_temp(i2c_dev_t *dev, float *temp, bh1900nux_data_format_t fmt);
+esp_err_t bh1900nux_get_t_low(bh1900nux_t *dev, float *temp);
 
 /**
- * @brief Set OS threshold temperature
+ * @brief Write lower temperature limit register
  *
  * @param dev Device descriptor
  * @param temp Temperature, deg.C
  * @param fmt Data format
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_set_os_temp(i2c_dev_t *dev, float temp, bh1900nux_data_format_t fmt);
+esp_err_t bh1900nux_set_t_low(bh1900nux_t *dev, float temp);
 
 /**
- * @brief Read OS hysteresis temperature
+ * @brief Read higher temperature limit register
  *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
  * @param fmt Data format
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_get_hysteresis_temp(i2c_dev_t *dev, float *temp, bh1900nux_data_format_t fmt);
+esp_err_t bh1900nux_get_t_high(bh1900nux_t *dev, float *temp);
 
 /**
- * @brief Set OS hysteresis temperature
+ * @brief Write higher temperature limit register
  *
  * @param dev Device descriptor
  * @param temp Temperature, deg.C
  * @param fmt Data format
  * @return `ESP_OK` on success
  */
-esp_err_t bh1900nux_set_hysteresis_temp(i2c_dev_t *dev, float temp, bh1900nux_data_format_t fmt);
+esp_err_t bh1900nux_set_t_high(bh1900nux_t *dev, float temp);
 
 #ifdef __cplusplus
 }

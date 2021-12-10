@@ -41,177 +41,204 @@
 #include <esp_idf_lib_helpers.h>
 #include "bh1900nux.h"
 
-static const char *TAG = "max31725";
+static const char *TAG = "bh1900nux";
 
-static const float t_lsb = 0.00390625;
+static const float t_lsb = 0.0625;
 
-#define MAX31725_I2C_ADDR_MAX 0x5f
+#define BH1900NUX_I2C_ADDR_MAX 0x4f
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
-#define REG_TEMP 0
-#define REG_CONF 1
-#define REG_HYST 2
-#define REG_OS   3
+#define REG_TEMP  0
+#define REG_CONF  1
+#define REG_TLOW  2
+#define REG_THIGH 3
 
-#define BIT_SHUTDOWN 0
-#define BIT_COMP_INT 1
-#define BIT_OS_POL   2
-#define BIT_FAULT_Q0 3
-#define BIT_DATA_FMT 5
-#define BIT_TIMEOUT  6
-#define BIT_ONE_SHOT 7
+#define BIT_SHUTDOWN  0
+#define BIT_ALERT_POL 2
+#define BIT_FAULT_DQ0 3
+#define BIT_ALERT     6
+#define BIT_ONE_SHOT  7
+#define BIT_WT0       8
 
-#define FMT_SHIFT 64.0
-#define CONV_TIME_MS 50
+#define CONV_TIME_MS 35
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 #define BV(x) (1 << (x))
 
-typedef union
+inline static uint16_t shuffle(uint16_t v)
 {
-    uint16_t udata;
-    int16_t sdata;
-} temp_data_t;
+    return (v << 8) | (v >> 8);
+}
 
-static esp_err_t read_temp(i2c_dev_t *dev, uint8_t reg, float *temp, max31725_data_format_t fmt)
+static esp_err_t read_reg(bh1900nux_t *dev, uint8_t reg, uint16_t *val)
 {
-    CHECK_ARG(dev && temp);
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, reg, val, 2));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
-    temp_data_t buf;
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, &buf.udata, 2));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    buf.udata = (buf.udata << 8) | (buf.udata >> 8);
-    *temp = buf.sdata * t_lsb + (fmt == MAX31725_FMT_EXTENDED ? FMT_SHIFT : 0);
+    *val = shuffle(*val);
 
     return ESP_OK;
 }
 
-static esp_err_t write_temp(i2c_dev_t *dev, uint8_t reg, float temp, max31725_data_format_t fmt)
+static esp_err_t write_reg(bh1900nux_t *dev, uint8_t reg, uint16_t val)
+{
+    uint16_t v = shuffle(val);
+
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, reg, &v, 2));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+
+    return ESP_OK;
+}
+
+static esp_err_t read_temp(bh1900nux_t *dev, uint8_t reg, float *temp)
+{
+    CHECK_ARG(dev && temp);
+
+    int16_t buf;
+
+    CHECK(read_reg(dev, reg, (uint16_t *)&buf));
+
+    *temp = ((int16_t)buf >> 4) * t_lsb;
+
+    return ESP_OK;
+}
+
+static esp_err_t write_temp(bh1900nux_t *dev, uint8_t reg, float temp)
 {
     CHECK_ARG(dev);
 
-    temp_data_t buf;
-    buf.sdata = (temp - (fmt == MAX31725_FMT_EXTENDED ? FMT_SHIFT : 0)) / t_lsb;
-    buf.udata = (buf.udata << 8) | (buf.udata >> 8);
+    return write_reg(dev, reg, (int16_t)(temp / t_lsb) << 4);
+}
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, &buf.udata, 2));
-    I2C_DEV_GIVE_MUTEX(dev);
+static esp_err_t update_reg(bh1900nux_t *dev, uint8_t reg, uint16_t val, uint16_t mask)
+{
+    CHECK_ARG(dev);
+
+    uint16_t tmp;
+    CHECK(read_reg(dev, reg, &tmp));
+    CHECK(write_reg(dev, reg, (tmp & ~mask) | (val & ~mask)));
 
     return ESP_OK;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t max31725_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t bh1900nux_init_desc(bh1900nux_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
-    if (addr < MAX31725_I2C_ADDR_BASE || addr > MAX31725_I2C_ADDR_MAX)
+    if (addr < BH1900NUX_I2C_ADDR_BASE || addr > BH1900NUX_I2C_ADDR_MAX)
     {
         ESP_LOGE(TAG, "Invalid device address: 0x%02x", addr);
         return ESP_ERR_INVALID_ARG;
     }
 
-    dev->port = port;
-    dev->addr = addr;
-    dev->cfg.sda_io_num = sda_gpio;
-    dev->cfg.scl_io_num = scl_gpio;
+    dev->i2c_dev.port = port;
+    dev->i2c_dev.addr = addr;
+    dev->i2c_dev.cfg.sda_io_num = sda_gpio;
+    dev->i2c_dev.cfg.scl_io_num = scl_gpio;
 #if HELPER_TARGET_IS_ESP32
-    dev->cfg.master.clk_speed = I2C_FREQ_HZ;
+    dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
 
-    return i2c_dev_create_mutex(dev);
+    return i2c_dev_create_mutex(&dev->i2c_dev);
 }
 
-esp_err_t max31725_free_desc(i2c_dev_t *dev)
+esp_err_t bh1900nux_free_desc(bh1900nux_t *dev)
 {
     CHECK_ARG(dev);
 
-    return i2c_dev_delete_mutex(dev);
+    return i2c_dev_delete_mutex(&dev->i2c_dev);
 }
 
-esp_err_t max31725_get_config(i2c_dev_t *dev, max31725_mode_t *mode, max31725_data_format_t *fmt, max31725_fault_queue_t *fq,
-        max31725_os_polarity_t *op, max31725_os_mode_t *om)
+esp_err_t bh1900nux_set_mode(bh1900nux_t *dev, bh1900nux_mode_t mode)
 {
-    CHECK_ARG(dev && mode && fmt && fq && op && om);
+    CHECK_ARG(dev);
 
-    uint8_t b;
+    dev->mode = mode;
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CONF, &b, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
+    uint16_t val, mask;
+    if (mode == BH1900NUX_MODE_CONTINUOUS)
+    {
+        val = BV(BIT_ONE_SHOT);
+        mask = BV(BIT_ONE_SHOT) | BV(BIT_SHUTDOWN);
+    }
+    else
+    {
+        val = BV(BIT_SHUTDOWN);
+        mask = BV(BIT_ONE_SHOT) | BV(BIT_SHUTDOWN);
+    }
 
-    *mode = (b >> BIT_SHUTDOWN) & 1;
-    *fmt = (b >> BIT_DATA_FMT) & 1;
-    *fq = (b >> BIT_FAULT_Q0) & 3;
-    *op = (b >> BIT_OS_POL) & 1;
-    *om = (b >> BIT_COMP_INT) & 1;
+    return update_reg(dev, REG_CONF, val, mask);
+}
+
+esp_err_t bh1900nux_get_config(bh1900nux_t *dev, bh1900nux_wait_time_t *wt, bh1900nux_fault_queue_t *fq, bh1900nux_alert_polarity_t *ap)
+{
+    CHECK_ARG(dev && wt && fq && ap);
+
+    uint16_t val;
+    CHECK(read_reg(dev, REG_CONF, &val));
+
+    *wt = (val >> BIT_WT0) & 3;
+    *fq = (val >> BIT_FAULT_DQ0) & 3;
+    *ap = (val >> BIT_ALERT_POL) & 1;
 
     return ESP_OK;
 }
 
-esp_err_t max31725_set_config(i2c_dev_t *dev, max31725_mode_t mode, max31725_data_format_t fmt, max31725_fault_queue_t fq,
-        max31725_os_polarity_t op, max31725_os_mode_t om)
+esp_err_t bh1900nux_set_config(bh1900nux_t *dev, bh1900nux_wait_time_t wt, bh1900nux_fault_queue_t fq, bh1900nux_alert_polarity_t ap)
 {
-    CHECK_ARG(dev && fq <= MAX31725_FAULTS_6);
+    CHECK_ARG(dev && fq <= BH1900NUX_FAULTS_6 && wt <= BH1900NUX_WT_3);
 
-    uint8_t b = (fmt != MAX31725_FMT_NORMAL ? BV(BIT_DATA_FMT) : 0) |
-                (fq << BIT_FAULT_Q0) |
-                (op != MAX31725_OS_LOW ? BV(BIT_OS_POL) : 0) |
-                (om != MAX31725_OS_COMPARATOR ? BV(BIT_COMP_INT) : 0) |
-                (mode != MAX31725_MODE_CONTINUOUS ? BV(BIT_SHUTDOWN) : 0);
+    uint16_t val = (wt << BIT_WT0) | (fq << BIT_FAULT_DQ0) | (ap != BH1900NUX_ALERT_LOW ? BV(BIT_ALERT_POL) : 0);
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_CONF, &b, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
+    CHECK(write_reg(dev, REG_CONF, val));
+    CHECK(bh1900nux_set_mode(dev, dev->mode));
 
     return ESP_OK;
 }
 
-esp_err_t max31725_one_shot(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt)
+esp_err_t bh1900nux_one_shot(bh1900nux_t *dev, float *temp)
 {
     CHECK_ARG(dev);
 
-    uint8_t b;
+    if (dev->mode != BH1900NUX_MODE_SHUTDOWN)
+    {
+        ESP_LOGE(TAG, "Cannot perform one-shot measurement, device in invalid mode");
+        return ESP_ERR_INVALID_STATE;
+    }
 
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CONF, &b, 1));
-    b |= BV(BIT_ONE_SHOT);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_CONF, &b, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
+    CHECK(update_reg(dev, REG_CONF, BV(BIT_ONE_SHOT) | BV(BIT_SHUTDOWN), BV(BIT_ONE_SHOT) | BV(BIT_SHUTDOWN)));
     // wait 50 ms
     vTaskDelay(pdMS_TO_TICKS(CONV_TIME_MS));
 
-    return read_temp(dev, REG_TEMP, temp, fmt);
+    return read_temp(dev, REG_TEMP, temp);
 }
 
-esp_err_t max31725_get_temperature(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt)
+esp_err_t bh1900nux_get_temperature(bh1900nux_t *dev, float *temp)
 {
-    return read_temp(dev, REG_TEMP, temp, fmt);
+    return read_temp(dev, REG_TEMP, temp);
 }
 
-esp_err_t max31725_get_os_temp(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt)
+esp_err_t bh1900nux_get_t_low(bh1900nux_t *dev, float *temp)
 {
-    return read_temp(dev, REG_OS, temp, fmt);
+    return read_temp(dev, REG_TLOW, temp);
 }
 
-esp_err_t max31725_set_os_temp(i2c_dev_t *dev, float temp, max31725_data_format_t fmt)
+esp_err_t bh1900nux_set_t_low(bh1900nux_t *dev, float temp)
 {
-    return write_temp(dev, REG_OS, temp, fmt);
+    return write_temp(dev, REG_TLOW, temp);
 }
 
-esp_err_t max31725_get_hysteresis_temp(i2c_dev_t *dev, float *temp, max31725_data_format_t fmt)
+esp_err_t bh1900nux_get_t_high(bh1900nux_t *dev, float *temp)
 {
-    return read_temp(dev, REG_HYST, temp, fmt);
+    return read_temp(dev, REG_THIGH, temp);
 }
 
-esp_err_t max31725_set_hysteresis_temp(i2c_dev_t *dev, float temp, max31725_data_format_t fmt)
+esp_err_t bh1900nux_set_t_high(bh1900nux_t *dev, float temp)
 {
-    return write_temp(dev, REG_HYST, temp, fmt);
+    return write_temp(dev, REG_THIGH, temp);
 }
