@@ -237,6 +237,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3   | `esp32`, `esp8266` | Yes
+| **bh1900nux**            | Driver for BH1900NUX temperature sensor                                          | BSD-3   | `esp32`, `esp8266` | Yes
 | **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3   | `esp32`, `esp8266` | Yes
 | **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | `esp32`, `esp8266` | Yes
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | `esp32`, `esp8266` | Yes

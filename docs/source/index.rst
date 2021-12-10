@@ -121,6 +121,7 @@ Humidity & temperature sensors
    groups/tsys01
    groups/aht
    groups/max31865
+   groups/bh1900nux
    
 Pressure sensors
 ================
