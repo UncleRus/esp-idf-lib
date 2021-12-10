@@ -53,6 +53,7 @@ static const float t_lsb = 0.0625;
 #define REG_CONF  1
 #define REG_TLOW  2
 #define REG_THIGH 3
+#define REG_RST   4
 
 #define BIT_SHUTDOWN  0
 #define BIT_ALERT_POL 2
@@ -62,6 +63,7 @@ static const float t_lsb = 0.0625;
 #define BIT_WT0       8
 
 #define CONV_TIME_MS 35
+#define RESET_TIME_MS 250
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -152,6 +154,15 @@ esp_err_t bh1900nux_free_desc(bh1900nux_t *dev)
     CHECK_ARG(dev);
 
     return i2c_dev_delete_mutex(&dev->i2c_dev);
+}
+
+esp_err_t bh1900nux_reset(bh1900nux_t *dev)
+{
+    CHECK_ARG(dev);
+
+    CHECK(write_reg(dev, REG_RST, 1));
+    vTaskDelay(pdMS_TO_TICKS(RESET_TIME_MS));
+    return bh1900nux_set_mode(dev, dev->mode);
 }
 
 esp_err_t bh1900nux_set_mode(bh1900nux_t *dev, bh1900nux_mode_t mode)

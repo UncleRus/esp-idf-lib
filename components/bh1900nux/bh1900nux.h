@@ -114,6 +114,14 @@ esp_err_t bh1900nux_init_desc(bh1900nux_t *dev, i2c_port_t port, uint8_t addr, g
 esp_err_t bh1900nux_free_desc(bh1900nux_t *dev);
 
 /**
+ * @brief Software reset
+ *
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t bh1900nux_reset(bh1900nux_t *dev);
+
+/**
  * @brief Set device operating mode
  *
  * @param dev Device descriptor
