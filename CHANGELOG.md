@@ -1,5 +1,28 @@
 # Changelog
 
+## v.0.8.2
+
+### Features
+
+- (max31865) Driver for MAX31865 resistance converter for platinum RTDs
+- (pca9557) Driver for PCA9537/PCA9557 remote 4/8-bit I/O expanders for I2C-bus
+- (ls7366r) Driver for LS7366R Quadrature Encoder Counter
+- (ci) Added metadata support
+- (bh1900nux) Driver for BH1900NUX temperature sensor
+
+### Bugfixes
+
+- (scd30) Fixed type casting warning
+- (ccs811) Fixed claculation bug in ccs811_set_environmental_data()
+- (max7219) Fixed bug with chip number in 8x8 example
+- (button) Added user context do descriptor
+- (si7021) Fixed delay for SHT20
+- (led_strip_spi) Added brightness support
+- (pcf8563) Fixed mdays/wdays bug
+- (sht4x) Fixed bug in example
+- (led_strip) Fixed memory leak when handling error in led_strip_init()
+
+
 ## v.0.8.1
 
 ### Features
@@ -21,6 +44,7 @@
 - (ds18x20) Added split 18B20/18S20 reads to allow for use of DS18X20_ANY
   without flubbing the conversion on an 18B20
 - (ds18x20) Added scratchpad write and copy commands
+
 
 ## v.0.8.0
 
@@ -52,6 +76,7 @@
 - (refactoring) Updated component makefiles and CMakeLists
 - (i2cdev) Added option to disable all mutexes
 
+
 ## v.0.7.3
 
 ### Features
@@ -64,6 +89,7 @@
 
 - (pca9685) b633f86 Speed-ups
 - (max7219) #159 Add "minus" sign and fix maximum brightness
+
 
 ## v.0.7.2
 
@@ -85,6 +111,7 @@
 - (doc) Multiple fixes
 - (pca9685) ce8f3fa Fix possible race condition
 
+
 ## v.0.7.1
 
 ### Features
@@ -101,6 +128,7 @@
 - (sht3x) 8289262 Fix possible race confition in SS measurement, refactoring
 - (bh1750, bmp180) d57488b Fix possible race condition
 
+
 ## v.0.7
 
 ### Features
@@ -109,12 +137,14 @@
 - (rda5807m) #25 Driver for single-chip broadcast FM radio tuner RDA5807M
 - (i2cdev) #138 I2C clock stertching support
 
+
 ## v.0.6.1
 
 ### Bugfixes
 
 - (ina219) #100 Potential error in ina219_get_gain
 - (bme680) #121 Pressure calculation for bme680 gives wrong results
+
 
 ## v.0.6
 
@@ -131,6 +161,7 @@
 - (sht3x, hmc5883l, hx711) #118 SHT3x measurements fail after 72min
 - (pca9685) d4f5e35 Fix full on/off
 - (ina219) Typo fix
+
 
 ## v.0.5-beta
 
