@@ -223,7 +223,7 @@ esp_err_t bh1900nux_one_shot(bh1900nux_t *dev, float *temp)
     }
 
     CHECK(update_reg(dev, REG_CONF, BV(BIT_ONE_SHOT) | BV(BIT_SHUTDOWN), BV(BIT_ONE_SHOT) | BV(BIT_SHUTDOWN)));
-    // wait 50 ms
+
     vTaskDelay(pdMS_TO_TICKS(CONV_TIME_MS));
 
     return read_temp(dev, REG_TEMP, temp);

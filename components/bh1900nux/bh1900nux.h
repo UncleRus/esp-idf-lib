@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
