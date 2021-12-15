@@ -164,6 +164,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3   | `esp32`, `esp8266` | Yes
 | **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3   | `esp32`, `esp8266` | Yes
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3   | `esp32`, `esp8266` | No
+| **hts221**               | Driver for HTS221 temperature and humidity sensor.                               | ISC     | `esp32`            | Yes
 | **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3   | `esp32`, `esp8266` | Yes
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3   | `esp32`, `esp8266` | Yes
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3   | `esp32`, `esp8266` | Yes
@@ -243,6 +244,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | `esp32`, `esp8266` | Yes
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3   | `esp32`, `esp8266` | No
 | **ds18x20**              | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs             | BSD-3   | `esp32`, `esp8266` | No
+| **hts221**               | Driver for HTS221 temperature and humidity sensor.                               | ISC     | `esp32`            | Yes
 | **lm75**                 | Driver for LM75, a digital temperature sensor and thermal watchdog               | BSD-3   | `esp32`, `esp8266` | Yes
 | **max31725**             | Driver for MAX31725/MAX31726 temperature sensors                                 | BSD-3   | `esp32`, `esp8266` | Yes
 | **max31865**             | Driver for MAX31865 resistance converter for platinum RTDs                       | BSD-3   | `esp32`            | Yes
@@ -286,3 +288,4 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [David Douard](https://github.com/douardda), developer of MH-Z19B driver
 - [Nate Usher](https://github.com/nated0g), developer of SCD30 driver
 - [Josh Kallus](https://github.com/Jkallus), developer of LS7366R driver
+- [saasaa](https://github.com/saasaa), developer of HTS221 driver
