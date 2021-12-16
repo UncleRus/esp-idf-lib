@@ -198,10 +198,4 @@ esp_err_t hts221_print_calibration_coeff();
  */
 esp_err_t hts221_read_status_register(i2c_dev_t *dev, uint8_t *status_reg);
 
-#ifdef __cplusplus
-}
-#endif
-
-/**@}*/
-
 #endif  // __HTS221_H__
