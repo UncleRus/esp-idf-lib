@@ -23,6 +23,46 @@
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
+#define HTS221_I2C_ADDRESS 0x5F
+
+#define HTS221_REG_WHOAMI 0x0F  // R   Device identification register
+#define HTS221_REG_AV_CONF 0x10 // R/W Humidity and temperature resolution mode
+#define HTS221_REG_CTRL_REG1 0x20 // R/W Control register 1
+#define HTS221_REG_CTRL_REG2 0x21 // R/W Control register 2
+#define HTS221_REG_CTRL_REG3                                                   \
+    0x22 // R/W Control register 3 for data ready output signal
+#define HTS221_REG_STATUS_REG 0x27 // R   Status register
+#define HTS221_REG_HUMIDITY_OUT_L                                              \
+    0x28 // R   Relative humidity output register (LSB)
+#define HTS221_REG_HUMIDITY_OUT_H                                              \
+    0x29 // R   Relative humidity output register (MSB)
+#define HTS221_REG_TEMP_OUT_L 0x2A  // R   Temperature output register (LSB)
+#define HTS221_REG_TEMP_OUT_H 0x2B  // R   Temperature output register (MSB)
+#define HTS221_REG_CALIB_START 0x30 // R/W Calibration start register
+
+#define HTS221_AV_CONF_DEFAULT                                                 \
+    0x1B // DEFAULT AV_CONF status register value according to datasheet
+
+#define HTS221_CTRL_REG1                                                       \
+    0x85 // Set CTRL_REG1 to power on mode, enable block data update, set output
+         // data rate to 1Hz
+#define HTS221_CTRL_REG1_POWERON                                               \
+    0x80 // CTRL_REG1 status register value to power on HTS221
+#define HTS221_CTRL_REG1_POWERDOWN                                             \
+    0x00 // CTRL_REG1 status register value to power on HTS221
+
+#define HTS221_CTRL_REG2                                                       \
+    0x00 // Default CTRL_REG2 status register
+         // value according to datasheet
+#define HTS221_CTRL_REG2_HEATER_ON                                             \
+    0x02 // CTRL_REG2 status register value to enable heater
+#define HTS221_CTRL_REG2_HEATER_OFF                                            \
+    0x00 // CTRL_REG2 status register value to
+         // disable heater
+
+#define HTS221_CTRL_REG3                                                       \
+    0x00 // Default CTRL_REG3 status register value according to datasheet
+
 #define CHECK(x)                                                               \
     do                                                                         \
     {                                                                          \
