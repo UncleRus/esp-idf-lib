@@ -196,37 +196,6 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity)
     return ESP_OK;
 }
 
-esp_err_t hts221_print_calibration_coeff()
-{
-    ESP_LOGI(TAG, "H0_rH_x2: 0x%0X = %i, size: %d ",
-             calibration_parameters.H0_rH, calibration_parameters.H0_rH,
-             sizeof(calibration_parameters.H0_rH));
-    ESP_LOGI(TAG, "H1_rH_x2: 0x%0X = %i, size: %d ",
-             calibration_parameters.H1_rH, calibration_parameters.H1_rH,
-             sizeof(calibration_parameters.H1_rH));
-    ESP_LOGI(TAG, "T0_degC_x8: 0x%0X = %i, size: %d ",
-             calibration_parameters.T0_degC, calibration_parameters.T0_degC,
-             sizeof(calibration_parameters.T0_degC));
-    ESP_LOGI(TAG, "T1_degC_x8: 0x%0X = %i, size: %d ",
-             calibration_parameters.T1_degC, calibration_parameters.T1_degC,
-             sizeof(calibration_parameters.T1_degC));
-    ESP_LOGI(TAG, "H0_T0_OUT: 0x%0X = %i, size: %d ",
-             calibration_parameters.H0_T0_OUT, calibration_parameters.H0_T0_OUT,
-             sizeof(calibration_parameters.H0_T0_OUT));
-    ESP_LOGI(TAG, "H1_T0_OUT: 0x%0X = %i, size: %d ",
-             calibration_parameters.H1_T0_OUT, calibration_parameters.H1_T0_OUT,
-             sizeof(calibration_parameters.H1_T0_OUT));
-    ESP_LOGI(TAG, "T0_OUT: 0x%0X = %i, size: %d ",
-             calibration_parameters.T0_OUT, calibration_parameters.T0_OUT,
-             sizeof(calibration_parameters.T0_OUT));
-    ESP_LOGI(TAG, "T1_OUT: 0x%0X = %i, size: %d ",
-             calibration_parameters.T1_OUT, calibration_parameters.T1_OUT,
-             sizeof(calibration_parameters.T1_OUT));
-    ESP_LOGI(TAG, "---------------------------------------\n");
-
-    return ESP_OK;
-}
-
 esp_err_t hts221_who_am_i(i2c_dev_t *dev, uint8_t *who_am_i)
 {
     CHECK_ARG(dev);
