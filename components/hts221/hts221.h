@@ -43,6 +43,8 @@
 extern "C" {
 #endif
 
+#define HTS221_I2C_ADDRESS 0x5F
+
 /**
  * @brief Struct for storing calibration parameters.
  *
@@ -60,8 +62,69 @@ typedef struct
     int16_t T1_OUT;
 } calibration_param_t;
 
+/**
+ * @brief Enum to select the number of averaged temperature samples.
+ *
+ */
+typedef enum
+{
+    HTS221_AVGT_2 = 0b000,   //!< 2 averaged temperature samples
+    HTS221_AVGT_4 = 0b001,   //!< 4 averaged temperature samples
+    HTS221_AVGT_8 = 0b010,   //!< 8 averaged temperature samples
+    HTS221_AVGT_16 = 0b011,  //!< 16 averaged temperature samples (default)
+    HTS221_AVGT_32 = 0b100,  //!< 32 averaged temperature samples
+    HTS221_AVGT_64 = 0b101,  //!< 64 averaged temperature samples
+    HTS221_AVGT_128 = 0b110, //!< 128 averaged temperature samples
+    HTS221_AVGT_256 = 0b111, //!< 256 averaged temperature samples
+} hts221_temperature_avg_t;
 
+/**
+ * @brief Enum to select the number of averaged humidity samples.
+ *
+ */
+typedef enum
+{
+    HTS221_AVGH_2 = 0b000,   //!< 4 averaged humidity samples
+    HTS221_AVGH_4 = 0b001,   //!< 8 averaged humidity samples
+    HTS221_AVGH_8 = 0b010,   //!< 16 averaged humidity samples
+    HTS221_AVGH_16 = 0b011,  //!< 32 averaged humidity samples (default)
+    HTS221_AVGH_32 = 0b100,  //!< 64 averaged humidity samples
+    HTS221_AVGH_64 = 0b101,  //!< 128 averaged humidity samples
+    HTS221_AVGH_128 = 0b110, //!< 256 averaged humidity samples
+    HTS221_AVGH_256 = 0b111, //!< 512 averaged humidity samples
+} hts221_humidity_avg_t;
 
+/**
+ * @brief Enum to toggle the heater state.
+ *
+ */
+typedef enum
+{
+    HTS221_HEATER_OFF = 0x00,
+    HTS221_HEATER_ON = 0x02,
+} hts221_heater_t;
+
+/**
+ * @brief Enum to toggle the power state.
+ *
+ */
+typedef enum
+{
+    HTS221_POWER_OFF = 0x00,
+    HTS221_POWER_ON = 0x80,
+} hts221_power_t;
+
+/**
+ * @brief Enum to toggle the power state.
+ *
+ */
+typedef enum
+{
+    HTS221_ONE_SHOT = 0b00,
+    HTS221_1HZ = 0x01,
+    HTS221_7HZ = 0x10,
+    HTS221_12_5HZ = 0x11,
+} hts221_output_data_rate_t;
 
 /**
  * @brief Initialize the HTS221 Device descriptor
@@ -73,8 +136,7 @@ typedef struct
  * @param[in] scl_gpio GPIO pin number for SCL
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port,
-                           gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t hts221_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
@@ -112,15 +174,15 @@ esp_err_t hts221_setup(i2c_dev_t *dev);
  * @brief Read the HTS221 humidity and temperature resolution mode register
  *
  * @param[in] dev Device descriptor
- * @param[out] av_conf humidity and temperature resolution mode register value,
- * default (0x1B)
+ * @param[out] t_avg Temperature average resolution mode. Default is (0x03)
+ * @param[out] rh_avg Humidity average resolution mode. Default is (0x03)
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_read_av_conf(i2c_dev_t *dev, uint8_t *av_conf);
+esp_err_t hts221_read_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
 
 /**
- * @brief Read the HTS221 calibration parameters from the respective registers
- * and save them in the static calibration_paramters struct.
+ * @brief Read the HTS221 calibration parameters from the respective
+ * registers and save them in the static calibration_paramters struct.
  *
  * @param[in] dev Device descriptor
  * @return `ESP_OK` on success
@@ -141,17 +203,29 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity);
  * @brief Write the HTS221 humidity and temperature resolution mode register
  *
  * @param[in] dev Device descriptor
- * @param[in] av_conf Status register value, default (0x1B)
+ * @param[in] t_avg Temperature average resolution mode. Default is (0x03)
+ * @param[in] rh_avg Humidity average resolution mode. Default is (0x03)
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_set_av_conf(i2c_dev_t *dev, uint8_t *av_conf);
+esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
 
 /**
- * @brief Print the HTS221 calibration parameters via ESP_LOGI to serial output
+ * @brief Toggle the HTS221 heater state
  *
+ * @param[in] dev Device descriptor
+ * @param[in] hts221_heater_t Desired heater state
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_print_calibration_coeff();
+esp_err_t hts221_heater_toggle(i2c_dev_t *dev, hts221_heater_t *heater);
+
+/**
+ * @brief Toggle the HTS221 power state
+ *
+ * @param[in] dev Device descriptor
+ * @param[in] hts221_power_t Desired power state
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_power_toggle(i2c_dev_t *dev, hts221_power_t *power);
 
 /**
  * @brief Read the HTS221 status register values

@@ -23,67 +23,46 @@
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
-#define HTS221_I2C_ADDRESS 0x5F
+#define HTS221_REG_WHOAMI 0x0F         // R   Device identification register
+#define HTS221_REG_AV_CONF 0x10        // R/W Humidity and temperature resolution mode
+#define HTS221_REG_CTRL_REG1 0x20      // R/W Control register 1
+#define HTS221_REG_CTRL_REG2 0x21      // R/W Control register 2
+#define HTS221_REG_CTRL_REG3 0x22      // R/W Control register 3 for data ready output signal
+#define HTS221_REG_STATUS_REG 0x27     // R   Status register
+#define HTS221_REG_HUMIDITY_OUT_L 0x28 // R   Relative humidity output register (LSB)
+#define HTS221_REG_HUMIDITY_OUT_H 0x29 // R   Relative humidity output register (MSB)
+#define HTS221_REG_TEMP_OUT_L 0x2A     // R   Temperature output register (LSB)
+#define HTS221_REG_TEMP_OUT_H 0x2B     // R   Temperature output register (MSB)
+#define HTS221_REG_CALIB_START 0x30    // R/W Calibration start register
 
-#define HTS221_REG_WHOAMI 0x0F  // R   Device identification register
-#define HTS221_REG_AV_CONF 0x10 // R/W Humidity and temperature resolution mode
-#define HTS221_REG_CTRL_REG1 0x20 // R/W Control register 1
-#define HTS221_REG_CTRL_REG2 0x21 // R/W Control register 2
-#define HTS221_REG_CTRL_REG3                                                   \
-    0x22 // R/W Control register 3 for data ready output signal
-#define HTS221_REG_STATUS_REG 0x27 // R   Status register
-#define HTS221_REG_HUMIDITY_OUT_L                                              \
-    0x28 // R   Relative humidity output register (LSB)
-#define HTS221_REG_HUMIDITY_OUT_H                                              \
-    0x29 // R   Relative humidity output register (MSB)
-#define HTS221_REG_TEMP_OUT_L 0x2A  // R   Temperature output register (LSB)
-#define HTS221_REG_TEMP_OUT_H 0x2B  // R   Temperature output register (MSB)
-#define HTS221_REG_CALIB_START 0x30 // R/W Calibration start register
+#define HTS221_AV_CONF_DEFAULT 0x1B // DEFAULT AV_CONF status register value according to datasheet
 
-#define HTS221_AV_CONF_DEFAULT                                                 \
-    0x1B // DEFAULT AV_CONF status register value according to datasheet
+#define HTS221_CTRL_REG1 0x85 // Set CTRL_REG1 to power on mode, enable block data update, set output data rate to 1Hz
+#define HTS221_CTRL_REG1_POWERON 0x80   // CTRL_REG1 status register value to power on HTS221
+#define HTS221_CTRL_REG1_POWERDOWN 0x00 // CTRL_REG1 status register value to power on HTS221
+#define HTS221_CTRL_REG2 0x00           // Default CTRL_REG2 status register value according to datasheet
+#define HTS221_CTRL_REG3 0x00           // Default CTRL_REG3 status register value according to datasheet
 
-#define HTS221_CTRL_REG1                                                       \
-    0x85 // Set CTRL_REG1 to power on mode, enable block data update, set output
-         // data rate to 1Hz
-#define HTS221_CTRL_REG1_POWERON                                               \
-    0x80 // CTRL_REG1 status register value to power on HTS221
-#define HTS221_CTRL_REG1_POWERDOWN                                             \
-    0x00 // CTRL_REG1 status register value to power on HTS221
-
-#define HTS221_CTRL_REG2                                                       \
-    0x00 // Default CTRL_REG2 status register
-         // value according to datasheet
-#define HTS221_CTRL_REG2_HEATER_ON                                             \
-    0x02 // CTRL_REG2 status register value to enable heater
-#define HTS221_CTRL_REG2_HEATER_OFF                                            \
-    0x00 // CTRL_REG2 status register value to
-         // disable heater
-
-#define HTS221_CTRL_REG3                                                       \
-    0x00 // Default CTRL_REG3 status register value according to datasheet
-
-#define CHECK(x)                                                               \
-    do                                                                         \
-    {                                                                          \
-        esp_err_t __;                                                          \
-        if ((__ = x) != ESP_OK)                                                \
-            return __;                                                         \
+#define CHECK(x)                                                                                                       \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        esp_err_t __;                                                                                                  \
+        if ((__ = x) != ESP_OK)                                                                                        \
+            return __;                                                                                                 \
     } while (0)
 
-#define CHECK_ARG(VAL)                                                         \
-    do                                                                         \
-    {                                                                          \
-        if (!(VAL))                                                            \
-            return ESP_ERR_INVALID_ARG;                                        \
+#define CHECK_ARG(VAL)                                                                                                 \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(VAL))                                                                                                    \
+            return ESP_ERR_INVALID_ARG;                                                                                \
     } while (0)
 
 static const char *TAG = "hts221";
 
 static calibration_param_t calibration_parameters = {0};
 
-esp_err_t hts221_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port,
-                           gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t hts221_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     if (addr != HTS221_I2C_ADDRESS)
@@ -118,14 +97,10 @@ esp_err_t hts221_setup(i2c_dev_t *dev)
     uint8_t ctrl_reg3 = HTS221_CTRL_REG3;
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(
-        dev, i2c_dev_write_reg(dev, HTS221_REG_AV_CONF, &av_conf_default, 1));
-    I2C_DEV_CHECK(dev,
-                  i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, &ctrl_reg1, 1));
-    I2C_DEV_CHECK(dev,
-                  i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, &ctrl_reg2, 1));
-    I2C_DEV_CHECK(dev,
-                  i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG3, &ctrl_reg3, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_AV_CONF, &av_conf_default, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, &ctrl_reg1, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, &ctrl_reg2, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG3, &ctrl_reg3, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     ESP_ERROR_CHECK(hts221_read_calibration_coeff(dev));
@@ -169,10 +144,8 @@ esp_err_t hts221_read_calibration_coeff(i2c_dev_t *dev)
 
     calibration_parameters.H0_rH = (H0_rH_x2 >> 1);
     calibration_parameters.H1_rH = (H1_rH_x2 >> 1);
-    calibration_parameters.T0_degC =
-        ((T0_T1_msb & 0x03) << 8 | T0_degC_x8_lsb) >> 3;
-    calibration_parameters.T1_degC =
-        ((T0_T1_msb & 0x0C) << 6 | T1_degC_x8_lsb) >> 3;
+    calibration_parameters.T0_degC = ((T0_T1_msb & 0x03) << 8 | T0_degC_x8_lsb) >> 3;
+    calibration_parameters.T1_degC = ((T0_T1_msb & 0x0C) << 6 | T1_degC_x8_lsb) >> 3;
     calibration_parameters.H0_T0_OUT = (H0_T0_OUT_msb << 8) | H0_T0_OUT_lsb;
     calibration_parameters.H1_T0_OUT = (H1_T0_OUT_msb << 8) | H1_T0_OUT_lsb;
     calibration_parameters.T0_OUT = (T0_OUT_msb << 8) | T0_OUT_lsb;
@@ -193,7 +166,7 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity)
     int16_t raw_humidity;
     int16_t raw_temperature;
 
-    hts221_read_status_register(dev, &status_reg);
+    ESP_ERROR_CHECK(hts221_read_status_register(dev, &status_reg));
     status_reg = status_reg & 0x03;
 
     if (status_reg != 0x03)
@@ -203,34 +176,26 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity)
     }
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_HUMIDITY_OUT_L,
-                                        &humidity_lsb, 1));
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_HUMIDITY_OUT_H,
-                                        &humidity_msb, 1));
-    I2C_DEV_CHECK(
-        dev, i2c_dev_read_reg(dev, HTS221_REG_TEMP_OUT_L, &temperature_lsb, 1));
-    I2C_DEV_CHECK(
-        dev, i2c_dev_read_reg(dev, HTS221_REG_TEMP_OUT_H, &temperature_msb, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_HUMIDITY_OUT_L, &humidity_lsb, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_HUMIDITY_OUT_H, &humidity_msb, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_TEMP_OUT_L, &temperature_lsb, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_TEMP_OUT_H, &temperature_msb, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     raw_humidity = (humidity_msb << 8) | humidity_lsb;
     raw_temperature = (temperature_msb << 8) | temperature_lsb;
 
-    *humidity =
-        (float)(calibration_parameters.H1_rH - calibration_parameters.H0_rH) *
-            (raw_humidity - calibration_parameters.H0_T0_OUT) /
-            (float)(calibration_parameters.H1_T0_OUT -
-                    calibration_parameters.H0_T0_OUT) +
-        (float)calibration_parameters.H0_rH;
+    *humidity = (float)(calibration_parameters.H1_rH - calibration_parameters.H0_rH) *
+                    (raw_humidity - calibration_parameters.H0_T0_OUT) /
+                    (float)(calibration_parameters.H1_T0_OUT - calibration_parameters.H0_T0_OUT) +
+                (float)calibration_parameters.H0_rH;
     if (*humidity > 100)
     {
         *humidity = 100;
     }
-    *temperature = (float)(calibration_parameters.T1_degC -
-                           calibration_parameters.T0_degC) *
+    *temperature = (float)(calibration_parameters.T1_degC - calibration_parameters.T0_degC) *
                        (raw_temperature - calibration_parameters.T0_OUT) /
-                       (float)(calibration_parameters.T1_OUT -
-                               calibration_parameters.T0_OUT) +
+                       (float)(calibration_parameters.T1_OUT - calibration_parameters.T0_OUT) +
                    (float)calibration_parameters.T0_degC;
 
     return ESP_OK;
@@ -238,8 +203,7 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity)
 
 esp_err_t hts221_who_am_i(i2c_dev_t *dev, uint8_t *who_am_i)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(who_am_i);
+    CHECK_ARG(dev && who_am_i);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_WHOAMI, who_am_i, 1));
@@ -248,77 +212,54 @@ esp_err_t hts221_who_am_i(i2c_dev_t *dev, uint8_t *who_am_i)
     return ESP_OK;
 }
 
-esp_err_t hts221_read_av_conf(i2c_dev_t *dev, uint8_t *av_conf)
+esp_err_t hts221_read_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(av_conf);
+    CHECK_ARG(dev && t_avg && rh_avg);
+
+    uint8_t av_conf;
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_AV_CONF, av_conf, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_AV_CONF, &av_conf, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *t_avg = (hts221_temperature_avg_t)((av_conf & 0x38) >> 3);
+    *rh_avg = (hts221_humidity_avg_t)((av_conf & 0x07));
+
+    return ESP_OK;
+}
+
+esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg)
+{
+    CHECK_ARG(dev && t_avg && rh_avg);
+
+    uint8_t av_conf;
+
+    av_conf = (uint8_t)((*t_avg) << 3) | (*rh_avg);
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_AV_CONF, &av_conf, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }
 
-esp_err_t hts221_set_av_conf(i2c_dev_t *dev, uint8_t *av_conf)
+esp_err_t hts221_power_toggle(i2c_dev_t *dev, hts221_power_t *power)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(av_conf);
+    CHECK_ARG(dev && power);
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_AV_CONF, av_conf, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, (uint8_t *)power, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }
 
-esp_err_t hts221_power_down(i2c_dev_t *dev)
+esp_err_t hts221_heater_toggle(i2c_dev_t *dev, hts221_heater_t *heater)
 {
-    CHECK_ARG(dev);
-    uint8_t power_down_bit = HTS221_CTRL_REG1_POWERDOWN;
+    CHECK_ARG(dev && heater);
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(
-        dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, &power_down_bit, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
-}
-
-esp_err_t hts221_power_on(i2c_dev_t *dev)
-{
-    CHECK_ARG(dev);
-    uint8_t power_on_bit = HTS221_CTRL_REG1_POWERON;
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(
-        dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, &power_on_bit, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
-}
-
-esp_err_t hts221_heater_off(i2c_dev_t *dev)
-{
-    CHECK_ARG(dev);
-    uint8_t heater_off_bit = HTS221_CTRL_REG2_HEATER_OFF;
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(
-        dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, &heater_off_bit, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
-}
-
-esp_err_t hts221_heater_on(i2c_dev_t *dev)
-{
-    CHECK_ARG(dev);
-    uint8_t heater_on_bit = HTS221_CTRL_REG2_HEATER_ON;
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(
-        dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, &heater_on_bit, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, (uint8_t *)heater, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
@@ -326,12 +267,10 @@ esp_err_t hts221_heater_on(i2c_dev_t *dev)
 
 esp_err_t hts221_read_status_register(i2c_dev_t *dev, uint8_t *status_reg)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(status_reg);
+    CHECK_ARG(dev && status_reg);
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev,
-                  i2c_dev_read_reg(dev, HTS221_REG_STATUS_REG, status_reg, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, HTS221_REG_STATUS_REG, status_reg, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
