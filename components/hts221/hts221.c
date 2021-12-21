@@ -228,13 +228,13 @@ esp_err_t hts221_read_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, h
     return ESP_OK;
 }
 
-esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg)
+esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t t_avg, hts221_humidity_avg_t rh_avg)
 {
     CHECK_ARG(dev && t_avg && rh_avg);
 
     uint8_t av_conf;
 
-    av_conf = (uint8_t)((*t_avg) << 3) | (*rh_avg);
+    av_conf = (uint8_t)((t_avg) << 3) | (rh_avg);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_AV_CONF, &av_conf, 1));

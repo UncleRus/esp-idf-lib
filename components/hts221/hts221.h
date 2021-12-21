@@ -207,7 +207,7 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity);
  * @param[in] rh_avg Humidity average resolution mode. Default is (0x03)
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
+esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t t_avg, hts221_humidity_avg_t rh_avg);
 
 /**
  * @brief Toggle the HTS221 heater state
