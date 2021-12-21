@@ -4,6 +4,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <hts221.h>
+#include <sdkconfig.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -24,9 +25,10 @@ static const char *TAG = "hts221-example";
 void task(void *pvParameters)
 {
     i2c_dev_t dev = {0};
-    ESP_ERROR_CHECK(hts221_init_desc(&dev, ADDR, 0, SDA_GPIO,
-                                     SCL_GPIO)); // Initialize HTS221 descriptor
-    ESP_ERROR_CHECK(hts221_setup(&dev));         // Setup HTS221 to default values according to datasheet.
+
+    // Initialize HTS221 descriptor and setup HTS221 to default values according to datasheet.
+    ESP_ERROR_CHECK(hts221_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(hts221_setup(&dev));
 
     float temperature, humidity;
 

@@ -95,27 +95,7 @@ typedef enum
 } hts221_humidity_avg_t;
 
 /**
- * @brief Enum to toggle the heater state.
- *
- */
-typedef enum
-{
-    HTS221_HEATER_OFF = 0x00,
-    HTS221_HEATER_ON = 0x02,
-} hts221_heater_t;
-
-/**
- * @brief Enum to toggle the power state.
- *
- */
-typedef enum
-{
-    HTS221_POWER_OFF = 0x00,
-    HTS221_POWER_ON = 0x80,
-} hts221_power_t;
-
-/**
- * @brief Enum to toggle the power state.
+ * @brief Enum to toggle the output data rate.
  *
  */
 typedef enum
@@ -147,38 +127,19 @@ esp_err_t hts221_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_n
 esp_err_t hts221_free_desc(i2c_dev_t *dev);
 
 /**
- * @brief Read the HTS221 WHO_AM_I register (0xBC)
- *
- * @param[in] dev Device descriptor
- * @param[out] who_am_i Device identifier, should be (OxBC)
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_who_am_i(i2c_dev_t *dev, uint8_t *who_am_i);
-
-/**
  * @brief Setup device parameters
  *
  * Set the AV_CONF register to the default resolution mode (0x1B) according to
  * the datasheet.
  * Set CTRL_REG1 to power on mode, enable block data update, set output
  * data rate to 1Hz.
- * Set CTRL_REG2 to default value (0x00), BOOT bit normal, heater off, one-shot
+ * Set CTRL_REG2 to default value (0x00), BOOT bit normal mode, heater off, one-shot
  * set to 0.
  *
  * @param[in] dev Device descriptor
  * @return `ESP_OK` on success
  */
 esp_err_t hts221_setup(i2c_dev_t *dev);
-
-/**
- * @brief Read the HTS221 humidity and temperature resolution mode register
- *
- * @param[in] dev Device descriptor
- * @param[out] t_avg Temperature average resolution mode. Default is (0x03)
- * @param[out] rh_avg Humidity average resolution mode. Default is (0x03)
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_read_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
 
 /**
  * @brief Read the HTS221 calibration parameters from the respective
@@ -200,6 +161,25 @@ esp_err_t hts221_read_calibration_coeff(i2c_dev_t *dev);
 esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity);
 
 /**
+ * @brief Read the HTS221 WHO_AM_I register (0xBC)
+ *
+ * @param[in] dev Device descriptor
+ * @param[out] who_am_i Device identifier, should be (OxBC)
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_who_am_i(i2c_dev_t *dev, uint8_t *who_am_i);
+
+/**
+ * @brief Read the HTS221 humidity and temperature resolution mode register
+ *
+ * @param[in] dev Device descriptor
+ * @param[out] t_avg Temperature average resolution mode. Default is (0x03)
+ * @param[out] rh_avg Humidity average resolution mode. Default is (0x03)
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_read_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
+
+/**
  * @brief Write the HTS221 humidity and temperature resolution mode register
  *
  * @param[in] dev Device descriptor
@@ -210,22 +190,22 @@ esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity);
 esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t t_avg, hts221_humidity_avg_t rh_avg);
 
 /**
- * @brief Toggle the HTS221 heater state
- *
- * @param[in] dev Device descriptor
- * @param[in] hts221_heater_t Desired heater state
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_heater_toggle(i2c_dev_t *dev, hts221_heater_t *heater);
-
-/**
  * @brief Toggle the HTS221 power state
  *
  * @param[in] dev Device descriptor
- * @param[in] hts221_power_t Desired power state
+ * @param[in] power Desired power state
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_power_toggle(i2c_dev_t *dev, hts221_power_t *power);
+esp_err_t hts221_power_toggle(i2c_dev_t *dev, bool power);
+
+/**
+ * @brief Toggle the HTS221 heater state
+ *
+ * @param[in] dev Device descriptor
+ * @param[in] heater Desired heater state
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_heater_toggle(i2c_dev_t *dev, bool heater);
 
 /**
  * @brief Read the HTS221 status register values

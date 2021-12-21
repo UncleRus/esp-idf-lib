@@ -38,10 +38,13 @@
 #define HTS221_AV_CONF_DEFAULT 0x1B // DEFAULT AV_CONF status register value according to datasheet
 
 #define HTS221_CTRL_REG1 0x85 // Set CTRL_REG1 to power on mode, enable block data update, set output data rate to 1Hz
+#define HTS221_CTRL_REG2 0x00 // Default CTRL_REG2 status register value according to datasheet
+#define HTS221_CTRL_REG3 0x00 // Default CTRL_REG3 status register value according to datasheet
+
 #define HTS221_CTRL_REG1_POWERON 0x80   // CTRL_REG1 status register value to power on HTS221
-#define HTS221_CTRL_REG1_POWERDOWN 0x00 // CTRL_REG1 status register value to power on HTS221
-#define HTS221_CTRL_REG2 0x00           // Default CTRL_REG2 status register value according to datasheet
-#define HTS221_CTRL_REG3 0x00           // Default CTRL_REG3 status register value according to datasheet
+#define HTS221_CTRL_REG1_POWERDOWN 0x00 // CTRL_REG1 status register value to power down HTS221
+#define HTS221_CTRL_REG2_HEATERON 0x02  // CTRL_REG2 status register value to enable heater
+#define HTS221_CTRL_REG2_HEATEROFF 0x00 // CTRL_REG2 status register value to disable heater
 
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -243,23 +246,28 @@ esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t t_avg, hts
     return ESP_OK;
 }
 
-esp_err_t hts221_power_toggle(i2c_dev_t *dev, hts221_power_t *power)
+esp_err_t hts221_power_toggle(i2c_dev_t *dev, bool power)
 {
-    CHECK_ARG(dev && power);
+    CHECK_ARG(dev);
+
+    uint8_t power_reg;
+    power_reg = power ? HTS221_CTRL_REG1_POWERON : HTS221_CTRL_REG1_POWERDOWN;
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, (uint8_t *)power, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG1, &power_reg, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }
 
-esp_err_t hts221_heater_toggle(i2c_dev_t *dev, hts221_heater_t *heater)
+esp_err_t hts221_heater_toggle(i2c_dev_t *dev, bool heater)
 {
-    CHECK_ARG(dev && heater);
+    CHECK_ARG(dev);
 
+    uint8_t heater_reg;
+    heater_reg = heater ? HTS221_CTRL_REG2_HEATERON : HTS221_CTRL_REG2_HEATEROFF;
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, (uint8_t *)heater, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, HTS221_REG_CTRL_REG2, &heater_reg, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
