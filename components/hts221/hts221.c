@@ -36,6 +36,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <i2cdev.h>
+#include <esp_timer.h>
 
 #define I2C_FREQ_HZ 400000 // 400kHz
 
