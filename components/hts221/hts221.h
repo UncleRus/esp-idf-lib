@@ -13,6 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /**
  * @file hts221.h
  * @brief HTS221 driver
@@ -31,7 +32,6 @@
  * ISC Licensed as described in the file LICENSE
  *
  */
-
 #ifndef __HTS221_H__
 #define __HTS221_H__
 
@@ -60,161 +60,230 @@ typedef struct
     int16_t H1_T0_OUT;
     int16_t T0_OUT;
     int16_t T1_OUT;
-} calibration_param_t;
+} hts221_calibration_param_t;
 
 /**
- * @brief Enum to select the number of averaged temperature samples.
- *
+ * @brief Number of averaged temperature samples
  */
 typedef enum
 {
-    HTS221_AVGT_2 = 0b000,   //!< 2 averaged temperature samples
-    HTS221_AVGT_4 = 0b001,   //!< 4 averaged temperature samples
-    HTS221_AVGT_8 = 0b010,   //!< 8 averaged temperature samples
-    HTS221_AVGT_16 = 0b011,  //!< 16 averaged temperature samples (default)
-    HTS221_AVGT_32 = 0b100,  //!< 32 averaged temperature samples
-    HTS221_AVGT_64 = 0b101,  //!< 64 averaged temperature samples
-    HTS221_AVGT_128 = 0b110, //!< 128 averaged temperature samples
-    HTS221_AVGT_256 = 0b111, //!< 256 averaged temperature samples
+    HTS221_AVGT_2 = 0,   //!< 2 averaged temperature samples
+    HTS221_AVGT_4,       //!< 4 averaged temperature samples
+    HTS221_AVGT_8,       //!< 8 averaged temperature samples
+    HTS221_AVGT_1,       //!< 16 averaged temperature samples
+    HTS221_AVGT_32,      //!< 32 averaged temperature samples
+    HTS221_AVGT_64,      //!< 64 averaged temperature samples
+    HTS221_AVGT_128,     //!< 128 averaged temperature samples
+    HTS221_AVGT_256,     //!< 256 averaged temperature samples
 } hts221_temperature_avg_t;
 
 /**
- * @brief Enum to select the number of averaged humidity samples.
- *
+ * @brief Number of averaged humidity samples
  */
 typedef enum
 {
-    HTS221_AVGH_2 = 0b000,   //!< 4 averaged humidity samples
-    HTS221_AVGH_4 = 0b001,   //!< 8 averaged humidity samples
-    HTS221_AVGH_8 = 0b010,   //!< 16 averaged humidity samples
-    HTS221_AVGH_16 = 0b011,  //!< 32 averaged humidity samples (default)
-    HTS221_AVGH_32 = 0b100,  //!< 64 averaged humidity samples
-    HTS221_AVGH_64 = 0b101,  //!< 128 averaged humidity samples
-    HTS221_AVGH_128 = 0b110, //!< 256 averaged humidity samples
-    HTS221_AVGH_256 = 0b111, //!< 512 averaged humidity samples
+    HTS221_AVGH_4 = 0,   //!< 4 averaged humidity samples
+    HTS221_AVGH_8,       //!< 8 averaged humidity samples
+    HTS221_AVGH_16,      //!< 16 averaged humidity samples
+    HTS221_AVGH_32,      //!< 32 averaged humidity samples
+    HTS221_AVGH_64,      //!< 64 averaged humidity samples
+    HTS221_AVGH_128,     //!< 128 averaged humidity samples
+    HTS221_AVGH_256,     //!< 256 averaged humidity samples
+    HTS221_AVGH_512,     //!< 512 averaged humidity samples
 } hts221_humidity_avg_t;
 
 /**
- * @brief Enum to toggle the output data rate.
- *
+ * @brief Output data rate
  */
 typedef enum
 {
-    HTS221_ONE_SHOT = 0b00,
-    HTS221_1HZ = 0x01,
-    HTS221_7HZ = 0x10,
-    HTS221_12_5HZ = 0x11,
-} hts221_output_data_rate_t;
+    HTS221_ONE_SHOT = 0,
+    HTS221_1HZ,
+    HTS221_7HZ,
+    HTS221_12_5HZ,
+} hts221_data_rate_t;
+
+typedef enum
+{
+    HTS221_DRDY_ACTIVE_HIGH = 0,
+    HTS221_DRDY_ACTIVE_LOW,
+} hts221_drdy_level_t;
+
+typedef enum
+{
+    HTS221_DRDY_PUSH_PULL = 0,
+    HTS221_DRDY_OPEN_DRAIN,
+} hts221_drdy_mode_t;
+
+typedef struct
+{
+    i2c_dev_t i2c_dev;
+    hts221_calibration_param_t cal;
+} hts221_t;
 
 /**
  * @brief Initialize the HTS221 Device descriptor
  *
  * @param[out] dev Device descriptor
- * @param[in] addr I2C address
- * @param[in] port I2C port number
- * @param[in] sda_gpio GPIO pin number for SDA
- * @param[in] scl_gpio GPIO pin number for SCL
+ * @param port     I2C port number
+ * @param sda_gpio GPIO pin number for SDA
+ * @param scl_gpio GPIO pin number for SCL
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t hts221_init_desc(hts221_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
  *
- * @param[in] dev Device descriptor
+ * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_free_desc(i2c_dev_t *dev);
+esp_err_t hts221_free_desc(hts221_t *dev);
 
 /**
- * @brief Setup device parameters
+ * @brief Reset device parameters, read calibration data
  *
- * Set the AV_CONF register to the default resolution mode (0x1B) according to
- * the datasheet.
- * Set CTRL_REG1 to power on mode, enable block data update, set output
- * data rate to 1Hz.
- * Set CTRL_REG2 to default value (0x00), BOOT bit normal mode, heater off, one-shot
- * set to 0.
+ * Reboot device, reset calibration data
  *
- * @param[in] dev Device descriptor
+ * @param dev Device descriptor
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_setup(i2c_dev_t *dev);
+esp_err_t hts221_init(hts221_t *dev);
 
 /**
- * @brief Read the HTS221 calibration parameters from the respective
- * registers and save them in the static calibration_paramters struct.
+ * @brief Get power mode
  *
- * @param[in] dev Device descriptor
+ * @param dev             Device descriptor
+ * @param[out] power_down true if device in power down mode
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_read_calibration_coeff(i2c_dev_t *dev);
+esp_err_t hts221_get_power_mode(hts221_t *dev, bool *power_down);
+
+/**
+ * @brief Set power mode
+ *
+ * @param dev        Device descriptor
+ * @param power_down true to set device to power down mode
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_set_power_mode(hts221_t *dev, bool power_down);
+
+/**
+ * @brief Get output data rate
+ *
+ * @param dev     Device descriptor
+ * @param[out] dr Data rate
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_get_data_rate(hts221_t *dev, hts221_data_rate_t *dr);
+
+/**
+ * @brief Set output data rate
+ *
+ * @param dev Device descriptor
+ * @param dr  Data rate
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_set_data_rate(hts221_t *dev, hts221_data_rate_t dr);
+
+/**
+ * @brief Get heater state
+ *
+ * @param dev         Device descriptor
+ * @param[out] enable true when heater is enabled
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_get_heater(hts221_t *dev, bool *enable);
+
+/**
+ * @brief Switch heater on/off
+ *
+ * @param dev    Device descriptor
+ * @param enable true to switch heater on
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_set_heater(hts221_t *dev, bool enable);
+
+/**
+ * @brief Get average configuration
+ *
+ * @param dev         Device descriptor
+ * @param[out] t_avg  Temperature average configuration
+ * @param[out] rh_avg Humidity average configuration
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_get_averaging(hts221_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
+
+/**
+ * @brief Set average configuration
+ *
+ * @param dev    Device descriptor
+ * @param t_avg  Temperature average configuration
+ * @param rh_avg Humidity average configuration
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_set_averaging(hts221_t *dev, hts221_temperature_avg_t t_avg, hts221_humidity_avg_t rh_avg);
+
+/**
+ * @brief Get configuration of DRDY pin
+ *
+ * @param dev         Device descriptor
+ * @param[out] enable true if DRDY pin is enabled
+ * @param[out] mode   DRDY pin mode (Push-pull or open drain)
+ * @param[out] active Pin active level
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_get_drdy_config(hts221_t *dev, bool *enable, hts221_drdy_mode_t *mode, hts221_drdy_level_t *active);
+
+/**
+ * @brief Set configuration of DRDY pin
+ *
+ * @param dev    Device descriptor
+ * @param enable true if DRDY pin is enabled
+ * @param mode   DRDY pin mode (Push-pull or open drain)
+ * @param active Pin active level
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_set_drdy_config(hts221_t *dev, bool enable, hts221_drdy_mode_t mode, hts221_drdy_level_t active);
+
+/**
+ * @brief Check the availability of new RH/T data
+ *
+ * \p ready parameter will be true only if new data for both temperature and humidity is available.
+ *
+ * @param dev        Device descriptor
+ * @param[out] ready true if new RH/T data available
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_is_data_ready(hts221_t *dev, bool *ready);
+
+/**
+ * @brief Start one shot measurement
+ *
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t hts221_start_oneshot(hts221_t *dev);
 
 /**
  * @brief Get temperature and relative humidity
  *
- * @param dev Device descriptor
- * @param[out] temperature Temperature, degrees Celsius
- * @param[out] humidity    Relative humidity, percents
+ * @param dev     Device descriptor
+ * @param[out] t  Temperature, degrees Celsius
+ * @param[out] rh Relative humidity, %
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_read_data(i2c_dev_t *dev, float *temperature, float *humidity);
+esp_err_t hts221_get_data(hts221_t *dev, float *t, float *rh);
 
 /**
- * @brief Read the HTS221 WHO_AM_I register (0xBC)
+ * @brief Measure temperature and relative humidity in one shot mode
  *
- * @param[in] dev Device descriptor
- * @param[out] who_am_i Device identifier, should be (OxBC)
+ * @param dev     Device descriptor
+ * @param[out] t  Temperature, degrees Celsius
+ * @param[out] rh Relative humidity, %
  * @return `ESP_OK` on success
  */
-esp_err_t hts221_who_am_i(i2c_dev_t *dev, uint8_t *who_am_i);
-
-/**
- * @brief Read the HTS221 humidity and temperature resolution mode register
- *
- * @param[in] dev Device descriptor
- * @param[out] t_avg Temperature average resolution mode. Default is (0x03)
- * @param[out] rh_avg Humidity average resolution mode. Default is (0x03)
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_read_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t *t_avg, hts221_humidity_avg_t *rh_avg);
-
-/**
- * @brief Write the HTS221 humidity and temperature resolution mode register
- *
- * @param[in] dev Device descriptor
- * @param[in] t_avg Temperature average resolution mode. Default is (0x03)
- * @param[in] rh_avg Humidity average resolution mode. Default is (0x03)
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_set_av_conf(i2c_dev_t *dev, hts221_temperature_avg_t t_avg, hts221_humidity_avg_t rh_avg);
-
-/**
- * @brief Toggle the HTS221 power state
- *
- * @param[in] dev Device descriptor
- * @param[in] power Desired power state
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_power_toggle(i2c_dev_t *dev, bool power);
-
-/**
- * @brief Toggle the HTS221 heater state
- *
- * @param[in] dev Device descriptor
- * @param[in] heater Desired heater state
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_heater_toggle(i2c_dev_t *dev, bool heater);
-
-/**
- * @brief Read the HTS221 status register values
- *
- * @param[in] dev Device descriptor
- * @param[out] status_reg Status register value, default (0x00)
- * @return `ESP_OK` on success
- */
-esp_err_t hts221_read_status_register(i2c_dev_t *dev, uint8_t *status_reg);
+esp_err_t hts221_measure(hts221_t *dev, float *t, float *rh);
 
 #ifdef __cplusplus
 }
