@@ -1,0 +1,22 @@
+---
+components:
+  - name: hts221
+    description: |
+      Driver for HTS221 temperature and humidity sensor.
+    group: temperature
+    groups:
+      - humidity
+    code_owners:
+      -name: saasaa
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: N/A
+    targets:
+      - name: esp32
+    licenses:
+      - name: ISC
+    copyrights:
+      - name: saasaa
+        year: 2021

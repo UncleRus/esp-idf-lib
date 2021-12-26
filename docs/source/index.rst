@@ -120,6 +120,7 @@ Humidity & temperature sensors
    groups/mcp960x
    groups/tsys01
    groups/aht
+   groups/hts221
    groups/max31865
    groups/bh1900nux
    
