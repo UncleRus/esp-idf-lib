@@ -376,7 +376,10 @@ esp_err_t hts221_get_data(hts221_t *dev, float *t, float *rh)
     uint8_t raw[4];
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, REG_HUMIDITY_OUT_L, raw, 4));
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, REG_HUMIDITY_OUT_L, &raw[0], 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, REG_HUMIDITY_OUT_H, &raw[1], 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, REG_TEMP_OUT_L, &raw[2], 1));
+    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, REG_TEMP_OUT_H, &raw[3], 1));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
     raw_rh = (raw[1] << 8) | raw[0];
