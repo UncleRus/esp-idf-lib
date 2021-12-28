@@ -1,0 +1,23 @@
+---
+components:
+  - name: hdc1000
+    description: |
+      Driver for HDC1000 temperature and humidity sensor
+    group: temperature
+    groups:
+      - humidity
+    code_owners:
+      - name: UncleRus
+    depends:
+      - name: i2cdev
+      - name: log
+      - name: esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - name: UncleRus
+        year: 2021
