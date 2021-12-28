@@ -136,7 +136,7 @@ esp_err_t bh1900nux_set_mode(bh1900nux_t *dev, bh1900nux_mode_t mode);
  * @param dev Device descriptor
  * @param[out] wt Delay between measurements
  * @param[out] fq Fault queue size
- * @param[out] op ALERT pin polarity
+ * @param[out] ap ALERT pin polarity
  * @return `ESP_OK` on success
  */
 esp_err_t bh1900nux_get_config(bh1900nux_t *dev, bh1900nux_wait_time_t *wt, bh1900nux_fault_queue_t *fq, bh1900nux_alert_polarity_t *ap);
@@ -186,7 +186,6 @@ esp_err_t bh1900nux_get_t_low(bh1900nux_t *dev, float *temp);
  *
  * @param dev Device descriptor
  * @param temp Temperature, deg.C
- * @param fmt Data format
  * @return `ESP_OK` on success
  */
 esp_err_t bh1900nux_set_t_low(bh1900nux_t *dev, float temp);
@@ -196,7 +195,6 @@ esp_err_t bh1900nux_set_t_low(bh1900nux_t *dev, float temp);
  *
  * @param dev Device descriptor
  * @param[out] temp Temperature, deg.C
- * @param fmt Data format
  * @return `ESP_OK` on success
  */
 esp_err_t bh1900nux_get_t_high(bh1900nux_t *dev, float *temp);
@@ -206,7 +204,6 @@ esp_err_t bh1900nux_get_t_high(bh1900nux_t *dev, float *temp);
  *
  * @param dev Device descriptor
  * @param temp Temperature, deg.C
- * @param fmt Data format
  * @return `ESP_OK` on success
  */
 esp_err_t bh1900nux_set_t_high(bh1900nux_t *dev, float temp);
