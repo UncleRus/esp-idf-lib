@@ -4,7 +4,7 @@ require "rspec"
 require "yaml"
 require_relative "metadata"
 
-@component_dir = File.expand_path(File.join(File.dirname(__FILE__), "../components"))
+@component_dir = File.expand_path(File.join(File.dirname(__FILE__), "../../components"))
 
 def metadata_array
   directories = Dir.children(Dir.new(@component_dir)).map { |c| File.join(@component_dir, c) }
