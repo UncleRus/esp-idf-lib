@@ -62,7 +62,7 @@ sdkconfig
 /__garbage__/
 /.vscode/
 /esp-idf-lib.code-workspace
-/Gemfile.lock
+Gemfile.lock
 
 # macOS .DS_Store and .AppleDouble files
 .DS_Store
