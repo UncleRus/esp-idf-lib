@@ -23,25 +23,25 @@ ESP32 ESP-IDF
 Clone respository:
 
 .. code-block:: shell
-   
+
    cd ~/my/work/path
    git clone git@github.com:UncleRus/esp-idf-lib.git
 
-or 
+or
 
 .. code-block:: shell
-   
+
    cd ~/my/work/path
    git clone git@gitlab.com:UncleRus/esp-idf-lib.git
 
 Add path to components in your project makefile, e.g:
 
 .. code-block:: make
-   
+
    PROJECT_NAME := my-esp-project
    EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
    include $(IDF_PATH)/make/project.mk
-   
+
 or in CMakeLists.txt:
 
 .. code-block:: cmake
@@ -50,28 +50,28 @@ or in CMakeLists.txt:
    set(EXTRA_COMPONENT_DIRS $ENV{HOME}/my/work/path/esp-idf-lib/components)
    include($ENV{IDF_PATH}/tools/cmake/project.cmake)
    project(my-esp-project)
-   
+
 ESP8266 RTOS SDK
 ================
 
 Clone respository:
 
 .. code-block:: shell
-   
+
    cd ~/my/work/path
    git clone git@github.com:UncleRus/esp-idf-lib.git
 
-or 
+or
 
 .. code-block:: shell
-   
+
    cd ~/my/work/path
    git clone git@gitlab.com:UncleRus/esp-idf-lib.git
 
 Add path to components in your project makefile, e.g:
 
 .. code-block:: make
-   
+
    PROJECT_NAME := my-esp-project
    EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
    EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip
@@ -121,9 +121,10 @@ Humidity & temperature sensors
    groups/tsys01
    groups/aht
    groups/hts221
+   groups/htu21d
    groups/max31865
    groups/bh1900nux
-   
+
 Pressure sensors
 ================
 .. toctree::
@@ -149,7 +150,7 @@ ADC/DAC
 =======
 .. toctree::
    :maxdepth: 1
-   
+
    groups/ads111x
    groups/hx711
    groups/pcf8591
@@ -160,7 +161,7 @@ Power/Current monitors
 ======================
 .. toctree::
    :maxdepth: 1
-   
+
    groups/ina219
    groups/ina260
    groups/ina3221
@@ -172,7 +173,7 @@ Magnetic sensors
 
    groups/hmc5883l
    groups/qmc5883l
-   
+
 Light sensors
 =============
 .. toctree::
@@ -194,7 +195,7 @@ GPIO expanders
    groups/mcp23008
    groups/mcp23x17
    groups/pca9557
-   
+
 Addressable LEDs
 ================
 .. toctree::
@@ -226,16 +227,16 @@ Other
    groups/tca9548
    groups/ds3502
    groups/wiegand
-   
+
 
 ===========
 Information
 ===========
 .. toctree::
    :maxdepth: 1
-   
+
    chips
-   
+
 
 ==================
 Indices and tables
