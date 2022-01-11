@@ -200,7 +200,7 @@ in `CMakeLists.txt`.
 `README.md`, run:
 
 ```console
-cd devtools && bundle exec rake readme
+bundle exec rake -C devtools readme
 ```
 
 ## Validating metadata of components
@@ -216,13 +216,13 @@ Requirements are:
 After installing requirements, run:
 
 ```console
-cd devtools && bundle install
+bundle install
 ```
 
 To validate metadata, run:
 
 ```console
-cd devtools && bundle exec rake rspec
+bundle exec rake -C devtools rspec
 ```
 
 The implementation uses `rspec` to validate metadata because:

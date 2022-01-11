@@ -8,13 +8,12 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7
-        working-directory: devtools
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-    - run: bundle exec rake
+    - run: bundle exec rake -C devtools
     - run: |
-        # Test if README.md is up-to-date with the metadata. If thies test
+        # Test if README.md is up-to-date with the metadata. If this test
         # fails, update README.md by:
         #
-        # bundle exec rake readme > README.md
-        cd devtools && bundle exec rake readme > ../README.md
+        # bundle exec rake -C devtools readme > README.md
+        bundle exec rake -C devtools readme > README.md
         git diff --exit-code README.md
