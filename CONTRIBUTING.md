@@ -400,7 +400,7 @@ metadata file of the component. If you change the file, you need to update the
 the metadata and a template, `README.md.erb`. Generate `README.md` by:
 
 ```console
-bundle exec rake readme
+bundle exec rake -C devtools readme > README.md
 ```
 
 See also [`Metadata.md`](Metadata.md).
