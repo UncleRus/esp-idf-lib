@@ -7,8 +7,12 @@ off at 1 Hz.
 
 ## Configuration
 
-You can change the number of pixels in a strip by `make menuconfig`. See
+You can change the number of pixels in a strip by `menuconfig`. See
 `CONFIG_LED_STRIP_LEN` under `Example configuration`. The default is 8 pixels.
+
+Choose GPIO number in `menuconfig` to which `DI` (`DIN` on some products) is
+connected. The default is `5`. `ESP32-C3-DevKitC-02` has an onboard WS2812
+driven by GPIO8.
 
 ## Notes
 
