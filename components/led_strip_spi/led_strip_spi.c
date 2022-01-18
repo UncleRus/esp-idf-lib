@@ -78,11 +78,21 @@ static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
 
     esp_err_t err = ESP_FAIL;
     spi_bus_config_t bus_config = {
-        .miso_io_num = -1,
         .mosi_io_num = strip->mosi_io_num,
         .sclk_io_num = strip->sclk_io_num,
+        .miso_io_num = -1,
         .quadhd_io_num = -1,
         .quadwp_io_num = -1,
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(4, 3, 2)
+        .data0_io_num = -1,
+        .data1_io_num = -1,
+        .data2_io_num = -1,
+        .data3_io_num = -1,
+        .data4_io_num = -1,
+        .data5_io_num = -1,
+        .data6_io_num = -1,
+#endif
+        .flags = SPICOMMON_BUSFLAG_MASTER,
         .max_transfer_sz = strip->max_transfer_sz,
     };
     spi_device_interface_config_t device_interface_config = {

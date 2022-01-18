@@ -13,6 +13,10 @@
  * For ESP8266
  * SCLK GPIO14 (D5 on NodeMCU devkit)
  * MOSI GPIO13 (D7 on NodeMCU devkit)
+ *
+ * For ESP32C3
+ * SCLK (FSPICLK) GPIO6
+ * MOSI (FSPID)   GPIO7
  */
 
 #define N_PIXEL CONFIG_EXAMPLE_N_PIXEL
@@ -129,6 +133,7 @@ void test(void *pvParameters)
     ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
     while (1) {
         /* rainbow */
+        ESP_LOGI(TAG, "Rainbow pattern");
         for (int i = 0; i < 255; i++) {
             ESP_ERROR_CHECK(rainbow(&strip));
             ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
@@ -137,6 +142,7 @@ void test(void *pvParameters)
         }
 
         /* simple RGB */
+        ESP_LOGI(TAG, "Simple RGB pattern");
         for (int i = 0; i < 10; i++) {
             ESP_ERROR_CHECK(simple_rgb(&strip));
             ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
@@ -145,6 +151,7 @@ void test(void *pvParameters)
         }
 
         /* rainbow scroll */
+        ESP_LOGI(TAG, "Scroll rainbow pattern");
         for (int i = 0; i < 2048; i++) {
             ESP_ERROR_CHECK(rainbow_scroll(&strip));
             ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
@@ -153,6 +160,7 @@ void test(void *pvParameters)
         }
 
         /* fade scroll */
+        ESP_LOGI(TAG, "Fade scroll pattern");
         for (int i = 0; i < 2048; i++) {
             ESP_ERROR_CHECK(fade_scroll(&strip));
             ESP_ERROR_CHECK(led_strip_spi_flush(&strip));
