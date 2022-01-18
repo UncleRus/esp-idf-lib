@@ -924,6 +924,115 @@ jobs:
               idf.py --ccache build
             fi
           done
+
+  build_esp32c3_v4_x:
+    runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    strategy:
+      matrix:
+        build_method:
+          - idf
+        branch:
+          # esp32c3 support was introduced in v4.3.
+          - master
+          - v4.3.2
+        target:
+          - esp32c3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          TOOLCHAIN_DIR="${HOME}/.espressif/tools"
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          __PROJECT_PATH=`pwd`
+          IDF_PATH="${__PROJECT_PATH}/idf"
+
+          # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
+          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+
+          echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
+          echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/esp-idf
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+
+      - name: Fixup the SDK
+        run: |
+
+          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
+
+      - name: Cache esp-idf tools
+
+        # cache esp-idf tools. each tagged branch has fixed versions of tools.
+        # the versions do not change. the master is an exception as it is a
+        # moving target. do NOT cache tools if the branch is master.
+        uses: actions/cache@v2
+        id: cache-tools
+        if: ${{ matrix.branch != 'master' }}
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools
+
+      - name: Run install.sh
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
+        run: |
+          ${IDF_PATH}/install.sh esp32c3
+
+      - name: Run idf_tools.py install-python-env
+        run: |
+          ${IDF_PATH}/tools/idf_tools.py install-python-env
+
+      - name: Build (idf.py)
+        if: ${{ matrix.build_method == 'idf' }}
+        run: |
+          IGNORE_FILE="ci-ignore"
+          . ${IDF_PATH}/export.sh
+
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          cd "${__PROJECT_EXAMPLE_DIR}"
+          for i in $(ls -d *); do
+            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
+              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
+              echo "Building ${i}..."
+              # FIXME Remove this workaround when esp-idf issue #7621 will be fixed
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=n" >> sdkconfig.defaults
+              echo "CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=n" >> sdkconfig.defaults
+              idf.py --ccache build
+            fi
+          done
   all_build:
     # a meta job that requires all of the above so that repository
     # admin can choose a single test name in "Require status checks to pass
