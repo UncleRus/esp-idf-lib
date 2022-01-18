@@ -3,13 +3,18 @@
 #include <freertos/task.h>
 #include <esp_log.h>
 #include <esp_err.h>
+#include <esp_idf_version.h>
 #include <max31865.h>
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define HOST HSPI_HOST
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
+#define HOST    HSPI_HOST
+#else
+#define HOST    SPI2_HOST
+#endif
 
 #define PIN_NUM_MOSI 23
 #define PIN_NUM_MISO 19
