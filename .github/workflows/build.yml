@@ -1002,12 +1002,12 @@ jobs:
         if: ${{ matrix.branch != 'master' }}
         with:
           path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
-          key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools
+          key: ${{ runner.os }}-${{ matrix.branch }}-${{ matrix.target }}-cache-tools-1
 
       - name: Run install.sh
         if: ${{ steps.cache-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
         run: |
-          ${IDF_PATH}/install.sh esp32c3
+          ${IDF_PATH}/install.sh
 
       - name: Run idf_tools.py install-python-env
         run: |
