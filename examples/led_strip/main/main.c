@@ -4,7 +4,7 @@
 #include <led_strip.h>
 
 #define LED_TYPE LED_STRIP_WS2812
-#define LED_GPIO 5
+#define LED_GPIO CONFIG_LED_STRIP_GPIO
 
 static const rgb_t colors[] = {
     { .r = 0x0f, .g = 0x0f, .b = 0x0f },

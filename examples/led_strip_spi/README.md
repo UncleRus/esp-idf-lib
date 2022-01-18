@@ -19,8 +19,8 @@ default is 8 pixels.
 | Pin on `SK9822` | Destination                  |
 |-----------------|------------------------------|
 | `5V`            | `5V`                         |
-| `CI`            | `GPIO14` (ESP32 and ESP8266) |
-| `DI`            | `GPIO13` (ESP32 and ESP8266) |
+| `CI`            | `GPIO14` (ESP32 and ESP8266) or `GPIO6` (ESP32C3) |
+| `DI`            | `GPIO13` (ESP32 and ESP8266) or `GPIO7` (ESP32C3) |
 | `GND`           | `GND`                        |
 
 `SK9822` LED strip has `CI` and `DI` at both end of the strip. Make sure the

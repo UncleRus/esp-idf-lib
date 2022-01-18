@@ -13,10 +13,10 @@ Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 
 | Chip           | Framework          | Versions
 |----------------|--------------------|-----------------------
-| ESP32          | ESP-IDF            | master, v4.x, v.3.3.5
-| ESP32-S2 *[1]* | ESP-IDF            | master, v4.x, v.3.3.5
-| ESP32-C3 *[1]* | ESP-IDF            | master, v4.x, v.3.3.5
-| ESP8266  *[2]* | ESP8266 RTOS SDK   | master, v3.3
+| ESP32          | ESP-IDF            | All officially supported versions (see [Support Period Policy](https://github.com/espressif/esp-idf/blob/master/SUPPORT_POLICY.md)) and `master`
+| ESP32-S2 *[1]* | ESP-IDF            | All officially supported versions and `master`
+| ESP32-C3 *[1]* | ESP-IDF            | All officially supported versions and `master`
+| ESP8266  *[2]* | ESP8266 RTOS SDK   | `master`, v3.4
 
 [1] *Use "`idf.py set-target esp32s2`" or "`idf.py set-target esp32c3`" before "`idf.py menuconfig`" to change
 the chip type.*
@@ -183,7 +183,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106 LED strips                            | MIT     | `esp32`            | Yes
-| **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | `esp32`, `esp8266` | Yes
+| **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | `esp32`, `esp32c3`, `esp8266` | Yes
 
 ### Light sensors
 

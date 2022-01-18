@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <esp_idf_version.h>
 #include <max7219.h>
 
 #ifndef APP_CPU_NUM
@@ -10,7 +11,11 @@
 #define SCROLL_DELAY 50
 #define CASCADE_SIZE 1
 
-#define HOST HSPI_HOST
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
+#define HOST    HSPI_HOST
+#else
+#define HOST    SPI2_HOST
+#endif
 
 #define PIN_NUM_MOSI 19
 #define PIN_NUM_CLK  18
