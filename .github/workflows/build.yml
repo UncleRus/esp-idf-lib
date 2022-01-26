@@ -384,7 +384,7 @@ jobs:
           # CMakelist.txt to 3.x, but not practical.
           - make
         branch:
-          - v3.3.5
+          - v3.3.6
     steps:
       - name: Checkout
         uses: actions/checkout@v2
