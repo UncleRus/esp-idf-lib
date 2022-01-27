@@ -185,6 +185,7 @@ jobs:
           - v4.1.2
           - v4.2.2
           - v4.3.2
+          - v4.4
         target:
           - esp32
     steps:
@@ -239,6 +240,9 @@ jobs:
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           v4.3.*)
+            TOOLCHAIN_VERSION="esp-2021r2-8.4.0"
+            ;;
+          v4.4)
             TOOLCHAIN_VERSION="esp-2021r2-8.4.0"
             ;;
           *)
@@ -818,7 +822,8 @@ jobs:
           # esp32s2 support since v4.2.x
           - master
           - v4.2.2
-          - v4.3.1
+          - v4.3.2
+          - v4.4
         target:
           - esp32s2
     steps:
