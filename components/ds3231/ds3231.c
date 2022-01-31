@@ -423,7 +423,10 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
 }
 
 
-esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age) {
+esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age)
+{
+    CHECK_ARG(dev);
+
     uint8_t age_u8 = (uint8_t) age;
 
     I2C_DEV_TAKE_MUTEX(dev);
@@ -442,8 +445,9 @@ esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age) {
 }
 
 
-esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age) {
-    CHECK_ARG(age);
+esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age)
+{
+    CHECK_ARG(dev && age);
 
     uint8_t age_u8;
 
