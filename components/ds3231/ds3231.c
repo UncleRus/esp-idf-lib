@@ -421,3 +421,41 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
 
     return ESP_OK;
 }
+
+
+esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age)
+{
+    CHECK_ARG(dev);
+
+    uint8_t age_u8 = (uint8_t) age;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, DS3231_ADDR_AGING, &age_u8, sizeof(uint8_t)));
+
+    /**
+     * To see the effects of the aging register on the 32kHz output
+     * frequency immediately, a manual conversion should be started
+     * after each aging register change.
+     */
+    I2C_DEV_CHECK(dev, ds3231_set_flag(dev, DS3231_ADDR_CONTROL, DS3231_CTRL_TEMPCONV, DS3231_SET));
+
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+
+
+esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age)
+{
+    CHECK_ARG(dev && age);
+
+    uint8_t age_u8;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, DS3231_ADDR_AGING, &age_u8, sizeof(uint8_t)));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *age = (int8_t) age_u8;
+
+    return ESP_OK;
+}

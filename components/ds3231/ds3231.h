@@ -306,6 +306,36 @@ esp_err_t ds3231_get_temp_integer(i2c_dev_t *dev, int8_t *temp);
  */
 esp_err_t ds3231_get_temp_float(i2c_dev_t *dev, float *temp);
 
+
+/**
+ * @brief Set the aging offset register to a new value.
+ *
+ * Positive aging values add capacitance to the array,
+ * slowing the oscillator frequency. Negative values remove
+ * capacitance from the array, increasing the oscillator
+ * frequency.
+ *
+ * **Supported only by DS3231**
+ *
+ * @param dev Device descriptor
+ * @param age Aging offset (in range [-128, 127]) to be set
+ * @return ESP_OK to indicate success
+ */
+esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age);
+
+
+/**
+ * @brief Get the aging offset register.
+ *
+ * **Supported only by DS3231**
+ *
+ * @param dev Device descriptor
+ * @param[out] age Aging offset in range [-128, 127]
+ * @return ESP_OK to indicate success
+ */
+esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age);
+
+
 #ifdef	__cplusplus
 }
 #endif
