@@ -96,7 +96,7 @@ static esp_err_t measure(i2c_dev_t *dev, uint8_t cmd, uint16_t *raw)
     I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, &cmd, 1));
 
     // wait
-    vTaskDelay(DELAY_MS / portTICK_RATE_MS);
+    vTaskDelay(DELAY_MS / portTICK_PERIOD_MS);
 
     // read data
     uint8_t buf[3];

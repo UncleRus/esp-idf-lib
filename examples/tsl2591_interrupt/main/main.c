@@ -27,7 +27,7 @@
 
 static const char *TAG = "Main";
 
-static xQueueHandle isr_evt_queue = NULL;
+static QueueHandle_t isr_evt_queue = NULL;
 
 
 static void IRAM_ATTR isr_handler(void *arg)
@@ -40,7 +40,7 @@ static void isr_task(void *arg)
 {
     ESP_LOGI(TAG, "isr_task started.");
     tsl2591_t *dev = NULL;
-    while(1) 
+    while(1)
     {
         ESP_LOGI(TAG, "Wait for interrupt.");
         if (xQueueReceive(isr_evt_queue, &dev, portMAX_DELAY))
@@ -49,7 +49,7 @@ static void isr_task(void *arg)
             bool als_np_intr = false;
             ESP_ERROR_CHECK(tsl2591_get_als_intr_flag(dev, &als_intr));
             ESP_ERROR_CHECK(tsl2591_get_np_intr_flag(dev, &als_np_intr));
-            
+
             if (als_intr & !als_np_intr)
             {
                 printf("ALS interrupt\n");
