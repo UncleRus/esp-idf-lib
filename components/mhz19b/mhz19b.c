@@ -261,7 +261,7 @@ esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_
     // Read response from serial buffer
     int len = uart_read_bytes(dev->uart_port, dev->buf,
                               MHZ19B_SERIAL_RX_BYTES,
-                              MHZ19B_SERIAL_RX_TIMEOUT_MS / portTICK_RATE_MS);
+                              MHZ19B_SERIAL_RX_TIMEOUT_MS / portTICK_PERIOD_MS);
     if (len < 9)
         return ESP_ERR_TIMEOUT;
 

@@ -54,7 +54,7 @@ static SemaphoreHandle_t mutex;
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define MUTEX_TIMEOUT   (CONFIG_LED_STRIP_SPI_MUTEX_TIMEOUT_MS / portTICK_RATE_MS)
+#define MUTEX_TIMEOUT   (CONFIG_LED_STRIP_SPI_MUTEX_TIMEOUT_MS / portTICK_PERIOD_MS)
 
 esp_err_t led_strip_spi_install()
 {
