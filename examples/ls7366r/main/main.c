@@ -29,16 +29,16 @@
 
 static const char TAG[] = "main";
 
-static xQueueHandle gpio_evt_queue = NULL;
+static QueueHandle_t gpio_evt_queue = NULL;
 
-static ls7366r_config_t config = { 
+static ls7366r_config_t config = {
 	.count_type =			LS7366R_NON_QUAD,
 	.counter_bits =			LS7366R_32_BIT,
 	.filter_clock_divider = LS7366R_FILTER_CLK_1,
 	.counter_enable =		LS7366R_COUNTER_ENABLE,
 	.index_mode =			LS7366R_INDEX_DISABLED,
 	.index_sync =			LS7366R_INDEX_ASYNCHRONOUS,
-	.flag_mode = { 
+	.flag_mode = {
 		.borrow = LS7366R_FLAG_BORROW_DISABLE,
 		.carry = LS7366R_FLAG_CARRY_DISABLE,
 		.compare = LS7366R_FLAG_COMPARE_ENABLE,
@@ -54,7 +54,7 @@ static void gpio_toggle_task(void* arg)
 		gpio_set_level(TEST_PIN, 1);
 		vTaskDelay(100 / portTICK_PERIOD_MS);
 		gpio_set_level(TEST_PIN, 0);
-		vTaskDelay(100 / portTICK_PERIOD_MS);	
+		vTaskDelay(100 / portTICK_PERIOD_MS);
 		vTaskDelay(1);
 	}
 }
@@ -76,14 +76,14 @@ static void gpio_recv_task(void* arg)
 		if (xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY))
 		{
 			printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
-		}	
-		
+		}
+
 	}
 }
 
 void app_main(void)
-{		
-	spi_bus_config_t cfg = { 
+{
+	spi_bus_config_t cfg = {
 		.miso_io_num = PIN_NUM_MISO,
 		.mosi_io_num = PIN_NUM_MOSI,
 		.sclk_io_num = PIN_NUM_SCLK,
@@ -92,12 +92,12 @@ void app_main(void)
 		.max_transfer_sz = 0,
 		.flags = 0
 	};
-	
+
 	ESP_ERROR_CHECK(spi_bus_initialize(LS7366R_HOST, &cfg, 0));
 	ls7366r_t dev;
 	ESP_ERROR_CHECK(ls7366r_init_desc(&dev, LS7366R_HOST, PIN_NUM_CS));
 	ESP_ERROR_CHECK(ls7366r_set_config(&dev, &config));
-	
+
 	// setup for gpio output (gpio_toggle_task)
 	gpio_config_t io_conf = { };
 	io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -106,7 +106,7 @@ void app_main(void)
 	io_conf.pull_down_en = 0;
 	io_conf.pull_up_en = 0;
 	gpio_config(&io_conf);
-	
+
 	// for interrupt input
 	io_conf.intr_type = GPIO_INTR_POSEDGE;
 	io_conf.mode = GPIO_MODE_INPUT;
@@ -114,18 +114,16 @@ void app_main(void)
 	io_conf.pull_down_en = 0;
 	io_conf.pull_up_en = 0;
 	gpio_config(&io_conf);
-	
-	
+
 	gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
 	xTaskCreate(gpio_recv_task, "gpio_recv_task", 2048, NULL, 10, NULL);
 	gpio_install_isr_service(0);
 	gpio_isr_handler_add(INTR_PIN, gpio_isr_handler, (void*)INTR_PIN);
-	
-	
+
 	xTaskCreate(gpio_toggle_task, "gpio_toggle_task", 4096, NULL, 5, NULL);
-	
+
 	ls7366r_set_compare_val(&dev, 250); // set the value for the compare flag to trigger as 250
-	
+
 	// While in regular loop print the count every 500ms
 	while (1)
 	{
