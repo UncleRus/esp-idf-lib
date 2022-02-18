@@ -1,8 +1,8 @@
 ---
-name: Report an issue in `esp-idf-lib` code
+name: Report an issue in esp-idf-lib code
 description: >
   This is for issues with our library code only. If you have a question, use
-  [Discussions](../../../discussions).
+  Discussions.
 body:
   - type: textarea
     id: issue_description
@@ -21,8 +21,8 @@ body:
     attributes:
       label: Which SDK are you using?
       options:
-        - label: esp-idf
-        - label: ESP8266 RTOS SDK
+        - esp-idf
+        - ESP8266 RTOS SDK
 
   - type: input
     id: sdk_version
@@ -83,10 +83,9 @@ body:
 
   - type: checkboxes
     id: confirmation
-    validations:
-      required: true
     attributes:
       label: Confirmation
       description: Please confirm and check the box below.
       options:
         - label: This report is not a question nor a request for drivers.
+          required: true
