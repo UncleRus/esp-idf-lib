@@ -1,5 +1,5 @@
 ---
-name: Report an issue in `esp-idf-lib` repository
+name: Report an issue in esp-idf-lib repository
 description: >
   This is for issues relating to the repository. If your issue is not directly
   related to library code, such as policies, CI, or the project itself, report
@@ -42,3 +42,4 @@ body:
       description: Please confirm and check the box below.
       options:
         - label: This report is not a bug report in code, a question, nor a request for drivers.
+          required: true
