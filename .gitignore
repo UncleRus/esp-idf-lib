@@ -61,6 +61,8 @@ sdkconfig
 /.pydevproject
 /__garbage__/
 /.vscode/
+/.idea/
+cmake-build-debug/
 /esp-idf-lib.code-workspace
 Gemfile.lock
 
