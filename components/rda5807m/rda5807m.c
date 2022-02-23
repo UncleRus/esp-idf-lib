@@ -253,15 +253,14 @@ esp_err_t rda5807m_init(rda5807m_t *dev, rda5807m_clock_freq_t clock_freq)
     dev->band = RDA5807M_BAND_87_108;
     dev->spacing = RDA5807M_CHAN_SPACE_100;
 
-    ESP_LOGI(TAG, "Device initialized");
+    ESP_LOGD(TAG, "Device initialized");
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_state(rda5807m_t *dev, rda5807m_state_t *state)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(state);
+    CHECK_ARG(dev && state);
 
     uint16_t r[6];
     uint16_t ctrl;
@@ -286,8 +285,7 @@ esp_err_t rda5807m_get_state(rda5807m_t *dev, rda5807m_state_t *state)
 
 esp_err_t rda5807m_get_volume(rda5807m_t *dev, uint8_t *vol)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(vol);
+    CHECK_ARG(dev && vol);
 
     uint16_t v;
     CHECK(read_register(dev, REG_VOL, &v));
@@ -298,20 +296,18 @@ esp_err_t rda5807m_get_volume(rda5807m_t *dev, uint8_t *vol)
 
 esp_err_t rda5807m_set_volume(rda5807m_t *dev, uint8_t vol)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(vol <= RDA5807M_VOL_MAX);
+    CHECK_ARG(dev && vol <= RDA5807M_VOL_MAX);
 
     CHECK(update_register(dev, REG_VOL, MASK_VOL_VOLUME, vol));
 
-    ESP_LOGI(TAG, "Volume set to %d", vol);
+    ESP_LOGD(TAG, "Volume set to %d", vol);
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_mute(rda5807m_t *dev, bool *mute)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(mute);
+    CHECK_ARG(dev && mute);
 
     uint16_t v;
     CHECK(read_register(dev, REG_CTRL, &v));
@@ -326,15 +322,14 @@ esp_err_t rda5807m_set_mute(rda5807m_t *dev, bool mute)
 
     CHECK(update_register(dev, REG_CTRL, BV(BIT_CTRL_DMUTE), mute ? 0 : BV(BIT_CTRL_DMUTE)));
 
-    ESP_LOGI(TAG, "Mute %s", mute ? "enabled" : "disabled");
+    ESP_LOGD(TAG, "Mute %s", mute ? "enabled" : "disabled");
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_softmute(rda5807m_t *dev, bool *softmute)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(softmute);
+    CHECK_ARG(dev && softmute);
 
     uint16_t v;
     CHECK(read_register(dev, REG_R4, &v));
@@ -349,15 +344,14 @@ esp_err_t rda5807m_set_softmute(rda5807m_t *dev, bool softmute)
 
     CHECK(update_register(dev, REG_R4, BV(BIT_R4_SOFTMUTE_EN), softmute ? BV(BIT_R4_SOFTMUTE_EN) : 0));
 
-    ESP_LOGI(TAG, "Softmute %s", softmute ? "enabled" : "disabled");
+    ESP_LOGD(TAG, "Softmute %s", softmute ? "enabled" : "disabled");
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_bass_boost(rda5807m_t *dev, bool *bass_boost)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(bass_boost);
+    CHECK_ARG(dev && bass_boost);
 
     uint16_t v;
     CHECK(read_register(dev, REG_CTRL, &v));
@@ -372,15 +366,14 @@ esp_err_t rda5807m_set_bass_boost(rda5807m_t *dev, bool bass_boost)
 
     CHECK(update_register(dev, REG_CTRL, BV(BIT_CTRL_BASS), bass_boost ? BV(BIT_CTRL_BASS) : 0));
 
-    ESP_LOGI(TAG, "Bass-boost %s", bass_boost ? "enabled" : "disabled");
+    ESP_LOGD(TAG, "Bass-boost %s", bass_boost ? "enabled" : "disabled");
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_mono(rda5807m_t *dev, bool *mono)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(mono);
+    CHECK_ARG(dev && mono);
 
     uint16_t v;
     CHECK(read_register(dev, REG_CTRL, &v));
@@ -395,15 +388,14 @@ esp_err_t rda5807m_set_mono(rda5807m_t *dev, bool mono)
 
     CHECK(update_register(dev, REG_CTRL, BV(BIT_CTRL_MONO), mono ? BV(BIT_CTRL_MONO) : 0));
 
-    ESP_LOGI(TAG, "Mono %s", mono ? "enabled" : "disabled");
+    ESP_LOGD(TAG, "Mono %s", mono ? "enabled" : "disabled");
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_band(rda5807m_t *dev, rda5807m_band_t *band)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(band);
+    CHECK_ARG(dev && band);
 
     uint16_t v;
     CHECK(read_register(dev, REG_CHAN, &v));
@@ -423,8 +415,7 @@ esp_err_t rda5807m_get_band(rda5807m_t *dev, rda5807m_band_t *band)
 
 esp_err_t rda5807m_set_band(rda5807m_t *dev, rda5807m_band_t band)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(band <= RDA5807M_BAND_50_76);
+    CHECK_ARG(dev && band <= RDA5807M_BAND_50_76);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, update_register_nolock(dev, REG_CHAN, MASK_CHAN_BAND,
@@ -436,15 +427,14 @@ esp_err_t rda5807m_set_band(rda5807m_t *dev, rda5807m_band_t band)
 
     dev->band = band;
 
-    ESP_LOGI(TAG, "Band: %d..%d kHz", band_limits[band].lower, band_limits[band].upper);
+    ESP_LOGD(TAG, "Band: %d..%d kHz", band_limits[band].lower, band_limits[band].upper);
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing_t *spacing)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(spacing);
+    CHECK_ARG(dev && spacing);
 
     uint16_t v;
     CHECK(read_register(dev, REG_CHAN, &v));
@@ -455,8 +445,7 @@ esp_err_t rda5807m_get_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing
 
 esp_err_t rda5807m_set_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing_t spacing)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(spacing <= RDA5807M_CHAN_SPACE_25);
+    CHECK_ARG(dev && spacing <= RDA5807M_CHAN_SPACE_25);
 
     CHECK(update_register(dev, REG_CTRL, MASK_CHAN_SPACE, spacing));
     dev->spacing = spacing;
@@ -466,8 +455,7 @@ esp_err_t rda5807m_set_channel_spacing(rda5807m_t *dev, rda5807m_channel_spacing
 
 esp_err_t rda5807m_get_frequency_khz(rda5807m_t *dev, uint32_t *frequency)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(frequency);
+    CHECK_ARG(dev && frequency);
 
     uint16_t chan;
     CHECK(read_registers_bulk(dev, &chan, 1));
@@ -499,15 +487,14 @@ esp_err_t rda5807m_set_frequency_khz(rda5807m_t *dev, uint32_t frequency)
     CHECK(update_register(dev, REG_CHAN, MASK_CHAN_CHAN | BV(BIT_CHAN_TUNE),
             (chan << BIT_CHAN_CHAN) | BV(BIT_CHAN_TUNE)));
 
-    ESP_LOGI(TAG, "Frequency: %d kHz", chan * spacings[dev->spacing] + band_limits[dev->band].lower);
+    ESP_LOGD(TAG, "Frequency: %d kHz", chan * spacings[dev->spacing] + band_limits[dev->band].lower);
 
     return ESP_OK;
 }
 
 esp_err_t rda5807m_get_afc(rda5807m_t *dev, bool *afc)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(afc);
+    CHECK_ARG(dev && afc);
 
     uint16_t v;
     CHECK(read_register(dev, REG_R4, &v));
@@ -525,8 +512,7 @@ esp_err_t rda5807m_set_afc(rda5807m_t *dev, bool afc)
 
 esp_err_t rda5807m_seek_start(rda5807m_t *dev, bool up, bool wrap, uint8_t threshold)
 {
-    CHECK_ARG(dev);
-    CHECK_ARG(threshold <= RDA5807M_SEEK_TH_MAX);
+    CHECK_ARG(dev && threshold <= RDA5807M_SEEK_TH_MAX);
 
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, update_register_nolock(dev, REG_VOL, MASK_VOL_SEEKTH,
@@ -536,7 +522,7 @@ esp_err_t rda5807m_seek_start(rda5807m_t *dev, bool up, bool wrap, uint8_t thres
             BV(BIT_CTRL_SEEK) | (up ? BV(BIT_CTRL_SEEKUP) : 0) | (wrap ? 0 : BV(BIT_CTRL_SKMODE))));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
-    ESP_LOGI(TAG, "Seek started: %s, %s at bound, SNR threshold: %d", up ? "up" : "down", wrap ? "wrap" : "stop", threshold);
+    ESP_LOGD(TAG, "Seek started: %s, %s at bound, SNR threshold: %d", up ? "up" : "down", wrap ? "wrap" : "stop", threshold);
 
     return ESP_OK;
 }
@@ -546,7 +532,7 @@ esp_err_t rda5807m_seek_stop(rda5807m_t *dev)
     CHECK_ARG(dev);
     CHECK(update_register(dev, REG_CTRL, BV(BIT_CTRL_SEEK), 0));
 
-    ESP_LOGI(TAG, "Seek stopped");
+    ESP_LOGD(TAG, "Seek stopped");
 
     return ESP_OK;
 }
