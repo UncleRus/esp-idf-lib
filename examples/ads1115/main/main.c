@@ -4,17 +4,7 @@
 #include <ads111x.h>
 #include <string.h>
 
-#define DEV_COUNT 2   // 2 ICs
-
 #define I2C_PORT 0
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -23,13 +13,13 @@
 #define GAIN ADS111X_GAIN_4V096 // +-4.096V
 
 // I2C addresses
-static const uint8_t addr[DEV_COUNT] = {
+static const uint8_t addr[CONFIG_EXAMPLE_DEV_COUNT] = {
     ADS111X_ADDR_GND,
     ADS111X_ADDR_VCC
 };
 
 // Descriptors
-static i2c_dev_t devices[DEV_COUNT];
+static i2c_dev_t devices[CONFIG_EXAMPLE_DEV_COUNT];
 
 // Gain value
 static float gain_val;
@@ -61,9 +51,9 @@ void ads111x_test(void *pvParameters)
     gain_val = ads111x_gain_values[GAIN];
 
     // Setup ICs
-    for (size_t i = 0; i < DEV_COUNT; i++)
+    for (size_t i = 0; i < CONFIG_EXAMPLE_DEV_COUNT; i++)
     {
-        ESP_ERROR_CHECK(ads111x_init_desc(&devices[i], addr[i], I2C_PORT, SDA_GPIO, SCL_GPIO));
+        ESP_ERROR_CHECK(ads111x_init_desc(&devices[i], addr[i], I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
         ESP_ERROR_CHECK(ads111x_set_mode(&devices[i], ADS111X_MODE_CONTINUOUS));    // Continuous conversion mode
         ESP_ERROR_CHECK(ads111x_set_data_rate(&devices[i], ADS111X_DATA_RATE_32)); // 32 samples per second
@@ -73,7 +63,7 @@ void ads111x_test(void *pvParameters)
 
     while (1)
     {
-        for (size_t i = 0; i < DEV_COUNT; i++)
+        for (size_t i = 0; i < CONFIG_EXAMPLE_DEV_COUNT; i++)
             measure(i);
 
         vTaskDelay(pdMS_TO_TICKS(500));
