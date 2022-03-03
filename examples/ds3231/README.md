@@ -1,7 +1,26 @@
-# What the example does
+# Example for `ds3231` driver
 
-The example sets (hard-coded) date and time. In the loop, it reads temperature
-and time from the device, prints them to the serial console.
+## What it does
+
+It initializes the date and the time to 2016-10-09 13:50:10.
+
+It shows date, time, and temperature in a loop.
+
+## Wiring
+
+Connect `SCL` and `SDA` pins to the following pins with appropriate pull-up
+resistors.
+
+| Name | Description | Defaults |
+|------|-------------|----------|
+| `CONFIG_EXAMPLE_I2C_MASTER_SCL` | GPIO number for `SCL` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
+| `CONFIG_EXAMPLE_I2C_MASTER_SDA` | GPIO number for `SDA` | "4" for `esp8266`, "5" for `esp32c3`, "18" for `esp32`, `esp32s2`, and `esp32s3` |
+
+## Notes
+
+`CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL` must be `y` on `esp8266`.
+
+## Log
 
 ```console
 I (28) boot: ESP-IDF v4.0-dev-1446-g6b169d473 2nd stage bootloader
@@ -55,11 +74,3 @@ E (0) i2c: /usr/home/trombik/github/trombik/esp-idf/components/driver/i2c.c:353 
 2016-10-09 13:50:11, 33.25 deg Cel
 ...
 ```
-
-## Connecting
-
-| `DS3231`  | `ESP8266` | `ESP32` | `NodeMCU` |
-|-----------|-----------|---------|-----------|
-| `SCL`     | `GPIO5`   | `GPIO16`| `D1`      |
-| `SDA`     | `GPIO4`   | `GPIO17`| `D2`      |
-
