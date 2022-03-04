@@ -40,12 +40,10 @@ static const uint64_t symbols[] = {
     0x3c66607c66663c00,
     0x3c66666e76663c00
 };
-const static size_t symbols_size = sizeof(symbols) - sizeof(uint64_t) * CASCADE_SIZE;
+static const size_t symbols_size = sizeof(symbols) - sizeof(uint64_t) * CASCADE_SIZE;
 
 void task(void *pvParameter)
 {
-    esp_err_t res;
-
     // Configure SPI bus
     spi_bus_config_t cfg = {
        .mosi_io_num = PIN_NUM_MOSI,
@@ -65,8 +63,8 @@ void task(void *pvParameter)
        .mirrored = true
     };
     ESP_ERROR_CHECK(max7219_init_desc(&dev, HOST, PIN_NUM_CS));
-    ESP_ERROR_CHECK(max7219_init(&dev))
-    ;
+    ESP_ERROR_CHECK(max7219_init(&dev));
+
     size_t offs = 0;
     while (1)
     {
