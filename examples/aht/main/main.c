@@ -7,15 +7,19 @@
 #include <esp_err.h>
 #include <esp_log.h>
 
-#define AHT_TYPE AHT_TYPE_AHT1x
-//#define AHT_TYPE AHT_TYPE_AHT20
+#ifdef CONFIG_EXAMPLE_I2C_ADDRESS_GND
+#define ADDR AHT_I2C_ADDRESS_GND
+#endif
+#ifdef CONFIG_EXAMPLE_I2C_ADDRESS_VCC
+#define ADDR AHT_I2C_ADDRESS_VCC
+#endif
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#ifdef CONFIG_EXAMPLE_TYPE_AHT1x
+#define AHT_TYPE AHT_TYPE_AHT1x
+#endif
+
+#ifdef CONFIG_EXAMPLE_TYPE_AHT20
+#define AHT_TYPE AHT_TYPE_AHT20
 #endif
 
 #ifndef APP_CPU_NUM
@@ -30,7 +34,7 @@ void task(void *pvParameters)
     dev.mode = AHT_MODE_NORMAL;
     dev.type = AHT_TYPE;
 
-    ESP_ERROR_CHECK(aht_init_desc(&dev, AHT_I2C_ADDRESS_GND, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(aht_init_desc(&dev, ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(aht_init(&dev));
 
     bool calibrated;
