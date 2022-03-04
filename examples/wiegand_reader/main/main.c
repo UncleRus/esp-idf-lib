@@ -6,16 +6,6 @@
 
 static const char *TAG = "wiegand_reader";
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define D0_GPIO 4
-#define D1_GPIO 5
-#else
-#define D0_GPIO 16
-#define D1_GPIO 17
-#endif
-
-#define READER_BUF_SIZE 4 // 32 bits should be enough for demo
-
 static wiegand_reader_t reader;
 
 static void reader_callback(wiegand_reader_t *r)
@@ -27,7 +17,7 @@ static void reader_callback(wiegand_reader_t *r)
 void task(void *arg)
 {
     // Initialize reader
-    ESP_ERROR_CHECK(wiegand_reader_init(&reader, D0_GPIO, D1_GPIO, true, READER_BUF_SIZE, reader_callback));
+    ESP_ERROR_CHECK(wiegand_reader_init(&reader, CONFIG_EXAMPLE_D0_GPIO, CONFIG_EXAMPLE_D0_GPIO, true, CONFIG_EXAMPLE_BUF_SIZE, reader_callback));
 
     while (1)
     {
