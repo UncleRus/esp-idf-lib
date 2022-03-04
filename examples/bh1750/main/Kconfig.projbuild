@@ -1,6 +1,6 @@
 menu "Example configuration"
     choice EXAMPLE_I2C_ADDRESS
-        prompt "Select chip type"
+        prompt "Select I2C address"
         default EXAMPLE_I2C_ADDRESS_LO
         help
             Select I2C address
