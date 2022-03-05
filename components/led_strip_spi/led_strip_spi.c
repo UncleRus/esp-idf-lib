@@ -290,7 +290,7 @@ static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
 
     for (int i = 0; i < mosi_buffer_block_size; i++) {
         trans.bits.mosi = ESP8266_SPI_MAX_DATA_LENGTH * 8; // bits, not bytes
-        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * i / sizeof(uint32_t);
+        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * i;
         err = spi_trans(HSPI_HOST, &trans);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
@@ -299,7 +299,7 @@ static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
     }
     if (mosi_buffer_block_size_mod > 0) {
         trans.bits.mosi = mosi_buffer_block_size_mod * 8; // bits, not bytes
-        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * mosi_buffer_block_size / sizeof(uint32_t);
+        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * mosi_buffer_block_size;
         err = spi_trans(HSPI_HOST, &trans);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
