@@ -4,16 +4,10 @@
 #include <ina219.h>
 #include <string.h>
 #include <esp_log.h>
+#include <assert.h>
 
 #define I2C_PORT 0
-#define I2C_ADDR INA219_ADDR_GND_GND
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
+#define I2C_ADDR CONFIG_EXAMPLE_I2C_ADDR
 
 const static char *TAG = "INA219_example";
 
@@ -22,7 +16,8 @@ void task(void *pvParameters)
     ina219_t dev;
     memset(&dev, 0, sizeof(ina219_t));
 
-    ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    assert(CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM > 0);
+    ESP_ERROR_CHECK(ina219_init_desc(&dev, I2C_ADDR, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_LOGI(TAG, "Initializing INA219");
     ESP_ERROR_CHECK(ina219_init(&dev));
 
@@ -31,7 +26,8 @@ void task(void *pvParameters)
             INA219_RES_12BIT_1S, INA219_RES_12BIT_1S, INA219_MODE_CONT_SHUNT_BUS));
 
     ESP_LOGI(TAG, "Calibrating INA219");
-    ESP_ERROR_CHECK(ina219_calibrate(&dev, 5.0, 0.1)); // 5A max current, 0.1 Ohm shunt resistance
+
+    ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)CONFIG_EXAMPLE_MAX_CURRENT, (1 / (float)CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM)));
 
     float bus_voltage, shunt_voltage, current, power;
 
