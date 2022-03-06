@@ -33,13 +33,18 @@ void test(void *pvParameters)
     ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 1));
     ESP_ERROR_CHECK(mcp23x17_init_desc_spi(&dev, HOST, MCP23X17_MAX_SPI_FREQ, CONFIG_EXAMPLE_ADDRESS, CONFIG_EXAMPLE_CS_GPIO));
 
+    // Set INTx mode to active high
+    ESP_ERROR_CHECK(mcp23x17_set_int_out_mode(&dev, MCP23X17_ACTIVE_HIGH));
     // Setup PORTA0 as input
-    mcp23x17_set_mode(&dev, 0, MCP23X17_GPIO_INPUT);
+    ESP_ERROR_CHECK(mcp23x17_set_mode(&dev, 0, MCP23X17_GPIO_INPUT));
+    // Enable pull-up
+    ESP_ERROR_CHECK(mcp23x17_set_pullup(&dev, 0, true));
     // Setup interrupt on it
-    mcp23x17_set_interrupt(&dev, 0, MCP23X17_INT_ANY_EDGE);
+    ESP_ERROR_CHECK(mcp23x17_set_interrupt(&dev, 0, MCP23X17_INT_ANY_EDGE));
 
+    // Setup INTA GPIO interrupt
     gpio_set_direction(CONFIG_EXAMPLE_INTA_GPIO, GPIO_MODE_INPUT);
-    gpio_set_intr_type(CONFIG_EXAMPLE_INTA_GPIO, GPIO_INTR_ANYEDGE);
+    gpio_set_intr_type(CONFIG_EXAMPLE_INTA_GPIO, GPIO_INTR_POSEDGE);
     gpio_install_isr_service(0);
     gpio_isr_handler_add(CONFIG_EXAMPLE_INTA_GPIO, intr_handler, NULL);
 
