@@ -55,7 +55,7 @@ static const char *TAG = "tca9548";
 
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
-esp_err_t tca9548_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t tca9548_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev && addr >= TCA9548_ADDR_0 && addr <= TCA9548_ADDR_7);
 

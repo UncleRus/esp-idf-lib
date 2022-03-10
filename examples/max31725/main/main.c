@@ -29,7 +29,7 @@ void test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(max31725_init_desc(&dev, I2C_PORT, ADDRESS, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(max31725_init_desc(&dev, ADDRESS, I2C_PORT, SDA_GPIO, SCL_GPIO));
 
 #if CONTINUOUS
 

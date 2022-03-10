@@ -21,7 +21,7 @@ void test(void *pvParameters)
     mcp23x17_t dev;
     memset(&dev, 0, sizeof(mcp23x17_t));
 
-    ESP_ERROR_CHECK(mcp23x17_init_desc(&dev, 0, MCP23X17_ADDR_BASE, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(mcp23x17_init_desc(&dev, MCP23X17_ADDR_BASE, 0, SDA_GPIO, SCL_GPIO));
 
     // Setup PORTA0 as input
     mcp23x17_set_mode(&dev, 0, MCP23X17_GPIO_INPUT);

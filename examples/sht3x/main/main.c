@@ -145,7 +145,7 @@ void app_main()
     ESP_ERROR_CHECK(i2cdev_init());
     memset(&dev, 0, sizeof(sht3x_t));
 
-    ESP_ERROR_CHECK(sht3x_init_desc(&dev, 0, ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sht3x_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
     ESP_ERROR_CHECK(sht3x_init(&dev));
 
     xTaskCreatePinnedToCore(task, "sh301x_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);

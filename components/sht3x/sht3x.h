@@ -106,7 +106,7 @@ typedef struct
  * @param scl_gpio  SCL GPIO
  * @return          `ESP_OK` on success
  */
-esp_err_t sht3x_init_desc(sht3x_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t sht3x_init_desc(sht3x_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor

@@ -25,7 +25,7 @@ void test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(pca9557_init_desc(&dev, 0, ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pca9557_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
 
     // Setup IO0 as input, IO1-IO7 as outputs
     ESP_ERROR_CHECK(pca9557_port_set_mode(&dev, 0x01));

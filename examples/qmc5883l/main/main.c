@@ -35,7 +35,7 @@ void qmc5883l_test(void *pvParameters)
     memset(&dev, 0, sizeof(qmc5883l_t));
 
     ESP_ERROR_CHECK(i2cdev_init());
-    ESP_ERROR_CHECK(qmc5883l_init_desc(&dev, 0, QMC5883L_I2C_ADDR_DEF, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(qmc5883l_init_desc(&dev, QMC5883L_I2C_ADDR_DEF, 0, SDA_GPIO, SCL_GPIO));
 
     // 50Hz data rate, 128 samples, -2G..+2G range
     ESP_ERROR_CHECK(qmc5883l_set_config(&dev, QMC5883L_DR_50, QMC5883L_OSR_128, QMC5883L_RNG_2));

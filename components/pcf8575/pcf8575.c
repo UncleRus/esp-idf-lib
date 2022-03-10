@@ -64,7 +64,7 @@ static esp_err_t write_port(i2c_dev_t *dev, uint16_t val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t pcf8575_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t pcf8575_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     CHECK_ARG(addr & 0x20);

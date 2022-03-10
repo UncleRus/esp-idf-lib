@@ -27,7 +27,7 @@ void test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(tca95x5_init_desc(&dev, 0, TCA95X5_I2C_ADDR_BASE, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(tca95x5_init_desc(&dev, TCA95X5_I2C_ADDR_BASE, 0, SDA_GPIO, SCL_GPIO));
 
     // Setup P00, P01 and P02 as input, other as output
     ESP_ERROR_CHECK(tca95x5_port_set_mode(&dev, 7)); // 0b0000000000000111

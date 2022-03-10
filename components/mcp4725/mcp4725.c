@@ -61,7 +61,7 @@ static esp_err_t read_data(i2c_dev_t *dev, void *data, uint8_t size)
     return ESP_OK;
 }
 
-esp_err_t mcp4725_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t mcp4725_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     if (addr < MCP4725A0_I2C_ADDR0 || addr > MCP4725A2_I2C_ADDR1)

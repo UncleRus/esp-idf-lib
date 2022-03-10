@@ -43,7 +43,7 @@ void lcd_test(void *pvParameters)
 
     // Prepare PCF8574
     memset(&pcf8574, 0, sizeof(i2c_dev_t));
-    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, 0, I2C_ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, I2C_ADDR, 0, SDA_GPIO, SCL_GPIO));
 
     // Prepare BMP280
     bmp280_params_t params;

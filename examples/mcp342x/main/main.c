@@ -30,7 +30,7 @@ static void task(void *arg)
     // Clear device descriptor
     memset(&adc, 0, sizeof(adc));
 
-    ESP_ERROR_CHECK(mcp342x_init_desc(&adc, I2C_PORT, ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(mcp342x_init_desc(&adc, ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
 
     adc.channel = CHANNEL;
     adc.gain = GAIN;
