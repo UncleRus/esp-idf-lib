@@ -28,7 +28,7 @@ void test(void *pvParameters)
     bh1900nux_t dev;
     memset(&dev, 0, sizeof(bh1900nux_t));
 
-    ESP_ERROR_CHECK(bh1900nux_init_desc(&dev, I2C_PORT, ADDRESS, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(bh1900nux_init_desc(&dev, ADDRESS, I2C_PORT, SDA_GPIO, SCL_GPIO));
 
 #if CONTINUOUS
 

@@ -55,13 +55,13 @@ extern "C" {
  * Default SCL frequency is 400kHz
  *
  * @param dev Pointer to I2C device descriptor
- * @param port I2C port number
  * @param addr I2C address (`0b0100<A2><A1><A0>`)
+ * @param port I2C port number
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
  * @return `ESP_OK` on success
  */
-esp_err_t tca95x5_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t tca95x5_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
