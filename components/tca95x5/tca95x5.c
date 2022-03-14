@@ -72,7 +72,7 @@ static esp_err_t write_reg_16(i2c_dev_t *dev, uint8_t reg, uint16_t val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t tca95x5_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t tca95x5_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev && (addr & TCA95X5_I2C_ADDR_BASE));
 

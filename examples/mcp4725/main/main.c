@@ -33,7 +33,7 @@ void task(void *pvParameters)
     memset(&dev, 0, sizeof(i2c_dev_t));
 
     // Init device descriptor
-    ESP_ERROR_CHECK(mcp4725_init_desc(&dev, 0, ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(mcp4725_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
 
     mcp4725_power_mode_t pm;
     ESP_ERROR_CHECK(mcp4725_get_power_mode(&dev, true, &pm));

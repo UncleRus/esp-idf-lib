@@ -31,7 +31,7 @@ void lcd_test(void *pvParameters)
     };
 
     memset(&pcf8574, 0, sizeof(i2c_dev_t));
-    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, 0, CONFIG_EXAMPLE_I2C_ADDR, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
+    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, CONFIG_EXAMPLE_I2C_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     ESP_ERROR_CHECK(hd44780_init(&lcd));
 

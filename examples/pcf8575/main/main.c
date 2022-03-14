@@ -22,7 +22,7 @@ void test(void *pvParameters)
     memset(&pcf8575, 0, sizeof(i2c_dev_t));
 
     // Init i2c device descriptor
-    ESP_ERROR_CHECK(pcf8575_init_desc(&pcf8575, 0, I2C_ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pcf8575_init_desc(&pcf8575, I2C_ADDR, 0, SDA_GPIO, SCL_GPIO));
 
     // Do some blinking
     uint16_t port_val = 0xaaaa;
