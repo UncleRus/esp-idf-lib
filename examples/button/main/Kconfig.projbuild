@@ -1,0 +1,17 @@
+menu "Example configuration"
+
+    config EXAMPLE_BUTTON1_GPIO
+        int "Button 1 GPIO number"
+        default 14 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 16 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for the first button
+
+    config EXAMPLE_BUTTON2_GPIO
+        int "Button 2 GPIO number"
+        default 12 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 17 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for the second button
+
+endmenu
