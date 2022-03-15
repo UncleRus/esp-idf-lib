@@ -1,0 +1,24 @@
+menu "Example configuration"
+
+    config EXAMPLE_CE_GPIO
+        int "CE GPIO number"
+        default 5 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 16 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO connected to CE pin
+
+    config EXAMPLE_IO_GPIO
+        int "I/O GPIO number"
+        default 4 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 17 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO connected to I/O pin
+
+    config EXAMPLE_SCLK_GPIO
+        int "SCLK GPIO number"
+        default 0 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO connected to SCLK pin
+
+endmenu
