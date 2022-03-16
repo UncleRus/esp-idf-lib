@@ -27,7 +27,7 @@ void task(void *pvParameters)
 
     ESP_LOGI(TAG, "Calibrating INA219");
 
-    ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)CONFIG_EXAMPLE_MAX_CURRENT, (1 / (float)CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM)));
+    ESP_ERROR_CHECK(ina219_calibrate(&dev, (float)CONFIG_EXAMPLE_MAX_CURRENT, (float)CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM / 1000.0f));
 
     float bus_voltage, shunt_voltage, current, power;
 

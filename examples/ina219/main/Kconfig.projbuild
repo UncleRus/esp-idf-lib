@@ -12,7 +12,7 @@ menu "Example configuration"
             Shunt resistor value in milliohm. Must not be zero.
 
     config EXAMPLE_I2C_ADDR
-        hex "I2C address of PCF8574"
+        hex "I2C address of INA219"
         default 0x40
         help
             I2C address of INA219. The default is A1 pin to GND, and A0 pin to
