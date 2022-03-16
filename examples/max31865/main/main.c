@@ -16,34 +16,49 @@
 #define HOST    SPI2_HOST
 #endif
 
-#define PIN_NUM_MOSI 23
-#define PIN_NUM_MISO 19
-#define PIN_NUM_CLK  18
-#define PIN_NUM_CS   5
+#if CONFIG_EXAMPLE_CONN_2WIRE
+#define RTD_CONNECTION MAX31865_2WIRE
+#endif
+#if CONFIG_EXAMPLE_CONN_3WIRE
+#define RTD_CONNECTION MAX31865_3WIRE
+#endif
+#if CONFIG_EXAMPLE_CONN_4WIRE
+#define RTD_CONNECTION MAX31865_4WIRE
+#endif
 
-#define RTD_STANDARD MAX31865_ITS90   // ITS-90
-#define RTD_NOMINAL 100               // 100 Ohm, PT100
-#define RTD_REFERENCE 430             // Rref = 430 Ohm
-#define RTD_CONNECTION MAX31865_2WIRE // 2-wire connection configuration
+#if CONFIG_EXAMPLE_SCALE_ITS90
+#define RTD_STANDARD MAX31865_ITS90
+#endif
+#if CONFIG_EXAMPLE_SCALE_DIN43760
+#define RTD_STANDARD MAX31865_DIN43760
+#endif
+#if CONFIG_EXAMPLE_SCALE_US
+#define RTD_STANDARD MAX31865_US_INDUSTRIAL
+#endif
+
+#if CONFIG_EXAMPLE_FILTER_50
+#define FILTER MAX31865_FILTER_50HZ
+#endif
+#if CONFIG_EXAMPLE_FILTER_60
+#define FILTER MAX31865_FILTER_60HZ
+#endif
 
 static const char *TAG = "max31865-example";
 
 static max31865_config_t config = {
     .v_bias = true,
-    .filter = MAX31865_FILTER_50HZ,
+    .filter = FILTER,
     .mode = MAX31865_MODE_SINGLE,
     .connection = RTD_CONNECTION
 };
 
 static void task(void *pvParameter)
 {
-    esp_err_t res;
-
     // Configure SPI bus
     spi_bus_config_t cfg = {
-       .mosi_io_num = PIN_NUM_MOSI,
-       .miso_io_num = PIN_NUM_MISO,
-       .sclk_io_num = PIN_NUM_CLK,
+       .mosi_io_num = CONFIG_EXAMPLE_MOSI_GPIO,
+       .miso_io_num = CONFIG_EXAMPLE_MISO_GPIO,
+       .sclk_io_num = CONFIG_EXAMPLE_SCLK_GPIO,
        .quadwp_io_num = -1,
        .quadhd_io_num = -1,
        .max_transfer_sz = 0,
@@ -54,10 +69,10 @@ static void task(void *pvParameter)
     // Init device
     max31865_t dev = {
         .standard = RTD_STANDARD,
-        .r_ref = RTD_REFERENCE,
-        .rtd_nominal = RTD_NOMINAL,
+        .r_ref = CONFIG_EXAMPLE_RTD_REF,
+        .rtd_nominal = CONFIG_EXAMPLE_RTD_NOMINAL,
     };
-    ESP_ERROR_CHECK(max31865_init_desc(&dev, HOST, PIN_NUM_CS));
+    ESP_ERROR_CHECK(max31865_init_desc(&dev, HOST, CONFIG_EXAMPLE_CS_GPIO));
 
     // Configure device
     ESP_ERROR_CHECK(max31865_set_config(&dev, &config));
