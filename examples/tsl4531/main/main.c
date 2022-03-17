@@ -3,15 +3,6 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <tsl4531.h>
-#include <string.h>
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -19,10 +10,9 @@
 
 void tsl4531_test(void *pvParameters)
 {
-    tsl4531_t dev;
-    memset(&dev, 0, sizeof(tsl4531_t));
+    tsl4531_t dev = { 0 };
 
-    ESP_ERROR_CHECK(tsl4531_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(tsl4531_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     ESP_ERROR_CHECK(tsl4531_init(&dev));
     ESP_ERROR_CHECK(tsl4531_config(&dev, TSL4531_INTEGRATION_400MS, true));
@@ -36,8 +26,8 @@ void tsl4531_test(void *pvParameters)
         else
             printf("Lux: %u\n", lux);
 
-        // 0.05 second delay
-        vTaskDelay(pdMS_TO_TICKS(50));
+        // 0.5 second delay
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
