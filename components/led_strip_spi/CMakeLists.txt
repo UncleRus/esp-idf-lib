@@ -9,3 +9,4 @@ idf_component_register(
     INCLUDE_DIRS .
     REQUIRES ${req}
 )
+target_compile_options(${COMPONENT_LIB} PRIVATE -Werror=override-init)
