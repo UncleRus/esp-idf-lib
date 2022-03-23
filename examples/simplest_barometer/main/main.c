@@ -7,15 +7,6 @@
 #include <bmp280.h>
 #include <string.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-#define I2C_ADDR 0x27
-
 static i2c_dev_t pcf8574;
 
 static esp_err_t write_lcd_data(const hd44780_t *lcd, uint8_t data)
@@ -43,14 +34,14 @@ void lcd_test(void *pvParameters)
 
     // Prepare PCF8574
     memset(&pcf8574, 0, sizeof(i2c_dev_t));
-    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, I2C_ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pcf8574_init_desc(&pcf8574, CONFIG_EXAMPLE_I2C_PCF8574_ADDRESS, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // Prepare BMP280
     bmp280_params_t params;
     bmp280_init_default_params(&params);
     bmp280_t dev;
     memset(&dev, 0, sizeof(bmp280_t));
-    ESP_ERROR_CHECK(bmp280_init_desc(&dev, BMP280_I2C_ADDRESS_0, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(bmp280_init_desc(&dev, BMP280_I2C_ADDRESS_0, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(bmp280_init(&dev, &params));
 
     // Init screen, switch backlight on
