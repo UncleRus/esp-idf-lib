@@ -4,14 +4,6 @@
  * It shows different user task implementation: either low level or high level
  * functions are used.
  *
- * Hardware configuration:
- *
- *    +-----------------+     +----------+
- *    |     ESP32       |     | SHT4x    |
- *    |                 |     |          |
- *    |   GPIO 16 (SCL) ------> SCL      |
- *    |   GPIO 17 (SDA) <-----> SDA      |
- *    +-----------------+     +----------+
  */
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
@@ -26,27 +18,14 @@
  * example. see sdkconfig.defaults.esp8266
  */
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
 static sht4x_t dev;
 
-#if defined(CONFIG_SHT4X_DEMO_LL)
+#if defined(CONFIG_EXAMPLE_SHT4X_DEMO_LL)
 
-/*
- * User task that triggers a measurement every 5 seconds.
- * In this example it starts the measurement, waits for the results and
- * fetches the results using separate functions
- */
 void task(void *pvParameters)
 {
     float temperature;
@@ -75,11 +54,6 @@ void task(void *pvParameters)
 }
 
 #else
-/*
- * User task that triggers a measurement every 5 seconds.
- * In this example it uses the high level function *sht4x_measure*
- * to perform one measurement in each cycle.
- */
 void task(void *pvParameters)
 {
     float temperature;
@@ -105,7 +79,7 @@ void app_main()
     ESP_ERROR_CHECK(i2cdev_init());
     memset(&dev, 0, sizeof(sht4x_t));
 
-    ESP_ERROR_CHECK(sht4x_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sht4x_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(sht4x_init(&dev));
 
     xTaskCreatePinnedToCore(task, "sht4x_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
