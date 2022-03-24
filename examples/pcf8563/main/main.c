@@ -5,20 +5,12 @@
 #include <string.h>
 #include <esp_err.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 void test(void *pvParameters)
 {
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(pcf8563_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pcf8563_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // setup datetime: 2020-04-03 12:35, Sunday
     struct tm time = {
