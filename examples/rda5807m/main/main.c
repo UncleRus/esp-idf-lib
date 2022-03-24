@@ -7,14 +7,6 @@
 
 #define I2C_PORT 0
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
@@ -53,7 +45,7 @@ static void test(void *pvParameters)
     dev.i2c_dev.cfg.scl_pullup_en = true;
     dev.i2c_dev.cfg.sda_pullup_en = true;
 
-    ESP_ERROR_CHECK(rda5807m_init_desc(&dev, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(rda5807m_init_desc(&dev, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(rda5807m_init(&dev, RDA5807M_CLK_32768HZ));
 
     xTaskCreatePinnedToCore(display, "display", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL, APP_CPU_NUM);
