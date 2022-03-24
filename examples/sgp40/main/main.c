@@ -53,7 +53,7 @@ void task(void *pvParamters)
 
     // setup SGP40
     memset(&sgp, 0, sizeof(sgp));
-    ESP_ERROR_CHECK(sgp40_init_desc(&sgp, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sgp40_init_desc(&sgp, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(sgp40_init(&sgp));
     ESP_LOGI(TAG, "SGP40 initilalized. Serial: 0x%04x%04x%04x",
             sgp.serial[0], sgp.serial[1], sgp.serial[2]);
