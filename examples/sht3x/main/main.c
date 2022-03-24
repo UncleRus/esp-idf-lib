@@ -4,16 +4,8 @@
  * It shows different user task implementations in *single shot mode* and
  * *periodic mode*. In *single shot* mode either low level or high level
  * functions are used.
- *
- * Hardware configuration:
- *
- *    +-----------------+     +----------+
- *    |     ESP32 |     | SHT3x    |
- *    |                 |     |          |
- *    |   GPIO 16 (SCL) ------> SCL      |
- *    |   GPIO 17 (SDA) <-----> SDA      |
- *    +-----------------+     +----------+
  */
+
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -27,23 +19,13 @@
  * example. see sdkconfig.defaults.esp8266
  */
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define ADDR SHT3X_I2C_ADDR_GND
-
 static sht3x_t dev;
 
-#if defined(CONFIG_SHT3X_DEMO_SSHL)
+#if defined(CONFIG_EXAMPLE_SHT3X_DEMO_HL)
 
 /*
  * User task that triggers a measurement every 5 seconds. Due to power
@@ -68,7 +50,7 @@ void task(void *pvParameters)
     }
 }
 
-#elif defined(CONFIG_SHT3X_DEMO_SSLL)
+#elif defined(CONFIG_EXAMPLE_SHT3X_DEMO_LL)
 
 /*
  * User task that triggers a measurement every 5 seconds. Due to power
@@ -145,7 +127,7 @@ void app_main()
     ESP_ERROR_CHECK(i2cdev_init());
     memset(&dev, 0, sizeof(sht3x_t));
 
-    ESP_ERROR_CHECK(sht3x_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sht3x_init_desc(&dev, CONFIG_EXAMPLE_SHT3X_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(sht3x_init(&dev));
 
     xTaskCreatePinnedToCore(task, "sh301x_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
