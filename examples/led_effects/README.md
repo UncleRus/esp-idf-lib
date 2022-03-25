@@ -1,4 +1,4 @@
-# Example for `led_effects` driver
+# Example for `led_strip` driver
 
 ## What it does
 
@@ -15,3 +15,8 @@ default).
 | Name | Description | Defaults |
 |------|-------------|----------|
 | `EXAMPLE_LED_GPIO` | GPIO number for `DIN`, the signal line for `WS2812` | "5" |
+
+## Powering
+
+The current consumption of so many LEDs (256 by default) can be very high.
+Please power the LED matrix from a separate high power +5V power supply.
