@@ -22,8 +22,6 @@
 
 void task(void *pvParameter)
 {
-    esp_err_t res;
-
     // Configure SPI bus
     spi_bus_config_t cfg = {
        .mosi_io_num = PIN_NUM_MOSI,
