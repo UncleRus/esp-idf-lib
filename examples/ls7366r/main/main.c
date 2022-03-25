@@ -11,8 +11,8 @@
 #include <esp_idf_lib_helpers.h>
 
 
-#define TEST_PIN 25
-#define INTR_PIN 4
+#define TEST_PIN CONFIG_EXAMPLE_PIN_NUM_TEST
+#define INTR_PIN CONFIG_EXAMPLE_PIN_NUM_INTR
 #define GPIO_OUTPUT_PIN_SEL (1ULL << TEST_PIN)
 #define GPIO_INPUT_PIN_SEL (1ULL << INTR_PIN)
 
@@ -22,10 +22,10 @@
 #define LS7366R_HOST VSPI_HOST
 #endif
 
-#define PIN_NUM_MISO 19
-#define PIN_NUM_MOSI 23
-#define PIN_NUM_SCLK 18
-#define PIN_NUM_CS 5
+#define PIN_NUM_MISO CONFIG_EXAMPLE_PIN_NUM_MISO
+#define PIN_NUM_MOSI CONFIG_EXAMPLE_PIN_NUM_MOSI
+#define PIN_NUM_SCLK CONFIG_EXAMPLE_PIN_NUM_CLK
+#define PIN_NUM_CS CONFIG_EXAMPLE_PIN_NUM_CS
 
 static const char TAG[] = "main";
 
