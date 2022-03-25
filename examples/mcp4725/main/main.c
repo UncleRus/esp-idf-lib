@@ -4,14 +4,6 @@
 #include <mcp4725.h>
 #include <string.h>
 
-#define ADDR MCP4725A0_I2C_ADDR0
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
 #define VDD 3.3
 
 static void wait_for_eeprom(i2c_dev_t *dev)
@@ -33,7 +25,7 @@ void task(void *pvParameters)
     memset(&dev, 0, sizeof(i2c_dev_t));
 
     // Init device descriptor
-    ESP_ERROR_CHECK(mcp4725_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(mcp4725_init_desc(&dev, CONFIG_EXAMPLE_I2C_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     mcp4725_power_mode_t pm;
     ESP_ERROR_CHECK(mcp4725_get_power_mode(&dev, true, &pm));
