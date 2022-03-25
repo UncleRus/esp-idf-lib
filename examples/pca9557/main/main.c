@@ -5,27 +5,12 @@
 #include <driver/gpio.h>
 #include <string.h>
 
-// PCA9557 - A0, A1, A2 pins are grounded
-#define ADDR PCA9557_I2C_ADDR_BASE
-// PCA9537
-//#define ADDR PCA9537_I2C_ADDR
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define INT_GPIO 16
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define INT_GPIO 19
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 void test(void *pvParameters)
 {
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(pca9557_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pca9557_init_desc(&dev, CONFIG_EXAMPLE_I2C_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // Setup IO0 as input, IO1-IO7 as outputs
     ESP_ERROR_CHECK(pca9557_port_set_mode(&dev, 0x01));
