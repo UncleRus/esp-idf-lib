@@ -8,8 +8,8 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define SCROLL_DELAY 50
-#define CASCADE_SIZE 1
+#define SCROLL_DELAY CONFIG_EXAMPLE_SCROLL_DELAY
+#define CASCADE_SIZE CONFIG_EXAMPLE_CASCADE_SIZE
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
 #define HOST    HSPI_HOST
@@ -17,9 +17,9 @@
 #define HOST    SPI2_HOST
 #endif
 
-#define PIN_NUM_MOSI 19
-#define PIN_NUM_CLK  18
-#define PIN_NUM_CS   5
+#define PIN_NUM_MOSI CONFIG_EXAMPLE_PIN_NUM_MOSI
+#define PIN_NUM_CLK  CONFIG_EXAMPLE_PIN_NUM_CLK
+#define PIN_NUM_CS   CONFIG_EXAMPLE_PIN_CS
 
 static const uint64_t symbols[] = {
     0x383838fe7c381000, // arrows
