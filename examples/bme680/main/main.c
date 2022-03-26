@@ -5,10 +5,13 @@
 #include <bme680.h>
 #include <string.h>
 
-#define SDA_GPIO 16
-#define SCL_GPIO 17
 #define PORT 0
+#if defined(CONFIG_EXAMPLE_I2C_ADDRESS_0)
 #define ADDR BME680_I2C_ADDR_0
+#endif
+#if defined(CONFIG_EXAMPLE_I2C_ADDRESS_1)
+#define ADDR BME680_I2C_ADDR_1
+#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -19,7 +22,7 @@ void bme680_test(void *pvParameters)
     bme680_t sensor;
     memset(&sensor, 0, sizeof(bme680_t));
 
-    ESP_ERROR_CHECK(bme680_init_desc(&sensor, ADDR, PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(bme680_init_desc(&sensor, ADDR, PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // init the sensor
     ESP_ERROR_CHECK(bme680_init_sensor(&sensor));

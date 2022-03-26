@@ -4,16 +4,6 @@
 #include <si7021.h>
 #include <string.h>
 
-#define CHIP_TYPE_SI70xx  // comment this line for SHT2x/HTU21D
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
@@ -23,9 +13,9 @@ void task(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(si7021_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(si7021_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
-#ifdef CHIP_TYPE_SI70xx
+#ifdef CONFIG_EXAMPLE_CHIP_TYPE_SI70xx
     uint64_t serial;
     si7021_device_id_t id;
 
@@ -55,6 +45,11 @@ void task(void *pvParameters)
 
     float val;
     esp_err_t res;
+
+    /* wait for the device to boot. HTU21D sometimes fails to return data
+     * at the initial reading. the datasheet does not say anything about
+     * startup sequence. */
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
     while (1)
     {

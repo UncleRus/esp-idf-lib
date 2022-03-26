@@ -8,7 +8,7 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define DELAY 2000
+#define DELAY CONFIG_EXAMPLE_DELAY
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
 #define HOST    HSPI_HOST
@@ -16,14 +16,12 @@
 #define HOST    SPI2_HOST
 #endif
 
-#define PIN_NUM_MOSI 19
-#define PIN_NUM_CLK  18
-#define PIN_NUM_CS   5
+#define PIN_NUM_MOSI CONFIG_EXAMPLE_PIN_NUM_MOSI
+#define PIN_NUM_CLK  CONFIG_EXAMPLE_PIN_NUM_CLK
+#define PIN_NUM_CS   CONFIG_EXAMPLE_PIN_NUM_CS
 
 void task(void *pvParameter)
 {
-    esp_err_t res;
-
     // Configure SPI bus
     spi_bus_config_t cfg = {
        .mosi_io_num = PIN_NUM_MOSI,

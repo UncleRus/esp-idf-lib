@@ -7,14 +7,6 @@
 #include <esp_err.h>
 #include <string.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
@@ -27,7 +19,7 @@ void test(void *pvParameters)
     memset(&dev, 0, sizeof(ccs811_dev_t)); // Zero descriptor
 
     ESP_LOGI(TAG, "Descriptor initialization");
-    ESP_ERROR_CHECK(ccs811_init_desc(&dev, CCS811_I2C_ADDRESS_1, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(ccs811_init_desc(&dev, CCS811_I2C_ADDRESS_1, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // Once I2C descreiptor initialized, function `ccs811_init()` has to be called
     // for each CCS811 sensor to initialize the sensor and to check its availability

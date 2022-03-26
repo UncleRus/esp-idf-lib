@@ -6,9 +6,6 @@
 
 #define TAG "MHZ19BDEMO"
 
-#define MHZ19B_TX 12
-#define MHZ19B_RX 13
-
 void app_main(void)
 {
 	int16_t co2;
@@ -17,7 +14,7 @@ void app_main(void)
 	uint16_t range;
 	bool autocal;
 
-	ESP_ERROR_CHECK(mhz19b_init(&dev, UART_NUM_1, MHZ19B_TX, MHZ19B_RX));
+	ESP_ERROR_CHECK(mhz19b_init(&dev, UART_NUM_1, CONFIG_EXAMPLE_UART_TX, CONFIG_EXAMPLE_UART_RX));
 
 	while (!mhz19b_detect(&dev))
 	{

@@ -7,14 +7,6 @@
 
 static const char *TAG = "scd30-example";
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 14
-#define SCL_GPIO 15
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
@@ -23,7 +15,7 @@ void task(void *pvParameters)
 {
     i2c_dev_t dev = {0};
 
-    ESP_ERROR_CHECK(scd30_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(scd30_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     uint16_t version, major_ver, minor_ver;
     ESP_ERROR_CHECK(scd30_read_firmware_version(&dev, &version));

@@ -5,32 +5,32 @@
 #include <string.h>
 
 #define I2C_PORT 0
-#define I2C_ADDR INA3221_I2C_ADDR_GND
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #define WARNING_CHANNEL 1
 #define WARNING_CURRENT (40.0)
 
 //#define STRUCT_SETTING 0
+#if defined EXAMPLE_MEASURING_MODE_TRIGGER
 #define MODE false  // true : continuous  measurements // false : trigger measurements
+#else
+#define MODE true
+#endif
 
 void task(void *pvParameters)
 {
     ina3221_t dev = {
-            .shunt = { 100, 100, 100 },         // shunt values are 100 mOhm for each channel
+            /* shunt values are 100 mOhm for each channel */
+            .shunt = {
+                CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM,
+                CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM,
+                CONFIG_EXAMPLE_SHUNT_RESISTOR_MILLI_OHM
+            },
             .config.config_register = INA3221_DEFAULT_CONFIG,
             .mask.mask_register = INA3221_DEFAULT_MASK
     };
     memset(&dev.i2c_dev, 0, sizeof(i2c_dev_t));
 
     ESP_ERROR_CHECK(i2cdev_init());
-    ESP_ERROR_CHECK(ina3221_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(ina3221_init_desc(&dev, CONFIG_EXAMPLE_I2C_ADDR, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
 #ifndef STRUCT_SETTING
     ESP_ERROR_CHECK(ina3221_set_options(&dev, MODE, true, true));    // Mode selection, bus and shunt activated
@@ -63,7 +63,7 @@ void task(void *pvParameters)
     {
         measure_number++;
 
-#if !MODE
+#if CONFIG_EXAMPLE_MEASURING_MODE_TRIGGER
         ESP_ERROR_CHECK(ina3221_trigger(&dev)); // Start a measure
         printf("trig done, wait: ");
         do

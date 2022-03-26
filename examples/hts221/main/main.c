@@ -4,17 +4,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <hts221.h>
-#include <sdkconfig.h>
-#include <stdio.h>
-#include <string.h>
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 2
-#define SCL_GPIO 3
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -27,7 +16,7 @@ void task(void *pvParameters)
     hts221_t dev = { 0 };
 
     // Initialize HTS221 descriptor and setup HTS221 to default values according to datasheet.
-    ESP_ERROR_CHECK(hts221_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(hts221_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(hts221_init(&dev));
     // Set data rate to 1Hz
     ESP_ERROR_CHECK(hts221_set_data_rate(&dev, HTS221_1HZ));

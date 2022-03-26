@@ -5,14 +5,12 @@
 #include <bh1750.h>
 #include <string.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
+#if defined(CONFIG_EXAMPLE_I2C_ADDRESS_LO)
 #define ADDR BH1750_ADDR_LO
+#endif
+#if defined(CONFIG_EXAMPLE_I2C_ADDRESS_HI)
+#define ADDR BH1750_ADDR_HI
+#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -23,7 +21,7 @@ void test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t)); // Zero descriptor
 
-    ESP_ERROR_CHECK(bh1750_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(bh1750_init_desc(&dev, ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(bh1750_setup(&dev, BH1750_MODE_CONTINUOUS, BH1750_RES_HIGH));
 
     while (1)

@@ -22,16 +22,16 @@
 
 static const char *TAG = "led_effect_example";
 
-#define LED_GPIO 5
+#define LED_GPIO CONFIG_EXAMPLE_LED_GPIO
 #define LED_TYPE LED_STRIP_WS2812
 
-#define LED_MATRIX_WIDTH  16
-#define LED_MATRIX_HEIGHT 16
-#define LED_BRIGHTNESS 20 // 0..255
+#define LED_MATRIX_WIDTH  CONFIG_EXAMPLE_LED_MATRIX_WIDTH
+#define LED_MATRIX_HEIGHT CONFIG_EXAMPLE_LED_MATRIX_HEIGHT
+#define LED_BRIGHTNESS CONFIG_EXAMPLE_LED_BRIGHTNESS // 0..255
 
-#define FPS 60
+#define FPS CONFIG_EXAMPLE_FPS
 
-#define SWITCH_PERIOD_MS 5000
+#define SWITCH_PERIOD_MS CONFIG_EXAMPLE_SWITCH_PERIOD_MS
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 

@@ -15,6 +15,7 @@ components:
     thread_safe: yes
     targets:
       - name: esp32
+      - name: esp32c3
       - name: esp8266
     licenses:
       - name: BSD-3

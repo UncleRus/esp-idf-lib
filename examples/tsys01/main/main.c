@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <string.h>
 #include <tsys01.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
+#if CONFIG_EXAMPLE_I2C_ADDRESS1
+#define ADDRESS TSYS01_I2C_ADDR1
 #else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#define ADDRESS TSYS01_I2C_ADDR2
 #endif
+
 #define I2C_PORT 0
 
 #ifndef APP_CPU_NUM
@@ -19,10 +17,9 @@
 
 void task(void *arg)
 {
-    tsys01_t dev;
-    memset(&dev, 0, sizeof(tsys01_t));
+    tsys01_t dev = { 0 };
 
-    ESP_ERROR_CHECK(tsys01_init_desc(&dev, TSYS01_I2C_ADDR1, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(tsys01_init_desc(&dev, ADDRESS, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(tsys01_init(&dev));
 
     printf("Device serial number: 0x%06x\n", dev.serial);

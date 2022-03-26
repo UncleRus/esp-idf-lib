@@ -16,21 +16,11 @@
  * example. see sdkconfig.defaults.esp8266
  */
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
 static const char *TAG = "sgp40-example";
-
-#define SHT_ADDR SHT3X_I2C_ADDR_GND
 
 static const char *voc_index_name(int32_t voc_index)
 {
@@ -55,7 +45,7 @@ void task(void *pvParamters)
 
     // setup SHT3x
     memset(&sht, 0, sizeof(sht));
-    ESP_ERROR_CHECK(sht3x_init_desc(&sht, 0, SHT_ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sht3x_init_desc(&sht, 0, CONFIG_EXAMPLE_SHT3X_ADDR, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(sht3x_init(&sht));
     // Start periodic measurements with 2 measurements per second.
     ESP_ERROR_CHECK(sht3x_start_measurement(&sht, SHT3X_PERIODIC_2MPS, SHT3X_HIGH));
@@ -63,7 +53,7 @@ void task(void *pvParamters)
 
     // setup SGP40
     memset(&sgp, 0, sizeof(sgp));
-    ESP_ERROR_CHECK(sgp40_init_desc(&sgp, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(sgp40_init_desc(&sgp, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(sgp40_init(&sgp));
     ESP_LOGI(TAG, "SGP40 initilalized. Serial: 0x%04x%04x%04x",
             sgp.serial[0], sgp.serial[1], sgp.serial[2]);

@@ -5,15 +5,18 @@
 #include <string.h>
 #include <esp_log.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#if defined(CONFIG_EXAMPLE_DS3502_ADDR_0)
+#define ADDR DS3502_ADDR_0
 #endif
-
-#define I2C_ADDR DS3502_ADDR_0
+#if defined(CONFIG_EXAMPLE_DS3502_ADDR_1)
+#define ADDR DS3502_ADDR_1
+#endif
+#if defined(CONFIG_EXAMPLE_DS3502_ADDR_2)
+#define ADDR DS3502_ADDR_2
+#endif
+#if defined(CONFIG_EXAMPLE_DS3502_ADDR_3)
+#define ADDR DS3502_ADDR_3
+#endif
 
 static const char *TAG = "ds3502_test";
 
@@ -25,7 +28,7 @@ void test(void *pvParameters)
     memset(&dev, 0, sizeof(i2c_dev_t));
 
     // Initialize i2c device descriptor
-    ESP_ERROR_CHECK(ds3502_init_desc(&dev, 0, I2C_ADDR, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(ds3502_init_desc(&dev, 0, ADDR, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // Initialize potentiometer
     ESP_ERROR_CHECK(ds3502_init(&dev));

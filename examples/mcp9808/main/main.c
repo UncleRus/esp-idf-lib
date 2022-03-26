@@ -11,19 +11,9 @@
  * example. see sdkconfig.defaults.esp8266
  */
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
-
-#define ADDR MCP9808_I2C_ADDR_000
 
 void task(void *pvParameters)
 {
@@ -33,7 +23,7 @@ void task(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(mcp9808_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(mcp9808_init_desc(&dev, CONFIG_EXAMPLE_I2C_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(mcp9808_init(&dev));
 
     while (1)

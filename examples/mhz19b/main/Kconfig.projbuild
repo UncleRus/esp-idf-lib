@@ -1,0 +1,17 @@
+menu "Example configuration"
+    config EXAMPLE_UART_TX
+        int "UART TX pin number"
+        default 15 if IDF_TARGET_ESP8266
+        default 18 if IDF_TARGET_ESP32C3
+        default 12 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for UART TX line.
+
+    config EXAMPLE_UART_RX
+        int "UART RX pin number"
+        default 13 if IDF_TARGET_ESP8266
+        default 19 if IDF_TARGET_ESP32C3
+        default 13 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for UART RX line.
+endmenu

@@ -4,29 +4,9 @@
 #include <qmc5883l.h>
 #include <string.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
-
-static void wait_for_data(qmc5883l_t *dev)
-{
-    while (true)
-    {
-        bool ready;
-        ESP_ERROR_CHECK(qmc5883l_data_ready(dev, &ready));
-        if (ready)
-            return;
-        vTaskDelay(1);
-    }
-}
 
 void qmc5883l_test(void *pvParameters)
 {
@@ -35,15 +15,13 @@ void qmc5883l_test(void *pvParameters)
     memset(&dev, 0, sizeof(qmc5883l_t));
 
     ESP_ERROR_CHECK(i2cdev_init());
-    ESP_ERROR_CHECK(qmc5883l_init_desc(&dev, QMC5883L_I2C_ADDR_DEF, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(qmc5883l_init_desc(&dev, QMC5883L_I2C_ADDR_DEF, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // 50Hz data rate, 128 samples, -2G..+2G range
     ESP_ERROR_CHECK(qmc5883l_set_config(&dev, QMC5883L_DR_50, QMC5883L_OSR_128, QMC5883L_RNG_2));
 
     while (1)
     {
-        wait_for_data(&dev);
-
         qmc5883l_data_t data;
         if (qmc5883l_get_data(&dev, &data) == ESP_OK)
             /* float is used in printf(). you need non-default configuration in

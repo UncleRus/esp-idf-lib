@@ -1,35 +1,31 @@
-#include <stdio.h>
+#include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ms5611.h>
-#include <string.h>
 
-#define I2C_ADDR MS5611_ADDR_CSB_LOW
-#define I2C_PORT 0
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
+#ifdef CONFIG_EXAMPLE_I2C_ADDRESS_LOW
+#define ADDR MS5611_ADDR_CSB_LOW
+#endif
+#ifdef CONFIG_EXAMPLE_I2C_ADDRESS_HIGH
+#define ADDR MS5611_ADDR_CSB_HIGH
 #endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define OVERSAMPLING_RATIO MS5611_OSR_1024
+static const char *TAG = "ms5611-example";
 
 void ms5611_test(void *pvParameters)
 {
-    ms5611_t dev;
-    memset(&dev, 0, sizeof(ms5611_t));
+    ms5611_t dev = { 0 };
 
-    ESP_ERROR_CHECK(ms5611_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
-    ESP_ERROR_CHECK(ms5611_init(&dev, OVERSAMPLING_RATIO));
+    ESP_ERROR_CHECK(ms5611_init_desc(&dev, ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
+    ESP_ERROR_CHECK(ms5611_init(&dev, MS5611_OSR_1024));
 
     float temperature;
     int32_t pressure;
+    esp_err_t res;
 
     while (1)
     {
@@ -37,9 +33,10 @@ void ms5611_test(void *pvParameters)
         // dev.osr = MS5611_OSR_256
 
         vTaskDelay(pdMS_TO_TICKS(500));
-        if (ms5611_get_sensor_data(&dev, &pressure, &temperature) != ESP_OK)
+        res = ms5611_get_sensor_data(&dev, &pressure, &temperature);
+        if (res != ESP_OK)
         {
-            printf("Temperature/pressure reading failed\n");
+            ESP_LOGE(TAG, "Temperature/pressure reading failed: %d (%s)", res, esp_err_to_name(res));
             continue;
         }
 
@@ -47,7 +44,7 @@ void ms5611_test(void *pvParameters)
          * sdkconfig for ESP8266, which is enabled by default for this
          * example. see sdkconfig.defaults.esp8266
          */
-        printf("Pressure: %d Pa, Temperature: %.2f C\n", pressure, temperature);
+        ESP_LOGI(TAG, "Pressure: %d Pa, Temperature: %.2f C\n", pressure, temperature);
     }
 }
 

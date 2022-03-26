@@ -4,15 +4,6 @@
 #include <pcf8591.h>
 #include <string.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-#define ADDR PCF8591_DEFAULT_ADDRESS
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
@@ -22,7 +13,7 @@ void pcf8591_test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(pcf8591_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pcf8591_init_desc(&dev, PCF8591_DEFAULT_ADDRESS, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     while (1)
     {

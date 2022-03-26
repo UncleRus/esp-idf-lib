@@ -6,19 +6,9 @@
 #include <esp_log.h>
 
 #define ADDR PCA9685_ADDR_BASE
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
-
-#define PWM_FREQ_HZ 1500
 
 static const char *TAG = "pca9685_test";
 
@@ -27,16 +17,16 @@ void pca9685_test(void *pvParameters)
     i2c_dev_t dev;
     memset(&dev, 0, sizeof(i2c_dev_t));
 
-    ESP_ERROR_CHECK(pca9685_init_desc(&dev, ADDR, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(pca9685_init_desc(&dev, ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(pca9685_init(&dev));
 
     ESP_ERROR_CHECK(pca9685_restart(&dev));
 
     uint16_t freq;
-    ESP_ERROR_CHECK(pca9685_set_pwm_frequency(&dev, PWM_FREQ_HZ));
+    ESP_ERROR_CHECK(pca9685_set_pwm_frequency(&dev, CONFIG_EXAMPLE_PWM_FREQ_HZ));
     ESP_ERROR_CHECK(pca9685_get_pwm_frequency(&dev, &freq));
 
-    ESP_LOGI(TAG, "Freq %dHz, real %d", PWM_FREQ_HZ, freq);
+    ESP_LOGI(TAG, "Freq %dHz, real %d", CONFIG_EXAMPLE_PWM_FREQ_HZ, freq);
 
     uint16_t val = 0;
     while (1)

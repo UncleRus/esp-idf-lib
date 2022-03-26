@@ -7,14 +7,6 @@
 #include <esp_err.h>
 #include <esp_log.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
-
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
@@ -25,7 +17,7 @@ void task(void *pvParameters)
 {
     hdc1000_t dev = { 0 };
 
-    ESP_ERROR_CHECK(hdc1000_init_desc(&dev, HDC1000_I2C_ADDRESS_0, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(hdc1000_init_desc(&dev, CONFIG_EXAMPLE_I2C_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(hdc1000_init(&dev));
 
     uint32_t serial[2];

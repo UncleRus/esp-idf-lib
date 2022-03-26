@@ -6,14 +6,7 @@
 #include <esp_log.h>
 
 #define I2C_PORT 0
-#define I2C_ADDR INA260_ADDR(INA260_ADDR_PIN_GND, INA260_ADDR_PIN_GND)
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
+#define I2C_ADDR CONFIG_EXAMPLE_I2C_ADDR
 
 void wait_for_sensor(ina260_t *dev)
 {
@@ -33,7 +26,7 @@ void task(void *pvParameters)
     ina260_t dev;
     memset(&dev, 0, sizeof(ina260_t));
 
-    ESP_ERROR_CHECK(ina260_init_desc(&dev, I2C_ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(ina260_init_desc(&dev, I2C_ADDR, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     printf("Initializing ina260\n");
     ESP_ERROR_CHECK(ina260_init(&dev));
 

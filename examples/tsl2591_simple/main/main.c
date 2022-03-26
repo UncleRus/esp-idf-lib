@@ -3,15 +3,6 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <tsl2591.h>
-#include <string.h>
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 18
-#define SCL_GPIO 19
-#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -19,10 +10,9 @@
 
 void tsl2591_test(void *pvParameters)
 {
-    tsl2591_t dev;
-    memset(&dev, 0, sizeof(tsl2591_t));
+    tsl2591_t dev = { 0 };
 
-    ESP_ERROR_CHECK(tsl2591_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(tsl2591_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(tsl2591_init(&dev));
 
     float lux;

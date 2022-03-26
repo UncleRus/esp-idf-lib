@@ -22,13 +22,6 @@
 #include <esp_log.h>
 #include <lm75.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
 #define I2C_PORT 0
 
 #ifndef APP_CPU_NUM
@@ -63,7 +56,7 @@ void lm75_task(void *pvParameters)
     ESP_ERROR_CHECK(i2cdev_init());
 
     ESP_LOGI(TAG, "Initializing LM75 descriptor");
-    ESP_ERROR_CHECK(lm75_init_desc(&dev, LM75_I2C_ADDRESS_DEFAULT, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(lm75_init_desc(&dev, LM75_I2C_ADDRESS_DEFAULT, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     ESP_LOGI(TAG, "Initializing LM75");
     ESP_ERROR_CHECK(lm75_init(&dev, config));

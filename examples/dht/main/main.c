@@ -3,29 +3,28 @@
 #include <freertos/task.h>
 #include <dht.h>
 
-static const dht_sensor_type_t sensor_type = DHT_TYPE_AM2301;
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-static const gpio_num_t dht_gpio = 4;
-#else
-static const gpio_num_t dht_gpio = 17;
+#if defined(CONFIG_EXAMPLE_TYPE_DHT11)
+#define SENSOR_TYPE DHT_TYPE_DHT11
 #endif
-
+#if defined(CONFIG_EXAMPLE_TYPE_AM2301)
+#define SENSOR_TYPE DHT_TYPE_AM2301
+#endif
+#if defined(CONFIG_EXAMPLE_TYPE_SI7021)
+#define SENSOR_TYPE DHT_TYPE_SI7021
+#endif
 
 void dht_test(void *pvParameters)
 {
-    int16_t temperature = 0;
-    int16_t humidity = 0;
+    float temperature, humidity;
 
-    // DHT sensors that come mounted on a PCB generally have
-    // pull-up resistors on the data pin.  It is recommended
-    // to provide an external pull-up resistor otherwise...
-
-    //gpio_set_pull_mode(dht_gpio, GPIO_PULLUP_ONLY);
+#ifdef CONFIG_EXAMPLE_INTERNAL_PULLUP
+    gpio_set_pull_mode(dht_gpio, GPIO_PULLUP_ONLY);
+#endif
 
     while (1)
     {
-        if (dht_read_data(sensor_type, dht_gpio, &humidity, &temperature) == ESP_OK)
-            printf("Humidity: %d%% Temp: %dC\n", humidity / 10, temperature / 10);
+        if (dht_read_float_data(SENSOR_TYPE, CONFIG_EXAMPLE_DATA_GPIO, &humidity, &temperature) == ESP_OK)
+            printf("Humidity: %.1f%% Temp: %.1fC\n", humidity, temperature);
         else
             printf("Could not read data from sensor\n");
 

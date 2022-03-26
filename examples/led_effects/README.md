@@ -1,11 +1,22 @@
-# LED effects example
+# Example for `led_strip` driver
 
-This example works with a 16x16 matrix of WS2812b LEDs (256 pieces in total):
+## What it does
 
-Connect DIN input of matrix to GPIO 5 of ESP32.
+The example configures a matrix of `WS2812` LED
+(`CONFIG_EXAMPLE_LED_MATRIX_WIDTH` x `CONFIG_EXAMPLE_LED_MATRIX_HEIGHT`,
+`16x16` by default) at `CONFIG_EXAMPLE_LED_BRIGHTNESS` brightness (20 by
+default).
 
-Keep in mind that the power consumption of so many LEDs can be overwhelming!
-Use a 5V power supply with high output current to power the matrix or lower
-`LED_BRIGHTNESS`.
+It shows effects every `CONFIG_EXAMPLE_SWITCH_PERIOD_MS` (2000 millisecond by
+default).
 
-Example uses `frambuffer` component to render some effects.
+## Wiring
+
+| Name | Description | Defaults |
+|------|-------------|----------|
+| `EXAMPLE_LED_GPIO` | GPIO number for `DIN`, the signal line for `WS2812` | "5" |
+
+## Powering
+
+The current consumption of so many LEDs (256 by default) can be very high.
+Please power the LED matrix from a separate high power +5V power supply.

@@ -5,15 +5,6 @@
 #include <string.h>
 
 #define I2C_PORT 0
-#define ADDR MCP342X_ADDR_MIN
-
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-#define SDA_GPIO 4
-#define SCL_GPIO 5
-#else
-#define SDA_GPIO 16
-#define SCL_GPIO 17
-#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
@@ -30,7 +21,7 @@ static void task(void *arg)
     // Clear device descriptor
     memset(&adc, 0, sizeof(adc));
 
-    ESP_ERROR_CHECK(mcp342x_init_desc(&adc, ADDR, I2C_PORT, SDA_GPIO, SCL_GPIO));
+    ESP_ERROR_CHECK(mcp342x_init_desc(&adc, CONFIG_EXAMPLE_I2C_ADDR, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     adc.channel = CHANNEL;
     adc.gain = GAIN;

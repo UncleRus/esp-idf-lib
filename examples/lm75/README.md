@@ -1,4 +1,6 @@
-# What the example does
+# Example for `lm75` driver
+
+## What it does
 
 The example application initializes LM75 device. In a loop, it reads
 temperature value from the device, prints it to the console. During the loop,
@@ -11,23 +13,19 @@ The default I2C address, which is used in this example, is 0x48. Some breakout
 boards has A0, A1, and A2, for using different address. The address must be
 between `LM75_I2C_ADDRESS_DEFAULT` (0x48) and `LM75_I2C_ADDRESS_MAX` (0x4f).
 
-## Connecting
+## Wiring
 
-| LM75 | ESP8266 | ESP32  | NodeMCU | ESP32 Devkit |
-|------|---------|--------|---------|--------------|
-| SCL  | GPIO5   | GPIO17 | D1      | TX2          |
-| SDA  | GPIO4   | GPIO16 | D2      | RX2          |
+Connect `SCL` and `SDA` pins to the following pins with appropriate pull-up
+resistors.
 
-## `sdkconfig`
+| Name | Description | Defaults |
+|------|-------------|----------|
+| `CONFIG_EXAMPLE_I2C_MASTER_SCL` | GPIO number for `SCL` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
+| `CONFIG_EXAMPLE_I2C_MASTER_SDA` | GPIO number for `SDA` | "4" for `esp8266`, "5" for `esp32c3`, "18" for `esp32`, `esp32s2`, and `esp32s3` |
 
-For ESP32, no additional configuration is necessary.
+## Notes
 
-For ESP8266, the following non-default configuration is necessary.
-
-```text
-# [Component config] > [Newlib] > [newlib level], set `normal`
-CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL=y
-```
+`CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL` must be `y` on `esp8266`.
 
 ## Example output
 
