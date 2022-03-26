@@ -25,6 +25,8 @@ described below.
 | `D7`      | 7         |
 | `BL`      | 3         |
 
+![Module schematics](../hd44780_i2c/i2c_lcd.png?raw=true)
+
 Connect `SCL` and `SDA` pins on `PCF8574` module to the following pins with
 appropriate pull-up resistors.
 
