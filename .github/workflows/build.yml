@@ -130,14 +130,6 @@ jobs:
           submodules: recursive
           ref: master
 
-      - name: Fixup the SDK
-        run: |
-
-          # XXX workaround removed option, --no-site-packages, from virtualenv. should
-          # be removed when the following commit is merged
-          # https://github.com/espressif/esp-idf/commit/7a18f02acd7005f7c56e62175a8d1968a1a9019d
-          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
-
       - name: Run idf_tools.py install
         run: |
           ${IDF_PATH}/tools/idf_tools.py install
@@ -285,14 +277,6 @@ jobs:
           path: idf
           submodules: recursive
           ref: ${{ matrix.branch }}
-
-      - name: Fixup the SDK
-        run: |
-
-          # XXX workaround removed option, --no-site-packages, from virtualenv. should
-          # be removed when the following commit is merged
-          # https://github.com/espressif/esp-idf/commit/7a18f02acd7005f7c56e62175a8d1968a1a9019d
-          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
 
       - name: Cache esp-idf tools
 
@@ -726,11 +710,6 @@ jobs:
           submodules: recursive
           ref: ${{ matrix.branch }}
 
-      - name: Fixup the SDK
-        run: |
-
-          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
-
       - name: Cache esp-idf tools
 
         # cache esp-idf tools. each tagged branch has fixed versions of tools.
@@ -831,11 +810,6 @@ jobs:
           path: idf
           submodules: recursive
           ref: ${{ matrix.branch }}
-
-      - name: Fixup the SDK
-        run: |
-
-          sed -i -e "s/'--no-site-packages',//" ${IDF_PATH}/tools/idf_tools.py
 
       - name: Cache esp-idf tools
 
