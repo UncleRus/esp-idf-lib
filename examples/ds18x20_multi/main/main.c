@@ -5,14 +5,10 @@
 #include <esp_log.h>
 #include <esp_err.h>
 
-#if defined(CONFIG_IDF_TARGET_ESP8266)
-static const gpio_num_t SENSOR_GPIO = 4;
-#else
-static const gpio_num_t SENSOR_GPIO = 17;
-#endif
-static const uint32_t LOOP_DELAY_MS = 500;
-static const int MAX_SENSORS = 8;
+static const gpio_num_t SENSOR_GPIO = CONFIG_EXAMPLE_ONEWIRE_GPIO;
+static const int MAX_SENSORS = CONFIG_EXAMPLE_DS18X20_MAX_SENSORS;
 static const int RESCAN_INTERVAL = 8;
+static const uint32_t LOOP_DELAY_MS = 500;
 
 static const char *TAG = "ds18x20_test";
 
