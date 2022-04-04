@@ -1,0 +1,18 @@
+menu "Example configuration"
+    config EXAMPLE_ONEWIRE_GPIO
+        int "GPIO Number of 1-Wire bus, or DQ"
+        default 4 if IDF_TARGET_ESP8266
+        default 18 if IDF_TARGET_ESP32C3
+        default 17 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO Number of 1-Wire bus, or DQ. You might need an external
+            pullup resistor on the bus. See README.md for details.
+
+    config EXAMPLE_DS18X20_MAX_SENSORS
+        int "Number of ds18x20 sensors on the 1-Wire bus"
+        default 8
+        help
+            Max number of ds18x20 sensors on th 1-Wire bus. If number of
+            sensors on the bus more than this value found on the bus, the rest
+            of sensors will be ignored.
+endmenu
