@@ -47,8 +47,14 @@
 extern "C" {
 #endif
 
-#define MCP9600_ADDR 0x40
-#define MCP9601_ADDR 0x41
+/**
+ * Basic I2C address. Device support 8 addresses, ranging from 0x60 to 0x67.
+ */
+#define MCP960X_ADDR_BASE     0x60
+/**
+ * Default I2C address (ADDR pin is floating).
+ */
+#define MCP960X_ADDR_DEFAULT  0x67
 
 #define MCP960X_FILTER_OFF 0
 #define MCP960X_FILTER_MAX 7

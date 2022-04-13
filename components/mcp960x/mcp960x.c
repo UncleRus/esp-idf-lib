@@ -172,7 +172,7 @@ esp_err_t mcp960x_init_desc(mcp960x_t *dev, uint8_t addr, i2c_port_t port, gpio_
 {
     CHECK_ARG(dev);
 
-    if (addr != (MCP9600_ADDR) && addr != (MCP9601_ADDR))
+    if (addr < (MCP960X_ADDR_BASE) || addr > (MCP960X_ADDR_DEFAULT))
     {
         ESP_LOGE(TAG, "Invalid I2C address");
         return ESP_ERR_INVALID_ARG;

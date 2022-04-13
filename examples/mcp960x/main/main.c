@@ -5,7 +5,7 @@
 #include <string.h>
 
 #define I2C_PORT 0
-#define I2C_ADDR MCP9601_ADDR
+#define I2C_ADDR MCP960X_ADDR_DEFAULT
 #define SENSORS_COUNT 4
 
 /* 5 pins for 4 sensors */
