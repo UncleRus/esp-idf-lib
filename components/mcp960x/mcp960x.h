@@ -52,7 +52,7 @@ extern "C" {
  */
 #define MCP960X_ADDR_BASE     0x60
 /**
- * Default I2C address (ADDR pin is floating).
+ * Default I2C address (ADDR pin is connected to VDD or floating).
  */
 #define MCP960X_ADDR_DEFAULT  0x67
 
