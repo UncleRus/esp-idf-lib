@@ -132,6 +132,16 @@ esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev);
 esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev);
 
 /**
+ * @brief Check the availability of the device
+ *
+ * Issue a write operation to the I2C device then stops.
+ *
+ * @param dev Device descriptor
+ * @return ESP_OK if device is available
+ */
+esp_err_t i2c_dev_probe(const i2c_dev_t *dev);
+
+/**
  * @brief Read from slave device
  *
  * Issue a send operation of \p out_data register address, followed by reading \p in_size bytes

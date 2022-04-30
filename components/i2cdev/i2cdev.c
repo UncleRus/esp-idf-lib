@@ -233,6 +233,26 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
     return ESP_OK;
 }
 
+esp_err_t i2c_dev_probe(const i2c_dev_t *dev)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    esp_err_t res = i2c_setup_port(dev);
+    if (res == ESP_OK)
+    {
+        i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+        i2c_master_start(cmd);
+        i2c_master_write_byte(cmd, dev->addr << 1, true);
+        i2c_master_stop(cmd);
+
+        res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
+
+        i2c_cmd_link_delete(cmd);
+    }
+
+    return res;
+}
+
 esp_err_t i2c_dev_read(const i2c_dev_t *dev, const void *out_data, size_t out_size, void *in_data, size_t in_size)
 {
     if (!dev || !in_data || !in_size) return ESP_ERR_INVALID_ARG;
