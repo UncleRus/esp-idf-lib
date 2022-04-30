@@ -28,7 +28,7 @@ necessarily an ESP device. There are many examples for various platforms.
 Search by keyword `i2c scanner`.
 
 Connect the I2C module to the I2C scanner device. Make sure appropriate
-pull-up registers are connected to `SCL` and `SDA` lines.
+pull-up resistors are connected to `SCL` and `SDA` lines.
 
 Scan devices on the I2C bus. If the scanner does not find the I2C device, then
 your wiring might have issues. If the scanner finds the I2C device, make sure
