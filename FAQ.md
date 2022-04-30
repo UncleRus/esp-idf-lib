@@ -23,8 +23,9 @@ Common causes of I2C issues are:
 
 When any of I2C-based drivers does not work, follow the steps below.
 
-Build an _I2C scanner_ device. The device is not necessarily an ESP device.
-There are many examples for various platforms. Search by keyword `i2c scanner`.
+Build an [_I2C scanner_ device](examples/i2c_scanner). The device is not
+necessarily an ESP device. There are many examples for various platforms.
+Search by keyword `i2c scanner`.
 
 Connect the I2C module to the I2C scanner device. Make sure appropriate
 pull-up registers are connected to `SCL` and `SDA` lines.
