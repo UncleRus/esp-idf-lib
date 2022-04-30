@@ -1,4 +1,3 @@
-#include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <i2cdev.h>
@@ -40,5 +39,5 @@ void app_main()
     // Init i2cdev library
     ESP_ERROR_CHECK(i2cdev_init());
     // Start task
-    xTaskCreatePinnedToCore(task, "i2c_scanner", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL, APP_CPU_NUM);
+    xTaskCreate(task, "i2c_scanner", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
