@@ -274,12 +274,12 @@ static inline void rgb_fill_gradient4_rgb(rgb_t *target, size_t num, rgb_t c1, r
  * be spread evenly across the 0..255 range, and the intermedate values
  * will be HSV-interpolated between adjacent explicit entries.
  */
-hsv_t color_from_palette_hsv(hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
+hsv_t color_from_palette_hsv(const hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
 
 /**
  * Same for RGB palette
  */
-rgb_t color_from_palette_rgb(rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
+rgb_t color_from_palette_rgb(const rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Filter functions

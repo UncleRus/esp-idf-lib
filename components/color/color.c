@@ -810,14 +810,14 @@ void rgb_fill_gradient_rgb(rgb_t *leds, size_t startpos, rgb_t startcolor, size_
 
 ////////////////////////////////////////////////////////////////////////////////
 
-hsv_t color_from_palette_hsv(hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend)
+hsv_t color_from_palette_hsv(const hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend)
 {
     uint8_t div = 256 / pal_size;
 
     uint8_t hi = index / div;
     uint8_t lo = index % div;
 
-    hsv_t *entry = palette + hi;
+    const hsv_t *entry = palette + hi;
 
     uint8_t hue1   = entry->hue;
     uint8_t sat1   = entry->sat;
@@ -883,14 +883,14 @@ hsv_t color_from_palette_hsv(hsv_t *palette, uint8_t pal_size, uint8_t index, ui
 
 #include <stdlib.h>
 
-rgb_t color_from_palette_rgb(rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend)
+rgb_t color_from_palette_rgb(const rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend)
 {
     uint8_t div = 256 / pal_size;
 
     uint8_t hi = index / div;
     uint8_t lo = index % div;
 
-    rgb_t *entry = palette + hi;
+    const rgb_t *entry = palette + hi;
 
     uint8_t red1   = entry->red;
     uint8_t green1 = entry->green;
@@ -1100,4 +1100,3 @@ rgb_t apply_gamma2rgb_channels(rgb_t c, float gamma_r, float gamma_g, float gamm
     };
     return res;
 }
-
