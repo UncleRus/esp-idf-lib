@@ -52,12 +52,22 @@ typedef struct wiegand_reader wiegand_reader_t;
 typedef void (*wiegand_callback_t)(wiegand_reader_t *reader);
 
 /**
+ * Bit and byte order of data
+ */
+typedef enum {
+    WIEGAND_MSB_FIRST = 0,
+    WIEGAND_LSB_FIRST
+} wiegand_order_t;
+
+/**
  * Wiegand reader descriptor
  */
 struct wiegand_reader
 {
     gpio_num_t gpio_d0, gpio_d1;
     wiegand_callback_t callback;
+    wiegand_order_t bit_order;
+    wiegand_order_t byte_order;
 
     uint8_t *buf;
     size_t size;
@@ -76,10 +86,13 @@ struct wiegand_reader
  * @param buf_size         Reader buffer size in bytes, must be large enough to
  *                         contain entire Wiegand key
  * @param callback         Callback function for processing received codes
+ * @param bit_order        Bit order of data
+ * @param byte_order       Byte order of data
  * @return `ESP_OK` on success
  */
 esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio_num_t gpio_d1,
-        bool internal_pullups, size_t buf_size, wiegand_callback_t callback);
+        bool internal_pullups, size_t buf_size, wiegand_callback_t callback, wiegand_order_t bit_order,
+        wiegand_order_t byte_order);
 
 /**
  * @brief Delete reader instance.

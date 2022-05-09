@@ -79,9 +79,17 @@ static void isr_handler(void *arg)
 
     esp_timer_stop(reader->timer);
 
-    uint8_t value = d0 ? 0x80 : 0;
+    uint8_t value;
+    if (reader->bit_order == WIEGAND_MSB_FIRST)
+        value = (d0 ? 0x80 : 0) >> (reader->bits % 8);
+    else
+        value = (d0 ? 1 : 0) << (reader->bits % 8);
 
-    reader->buf[reader->bits / 8] |= value >> (reader->bits % 8);
+    if (reader->byte_order == WIEGAND_MSB_FIRST)
+        reader->buf[reader->size - reader->bits / 8 - 1] |= value;
+    else
+        reader->buf[reader->bits / 8] |= value;
+
     reader->bits++;
 
     esp_timer_start_once(reader->timer, TIMER_INTERVAL_US);
@@ -107,7 +115,8 @@ static void timer_handler(void *arg)
 ////////////////////////////////////////////////////////////////////////////////
 
 esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio_num_t gpio_d1,
-        bool internal_pullups, size_t buf_size, wiegand_callback_t callback)
+        bool internal_pullups, size_t buf_size, wiegand_callback_t callback, wiegand_order_t bit_order,
+        wiegand_order_t byte_order)
 {
     CHECK_ARG(reader && buf_size && callback);
 
@@ -120,6 +129,8 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
     reader->gpio_d1 = gpio_d1;
     reader->size = buf_size;
     reader->buf = calloc(buf_size, 1);
+    reader->bit_order = bit_order;
+    reader->byte_order = byte_order;
     reader->callback = callback;
 
     esp_timer_create_args_t timer_args = {

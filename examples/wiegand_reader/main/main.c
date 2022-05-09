@@ -17,7 +17,8 @@ static void reader_callback(wiegand_reader_t *r)
 void task(void *arg)
 {
     // Initialize reader
-    ESP_ERROR_CHECK(wiegand_reader_init(&reader, CONFIG_EXAMPLE_D0_GPIO, CONFIG_EXAMPLE_D0_GPIO, true, CONFIG_EXAMPLE_BUF_SIZE, reader_callback));
+    ESP_ERROR_CHECK(wiegand_reader_init(&reader, CONFIG_EXAMPLE_D0_GPIO, CONFIG_EXAMPLE_D0_GPIO,
+            true, CONFIG_EXAMPLE_BUF_SIZE, reader_callback, WIEGAND_MSB_FIRST, WIEGAND_LSB_FIRST));
 
     while (1)
     {
