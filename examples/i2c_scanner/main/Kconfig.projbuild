@@ -15,4 +15,9 @@ menu "I2C scanner configuration"
         default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
         help
             GPIO number for I2C Master data line.
+
+    config EXAMPLE_I2C_CLOCK_HZ
+        int "I2C clock frequency, Hz"
+        default 100000
+
 endmenu

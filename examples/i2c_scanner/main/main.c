@@ -9,7 +9,7 @@ void task(void *ignore)
     dev.cfg.sda_io_num = CONFIG_EXAMPLE_I2C_MASTER_SDA;
     dev.cfg.scl_io_num = CONFIG_EXAMPLE_I2C_MASTER_SCL;
 #if HELPER_TARGET_IS_ESP32
-    dev.cfg.master.clk_speed = 100000; // 100kHz
+    dev.cfg.master.clk_speed = CONFIG_EXAMPLE_I2C_CLOCK_HZ; // 100kHz
 #endif
     while (1)
     {
@@ -22,7 +22,7 @@ void task(void *ignore)
                 printf("\n%.2x:", addr);
 
             dev.addr = addr;
-            res = i2c_dev_probe(&dev);
+            res = i2c_dev_probe(&dev, I2C_DEV_WRITE);
 
             if (res == 0)
                 printf(" %.2x", addr);
