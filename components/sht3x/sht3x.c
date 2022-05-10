@@ -234,13 +234,7 @@ esp_err_t sht3x_init(sht3x_t *dev)
     dev->meas_started = false;
     dev->meas_first = false;
 
-    // send reset command
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, send_cmd_nolock(dev, SHT3X_RESET_CMD));
-    vTaskDelay(pdMS_TO_TICKS(10));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-
-    return ESP_OK;
+    return send_cmd(dev, SHT3X_CLEAR_STATUS_CMD);
 }
 
 esp_err_t sht3x_set_heater(sht3x_t *dev, bool enable)

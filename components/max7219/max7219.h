@@ -52,6 +52,8 @@
 extern "C" {
 #endif
 
+#define MAX7219_MAX_CLOCK_SPEED_HZ (10000000) // 10 MHz
+
 #define MAX7219_MAX_CASCADE_SIZE 8
 #define MAX7219_MAX_BRIGHTNESS   15
 
@@ -73,10 +75,11 @@ typedef struct
  *
  * @param dev Device descriptor
  * @param host SPI host
+ * @param clock_speed_hz SPI clock speed, Hz
  * @param cs_pin CS GPIO number
  * @return `ESP_OK` on success
  */
-esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin);
+esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin);
 
 /**
  * @brief Free device descriptor

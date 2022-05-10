@@ -74,7 +74,7 @@ Add path to components in your project makefile, e.g:
    
    PROJECT_NAME := my-esp-project
    EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
-   EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip
+   EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip max31865 ls7366r max31855
    include $(IDF_PATH)/make/project.mk
 
 ====================
@@ -124,6 +124,7 @@ Humidity & temperature sensors
    groups/max31865
    groups/bh1900nux
    groups/hdc1000
+   groups/max31855
    
 Pressure sensors
 ================

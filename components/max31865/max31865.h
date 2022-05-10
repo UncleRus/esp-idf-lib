@@ -49,6 +49,8 @@
 extern "C" {
 #endif
 
+#define MAX31865_MAX_CLOCK_SPEED_HZ (1000000) // 1 MHz
+
 /**
  * Conversion mode
  */
@@ -109,12 +111,13 @@ typedef struct
 /**
  * @brief Initialize device descriptor
  *
- * @param dev    Device descriptor
- * @param host   SPI host
- * @param cs_pin CS GPIO number
+ * @param dev            Device descriptor
+ * @param host           SPI host
+ * @param clock_speed_hz SPI clock speed, Hz
+ * @param cs_pin         CS GPIO number
  * @return `ESP_OK` on success
  */
-esp_err_t max31865_init_desc(max31865_t *dev, spi_host_device_t host, gpio_num_t cs_pin);
+esp_err_t max31865_init_desc(max31865_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin);
 
 /**
  * @brief Free device descriptor

@@ -85,8 +85,6 @@
 #define COUNTER_FLAG_BW               0x40    
 #define COUNTER_FLAG_CY               0x80    
 
-#define CLOCK_SPEED_HZ (2 * 1000 * 1000) // 2 MHz clock
-
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 
@@ -180,45 +178,11 @@ static esp_err_t write_dtr(spi_device_handle_t spi, uint8_t* data, uint8_t lengt
 	return write_data(spi, CMD_WR | REG_DTR, data, length);
 }
 
-//static esp_err_t load_cntr(spi_device_handle_t spi)
-//{
-//	return write_command(spi, CMD_LOAD | REG_CNTR);
-//}
-//
-//static esp_err_t load_otr(spi_device_handle_t spi)
-//{
-//	return write_command(spi, CMD_LOAD | REG_OTR);
-//}
-//
-//static esp_err_t read_mdr0(spi_device_handle_t spi, uint8_t *data)
-//{
-//	return read_register(spi, CMD_RD | REG_MDR0, data);
-//}
-
 static esp_err_t read_mdr1(spi_device_handle_t spi, uint8_t *data)
 {
 	return read_register(spi, CMD_RD | REG_MDR1, data);
 }
 
-//static esp_err_t read_otr(spi_device_handle_t spi, int32_t *data)
-//{
-//	esp_err_t ret;
-//	uint8_t data_buf[4];
-//	uint32_t result;
-//
-//	ret = read_data(spi, CMD_RD | REG_OTR, data_buf, 4);
-//	result = data_buf[0];
-//
-//	for (uint8_t cnt = 1; cnt < 4; cnt++)
-//	{
-//		result <<= 8;
-//		result |= data_buf[cnt];
-//	}
-//
-//	*data = result;
-//	return ret;
-//}
-//
 static esp_err_t read_cntr(spi_device_handle_t spi, int32_t* data)
 {
 	esp_err_t ret;
@@ -236,21 +200,6 @@ static esp_err_t read_cntr(spi_device_handle_t spi, int32_t* data)
 	*data = result;
 	return ret;
 }
-
-//static esp_err_t read_str(spi_device_handle_t spi, uint8_t* data)
-//{
-//	return read_register(spi, CMD_RD | REG_STR, data);
-//}
-//
-//static esp_err_t clear_mdr0(spi_device_handle_t spi)
-//{
-//	return write_command(spi, CMD_CLR | REG_MDR0);
-//}
-//
-//static esp_err_t clear_mdr1(spi_device_handle_t spi)
-//{
-//	return write_command(spi, CMD_CLR | REG_MDR1);
-//}
 
 static esp_err_t clear_cntr(spi_device_handle_t spi)
 {
@@ -287,12 +236,12 @@ static esp_err_t counter_disable(spi_device_handle_t spi)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-esp_err_t ls7366r_init_desc(ls7366r_t *dev, spi_host_device_t host, gpio_num_t cs_pin)
+esp_err_t ls7366r_init_desc(ls7366r_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
 {
 	CHECK_ARG(dev);
 	memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
 	dev->spi_cfg.spics_io_num = cs_pin;
-	dev->spi_cfg.clock_speed_hz = CLOCK_SPEED_HZ;
+	dev->spi_cfg.clock_speed_hz = clock_speed_hz;
 	dev->spi_cfg.mode = 0;
 	dev->spi_cfg.queue_size = 1;
 	dev->spi_cfg.command_bits = 8;

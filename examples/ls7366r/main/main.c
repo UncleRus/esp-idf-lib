@@ -95,7 +95,7 @@ void app_main(void)
 
 	ESP_ERROR_CHECK(spi_bus_initialize(LS7366R_HOST, &cfg, 0));
 	ls7366r_t dev;
-	ESP_ERROR_CHECK(ls7366r_init_desc(&dev, LS7366R_HOST, PIN_NUM_CS));
+	ESP_ERROR_CHECK(ls7366r_init_desc(&dev, LS7366R_HOST, LS7366R_MAX_CLOCK_SPEED_HZ, PIN_NUM_CS));
 	ESP_ERROR_CHECK(ls7366r_set_config(&dev, &config));
 
 	// setup for gpio output (gpio_toggle_task)

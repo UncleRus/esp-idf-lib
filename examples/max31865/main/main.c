@@ -72,7 +72,7 @@ static void task(void *pvParameter)
         .r_ref = CONFIG_EXAMPLE_RTD_REF,
         .rtd_nominal = CONFIG_EXAMPLE_RTD_NOMINAL,
     };
-    ESP_ERROR_CHECK(max31865_init_desc(&dev, HOST, CONFIG_EXAMPLE_CS_GPIO));
+    ESP_ERROR_CHECK(max31865_init_desc(&dev, HOST, MAX31865_MAX_CLOCK_SPEED_HZ, CONFIG_EXAMPLE_CS_GPIO));
 
     // Configure device
     ESP_ERROR_CHECK(max31865_set_config(&dev, &config));

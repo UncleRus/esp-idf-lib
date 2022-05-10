@@ -470,7 +470,7 @@ jobs:
           IGNORE_FILE="ci-ignore-esp8266"
 
           # these drivers do not compile for ESP8266 yet
-          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip max31865 ls7366r"
+          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip max31865 ls7366r max31855"
           cd "${__PROJECT_EXAMPLE_DIR}"
           for i in $(ls -d *); do
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
@@ -623,7 +623,7 @@ jobs:
           IGNORE_FILE="ci-ignore-esp8266"
 
           # these drivers do not compile for ESP8266 yet
-          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip max31865 ls7366r"
+          export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip max31865 ls7366r max31855"
           cd "${__PROJECT_EXAMPLE_DIR}"
           for i in $(ls -d *); do
             if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
