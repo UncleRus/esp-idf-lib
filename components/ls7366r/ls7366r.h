@@ -43,13 +43,14 @@
 #include <driver/gpio.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-	
+
+#define LS7366R_MAX_CLOCK_SPEED_HZ (2000000) // 2 MHz clock
+
 /**
  * Counter type
-*/
+ */
 typedef enum
 {
     LS7366R_NON_QUAD, // Up down counting with channel A being step and channel B being direction
@@ -60,7 +61,7 @@ typedef enum
 
 /**
  * Count mode
-*/
+ */
 typedef enum
 {
     LS7366R_FREE_RUN, // Free running count mode
@@ -71,7 +72,7 @@ typedef enum
 
 /**
  * Index mode
-*/
+ */
 typedef enum
 {
     LS7366R_INDEX_DISABLED, // Disable index
@@ -82,7 +83,7 @@ typedef enum
 
 /**
  * Index sync or async
-*/
+ */
 typedef enum
 {
     LS7366R_INDEX_SYNCHRONOUS, // Asynchronous index
@@ -91,7 +92,7 @@ typedef enum
 
 /**
  * Counter bits
-*/
+ */
 typedef enum
 {
     LS7366R_8_BIT, // 1 byte counter mode
@@ -102,7 +103,7 @@ typedef enum
 
 /**
  * Counter clock divider
-*/
+ */
 typedef enum
 {
     LS7366R_FILTER_CLK_1, // Filter clock division factor 1
@@ -111,7 +112,7 @@ typedef enum
 
 /**
  * Counter enable
-*/
+ */
 typedef enum
 {
     LS7366R_COUNTER_ENABLE, // Enable counting
@@ -120,7 +121,7 @@ typedef enum
 
 /**
  * Counter flag carry mode
-*/
+ */
 typedef enum
 {
     LS7366R_FLAG_CARRY_ENABLE, // Enable flag on carry bit
@@ -129,7 +130,7 @@ typedef enum
 
 /**
  * Counter flag borrow mode
-*/
+ */
 typedef enum
 {
     LS7366R_FLAG_BORROW_ENABLE, // Enable flag on borrow bit
@@ -138,7 +139,7 @@ typedef enum
 
 /**
  * Counter flag index mode
-*/
+ */
 typedef enum
 {
     LS7366R_FLAG_INDEX_ENABLE, // Enable flag on index bit
@@ -147,7 +148,7 @@ typedef enum
 
 /**
  * Counter flag compare mode
-*/
+ */
 typedef enum
 {
     LS7366R_FLAG_COMPARE_ENABLE, // Enable flag on compare bit
@@ -162,12 +163,18 @@ typedef struct
     ls7366r_flag_index_mode_t index;
 } ls7366r_flag_mode_t; // LS7366R flag mode struct
 
+/**
+ * Device descriptor
+ */
 typedef struct
 {
     spi_device_interface_config_t spi_cfg;
     spi_device_handle_t spi_dev;
 } ls7366r_t; // LS7366R device struct
 
+/**
+ * Device configuration
+ */
 typedef struct
 {
     ls7366r_flag_mode_t flag_mode; // MDR1
@@ -180,65 +187,66 @@ typedef struct
 } ls7366r_config_t; // LS7366R config struct
 
 /**
-* @brief Initialize device descriptor
-*
-* @param dev    Device descriptor
-* @param host   SPI host
-* @param cs_pin CS GPIO number
-* @return `ESP_OK` on success
-*/
-esp_err_t ls7366r_init_desc(ls7366r_t *dev, spi_host_device_t host, gpio_num_t cs_pin);
+ * @brief Initialize device descriptor
+ *
+ * @param dev            Device descriptor
+ * @param host           SPI host
+ * @param clock_speed_hz SPI clock speed, Hz
+ * @param cs_pin         CS GPIO number
+ * @return `ESP_OK` on success
+ */
+esp_err_t ls7366r_init_desc(ls7366r_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin);
 
 /**
-* @brief Free device descriptor
-*
-* @param dev Device descriptor
-* @return `ESP_OK` on success
-*/
+ * @brief Free device descriptor
+ *
+ * @param dev Device descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t ls7366r_free_desc(ls7366r_t *dev);
 
 /**
-* @brief Configure device
-*
-* @param dev    Device descriptor
-* @param config Configuration
-* @return `ESP_OK` on success
-*/
+ * @brief Configure device
+ *
+ * @param dev    Device descriptor
+ * @param config Configuration
+ * @return `ESP_OK` on success
+ */
 esp_err_t ls7366r_set_config(ls7366r_t *dev, const ls7366r_config_t *config);
 
 /**
-* @brief Get current count
-*
-* @param dev    Device descriptor
-* @param count Count variable
-* @return `ESP_OK` on success
-*/
+ * @brief Get current count
+ *
+ * @param dev    Device descriptor
+ * @param count  Count variable
+ * @return `ESP_OK` on success
+ */
 esp_err_t ls7366r_get_count(ls7366r_t *dev, int32_t *count);
 
 /**
-* @brief set value for compare
-*
-* @param dev    Device descriptor
-* @param cmp compare value
-* @return `ESP_OK` on success
-*/
+ * @brief set value for compare
+ *
+ * @param dev    Device descriptor
+ * @param cmp    Compare value
+ * @return `ESP_OK` on success
+ */
 esp_err_t ls7366r_set_compare_val(ls7366r_t *dev, int32_t cmp);
 
 /**
-* @brief clear counter value, set to 0
-*
-* @param dev    Device descriptor
-* @return `ESP_OK` on success
-*/
+ * @brief clear counter value, set to 0
+ *
+ * @param dev    Device descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t ls7366r_clear_counter(ls7366r_t *dev);
 
 /**
-* @brief enable or disable counter
-*
-* @param dev    Device descriptor
-* @param enable counter enabled or disabled
-* @return `ESP_OK` on success
-*/
+ * @brief enable or disable counter
+ *
+ * @param dev    Device descriptor
+ * @param enable Counter enabled or disabled
+ * @return `ESP_OK` on success
+ */
 esp_err_t ls7366r_counter_enable(ls7366r_t *dev, bool enable);
 	
 #ifdef __cplusplus

@@ -8,25 +8,19 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define DELAY CONFIG_EXAMPLE_DELAY
-
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
 #define HOST    HSPI_HOST
 #else
 #define HOST    SPI2_HOST
 #endif
 
-#define PIN_NUM_MOSI CONFIG_EXAMPLE_PIN_NUM_MOSI
-#define PIN_NUM_CLK  CONFIG_EXAMPLE_PIN_NUM_CLK
-#define PIN_NUM_CS   CONFIG_EXAMPLE_PIN_NUM_CS
-
 void task(void *pvParameter)
 {
     // Configure SPI bus
     spi_bus_config_t cfg = {
-       .mosi_io_num = PIN_NUM_MOSI,
+       .mosi_io_num = CONFIG_EXAMPLE_PIN_NUM_MOSI,
        .miso_io_num = -1,
-       .sclk_io_num = PIN_NUM_CLK,
+       .sclk_io_num = CONFIG_EXAMPLE_PIN_NUM_CLK,
        .quadwp_io_num = -1,
        .quadhd_io_num = -1,
        .max_transfer_sz = 0,
@@ -40,9 +34,9 @@ void task(void *pvParameter)
        .digits = 8,
        .mirrored = true
     };
-    ESP_ERROR_CHECK(max7219_init_desc(&dev, HOST, PIN_NUM_CS));
+    ESP_ERROR_CHECK(max7219_init_desc(&dev, HOST, MAX7219_MAX_CLOCK_SPEED_HZ, CONFIG_EXAMPLE_PIN_NUM_CS));
 
-    char buf[10];
+    char buf[10]; // 8 digits + decimal point + \0
 
     ESP_ERROR_CHECK(max7219_init(&dev));
 
@@ -52,17 +46,17 @@ void task(void *pvParameter)
 
         max7219_clear(&dev);
         max7219_draw_text_7seg(&dev, 0, "7219LEDS");
-        vTaskDelay(pdMS_TO_TICKS(DELAY));
+        vTaskDelay(pdMS_TO_TICKS(CONFIG_EXAMPLE_DELAY));
 
         max7219_clear(&dev);
         sprintf(buf, "%2.4f A", 34.6782);
         max7219_draw_text_7seg(&dev, 0, buf);
-        vTaskDelay(pdMS_TO_TICKS(DELAY));
+        vTaskDelay(pdMS_TO_TICKS(CONFIG_EXAMPLE_DELAY));
 
         max7219_clear(&dev);
         sprintf(buf, "%08x", 12345678);
         max7219_draw_text_7seg(&dev, 0, buf);
-        vTaskDelay(pdMS_TO_TICKS(DELAY));
+        vTaskDelay(pdMS_TO_TICKS(CONFIG_EXAMPLE_DELAY));
     }
 }
 

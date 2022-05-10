@@ -43,8 +43,6 @@
 
 static const char *TAG = "max31865";
 
-#define CLOCK_SPEED_HZ (1000000) // 1 MHz
-
 #define REG_CONFIG         (0x00)
 #define REG_RTD_MSB        (0x01)
 #define REG_HIGH_FAULT_MSB (0x03)
@@ -128,13 +126,13 @@ static esp_err_t read_reg_16(max31865_t *dev, uint8_t reg, uint16_t *val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t max31865_init_desc(max31865_t *dev, spi_host_device_t host, gpio_num_t cs_pin)
+esp_err_t max31865_init_desc(max31865_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
 {
     CHECK_ARG(dev);
 
     memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
     dev->spi_cfg.spics_io_num = cs_pin;
-    dev->spi_cfg.clock_speed_hz = CLOCK_SPEED_HZ;
+    dev->spi_cfg.clock_speed_hz = clock_speed_hz;
     dev->spi_cfg.mode = 1;
     dev->spi_cfg.queue_size = 1;
     dev->spi_cfg.cs_ena_pretrans = 1;
