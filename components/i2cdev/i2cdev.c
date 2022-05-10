@@ -237,6 +237,8 @@ esp_err_t i2c_dev_probe(const i2c_dev_t *dev)
 {
     if (!dev) return ESP_ERR_INVALID_ARG;
 
+    SEMAPHORE_TAKE(dev->port);
+
     esp_err_t res = i2c_setup_port(dev);
     if (res == ESP_OK)
     {
@@ -249,6 +251,8 @@ esp_err_t i2c_dev_probe(const i2c_dev_t *dev)
 
         i2c_cmd_link_delete(cmd);
     }
+
+    SEMAPHORE_GIVE(dev->port);
 
     return res;
 }
