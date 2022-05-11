@@ -124,6 +124,7 @@ Humidity & temperature sensors
    groups/max31865
    groups/bh1900nux
    groups/hdc1000
+   groups/sts21
    
 Pressure sensors
 ================
