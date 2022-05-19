@@ -1,6 +1,8 @@
 if(${IDF_TARGET} STREQUAL esp8266)
     set(req esp8266 esp_timer)
-else()
+elseif(${IDF_VERSION_MAJOR} STREQUAL 4 AND ${IDF_VERSION_MINOR} STREQUAL 1 AND ${IDF_VERSION_PATCH} STREQUAL 3)
+    set(req driver)
+else()    
     set(req driver esp_timer)
 endif()
 
