@@ -11,6 +11,9 @@ menu "Example configuration"
 
             PCA9537 has a fixed I2C address (`0x49`).
 
+            TCA9534 has three address pins (`A0`, `A1` and `A2`). The address
+            starts from `0x38` (all address pins are grounded)
+
     config EXAMPLE_I2C_MASTER_SCL
         int "SCL GPIO Number"
         default 5 if IDF_TARGET_ESP8266
