@@ -28,7 +28,7 @@
 /**
  * @file pca9557.c
  *
- * ESP-IDF driver for PCA9537/PCA9557 remote 4/8-bit I/O expanders for I2C-bus
+ * ESP-IDF driver for PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
  *
  * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -47,7 +47,6 @@
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define BV(x) (1 << (x))
 
 static esp_err_t read_reg_8(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
 {
@@ -71,11 +70,40 @@ static esp_err_t write_reg_8(i2c_dev_t *dev, uint8_t reg, uint8_t val)
     return ESP_OK;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+static esp_err_t read_bit(i2c_dev_t *dev, uint8_t reg, uint8_t bit, uint32_t *val)
+{
+    CHECK_ARG(dev && val);
+
+    uint8_t v;
+    CHECK(read_reg_8(dev, REG_IN, &v));
+    *val = v & BIT(bit) ? 1 : 0;
+
+    return ESP_OK;
+}
+
+static esp_err_t write_bit(i2c_dev_t *dev, uint8_t reg, uint8_t bit, uint32_t val)
+{
+    CHECK_ARG(dev);
+
+    uint8_t v;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_OUT, &v, 1));
+    v = (v & ~BIT(bit)) | (val ? BIT(bit) : 0);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_OUT, &v, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 esp_err_t pca9557_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
-    CHECK_ARG(dev && ((addr & PCA9557_I2C_ADDR_BASE) == PCA9557_I2C_ADDR_BASE || addr == PCA9537_I2C_ADDR));
+    CHECK_ARG(dev && (
+            (addr & PCA9557_I2C_ADDR_BASE) == PCA9557_I2C_ADDR_BASE ||
+            (addr & TCA9534_I2C_ADDR_BASE) == TCA9534_I2C_ADDR_BASE ||
+            addr == PCA9537_I2C_ADDR));
 
     dev->port = port;
     dev->addr = addr;
@@ -125,25 +153,23 @@ esp_err_t pca9557_port_write(i2c_dev_t *dev, uint8_t val)
     return write_reg_8(dev, REG_OUT, val);
 }
 
+esp_err_t pca9557_get_mode(i2c_dev_t *dev, uint8_t pin, pca9557_mode_t *mode)
+{
+    return read_bit(dev, REG_CONF, pin, mode);
+}
+
+esp_err_t pca9557_set_mode(i2c_dev_t *dev, uint8_t pin, pca9557_mode_t mode)
+{
+    return write_bit(dev, REG_CONF, pin, mode);
+}
+
 esp_err_t pca9557_get_level(i2c_dev_t *dev, uint8_t pin, uint32_t *val)
 {
-    uint8_t v;
-    CHECK(read_reg_8(dev, REG_IN, &v));
-    *val = v & BV(pin) ? 1 : 0;
-
-    return ESP_OK;
+    return read_bit(dev, REG_IN, pin, val);
 }
 
 esp_err_t pca9557_set_level(i2c_dev_t *dev, uint8_t pin, uint32_t val)
 {
-    uint8_t v;
-
-    I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_OUT, &v, 1));
-    v = (v & ~BV(pin)) | (val ? BV(pin) : 0);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_OUT, &v, 1));
-    I2C_DEV_GIVE_MUTEX(dev);
-
-    return ESP_OK;
+    return write_bit(dev, REG_OUT, pin, val);
 }
 
