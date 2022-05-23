@@ -83,7 +83,7 @@ e.g:
 ```Makefile
 PROJECT_NAME := my-esp-project
 EXTRA_COMPONENT_DIRS := /home/user/myprojects/esp/esp-idf-lib/components
-EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip max31865 ls7366r
+EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip max31865 ls7366r max31855
 include $(IDF_PATH)/make/project.mk
 ```
 
@@ -249,6 +249,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **hts221**               | Driver for HTS221 temperature and humidity sensor.                               | ISC     | `esp32`            | Yes
 | **lm75**                 | Driver for LM75, a digital temperature sensor and thermal watchdog               | BSD-3   | `esp32`, `esp8266` | Yes
 | **max31725**             | Driver for MAX31725/MAX31726 temperature sensors                                 | BSD-3   | `esp32`, `esp8266` | Yes
+| **max31855**             | Driver for MAX31855 cold-junction compensated thermocouple-to-digital converter  | BSD-3   | `esp32`            | Yes
 | **max31865**             | Driver for MAX31865 resistance converter for platinum RTDs                       | BSD-3   | `esp32`            | Yes
 | **mcp960x**              | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter            | BSD-3   | `esp32`, `esp8266` | Yes
 | **mcp9808**              | Driver for MCP9808 Digital Temperature Sensor                                    | BSD-3   | `esp32`, `esp8266` | Yes
