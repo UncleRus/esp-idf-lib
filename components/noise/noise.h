@@ -30,11 +30,11 @@
 /// Noise functions provided by the library.
 
 ///@defgroup Noise Noise functions
-///Simplex noise function definitions
+///Perlin noise function definitions
 ///@{
 /// @name scaled 16 bit noise functions
 ///@{
-/// 16 bit, fixed point implementation of perlin's Simplex Noise.  Coordinates are
+/// 16 bit, fixed point implementation of Perlin's Noise.  Coordinates are
 /// 16.16 fixed point values, 32 bit integers with integral coordinates in the high 16
 /// bits and fractional in the low 16 bits, and the function takes 1d, 2d, and 3d coordinate
 /// values.  These functions are scaled to return 0-65535

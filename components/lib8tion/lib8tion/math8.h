@@ -29,11 +29,6 @@
 ///@defgroup Math Basic math operations
 /// Fast, efficient 8-bit math functions specifically
 /// designed for high-performance LED programming.
-///
-/// Because of the AVR(Arduino) and ARM assembly language
-/// implementations provided, using these functions often
-/// results in smaller and faster code than the equivalent
-/// program using plain "C" arithmetic and logic.
 ///@{
 
 /// add one byte to another, saturating at 0xFF
@@ -48,7 +43,7 @@ LIB8STATIC_ALWAYS_INLINE uint8_t qadd8(uint8_t i, uint8_t j)
     return t;
 }
 
-/// Add one byte to another, saturating at 0x7F
+/// Add one byte to another, saturating at 0x7F and -0x80
 /// @param i - first byte to add
 /// @param j - second byte to add
 /// @returns the sum of i & j, capped at 0xFF
@@ -57,6 +52,8 @@ LIB8STATIC_ALWAYS_INLINE int8_t qadd7(int8_t i, int8_t j)
     int16_t t = i + j;
     if (t > 127)
         t = 127;
+    else if (t < -128)
+        t = -127;
     return t;
 }
 
@@ -77,7 +74,7 @@ LIB8STATIC_ALWAYS_INLINE uint8_t add8(uint8_t i, uint8_t j)
     return t;
 }
 
-/// add one byte to another, with one byte result
+/// add one byte to two bytes, with two bytes result
 LIB8STATIC_ALWAYS_INLINE uint16_t add8to16(uint8_t i, uint16_t j)
 {
     uint16_t t = i + j;
@@ -107,22 +104,38 @@ LIB8STATIC_ALWAYS_INLINE uint16_t avg16(uint16_t i, uint16_t j)
     return (uint32_t)((uint32_t)(i) + (uint32_t)(j)) >> 1;
 }
 
+/// Calculate an integer average of two unsigned
+///       8-bit integer values (uint8_t).
+///       Fractional results are rounded up, e.g. avg8r(20,41) = 31
+LIB8STATIC_ALWAYS_INLINE uint8_t avg8r(uint8_t i, uint8_t j)
+{
+    return (i + j + 1) >> 1;
+}
+
+/// Calculate an integer average of two unsigned
+///       16-bit integer values (uint16_t).
+///       Fractional results are rounded up, e.g. avg16r(20,41) = 31
+LIB8STATIC_ALWAYS_INLINE uint16_t avg16r(uint16_t i, uint16_t j)
+{
+    return (uint32_t)((uint32_t)(i) + (uint32_t)(j) + 1) >> 1;
+}
+
 /// Calculate an integer average of two signed 7-bit
 ///       integers (int8_t)
 ///       If the first argument is even, result is rounded down.
-///       If the first argument is odd, result is result up.
+///       If the first argument is odd, result is rounded up.
 LIB8STATIC_ALWAYS_INLINE int8_t avg7(int8_t i, int8_t j)
 {
-    return ((i + j) >> 1) + (i & 0x1);
+    return (i >> 1) + (j >> 1) + (i & 0x1);
 }
 
 /// Calculate an integer average of two signed 15-bit
 ///       integers (int16_t)
 ///       If the first argument is even, result is rounded down.
-///       If the first argument is odd, result is result up.
+///       If the first argument is odd, result is rounded up.
 LIB8STATIC_ALWAYS_INLINE int16_t avg15(int16_t i, int16_t j)
 {
-    return ((int32_t)((int32_t)(i) + (int32_t)(j)) >> 1) + (i & 0x1);
+    return (i >> 1) + (j >> 1) + (i & 0x1);
 }
 
 ///       Calculate the remainder of one unsigned 8-bit
@@ -188,7 +201,7 @@ LIB8STATIC_ALWAYS_INLINE uint8_t mul8(uint8_t i, uint8_t j)
 /// @returns the product of i * j, capping at 0xFF
 LIB8STATIC_ALWAYS_INLINE uint8_t qmul8(uint8_t i, uint8_t j)
 {
-    int p = ((int)i * (int)(j));
+    unsigned p = (unsigned)i * (unsigned)j;
     if (p > 255)
         p = 255;
     return p;
@@ -233,13 +246,31 @@ LIB8STATIC uint8_t sqrt16(uint16_t x)
     return low - 1;
 }
 
-/// blend a variable proproportion(0-255) of one byte to another
+/// blend a variable proportion(0-255) of one byte to another
 /// @param a - the starting byte value
 /// @param b - the byte value to blend toward
 /// @param amountOfB - the proportion (0-255) of b to blend
 /// @returns a byte value between a and b, inclusive
 LIB8STATIC uint8_t blend8(uint8_t a, uint8_t b, uint8_t amountOfB)
 {
+    // The BLEND_FIXED formula is
+    //
+    //   result = (  A*(amountOfA) + B*(amountOfB)              )/ 256
+    //
+    // …where amountOfA = 255-amountOfB.
+    //
+    // This formula will never return 255, which is why the BLEND_FIXED + SCALE8_FIXED version is
+    //
+    //   result = (  A*(amountOfA) + A + B*(amountOfB) + B      ) / 256
+    //
+    // We can rearrange this formula for some great optimisations.
+    //
+    //   result = (  A*(amountOfA) + A + B*(amountOfB) + B      ) / 256
+    //          = (  A*(255-amountOfB) + A + B*(amountOfB) + B  ) / 256
+    //          = (  A*(256-amountOfB) + B*(amountOfB) + B      ) / 256
+    //          = (  A*256 + B + B*(amountOfB) - A*(amountOfB)  ) / 256  // this is the version used in SCALE8_FIXED AVR below
+    //          = (  A*256 + B + (B-A)*(amountOfB)              ) / 256  // this is the version used in SCALE8_FIXED C below
+
     uint16_t partial;
     uint8_t result;
 
