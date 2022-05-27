@@ -26,7 +26,7 @@
  * @defgroup led_strip led_strip
  * @{
  *
- * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106 LED strips
+ * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106/SM16703 LED strips
  *
  * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -56,6 +56,7 @@ typedef enum
     LED_STRIP_WS2812 = 0,
     LED_STRIP_SK6812,
     LED_STRIP_APA106,
+    LED_STRIP_SM16703,
 
     LED_STRIP_TYPE_MAX
 } led_strip_type_t;

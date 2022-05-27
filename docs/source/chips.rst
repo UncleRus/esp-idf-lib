@@ -167,6 +167,8 @@ Supported devices
 +---------------+----------------------------------------+----------------------+
 | APA106        | Shenzhen LED Color Opto Electronic CO. | :ref:`led_strip`     |
 +---------------+----------------------------------------+----------------------+
+| SM16703       | Greeled Electronic LTD                 | :ref:`led_strip`     |
++---------------+----------------------------------------+----------------------+
 | SK9822        | Shenzhen LED Color Opto Electronic CO. | :ref:`led_strip_spi` |
 +---------------+----------------------------------------+----------------------+
 | APA102        | Shenzhen LED Color Opto Electronic CO. | :ref:`led_strip_spi` |
