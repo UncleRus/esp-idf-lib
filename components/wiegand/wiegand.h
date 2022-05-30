@@ -74,6 +74,7 @@ struct wiegand_reader
     size_t bits;
     esp_timer_handle_t timer;
     bool start_parity;
+    bool enabled;
 };
 
 /**
@@ -93,6 +94,24 @@ struct wiegand_reader
 esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio_num_t gpio_d1,
         bool internal_pullups, size_t buf_size, wiegand_callback_t callback, wiegand_order_t bit_order,
         wiegand_order_t byte_order);
+
+/**
+ * @brief Disable reader
+ *
+ * While reader is disabled, it will not receive new data
+ *
+ * @param reader Reader descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t wiegand_reader_disable(wiegand_reader_t *reader);
+
+/**
+ * @brief Enable reader
+ *
+ * @param reader Reader descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t wiegand_reader_enable(wiegand_reader_t *reader);
 
 /**
  * @brief Delete reader instance.

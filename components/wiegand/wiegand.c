@@ -149,8 +149,47 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
     CHECK(gpio_isr_handler_add(gpio_d0, isr_handler, reader));
     CHECK(gpio_isr_handler_add(gpio_d1, isr_handler, reader));
     isr_enable(reader);
+    reader->enabled = true;
 
-    ESP_LOGI(TAG, "Reader initialized on D0=%d, D1=%d", gpio_d0, gpio_d1);
+    ESP_LOGD(TAG, "Reader initialized on D0=%d, D1=%d", gpio_d0, gpio_d1);
+
+    return ESP_OK;
+}
+
+esp_err_t wiegand_reader_disable(wiegand_reader_t *reader)
+{
+    CHECK_ARG(reader);
+    if (!reader->enabled)
+    {
+        ESP_LOGE(TAG, "Reader already disabled");
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    isr_disable(reader);
+    esp_timer_stop(reader->timer);
+    reader->enabled = false;
+
+    ESP_LOGD(TAG, "Reader on D0=%d, D1=%d disabled", reader->gpio_d0, reader->gpio_d1);
+
+    return ESP_OK;
+}
+
+esp_err_t wiegand_reader_enable(wiegand_reader_t *reader)
+{
+    CHECK_ARG(reader);
+    if (reader->enabled)
+    {
+        ESP_LOGE(TAG, "Reader already enabled");
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    reader->bits = 0;
+    memset(reader->buf, 0, reader->size);
+
+    isr_enable(reader);
+    reader->enabled = true;
+
+    ESP_LOGD(TAG, "Reader on D0=%d, D1=%d enabled", reader->gpio_d0, reader->gpio_d1);
 
     return ESP_OK;
 }
@@ -166,7 +205,7 @@ esp_err_t wiegand_reader_done(wiegand_reader_t *reader)
     CHECK(esp_timer_delete(reader->timer));
     free(reader->buf);
 
-    ESP_LOGI(TAG, "Reader removed");
+    ESP_LOGD(TAG, "Reader removed");
 
     return ESP_OK;
 }
