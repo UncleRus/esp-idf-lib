@@ -66,6 +66,8 @@ static void isr_handler(void *arg)
 #endif
 {
     wiegand_reader_t *reader = (wiegand_reader_t *)arg;
+    if (!reader->enabled)
+        return;
 
     int d0 = gpio_get_level(reader->gpio_d0);
     int d1 = gpio_get_level(reader->gpio_d1);
@@ -101,13 +103,12 @@ static void timer_handler(void *arg)
 
     ESP_LOGD(TAG, "Got %d bits of data", reader->bits);
 
-    isr_disable(reader);
+    wiegand_reader_disable(reader);
 
     if (reader->callback)
         reader->callback(reader);
 
-    reader->bits = 0;
-    memset(reader->buf, 0, reader->size);
+    wiegand_reader_enable(reader);
 
     isr_enable(reader);
 }
@@ -159,11 +160,6 @@ esp_err_t wiegand_reader_init(wiegand_reader_t *reader, gpio_num_t gpio_d0, gpio
 esp_err_t wiegand_reader_disable(wiegand_reader_t *reader)
 {
     CHECK_ARG(reader);
-    if (!reader->enabled)
-    {
-        ESP_LOGE(TAG, "Reader already disabled");
-        return ESP_ERR_INVALID_STATE;
-    }
 
     isr_disable(reader);
     esp_timer_stop(reader->timer);
@@ -177,11 +173,6 @@ esp_err_t wiegand_reader_disable(wiegand_reader_t *reader)
 esp_err_t wiegand_reader_enable(wiegand_reader_t *reader)
 {
     CHECK_ARG(reader);
-    if (reader->enabled)
-    {
-        ESP_LOGE(TAG, "Reader already enabled");
-        return ESP_ERR_INVALID_STATE;
-    }
 
     reader->bits = 0;
     memset(reader->buf, 0, reader->size);
