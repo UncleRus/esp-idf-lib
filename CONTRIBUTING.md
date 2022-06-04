@@ -79,6 +79,25 @@ creating a Pull Request unless the bug is subtle, typos, or easy to reproduce
 and fix. Make sure to read [Development Life Cycle](#development-life-cycle)
 as a Pull Request must meet the same standards documented in the section.
 
+A GitHub Actions workflow,
+[pr-labeler-action](https://github.com/TimonVS/pr-labeler-action), is used to
+label PRs by branch name. Your fix branch should have prefixes defined in
+[.github/pr-labeler.yml](.github/pr-labeler.yml). Create a branch with one of
+the prefixes. If you are fixing a bug, your branch name should be `bugfix-`.
+The rest of branch name should be short, and descriptive. If the fix has
+related issues, the branch name should include them.
+
+```console
+git checkout -b bugfix-issue-1
+```
+
+Change the branch name before creating a PR if your branch name does not
+follow the convention.
+
+```console
+git branch --move bugfix-issue-1
+```
+
 ### Writing documentation
 
 Even if you are not an author of the code in the repository, you can write
