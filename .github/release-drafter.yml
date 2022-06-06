@@ -1,0 +1,25 @@
+---
+
+# configuration for release-drafter.
+# https://github.com/release-drafter/release-drafter
+name-template: "$NEXT_PATCH_VERSION"
+tag-template: "$NEXT_PATCH_VERSION"
+
+# map labels to categories.
+# to label PRs, see .github/workflows/pr-labeler.yml
+categories:
+  - title: Features
+    label: feature
+  - title: Bug Fixes
+    labels:
+      - bugfix
+      - fix
+  - title: Documentation
+    label: documentation
+  - title: CI
+    label: ci
+change-template: "* $TITLE (#$NUMBER)"
+template: |
+  ## Release $NEXT_PATCH_VERSION
+
+  $CHANGES
