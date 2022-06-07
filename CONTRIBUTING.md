@@ -16,6 +16,7 @@
     * [Creating a feature branch in your fork and develop](#creating-a-feature-branch-in-your-fork-and-develop)
     * [C Code style](#c-code-style)
     * [`markdown` Code style](#markdown-code-style)
+    * [`git` branch name convention](#git-branch-name-convention)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
     * [Writing a commit message](#writing-a-commit-message)
     * [Updating README.md](#updating-readmemd)
@@ -87,6 +88,8 @@ the prefixes. If you are fixing a bug, your branch name should be `bugfix-`.
 The rest of branch name should be short, and descriptive. If the fix has
 related issues, the branch name should include them.
 
+See also [`git` branch name convention](#git-branch-name-convention).
+
 ```console
 git checkout -b bugfix-issue-1
 ```
@@ -115,6 +118,14 @@ Not all contributors are native English speakers. If you are, please let us
 know ambiguity in the documentation, wrong usages of terms, and mistakes in
 English grammar. For this case, please create a Pull Request (creating an
 issue is optional).
+
+Create a branch that documents features, or fixes existing documentations.
+
+```console
+git checkout -b doc-foo
+```
+
+See also [`git` branch name convention](#git-branch-name-convention).
 
 ### Suggesting enhancements
 
@@ -173,11 +184,14 @@ Create a feature branch in your fork from the `master` branch.
 git checkout master
 ```
 
-Check out the feature branch.
+Check out the feature branch. The feature branch name should start with
+`feat-` or `feature-`.
 
 ```console
-git checkout -b my-feature
+git checkout -b feat-implement-foo
 ````
+
+See also [`git` branch name convention](#git-branch-name-convention).
 
 Write your code. Test the code in your physical test environment.  Commit your
 changes and push them to your remote fork on GitHub.
@@ -189,7 +203,7 @@ changes and push them to your remote fork on GitHub.
 ```console
 git add path/to/files
 git commit -v
-git push --set-upstream origin my-feature
+git push --set-upstream origin feat-implement-foo
 ````
 
 See also [Writing a commit message](#writing-a-commit-message).
@@ -219,7 +233,7 @@ commits. This is especially useful when you are actively developing and the
 commit history has many trial-and-error commits.
 
 ```console
-git checkout my-feature
+git checkout feat-implement-foo
 git rebase -i master
 git push -f
 ```
@@ -307,6 +321,27 @@ output is shown below.
 ```console
 examples/led_strip_spi/README.md:30: MD040 Fenced code blocks should have a language specified
 ```
+
+### `git` branch name convention
+
+We use the following convention for git branch name. Use one of branch name
+prefixes when creating a branch.
+
+| Branch name prefix | Description |
+| `feat-`, and `feature-` | A feature branch that implements feature(s), or add enhancement(s) to existing code |
+| `fix-`, and `bugfix-` | A bug fix branch that fixes bug(s). The rest of the branch name should include issue number, such as `fix-issue-1` |
+| `ci-` | A branch that implements enhancement(s), or fixes issue(s) in CI |
+| `chore-` | A branch that does not affect code or its behavior, such as updating `.gitignore` |
+| `doc-`, and `documentation-` | Adding or updating documentation only, such as documenting undocumented features, or fixing existing documentation(s) |
+
+A GitHub Actions workflow automatically labels PRs depending on the branch
+name prefixes so that the PR is automatically included in release notes.
+
+The rest of the branch name should be short, and descriptive. If your branch
+fixes, implements, or relates to, an Issue, include the Issue number. Say, if
+your branch fixes a bug reported Issue ${N}, the branch name should be
+`fix-issue-1` so that reviewer immediately understand there is a related Issue
+with your branch.
 
 ### Typical issues you will face in developments
 
