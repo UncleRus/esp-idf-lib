@@ -340,8 +340,9 @@ name prefixes so that the PR is automatically included in release notes.
 The rest of the branch name should be short, and descriptive. If your branch
 fixes, implements, or relates to, an Issue, include the Issue number. Say, if
 your branch fixes a bug reported Issue ${N}, the branch name should be
-`fix-issue-1` so that reviewer immediately understand there is a related Issue
-with your branch.
+`fix-issue-${N}` so that reviewer immediately understand there is a related
+Issue with your branch. Replace `${N}` with the Issue number, such as
+`fix-issue-123` when the Issue number is 123.
 
 ### Typical issues you will face in developments
 
