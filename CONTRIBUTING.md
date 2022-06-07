@@ -328,6 +328,7 @@ We use the following convention for git branch name. Use one of branch name
 prefixes when creating a branch.
 
 | Branch name prefix | Description |
+|--------------------|-------------|
 | `feat-`, and `feature-` | A feature branch that implements feature(s), or add enhancement(s) to existing code |
 | `fix-`, and `bugfix-` | A bug fix branch that fixes bug(s). The rest of the branch name should include issue number, such as `fix-issue-1` |
 | `ci-` | A branch that implements enhancement(s), or fixes issue(s) in CI |
