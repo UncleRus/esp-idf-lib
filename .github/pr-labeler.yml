@@ -9,7 +9,8 @@ bugfix:
   - "fix-*"
   - "bugfix-*"
 chore: "chore-*"
-ci: "ci-*"
+ci:
+  - "ci-*"
 documentation:
   - "documentation-*"
   - "doc-*"
