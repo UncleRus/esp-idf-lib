@@ -198,13 +198,14 @@ GPIO expanders
    groups/mcp23x17
    groups/pca9557
    
-Addressable LEDs
-================
+LED controllers
+===============
 .. toctree::
    :maxdepth: 1
 
    groups/led_strip
    groups/led_strip_spi
+   groups/ht16k33
 
 Input controls
 ==============
