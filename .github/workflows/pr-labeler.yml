@@ -7,13 +7,14 @@ on:
       - opened
   # run the workflow when a PR is created from a branch in forks
   pull_request_target:
-    types: [opened]
+    types:
+      - opened
 
 jobs:
   pr-labeler:
     runs-on: ubuntu-latest
     steps:
-      - uses: TimonVS/pr-labeler-action@v3
+      - uses: TimonVS/pr-labeler-action@v4
         with:
           configuration-path: .github/pr-labeler.yml
         env:
