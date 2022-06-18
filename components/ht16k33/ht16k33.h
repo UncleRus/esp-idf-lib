@@ -32,7 +32,6 @@
 #define __HT16K33_H__
 
 #ifdef __cplusplus
-
 extern "C" {
 #endif
 

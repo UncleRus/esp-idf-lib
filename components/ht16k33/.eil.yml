@@ -8,9 +8,10 @@ components:
     depends:
       - name: i2cdev
       - name: log
-    thread_safe: N/A
+    thread_safe: yes
     targets:
       - name: esp32
+      - name: esp8266
     licenses:
       - name: MIT
     copyrights:
