@@ -184,6 +184,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips                    | MIT     | `esp32`            | Yes
 | **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | `esp32`, `esp32c3`, `esp8266` | Yes
+| **ht16k33**              | I2C LED driver                                                                   | MIT     | `esp32`            | Yes
 
 ### Light sensors
 
@@ -293,3 +294,4 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Nate Usher](https://github.com/nated0g), developer of SCD30 driver
 - [Josh Kallus](https://github.com/Jkallus), developer of LS7366R driver
 - [saasaa](https://github.com/saasaa), developer of HTS221 driver
+- [Timofei Korostelev](https://github.com/chudsaviet), developer of HT16K33 driver
