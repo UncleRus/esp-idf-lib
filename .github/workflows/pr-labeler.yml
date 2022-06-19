@@ -1,11 +1,7 @@
 ---
 name: PR Labeler
 on:
-  # run the workflow when a PR is created from a branch in the repository
-  pull_request:
-    types:
-      - opened
-  # run the workflow when a PR is created from a branch in forks
+  # run the workflow when a PR is created
   pull_request_target:
     types:
       - opened
