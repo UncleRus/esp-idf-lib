@@ -12,7 +12,7 @@ permissions:
 jobs:
   pr-labeler:
     permissions:
-      # XXX required by TimonVS/pr-labeler-action@v3
+      # XXX required by TimonVS/pr-labeler-action
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
