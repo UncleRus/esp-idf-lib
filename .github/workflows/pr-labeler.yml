@@ -6,6 +6,9 @@ on:
     types:
       - opened
 
+permissions:
+  contents: read
+
 jobs:
   pr-labeler:
     permissions:
