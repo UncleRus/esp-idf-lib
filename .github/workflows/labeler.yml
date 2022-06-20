@@ -1,8 +1,23 @@
 ---
+name: Label PR
 on:
-  pull_request_target: # PRs from forked repositories
-  pull_request:
+  # use pull_request_target here to label PRs. from the documentation:
+  #
+  # "This event runs in the context of the base of the pull request, rather
+  # than in the context of the merge commit, as the pull_request event does"
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target
+  #
+  # this workflow is potentially dangerous because the workflow has access to
+  # GitHub APIs, i.e. secrets.GITHUB_TOKEN, and the author of PRs, who might
+  # not be a member of the repository, can modify the workflow.
+  #
+  # see also:
+  # Keeping your GitHub Actions and workflows secure Part 1: Preventing pwn requests
+  # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  pull_request_target:
 
+# this workflow needs write access to PRs because it add labels to PRs, or
+# remove labels from PRs.
 permissions:
   contents: read
   pull-requests: write
