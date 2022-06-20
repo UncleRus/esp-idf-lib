@@ -1,6 +1,6 @@
 ---
 
-# see https://github.com/fuxingloh/multi-labeler
+# see https://github.com/fuxingloh/multi-labeler for details
 version: v1
 labels:
   - label: "enhancement"
