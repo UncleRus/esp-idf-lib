@@ -1,0 +1,18 @@
+---
+on:
+  pull_request_target: # PRs from forked repositories
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  labeler:
+    name: Labeler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fuxingloh/multi-labeler@v1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          config-path: .github/labeler.yml
