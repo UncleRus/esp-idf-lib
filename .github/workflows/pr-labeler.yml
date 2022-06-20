@@ -1,7 +1,9 @@
 ---
 name: PR Labeler
 on:
-  # run the workflow when a PR is created
+  # run the workflow when a PR is created.
+  # note that the workflow is triggered by pull_request_target, which means
+  # the workflow runs with access to GITHUB_TOKEN.
   pull_request_target:
     types:
       - opened
@@ -16,7 +18,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: TimonVS/pr-labeler-action@main
+      - uses: TimonVS/pr-labeler-action@v3
         with:
           configuration-path: .github/pr-labeler.yml
         env:
