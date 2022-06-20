@@ -3,7 +3,9 @@ name: PR Labeler
 on:
   # run the workflow when a PR is created.
   # note that the workflow is triggered by pull_request_target, which means
-  # the workflow runs with access to GITHUB_TOKEN.
+  # the workflow runs with access to GITHUB_TOKEN. external code, such as PRs
+  # from forks, should not be ran in this context. see the details at:
+  # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
   pull_request_target:
     types:
       - opened
