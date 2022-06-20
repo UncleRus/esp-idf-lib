@@ -18,7 +18,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: TimonVS/pr-labeler-action@main
+      - uses: TimonVS/pr-labeler-action@v3
         with:
           configuration-path: .github/pr-labeler.yml
         env:
