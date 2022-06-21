@@ -3,6 +3,8 @@
 # see https://github.com/fuxingloh/multi-labeler
 version: v1
 labels:
+
+  # thses labels are used to draft relases.
   - label: "enhancement"
     matcher:
       branch: "^(feat|feature)-.*"
@@ -18,3 +20,26 @@ labels:
   - label: "chore"
     matcher:
       branch: "^chore-.*"
+
+  # area indicates which files are modified in the PR.
+  - label: "area:docs"
+    matcher:
+      files:
+        any:
+          - "docs/**"
+          - "*.md"
+  - label: "area:docs-only"
+    matcher:
+      files:
+        any:
+          - "docs/**"
+          - "*.md"
+        all:
+          - "!components"
+  - label: "area:ci"
+    matcher:
+      files:
+        - ".github/**"
+  - label: "area:components"
+    matcher:
+      files: "components/**"
