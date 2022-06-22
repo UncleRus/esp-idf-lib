@@ -1,0 +1,65 @@
+---
+
+name: Mention owner in PRs
+on:
+  workflow_run:
+    workflows:
+      - Build examples
+    types:
+      - completed
+
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Get a list of changed files under components
+        uses: tj-actions/changed-files@v23
+        id: changed-files
+        with:
+          path: components
+
+      - name: Get a list of changed components
+        run: |
+          components = ""
+          for path in ${{ all_changed_and_modified_files }}; do
+            component  = `echo "${path}" | cut -f 1 -d '/'`
+            components = "${components}\n${component}"
+          done
+          components = `echo ${components} | uniq`
+          echo "Changed components: `${components}`"
+          echo "CHANGED_COMPONENTS=${components}" >> ${GITHUB_ENV}
+
+      - run: npm install js-yaml
+
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            console.log(context)
+
+            const yaml = require('js-yaml');
+            const fs = require('fs');
+            const util = require('util');
+
+            let affected_owners = [];
+            let components = process.env.CHANGED_COMPONENTS.split("\\n");
+
+            for (i = 0; i < components.length; i++) {
+              let path = "components" + "/" + components[i] + "/" + ".eli.yml";
+              console.log(util.format("reading .eli.yml %s", path));
+              try {
+                let metadata = yaml.safeLoad(fs.readFileSync(data.yaml', 'utf8'));
+                let code_owners = metadata.code_owners.map(code_owner => { return code_owner.name };
+                affected_owners.push(metadata.code_ownes);
+              } catch (e) {
+                console.log(e);
+              }
+            }
+            console.log(util.format("affected_owners `%s`", affected_owners));
