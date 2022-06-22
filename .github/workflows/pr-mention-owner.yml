@@ -2,6 +2,7 @@
 
 name: Mention owner in PRs
 on:
+  # run when "Build examples" workflow finishes
   workflow_run:
     workflows:
       - Build examples
@@ -57,7 +58,7 @@ jobs:
               try {
                 let metadata = yaml.safeLoad(fs.readFileSync(data.yaml', 'utf8'));
                 let code_owners = metadata.code_owners.map(code_owner => { return code_owner.name };
-                affected_owners.push(metadata.code_ownes);
+                affected_owners.push(metadata.code_owners);
               } catch (e) {
                 console.log(e);
               }
