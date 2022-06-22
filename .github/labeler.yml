@@ -23,12 +23,14 @@ labels:
 
   # area indicates which files are modified in the PR.
   - label: "area:docs"
+    sync: true
     matcher:
       files:
         any:
           - "docs/**"
           - "*.md"
   - label: "area:docs-only"
+    sync: true
     matcher:
       files:
         any:
@@ -37,9 +39,11 @@ labels:
         all:
           - "!components"
   - label: "area:ci"
+    sync: true
     matcher:
       files:
         - ".github/**"
   - label: "area:components"
+    sync: true
     matcher:
       files: "components/**"
