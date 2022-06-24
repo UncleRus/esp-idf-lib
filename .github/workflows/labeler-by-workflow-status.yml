@@ -34,7 +34,7 @@ jobs:
           script: |
             const util = require("util");
 
-            label_failure_name = util.format("ci/%s/failure", context.payload.workflow_run.name;
+            label_failure_name = util.format("ci/%s/failure", context.payload.workflow_run.name);
             try {
               await github.rest.issues.removeLabel({
                 issue_number: context.payload.workflow_run.pull_requests[0].number,
@@ -59,7 +59,7 @@ jobs:
           script: |
             const util = require("util");
 
-            label_failure_name = util.format("ci/%s/failure", context.payload.workflow_run.name;
+            label_failure_name = util.format("ci/%s/failure", context.payload.workflow_run.name);
             try {
               await github.rest.issues.addLabels({
                 issue_number: context.payload.workflow_run.pull_requests[0].number,
