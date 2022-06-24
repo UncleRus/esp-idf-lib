@@ -19,9 +19,9 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            # steps receive a context from the workflow_run event
-            # see:
-            # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_run
+            // steps receive a context from the workflow_run event
+            // see:
+            // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_run
             console.log(JSON.stringify(context, null, 2))
 
   on-success:
