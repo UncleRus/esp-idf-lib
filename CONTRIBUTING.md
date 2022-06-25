@@ -463,21 +463,81 @@ See also [`Metadata.md`](Metadata.md).
 
 ### Creating a Pull Request
 
-When your code is ready to be merged, and all the tests have passed in the CI,
-create a Pull Request. Before creating a Pull Request, make sure:
+To test your code, you need to create a Pull Request. It is not practical to
+test code manually because you have to perform many tests. For instance, the
+number of tests is all targets (`esp32`, `esp8266`, `esp32s2`, etc) * build
+methods (`make` and `idf.py`) * supported `esp-idf` versions. Let the CI do it
+for you.
+
+Before creating a Pull Request, make sure:
 
 1. You compiled the code and the build succeeded
-2. You pushed the changes to your remote fork and the CI passed
-3. Functions, macros, data types are documented in the code
-4. An example application is provided under [`examples`](examples)
-5. You compiled the example code and the example application ran on a
+1. Functions, macros, data types are documented in the code
+1. An example application is provided under [`examples`](examples)
+1. You compiled the example code and the example application ran on a
    physical device as expected and documented
-6. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
+1. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
    by including the license at the top of file
-7. One of your commits in the feature branch, or the PR itself, mentions Issue
+1. One of your commits in the feature branch, or the PR itself, mentions Issue
    number so that the Issue will be automatically closed when the PR is merged
 
-From this point, you should avoid to `git rebase` your feature branch.
+When a PR is created, GitHub Actions workflows will:
+
+* label the PR with various labels, such as type of the PR (bug fix, or
+  feature)
+* perform necessary tests depending on the changes (build the examples in a
+  matrix if the source code is modified, build the documentation if files
+  under `docs` are modified)
+
+After the CI processes complete, you will see "All checks have passed" or some
+failures in the PR. To merge the PR, all checks must pass. Log is available
+from the link, `Details`, in the failed test.
+
+If the PR does not pass the CI, update the branch with a fix. At this point,
+`git rebase` may be used. For instance, if a commit has a typo and one of the
+test fails because of syntax error, commit a fix of the syntax error and do
+`git rebase` to merge the fix into the original commit that has introduced the
+syntax error.
+
+```console
+git add path/to/file
+git commmit -v
+git rebase -i master
+```
+
+`-i`, or `--interactive`, flag will launch a text editor where the history of
+the branch can be edited with commands. The buffer of the editor will look
+like:
+
+```text
+pick f7f3f6d bugfix: fix issue foo
+pick 310154e bugfix: fix a syntax error in f7f3f6d
+```
+
+The second commit, `310154e`, should be part of the previous, `f7f3f6d`. To
+rewrite the commit history, replace `pick` with `fixup`.
+
+```text
+pick f7f3f6d bugfix: fix issue foo
+fixup 310154e bugfix: fix a syntax error in f7f3f6d
+```
+
+When you save and exit the editor, `git` rewrites the commit history as if
+`310154e` was never committed. The commit `310154e` is now part of `f7f3f6d`.
+If you don't save or modify the buffer, `git` will not rewrite the commit
+history.
+
+`git rebase` can be used to tidy up the commits. To `rebase` or not to
+`rebase` depends on the nature of commits. A single commit per PR is preferred,
+but is not mandatory.
+
+See also
+[7.6 Git Tools - Rewriting History](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History).
+
+When all the tests pass, ask the code owner to review the PR. The code owner
+can be found in `.eli.yml` file in the component directory.  From this point,
+you should avoid to `git rebase` your feature branch. Otherwise, the reviewer
+would have to review the PR from scratch.
 
 Developers who has write access to the repository will leave comments, ask
 rewrites, and merge the PR.
