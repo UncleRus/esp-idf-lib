@@ -13,17 +13,17 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <memory.h>
+#include "ht16k33.h"
 
+#include <string.h>
 #include <freertos/FreeRTOS.h>
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
-#include <esp_check.h>
-#endif
 #include <esp_err.h>
 #include <esp_log.h>
+#include <esp_idf_lib_helpers.h>
 
-#include "ht16k33.h"
+#if HELPER_TRAGET_IS_ESP32 && ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#include <esp_check.h>
+#endif
 
 static const char* TAG = "ht16k33";
 
@@ -54,7 +54,7 @@ static const char* TAG = "ht16k33";
 #ifndef ESP_RETURN_ON_ERROR
 #define ESP_RETURN_ON_ERROR(x, log_tag, format, ...) do {                                \
         esp_err_t err_rc_ = (x);                                                         \
-        if (unlikely(err_rc_ != ESP_OK)) {                                               \
+        if (err_rc_ != ESP_OK) {                                                         \
             ESP_LOGE(log_tag, "%s(%d): " format, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
             return err_rc_;                                                              \
         }                                                                                \

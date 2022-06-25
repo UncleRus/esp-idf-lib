@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 /**
- * Defualt I2C address
+ * Default I2C address
  */
 #define HT16K33_DEFAULT_ADDR 0x70
 #define HT16K33_MAX_BRIGHTNESS 15
