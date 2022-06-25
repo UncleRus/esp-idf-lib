@@ -31,21 +31,30 @@
 #if !defined(__HT16K33_H__)
 #define __HT16K33_H__
 
+#include <driver/gpio.h>
+#include <esp_err.h>
+#include <i2cdev.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * Defualt I2C address
+ */
 #define HT16K33_DEFAULT_ADDR 0x70
 #define HT16K33_MAX_BRIGHTNESS 15
 #define HT16K33_RAM_SIZE_BYTES 16
 
-// Display blinking frequencies.
-typedef enum { f0hz, f2hz, f1hz, f05hz } ht16k33_blinking_freq_t;
-
-#include <driver/gpio.h>
-#include <esp_err.h>
-
-#include <i2cdev.h>
+/**
+ * Display blinking frequencies.
+ */
+typedef enum { 
+    HTK16K33_F_0HZ,
+    HTK16K33_F_2HZ,
+    HTK16K33_F_1HZ,
+    HTK16K33_F_05HZ,
+} ht16k33_blinking_freq_t;
 
 /**
  * @brief Initialize the HT16K33 device descriptor.
