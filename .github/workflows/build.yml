@@ -22,7 +22,7 @@ jobs:
       - name: Download the PR number from the triggering workflow as an artifact
         # XXX actions/download-artifact does not work here.
         # see the rationale at: https://github.com/dawidd6/action-download-artifact
-        uses: dawidd6/action-download-artifact
+        uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: labeler.yml
