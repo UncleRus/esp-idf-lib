@@ -1,13 +1,12 @@
 ---
 name: Build examples
 on:
-  pull_request:
+  workflow_run:
+    workflows:
+      - Label PR
     types:
-      - labeled
-      - synchronize
+      - completed
 
-  # include workflow_dispatch to enable manual trigger from Web UI.
-  workflow_dispatch:
 jobs:
   pre_build:
 
@@ -27,21 +26,13 @@ jobs:
           script: |
             console.log(JSON.stringify(context, null, 2))
             let should_skip = false;
+            let labels = context.payload.workflow_run.pull_requests[0].labels.map(label => { return label.name });
 
-            switch(context.payload.action) {
-              // when the added label is not "area:components", skip
-              case "labeled":
-                if (context.payload.label.name != "area:components" && context.payload.label.name != "area:ci") {
-                  should_skip = true;
-                }
-                break;
-              // when the PR branch is updated, but "area:components" label is not found, skip
-              case "synchronize":
-                let labels = context.payload.pull_request.labels.map(label => { return label.name });
-                if (!labels.includes("area:components") && !labels.includes("area:ci")) {
-                  should_skip = true;
-                }
-                break;
+            if (!labels.includes("area:components") {
+              should_skip = true;
+            }
+            if (labels.includes("area:ci") {
+              should_skip = false;
             }
             return should_skip;
 
