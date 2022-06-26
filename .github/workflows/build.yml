@@ -28,10 +28,10 @@ jobs:
             let should_skip = false;
             let labels = context.payload.workflow_run.pull_requests[0].labels.map(label => { return label.name });
 
-            if (!labels.includes("area:components") {
+            if (!labels.includes("area:components")) {
               should_skip = true;
             }
-            if (labels.includes("area:ci") {
+            if (labels.includes("area:ci")) {
               should_skip = false;
             }
             return should_skip;
