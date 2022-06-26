@@ -20,8 +20,13 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.result }}
     steps:
       - name: Download the PR number from the triggering workflow as an artifact
-        uses: actions/download-artifact@v3
+        # XXX actions/download-artifact does not work here.
+        # see the rationale at: https://github.com/dawidd6/action-download-artifact
+        uses: dawidd6/action-download-artifact
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: labeler.yml
+          run_id: ${{ github.event.workflow_run.id }}
           name: pr_number
 
       - name: Export the number
