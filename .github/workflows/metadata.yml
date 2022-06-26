@@ -1,4 +1,5 @@
 ---
+# foo
 name: Metadata
 on:
   pull_request:
