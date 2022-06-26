@@ -38,6 +38,7 @@ labels:
           - "*.md"
         all:
           - "!components"
+          - "!.github/**"
   - label: "area:ci"
     sync: true
     matcher:
