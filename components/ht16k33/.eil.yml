@@ -1,0 +1,20 @@
+---
+components:
+  - name: ht16k33
+    description: HT16K33 LED controller driver
+    group: led
+    groups: []
+    code_owners: chudsaviet
+    depends:
+      - name: i2cdev
+      - name: log
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+    licenses:
+      - name: MIT
+    copyrights:
+      - author:
+          name: chudsaviet
+        year: 2022
