@@ -48,7 +48,7 @@ jobs:
             console.log("pull_request");
             console.log(JSON.stringify(pull_request, null, 2));
 
-            let labels = pull_request.labels.map(label => { return label.name });
+            let labels = pull_request.data.labels.map(label => { return label.name });
 
             if (!labels.includes("area:components")) {
               should_skip = true;
