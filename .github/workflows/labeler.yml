@@ -31,3 +31,21 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           config-path: .github/labeler.yml
+
+      - name: Save the PR number for other workflows triggered by this workflow
+        # pass the PR number to other workflows.
+        #
+        # background: workflows triggered by workflow_run get an event context.
+        # the context, somehow, does not include pull_requests object (I don't
+        # know why GitHub does not include it). that means the triggered
+        # workflow has no way to know the PR number. workaround the issue by
+        # uploading the PR number as an artifact.
+        run: |
+          echo "${{ github.event.number }}" > pr_number.txt
+
+      - name: Upload the PR number as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr_number
+          path: pr_number.txt
+          if-no-files-found: error

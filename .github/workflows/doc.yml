@@ -13,14 +13,37 @@ jobs:
     outputs:
       should_skip: ${{ steps.skip_check.outputs.result }}
     steps:
+      - name: Download the PR number from the triggering workflow as an artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: pr_number
+
+      - name: Export the number
+        run: |
+          ls -al
+          cat pr_number.txt
+          PR_NUMBER=`cat pr_number.txt`
+          echo "PR_NUMBER=${PR_NUMBER}" >> ${GITHUB_ENV}
+
       - id: skip_check
         uses: actions/github-script@v6
         with:
           result-encoding: string
           script: |
+            console.log("context");
             console.log(JSON.stringify(context, null, 2));
             let should_skip = false;
-            let labels = context.payload.workflow_run.pull_requests[0].labels.map(label => { return label.name });
+            let pr_number = parseInt(process.env.PR_NUMBER);
+
+            pull_request = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr_number,
+            });
+            console.log("pull_request");
+            console.log(JSON.stringify(pull_request, null, 2));
+
+            let labels = pull_request.labels.map(label => { return label.name });
 
             if (!labels.includes("area:docs")) {
               should_skip = true;
