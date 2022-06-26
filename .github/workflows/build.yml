@@ -24,7 +24,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            console.log(JSON.stringify(context, null, 2))
+            console.log(JSON.stringify(context, null, 2));
             let should_skip = false;
             let labels = context.payload.workflow_run.pull_requests[0].labels.map(label => { return label.name });
 
