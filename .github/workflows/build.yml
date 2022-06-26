@@ -1,10 +1,12 @@
 ---
 name: Build examples
 on:
-  push:
   pull_request:
-     branches:
-        - master
+    branches:
+      - master
+    types:
+      - labeled
+      - synchronize
 
   # include workflow_dispatch to enable manual trigger from Web UI.
   workflow_dispatch:
@@ -18,18 +20,32 @@ jobs:
     # if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      should_skip: ${{ steps.skip_check.outputs.result }}
     steps:
       - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v3.4.0
+        uses: actions/github-script@v6
         with:
-          concurrent_skipping: same_content
+          result-encoding: string
+          script: |
+            console.log(JSON.stringify(context, null, 2))
+            let should_skip = false;
 
-          # if the change includes documentation, or ruby files changes only, skip.
-          paths_ignore: '["docs/**", "**/*.md", "*.md", "**/*.rb"]'
-
-          # but do not skip if the triggered event is one of these.
-          do_not_skip: '["workflow_dispatch", "schedule", "pull_request"]'
+            switch(context.payload.action) {
+              // when the added label is not "area:components", skip
+              case "labeled":
+                if (context.payload.label.name != "area:components" && context.payload.label.name != "area:ci") {
+                  should_skip = true;
+                }
+                break;
+              // when the PR branch is updated, but "area:components" label is not found, skip
+              case "synchronize":
+                let labels = context.payload.pull_request.labels.map(label => { return label.name });
+                if (!labels.includes("area:components") && !labels.includes("area:ci")) {
+                  should_skip = true;
+                }
+                break;
+            }
+            return should_skip;
 
   # XXX create multiple jobs for major versions
   #
