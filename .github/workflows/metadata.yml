@@ -2,8 +2,6 @@
 name: Metadata
 on:
   pull_request:
-    branches:
-      - master
     types:
       - labeled
       - synchronize
