@@ -1,11 +1,10 @@
 ---
 name: Build examples
 on:
-  workflow_run:
-    workflows:
-      - Label PR
+  pull_request:
     types:
-      - completed
+      - labeled
+      - synchronize
 
 jobs:
   pre_build:
@@ -19,23 +18,6 @@ jobs:
     outputs:
       should_skip: ${{ steps.skip_check.outputs.result }}
     steps:
-      - name: Download the PR number from the triggering workflow as an artifact
-        # XXX actions/download-artifact does not work here.
-        # see the rationale at: https://github.com/dawidd6/action-download-artifact
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: labeler.yml
-          run_id: ${{ github.event.workflow_run.id }}
-          name: pr_number
-
-      - name: Export the number
-        run: |
-          ls -al
-          cat pr_number.txt
-          PR_NUMBER=`cat pr_number.txt`
-          echo "PR_NUMBER=${PR_NUMBER}" >> ${GITHUB_ENV}
-
       - id: skip_check
         uses: actions/github-script@v6
         with:
@@ -44,24 +26,26 @@ jobs:
             console.log("context");
             console.log(JSON.stringify(context, null, 2));
             let should_skip = false;
-            let pr_number = parseInt(process.env.PR_NUMBER);
 
-            pull_request = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr_number,
-            });
-            console.log("pull_request");
-            console.log(JSON.stringify(pull_request, null, 2));
-
-            let labels = pull_request.data.labels.map(label => { return label.name });
-
-            if (!labels.includes("area:components")) {
-              should_skip = true;
-            }
-            if (labels.includes("area:ci")) {
-              should_skip = false;
-            }
+            switch(context.payload.action) {
+              case "labeled":
+                if (context.payload.label.name != "area:components") {
+                  should_skip = true;
+                }
+                if (context.payload.label.name == "area:ci") {
+                  should_skip = false;
+                }
+                break;
+              case "synchronize":
+                let labels = context.payload.pull_request.labels.map(label => { return label.name });
+                if (!labels.includes("area:components")) {
+                  should_skip = true;
+                }
+                if (labels.includes("area:ci")) {
+                  should_skip = false;
+                }
+                break;
+              }
             return should_skip;
 
   # XXX create multiple jobs for major versions

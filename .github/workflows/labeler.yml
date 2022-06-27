@@ -25,6 +25,7 @@ permissions:
 jobs:
   labeler:
     name: Labeler
+    if: ${{ secrets.LABELER_TOKEN == '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: fuxingloh/multi-labeler@v1
@@ -32,20 +33,12 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           config-path: .github/labeler.yml
 
-      - name: Save the PR number for other workflows triggered by this workflow
-        # pass the PR number to other workflows.
-        #
-        # background: workflows triggered by workflow_run get an event context.
-        # the context, somehow, does not include pull_requests object (I don't
-        # know why GitHub does not include it). that means the triggered
-        # workflow has no way to know the PR number. workaround the issue by
-        # uploading the PR number as an artifact.
-        run: |
-          echo "${{ github.event.number }}" > pr_number.txt
-
-      - name: Upload the PR number as an artifact
-        uses: actions/upload-artifact@v3
+  labeler_with_personal_access_token:
+    name: Labeler with Personal Access Token
+    if: ${{ secrets.LABELER_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fuxingloh/multi-labeler@v1
         with:
-          name: pr_number
-          path: pr_number.txt
-          if-no-files-found: error
+          github-token: ${{secrets.LABELER_TOKEN}}
+          config-path: .github/labeler.yml
