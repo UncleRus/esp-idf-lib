@@ -35,6 +35,13 @@ jobs:
             const util = require("util");
 
             label_failure_name = util.format("ci/%s/failure", context.payload.workflow_run.name);
+
+            // when pull_requests.length is zero, that means the workflow_run
+            // has no PR, e.g. workflow_run was invoked in `master`, and no
+            // PR to label.
+            if (context.payload.workflow_run.pull_requests.length == 0) {
+              return;
+            }
             try {
               await github.rest.issues.removeLabel({
                 issue_number: context.payload.workflow_run.pull_requests[0].number,
@@ -60,6 +67,10 @@ jobs:
             const util = require("util");
 
             label_failure_name = util.format("ci/%s/failure", context.payload.workflow_run.name);
+
+            if (context.payload.workflow_run.pull_requests.length == 0) {
+              return;
+            }
             try {
               await github.rest.issues.addLabels({
                 issue_number: context.payload.workflow_run.pull_requests[0].number,
