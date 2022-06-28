@@ -25,17 +25,6 @@ permissions:
 jobs:
   labeler:
     name: Labeler
-    if: ${{ secrets.LABELER_TOKEN == '' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: fuxingloh/multi-labeler@v1
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          config-path: .github/labeler.yml
-
-  labeler_with_personal_access_token:
-    name: Labeler with Personal Access Token
-    if: ${{ secrets.LABELER_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: fuxingloh/multi-labeler@v1
