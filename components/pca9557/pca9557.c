@@ -155,7 +155,7 @@ esp_err_t pca9557_port_write(i2c_dev_t *dev, uint8_t val)
 
 esp_err_t pca9557_get_mode(i2c_dev_t *dev, uint8_t pin, pca9557_mode_t *mode)
 {
-    return read_bit(dev, REG_CONF, pin, mode);
+    return read_bit(dev, REG_CONF, pin, (uint32_t *)mode);
 }
 
 esp_err_t pca9557_set_mode(i2c_dev_t *dev, uint8_t pin, pca9557_mode_t mode)
