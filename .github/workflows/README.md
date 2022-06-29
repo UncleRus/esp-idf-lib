@@ -6,6 +6,9 @@ This document describes how GitHub Actions workflows work in the repository.
 
 * [Overview](#overview)
 * [Labeler workflow](#labeler-workflow)
+    * [The triggering labeler workflow and Personal Access Token](#the-triggering-labeler-workflow-and-personal-access-token)
+    * [Creating a Personal Access Token](#creating-a-personal-access-token)
+    * [Using a Personal Access Token](#using-a-personal-access-token)
     * [Security considerations](#security-considerations)
 * [Action workflow](#action-workflow)
     * [Security considerations](#security-considerations-1)
@@ -50,6 +53,86 @@ In a labeler workflow, add or remove labels by using
 [actions/github-script](https://github.com/actions/github-script), which
 enable to use JavaScript code and GitHub REST APIs. It is possible to use
 shell instead, but not very practical.
+
+### The triggering labeler workflow and Personal Access Token
+
+Events triggered by a workflow do not run another workflow.
+[Triggering a workflow from a workflow](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow)
+says:
+
+> When you use the repository's GITHUB_TOKEN to perform tasks, events
+> triggered by the GITHUB_TOKEN will not create a new workflow run. This
+> prevents you from accidentally creating recursive workflow runs.
+
+That means `pull_request` event with type `labeled` will not be fired when a
+workflow labels a PR (but it will be if you manually label a PR).
+
+To trigger other workflows from a labeler, the labeler workflow needs a
+Personal Access Token, or a PAT, instead of `GITHUB_TOKEN`.
+
+> If you do want to trigger a workflow from within a workflow run, you can use
+> a personal access token instead of GITHUB_TOKEN to trigger events that
+> require a token.
+
+### Creating a Personal Access Token
+
+To create a PAT, visit [Settings](https://github.com/settings/profile) in your
+profile, and `Developer settings` > `Personal access token`. Click `Generate
+new token`.
+
+Choose `Expiration`. If you choose an expiration date for the token, the token
+will expire after GitHub send a notification that reminds you of the
+expiration. Obviously, you need to create a new token after the expiration
+date.  If you choose `No expiration`, the token will not expire, but GitHub
+does not recommend it.
+
+Choose `public_repo` scope for the access token.
+
+Click `Generate token`.
+
+See
+[Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+for details.
+
+### Using a Personal Access Token
+
+To use the generated PAT, it must be passed to workflows by a repository
+secret. That way, the token is available `${{ secrets.* }}` in workflows
+without hard-coding it in public code.
+
+After creating a PAT, create a repository secret. The name should be
+`LABELER_TOKEN` (this is the key of repository secrets used in labeler
+workflows), and the value should be the token. See
+[Managing encrypted secrets for your repository and organization for Codespaces](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-encrypted-secrets-for-your-repository-and-organization-for-codespaces)
+for details.
+
+```yaml
+jobs:
+  labeler:
+    name: Labeler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fuxingloh/multi-labeler@v1
+        with:
+          github-token: ${{secrets.LABELER_TOKEN}}
+          config-path: .github/labeler.yml
+```
+
+Note that if the labeler merely labels PRs just for human-being, not to run
+another workflow, the labeler does not need a PAT. Use `GITHUB_TOKEN` in that
+case.
+
+```yaml
+jobs:
+  labeler:
+    name: Labeler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fuxingloh/multi-labeler@v1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          config-path: .github/labeler.yml
+```
 
 ### Security considerations
 
