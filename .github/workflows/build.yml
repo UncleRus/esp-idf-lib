@@ -251,7 +251,7 @@ jobs:
             TOOLCHAIN_VERSION="esp-2020r3-8.4.0"
             ;;
           v4.3.*)
-            TOOLCHAIN_VERSION="esp-2021r2-8.4.0"
+            TOOLCHAIN_VERSION="esp-2021r2-patch3-8.4.0"
             ;;
           v4.4.*)
             TOOLCHAIN_VERSION="esp-2021r2-patch3-8.4.0"
