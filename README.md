@@ -185,6 +185,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **ht16k33**              | HT16K33 LED controller driver                                                    | MIT     | `esp32`, `esp8266` | Yes
 | **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips                    | MIT     | `esp32`            | Yes
 | **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | `esp32`, `esp32c3`, `esp8266` | Yes
+| **max7219**              | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                          | BSD-3   | `esp32`            | Yes
 
 ### Light sensors
 
@@ -209,7 +210,6 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3   | `esp32`, `esp8266` | Yes
 | **example**              | An example component                                                             | ISC     | `esp32`, `esp8266` | Yes
 | **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3   | `esp32`, `esp8266` | No
-| **max7219**              | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                          | BSD-3   | `esp32`            | Yes
 | **pca9685**              | Driver for 16-channel, 12-bit PWM PCA9685                                        | BSD-3   | `esp32`, `esp8266` | Yes
 | **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3   | `esp32`, `esp8266` | Yes
 | **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3   | `esp32`, `esp8266` | Yes
