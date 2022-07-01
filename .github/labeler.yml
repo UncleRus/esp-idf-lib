@@ -48,3 +48,441 @@ labels:
     sync: true
     matcher:
       files: "components/**"
+  - label: "area:components:ads111x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ads111x/**"
+  - label: "area:components:aht"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/aht/**"
+  - label: "area:components:bh1750"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/bh1750/**"
+  - label: "area:components:bh1900nux"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/bh1900nux/**"
+  - label: "area:components:bme680"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/bme680/**"
+  - label: "area:components:bmp180"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/bmp180/**"
+  - label: "area:components:bmp280"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/bmp280/**"
+  - label: "area:components:button"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/button/**"
+  - label: "area:components:ccs811"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ccs811/**"
+  - label: "area:components:color"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/color/**"
+  - label: "area:components:dht"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/dht/**"
+  - label: "area:components:ds1302"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ds1302/**"
+  - label: "area:components:ds1307"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ds1307/**"
+  - label: "area:components:ds18x20"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ds18x20/**"
+  - label: "area:components:ds3231"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ds3231/**"
+  - label: "area:components:ds3502"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ds3502/**"
+  - label: "area:components:encoder"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/encoder/**"
+  - label: "area:components:esp_idf_lib_helpers"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/esp_idf_lib_helpers/**"
+  - label: "area:components:example"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/example/**"
+  - label: "area:components:framebuffer"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/framebuffer/**"
+  - label: "area:components:hd44780"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/hd44780/**"
+  - label: "area:components:hdc1000"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/hdc1000/**"
+  - label: "area:components:hmc5883l"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/hmc5883l/**"
+  - label: "area:components:ht16k33"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ht16k33/**"
+  - label: "area:components:hts221"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/hts221/**"
+  - label: "area:components:hx711"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/hx711/**"
+  - label: "area:components:i2cdev"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/i2cdev/**"
+  - label: "area:components:ina219"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ina219/**"
+  - label: "area:components:ina260"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ina260/**"
+  - label: "area:components:ina3221"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ina3221/**"
+  - label: "area:components:led_strip"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/led_strip/**"
+  - label: "area:components:led_strip_spi"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/led_strip_spi/**"
+  - label: "area:components:lib8tion"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/lib8tion/**"
+  - label: "area:components:lm75"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/lm75/**"
+  - label: "area:components:ls7366r"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ls7366r/**"
+  - label: "area:components:max31725"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/max31725/**"
+  - label: "area:components:max31855"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/max31855/**"
+  - label: "area:components:max31865"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/max31865/**"
+  - label: "area:components:max7219"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/max7219/**"
+  - label: "area:components:mcp23008"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mcp23008/**"
+  - label: "area:components:mcp23x17"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mcp23x17/**"
+  - label: "area:components:mcp342x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mcp342x/**"
+  - label: "area:components:mcp4725"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mcp4725/**"
+  - label: "area:components:mcp960x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mcp960x/**"
+  - label: "area:components:mcp9808"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mcp9808/**"
+  - label: "area:components:mhz19b"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mhz19b/**"
+  - label: "area:components:ms5611"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ms5611/**"
+  - label: "area:components:noise"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/noise/**"
+  - label: "area:components:onewire"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/onewire/**"
+  - label: "area:components:pca9557"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/pca9557/**"
+  - label: "area:components:pca9685"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/pca9685/**"
+  - label: "area:components:pcf8563"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/pcf8563/**"
+  - label: "area:components:pcf8574"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/pcf8574/**"
+  - label: "area:components:pcf8575"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/pcf8575/**"
+  - label: "area:components:pcf8591"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/pcf8591/**"
+  - label: "area:components:qmc5883l"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/qmc5883l/**"
+  - label: "area:components:rda5807m"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/rda5807m/**"
+  - label: "area:components:scd30"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/scd30/**"
+  - label: "area:components:scd4x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/scd4x/**"
+  - label: "area:components:sgp40"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/sgp40/**"
+  - label: "area:components:sht3x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/sht3x/**"
+  - label: "area:components:sht4x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/sht4x/**"
+  - label: "area:components:si7021"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/si7021/**"
+  - label: "area:components:sts21"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/sts21/**"
+  - label: "area:components:tca9548"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tca9548/**"
+  - label: "area:components:tca95x5"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tca95x5/**"
+  - label: "area:components:tda74xx"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tda74xx/**"
+  - label: "area:components:tsl2561"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tsl2561/**"
+  - label: "area:components:tsl2591"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tsl2591/**"
+  - label: "area:components:tsl4531"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tsl4531/**"
+  - label: "area:components:tsys01"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/tsys01/**"
+  - label: "area:components:ultrasonic"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ultrasonic/**"
+  - label: "area:components:wiegand"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/wiegand/**"
