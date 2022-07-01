@@ -17,14 +17,10 @@ jobs:
     #
     # Another output, component_labels, includes all the component labels of
     # the PR, e.g. "area:components:foo,area:components:bar".
-    #
-    # `all_components` output includes all the component names under
-    # `components`, separated by a space.
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.skip_check.outputs.result }}
       component_labels: ${{ steps.get_all_component_labels.outputs.result }}
-      all_components: ${{ steps.get_all_components.outputs.all_components }}
     steps:
       - id: skip_check
         uses: actions/github-script@v6
@@ -55,13 +51,6 @@ jobs:
                 break;
               }
             return should_skip;
-
-      - name: Get all component names under components directory
-        id: get_all_components
-        run: |
-          all_components=`ls -1 components`
-          echo "all_components=${all_components}"
-          echo "::set-output name=all_components::${all_components}"
 
       - name: Get all area:components:* lables
         # this step returns a list of labels that start with "area:components:".
@@ -227,7 +216,7 @@ jobs:
           for component_label in ${component_labels}; do
             echo "${component_label}"
           done
-          all_components=`echo ${{ needs.pre_build.outputs.all_components }}`
+          all_components=`ls -1 components`
           echo "The repository has the following components:"
           for component in ${all_components}; do
             echo "${component}"
