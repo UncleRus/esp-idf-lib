@@ -1,0 +1,109 @@
+---
+# A workflow to test all the components have a label for components, such as
+# `area:components:foo`
+name: Check components label
+on:
+  pull_request:
+    types:
+      - labeled
+      - synchronize
+
+jobs:
+  pre_build:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.result }}
+    steps:
+      - id: skip_check
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            console.log("context");
+            console.log(JSON.stringify(context, null, 2));
+            let should_skip = false;
+
+            switch(context.payload.action) {
+              case "labeled":
+                if (context.payload.label.name != "area:components") {
+                  should_skip = true;
+                }
+                if (context.payload.label.name == "area:ci") {
+                  should_skip = false;
+                }
+                break;
+              case "synchronize":
+                let labels = context.payload.pull_request.labels.map(label => { return label.name });
+                if (!labels.includes("area:components")) {
+                  should_skip = true;
+                }
+                if (labels.includes("area:ci")) {
+                  should_skip = false;
+                }
+                break;
+              }
+            return should_skip;
+  check_labels:
+    runs-on: ubuntu-latest
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.result }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install yq to parse YAML files
+        run: |
+          YQ_VERSION=v4.25.3
+          YQ_BINARY=yq_linux_amd64
+          YQ_COMMAND="/usr/bin/yq"
+          wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}" -O ./yq
+          sudo mv ./yq "${YQ_COMMAND}"
+          sudo chmod +x "${YQ_COMMAND}"
+          "${YQ_COMMAND}" --version
+
+      - name: Check all components have a label for components
+        run: |
+          COMPONENTS_DIR="components"
+          echo "COMPONENTS_DIR: $COMPONENTS_DIR"
+          YAML_FILE=".github/labeler.yml"
+          echo "YAML_FILE: ${YAML_FILE}"
+          ALL_COMPONENTS=`ls -1 "${COMPONENTS_DIR}"`
+          echo "ALL_COMPONENTS:"
+          echo "${ALL_COMPONENTS}"
+          COMPONENTS_LABELS=`yq '.labels[] | select (.label == "area:components:*") | .label' "${YAML_FILE}"`
+          echo "COMPONENTS_LABELS:"
+          echo "${COMPONENTS_LABELS}"
+          EXIT_STATUS=0
+          MISSING_COMPONENTS=""
+          for COMPONENT in ${ALL_COMPONENTS}; do
+            echo "Check if \"${COMPONENT}\" has its own label, \"area:components:${COMPONENT}\", in \"${YAML_FILE}\""
+            FOUND=0
+            for COMPONENTS_LABEL in ${COMPONENTS_LABELS}; do
+              if [ "area:components:${COMPONENT}" = "${COMPONENTS_LABEL}" ]; then
+                FOUND=1
+              fi
+            done
+            if [ ${FOUND} -eq 1 ]; then
+              echo "Found \"${COMPONENT}\" in COMPONENTS_LABELS"
+            else
+              echo "\"${COMPONENT}\" could not be found in COMPONENTS_LABELS"
+              EXIT_STATUS=1
+              MISSING_COMPONENTS="${MISSING_COMPONENTS} ${COMPONENT}"
+            fi
+          done
+          if [ ${EXIT_STATUS} -eq 1 ]; then
+            echo "Some components could not be found in COMPONENTS_LABELS"
+            echo "MISSING_COMPONENTS: \"${MISSING_COMPONENTS}\""
+            echo "Add the following to \"${YAML_FILE}\""
+            for NAME in ${MISSING_COMPONENTS}; do
+              echo "  - label: \"area:components:${NAME}\""
+              echo "    sync: true"
+              echo "    matcher:"
+              echo "      files:"
+              echo "        any:"
+              echo "          - \"components/${NAME}/**\""
+            done
+          fi
+          exit "${EXIT_STATUS}"
