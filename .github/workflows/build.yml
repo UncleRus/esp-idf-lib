@@ -227,6 +227,28 @@ jobs:
           for component_label in ${component_labels}; do
             echo "${component_label}"
           done
+          all_components=`echo ${{ needs.pre_build.outputs.all_components }}`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
+
           IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
@@ -239,13 +261,19 @@ jobs:
           export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
           export CCACHE_NOHASHDIR=true
 
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              idf.py --ccache build
-            fi
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                idf.py --ccache build
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
 
   build_esp32_v4_x:
@@ -389,6 +417,33 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
+
           IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
@@ -401,13 +456,19 @@ jobs:
           export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
           export CCACHE_NOHASHDIR=true
 
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              idf.py --ccache build
-            fi
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                idf.py --ccache build
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
 
       - name: Setup ccache (make)
@@ -429,6 +490,32 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
 
           # make sure gcc is in $PATH
           echo ${PATH}
@@ -437,14 +524,29 @@ jobs:
           IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              make defconfig
-              make -j$(nproc)
-            fi
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                make defconfig
+                make -j$(nproc)
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
 
   build_esp8266:
@@ -556,18 +658,65 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
+
+          # make sure gcc is in $PATH
+          echo ${PATH}
+          ${__PROJECT_GCC_FILE} --version
+
           IGNORE_FILE="ci-ignore-esp8266"
 
           # these drivers do not compile for ESP8266 yet
           export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip max31865 ls7366r max31855"
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              make defconfig
-              make -j$(nproc)
-            fi
+
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                make defconfig
+                make -j$(nproc)
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
 
   build_esp8266_v3_3_x:
@@ -705,6 +854,32 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
 
           # make sure gcc is in $PATH
           echo ${PATH}
@@ -714,14 +889,30 @@ jobs:
 
           # these drivers do not compile for ESP8266 yet
           export EXCLUDE_COMPONENTS="max7219 mcp23x17 led_strip max31865 ls7366r max31855"
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              make defconfig
-              make -j$(nproc)
-            fi
+
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                make defconfig
+                make -j$(nproc)
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
 
   # XXX esp32s2 support was introduced in v4.2. older esp-idf does not install
@@ -825,19 +1016,58 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
+
           IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
           export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
           export CCACHE_NOHASHDIR=true
 
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              idf.py --ccache build
-            fi
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                idf.py --ccache build
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
 
   build_esp32c3_v4_x:
@@ -928,19 +1158,58 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+          done
+
+          # XXX if component_labels is empty, that means all examples must be
+          # built, e.g. the PR has "area:ci" label only.
+          if [ -z ${component_labels} ]; then
+            echo "the PR has no area:components:* label."
+            echo "going to build all examples."
+            components_to_build="${all_components}"
+          fi
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
+
           IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
           export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
           export CCACHE_NOHASHDIR=true
 
-          cd "${__PROJECT_EXAMPLE_DIR}"
-          for i in $(ls -d *); do
-            if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${i}/${IGNORE_FILE}" ]; then
-              cd "${__PROJECT_EXAMPLE_DIR}/${i}"
-              echo "Building ${i}..."
-              idf.py --ccache build
-            fi
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              if [ ! -e "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}/${IGNORE_FILE}" ]; then
+                cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+                echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+                idf.py --ccache build
+              else
+                echo "file #{IGNORE_FILE} found in ${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}, skipping"
+              fi
+            done
           done
   all_build:
     # a meta job that requires all of the above so that repository
