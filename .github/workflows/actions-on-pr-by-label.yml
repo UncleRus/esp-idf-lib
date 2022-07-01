@@ -18,7 +18,7 @@ jobs:
     # this job needs write access to PRs because it modifies the PR by
     # creating a comment.
     permissions:
-      - pull-requests: write
+      pull-requests: write
     steps:
       - name: Dump context for debugging
         uses: actions/github-script@v6
