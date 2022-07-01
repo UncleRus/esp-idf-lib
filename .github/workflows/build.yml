@@ -14,9 +14,13 @@ jobs:
     #
     # needs: pre_build
     # if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    #
+    # Another output, component_labels, includes all the component labels of
+    # the PR, e.g. "area:components:foo,area:components:bar".
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.skip_check.outputs.result }}
+      component_labels: ${{ steps.get_all_component_labels.outputs.result }}
     steps:
       - id: skip_check
         uses: actions/github-script@v6
@@ -47,6 +51,55 @@ jobs:
                 break;
               }
             return should_skip;
+
+      - name: Get all area:components:* lables
+        # this step returns a list of labels that start with "area:components:".
+        # the output includes comma-separated list of labels, such as "area:
+        # components:foo,area:components:bar".
+        id: get_all_component_labels
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            console.log("context");
+            console.log(JSON.stringify(context, null, 2));
+            let i = 0;
+            let component_labels = [];
+
+            switch(context.payload.action) {
+              case "labeled":
+                try {
+                  pr = await github.rest.issues.get({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.payload.number,
+                  });
+                  console.log("pr");
+                  console.log(JSON.stringify(pr, null, 2));
+
+                  for (i = 0; i < pr.labels.length; i++) {
+                    if (pr.labels[i].name.startsWith("area:components:")) {
+                      // " vim syntax cannot parse above line, breaking syntax highlight
+                      component_labels.push(pr.labels[i].name);
+                    }
+                  }
+                } catch(e) {
+                  core.error(e);
+                  core.setFailed(e.message);
+                }
+                break;
+                // append all labels that start with "area:components:"
+              case "synchronize":
+                let labels = context.payload.pull_request.labels.map(label => { return label.name });
+                for (i = 0; i < labels.length; i++) {
+                  if (labels[i].startsWith("area:components:")) {
+                    // "
+                    component_labels.push(labels[i]);
+                  }
+                }
+                break;
+              }
+            return component_labels;
 
   # XXX create multiple jobs for major versions
   #
@@ -158,6 +211,11 @@ jobs:
 
       - name: Build (idf.py)
         run: |
+          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
           IGNORE_FILE="ci-ignore"
           . ${IDF_PATH}/export.sh
 
