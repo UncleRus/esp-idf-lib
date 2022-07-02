@@ -104,6 +104,7 @@ jobs:
               echo "      files:"
               echo "        any:"
               echo "          - \"components/${NAME}/**\""
+              echo "          - \"examples/${NAME}/**\""
             done
           fi
           exit "${EXIT_STATUS}"
