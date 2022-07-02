@@ -33,18 +33,34 @@ jobs:
 
             switch(context.payload.action) {
               case "labeled":
-                if (context.payload.label.name != "area:components") {
+
+                // skip if the added label is not "area:components" nor "area:components:*"
+                if (context.payload.label.name != "area:components" && !context.payload.label.name.startsWith("area:components:")) {
+                  // "
                   should_skip = true;
                 }
+
+                // but if it is "area:ci" label, don't skip because changes to the CI affect everything.
                 if (context.payload.label.name == "area:ci") {
                   should_skip = false;
                 }
                 break;
               case "synchronize":
                 let labels = context.payload.pull_request.labels.map(label => { return label.name });
+
+                // skip if the added label is not "area:components"
                 if (!labels.includes("area:components")) {
                   should_skip = true;
                 }
+
+                // but if labels include "area:components:", do not skip
+                for (let i = 0; i < labels.length; i++) {
+                  if (labels[i].startsWith("area:components:")) { // "
+                    should_skip = false;
+                  }
+                }
+
+                // but if labels include "area:ci" label, don't skip because changes to the CI affect everything.
                 if (labels.includes("area:ci")) {
                   should_skip = false;
                 }
