@@ -239,7 +239,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
@@ -434,7 +434,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
@@ -507,7 +507,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
@@ -675,7 +675,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
@@ -871,7 +871,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
@@ -1033,7 +1033,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
@@ -1175,7 +1175,7 @@ jobs:
           done
           components_to_build=""
           for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 2 -d':'`
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
             components_to_build="${components_to_build} ${component_name}"
           done
 
