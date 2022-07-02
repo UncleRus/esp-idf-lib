@@ -477,6 +477,8 @@ Before creating a Pull Request, make sure:
    directory, create a directory `${COMPONENT_NAME}/default`. For instance, a
    component `foo` must have `examples/foo/default`. Create an example
    application in that directory.
+1. Update [.github/labeler.yml](.github/labeler.yml). The component should
+   have a label for it.
 1. You compiled the example code and the example application ran on a
    physical device as expected and documented
 1. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
