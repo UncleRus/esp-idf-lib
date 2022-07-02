@@ -473,7 +473,10 @@ Before creating a Pull Request, make sure:
 
 1. You compiled the code and the build succeeded
 1. Functions, macros, data types are documented in the code
-1. An example application is provided under [`examples`](examples)
+1. An example application is provided under [`examples`](examples). In the
+   directory, create a directory `${COMPONENT_NAME}/default`. For instance, a
+   component `foo` must have `examples/foo/default`. Create an example
+   application in that directory.
 1. You compiled the example code and the example application ran on a
    physical device as expected and documented
 1. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
