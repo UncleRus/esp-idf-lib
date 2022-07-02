@@ -77,10 +77,10 @@ jobs:
                   console.log("pr");
                   console.log(JSON.stringify(pr, null, 2));
 
-                  for (i = 0; i < pr.labels.length; i++) {
-                    if (pr.labels[i].name.startsWith("area:components:")) {
+                  for (i = 0; i < pr.data.labels.length; i++) {
+                    if (pr.data.labels[i].name.startsWith("area:components:")) {
                       // " vim syntax cannot parse above line, breaking syntax highlight
-                      component_labels.push(pr.labels[i].name);
+                      component_labels.push(pr.data.labels[i].name);
                     }
                   }
                 } catch(e) {
