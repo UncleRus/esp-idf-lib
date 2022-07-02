@@ -21,6 +21,7 @@ jobs:
     outputs:
       should_skip: ${{ steps.skip_check.outputs.result }}
       component_labels: ${{ steps.get_component_labels.outputs.result }}
+      components_to_build: ${{ steps.select_components_to_build.outputs.components_to_build }}
     steps:
       - id: skip_check
         uses: actions/github-script@v6
@@ -75,6 +76,33 @@ jobs:
               }
             return should_skip;
 
+      - name: See if the PR has area:ci label
+        id: has_area_ci_label
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            let result = false;
+            try {
+              pr = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.number,
+              });
+              console.log("pr");
+              console.log(JSON.stringify(pr, null, 2));
+              for (i = 0; i < pr.data.labels.length; i++) {
+                if (pr.data.labels[i].name == "area:ci") {
+                  result = true;
+                }
+              }
+
+            } catch(e) {
+                core.error(e);
+                core.setFailed(e.message);
+            }
+            return result;
+
       - name: Get all area:components:* lables
         # this step returns a list of labels that start with "area:components:".
         # the output includes comma-separated list of labels, such as "area:
@@ -123,6 +151,42 @@ jobs:
                 break;
               }
             return component_labels;
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Select components to build
+        # this step returns a list of components to build
+        id: select_components_to_build
+        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
+        run: |
+          component_labels=`echo ${{ steps.get_component_labels.outputs.result }} | sed -e 's/,/ /'`
+          echo "The PR has the following component labels:"
+          for component_label in ${component_labels}; do
+            echo "${component_label}"
+          done
+          all_components=`ls -1 components`
+          echo "The repository has the following components:"
+          for component in ${all_components}; do
+            echo "${component}"
+          done
+          components_to_build=""
+          for component_label in ${component_labels}; do
+            component_name=`echo ${component_label} | cut -f 3 -d':'`
+            components_to_build="${components_to_build} ${component_name}"
+            echo "components to build by labels"
+            echo "${components_to_build}"
+          done
+
+          # if component_labels has "area:ci" build all components
+          if [ ${{ steps.has_area_ci_label.outputs.result }} == "true" ]; then
+            echo "the PR has area:ci label, going to build all components"
+            components_to_build="${all_components}"
+          fi
+          echo "The components to build:"
+          components_to_build=`echo ${components_to_build} | tr "\n" " "`
+          echo ${components_to_build}
+          echo "::set-output name=components_to_build::${components_to_build}"
 
   # XXX create multiple jobs for major versions
   #
@@ -234,29 +298,7 @@ jobs:
 
       - name: Build (idf.py)
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
@@ -429,29 +471,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
@@ -502,29 +522,7 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
@@ -670,29 +668,7 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
@@ -866,29 +842,7 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
@@ -1028,29 +982,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
@@ -1170,29 +1102,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
-          echo "The PR has the following component labels:"
-          for component_label in ${component_labels}; do
-            echo "${component_label}"
-          done
-          all_components=`ls -1 components`
-          echo "The repository has the following components:"
-          for component in ${all_components}; do
-            echo "${component}"
-          done
-          components_to_build=""
-          for component_label in ${component_labels}; do
-            component_name=`echo ${component_label} | cut -f 3 -d':'`
-            components_to_build="${components_to_build} ${component_name}"
-          done
-
-          # XXX if component_labels is empty, that means all examples must be
-          # built, e.g. the PR has "area:ci" label only.
-          if [ -z ${component_labels} ]; then
-            echo "the PR has no area:components:* label."
-            echo "going to build all examples."
-            components_to_build="${all_components}"
-          fi
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
 
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
