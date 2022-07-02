@@ -33,35 +33,42 @@ jobs:
 
             switch(context.payload.action) {
               case "labeled":
-
-                // skip if the added label is not "area:components" nor "area:components:*"
+                console.log("context.payload.label.name");
+                console.log(JSON.stringify(context.payload.label.name));
+                console.log("skip if the added label is not area:components nor area:components:*");
+                  // "
                 if (context.payload.label.name != "area:components" && !context.payload.label.name.startsWith("area:components:")) {
                   // "
                   should_skip = true;
                 }
 
-                // but if it is "area:ci" label, don't skip because changes to the CI affect everything.
+                console.log("but if it is area:ci label, don't skip because changes to the CI affect everything.");
                 if (context.payload.label.name == "area:ci") {
                   should_skip = false;
                 }
                 break;
               case "synchronize":
                 let labels = context.payload.pull_request.labels.map(label => { return label.name });
+                console.log("labels");
+                console.log(JSON.stringify(labels));
 
-                // skip if the added label is not "area:components"
+                console.log("skip if labels does not include area:components");
                 if (!labels.includes("area:components")) {
+                  console.log("area:components found in the labels");
                   should_skip = true;
                 }
 
-                // but if labels include "area:components:", do not skip
+                console.log("but if labels include area:components:, do not skip");
                 for (let i = 0; i < labels.length; i++) {
                   if (labels[i].startsWith("area:components:")) { // "
+                    console.log("they does, do not skip");
                     should_skip = false;
                   }
                 }
 
-                // but if labels include "area:ci" label, don't skip because changes to the CI affect everything.
+                console.log("but if labels include area:ci label, don't skip because changes to the CI affect everything.");
                 if (labels.includes("area:ci")) {
+                  console.log("they does, do not skip");
                   should_skip = false;
                 }
                 break;
