@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.skip_check.outputs.result }}
-      component_labels: ${{ steps.get_all_component_labels.outputs.result }}
+      component_labels: ${{ steps.get_component_labels.outputs.result }}
     steps:
       - id: skip_check
         uses: actions/github-script@v6
@@ -72,7 +72,7 @@ jobs:
         # this step returns a list of labels that start with "area:components:".
         # the output includes comma-separated list of labels, such as "area:
         # components:foo,area:components:bar".
-        id: get_all_component_labels
+        id: get_component_labels
         uses: actions/github-script@v6
         with:
           result-encoding: string
@@ -227,7 +227,7 @@ jobs:
 
       - name: Build (idf.py)
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
@@ -422,7 +422,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
@@ -495,7 +495,7 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
@@ -663,7 +663,7 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
@@ -859,7 +859,7 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
@@ -1021,7 +1021,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
@@ -1163,7 +1163,7 @@ jobs:
       - name: Build (idf.py)
         if: ${{ matrix.build_method == 'idf' }}
         run: |
-          component_labels=`echo ${{ needs.pre_build.outputs.all_component_labels }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ needs.pre_build.outputs.component_labels }} | sed -e 's/,/ /'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
