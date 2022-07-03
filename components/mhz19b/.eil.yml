@@ -13,6 +13,8 @@ components:
     targets:
       - name: esp32
       - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
     licenses:
       - name: BSD-3
     copyrights:
@@ -22,4 +24,3 @@ components:
       - author:
           name: DavidD
         year: 2021
-
