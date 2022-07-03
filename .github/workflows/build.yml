@@ -178,6 +178,43 @@ jobs:
             echo "${components_to_build}"
           done
 
+          echo "Get a list of components by REQUIRES"
+          extra_components_to_build_by_require=""
+
+          # scan all component directories and if a component requires
+          # one of components_to_build, add it to extra_components_to_build_by_require
+          for component in ${components_to_build}; do
+            for c in ${all_components}; do
+              # the output is:
+              # REQUIRES:log;color
+              required=`cmake -DCOMPONENT_NAME:STRING=${c} devtools/cmake-get-requires  2>&1 >/dev/null | grep 'REQUIRES:' | cut -f2 -d':' | sed -e 's/;/ /g'`
+              echo "component ${c} requires ${required}"
+              for r in ${required}; do
+                if echo "${all_components}" | grep -q "${r}"; then
+                  echo "component ${r} is in all_components"
+                  if [ "${r}" = "${component}" ]; then
+                    echo "component ${c} requires ${component}, adding to extra_components_to_build_by_require"
+                    extra_components_to_build_by_require="${extra_components_to_build_by_require} ${c}"
+                  else
+                    echo "component ${c} does not require ${component}, ignoring"
+                  fi
+                else
+                  echo "component ${r} is not in all_components, ignoring"
+                fi
+              done
+            done
+          done
+          # remove duplicated name from extra_components_to_build_by_require
+          extra_components_to_build_by_require=`echo "${extra_components_to_build_by_require}" | tr ' ' '\n' | sort -u | tr '\n' ' '`
+
+          echo "The list of components to build by REQUIRES:"
+          echo "${extra_components_to_build_by_require}"
+
+          # and merge everything
+          components_to_build="${components_to_build} ${extra_components_to_build_by_require}"
+          echo "components to build:"
+          echo "${components_to_build}"
+
           # if component_labels has "area:ci" build all components
           if [ ${{ steps.has_area_ci_label.outputs.result }} == "true" ]; then
             echo "the PR has area:ci label, going to build all components"
