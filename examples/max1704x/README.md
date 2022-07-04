@@ -1,9 +1,9 @@
-# Example for `pcf8563` driver
+# Example for `max1704x` driver
 
 ## What it does
 
-The example configures a `pcf8563` device with date and time. It reads and
-shows date and time from the device in a loop.
+The example configures a `max1704x` device to get battry voltage, state of charge,
+and rate of change (MAX17048/9) in a loop.
 
 ## Wiring
 
