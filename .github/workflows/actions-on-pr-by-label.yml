@@ -13,12 +13,12 @@ jobs:
   on-labeled-ci-failure:
     # when a workflow fails, the PR is labeled with
     # `ci/${WORKFLOW_NAME}/failure`.
-    if: ${{ startsWith(github.event.label.name, 'ci/') && endsWith(github.event.label.name. '/failure') }}
+    if: ${{ startsWith(github.event.label.name, 'ci/') && endsWith(github.event.label.name, '/failure') }}
     runs-on: ubuntu-latest
     # this job needs write access to PRs because it modifies the PR by
     # creating a comment.
     permissions:
-      - pull-requests: write
+      pull-requests: write
     steps:
       - name: Dump context for debugging
         uses: actions/github-script@v6

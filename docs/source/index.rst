@@ -198,8 +198,8 @@ GPIO expanders
    groups/mcp23x17
    groups/pca9557
    
-LED controllers
-===============
+LED drivers
+===========
 .. toctree::
    :maxdepth: 1
 

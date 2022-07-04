@@ -6,6 +6,7 @@ This document describes how GitHub Actions workflows work in the repository.
 
 * [Overview](#overview)
 * [Labeler workflow](#labeler-workflow)
+    * [Labels used by the CI](#labels-used-by-the-ci)
     * [The triggering labeler workflow and Personal Access Token](#the-triggering-labeler-workflow-and-personal-access-token)
     * [Creating a Personal Access Token](#creating-a-personal-access-token)
     * [Using a Personal Access Token](#using-a-personal-access-token)
@@ -53,6 +54,14 @@ In a labeler workflow, add or remove labels by using
 [actions/github-script](https://github.com/actions/github-script), which
 enable to use JavaScript code and GitHub REST APIs. It is possible to use
 shell instead, but not very practical.
+
+### Labels used by the CI
+
+| Label             | Description                          |
+|-------------------|--------------------------------------|
+| `area:components` | Code under `components` is modified. |
+| `area:components:${NAME}` | Code of a specific component is modified. `${NAME}` is the name of the component. |
+| `area:ci` | The CI is modified. |
 
 ### The triggering labeler workflow and Personal Access Token
 
