@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 #include <sys/time.h>
 #include <hd44780.h>
+#include <esp_idf_lib_helpers.h>
 
 static uint32_t get_time_sec()
 {
@@ -23,6 +24,15 @@ void lcd_test(void *pvParameters)
         .font = HD44780_FONT_5X8,
         .lines = 2,
         .pins = {
+#if HELPER_TARGET_IS_ESP8266
+            .rs = GPIO_NUM_12,
+            .e  = GPIO_NUM_14,
+            .d4 = GPIO_NUM_5,
+            .d5 = GPIO_NUM_13,
+            .d6 = GPIO_NUM_16,
+            .d7 = GPIO_NUM_4,
+            .bl = HD44780_NOT_USED
+#else
             .rs = GPIO_NUM_19,
             .e  = GPIO_NUM_18,
             .d4 = GPIO_NUM_5,
@@ -30,6 +40,7 @@ void lcd_test(void *pvParameters)
             .d6 = GPIO_NUM_16,
             .d7 = GPIO_NUM_4,
             .bl = HD44780_NOT_USED
+#endif
         }
     };
 

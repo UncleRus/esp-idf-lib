@@ -7,13 +7,15 @@ components:
     groups: []
     code_owners: UncleRus
     depends:
-      - i2cdev
+      - name: i2cdev
       - name: log
       - name: esp_idf_lib_helpers
     thread_safe: yes
     targets:
       - name: esp32
-      - esp8266
+      - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
     licenses:
       - name: BSD-3
     copyrights:
