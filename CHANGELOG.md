@@ -1,5 +1,36 @@
 # Changelog
 
+## v.0.8.3
+
+### Changes that break compatibility 
+
+- ⚠ (bh1900nux, max31725, mcp23008, mcp23x17, mcp342x, mcp4725, pca9557, pcf8574, pcf8575, qmc5883l, sht3x, tca9548, tca95x5): The order of the arguments in `xxx_init_desc()` functions has been changed to bring all drivers to a common standard: instead of `xxx_init_desc(..., i2c_port_t port, uint8_t addr, ...)`, now `xxx_init_desc(..., uint8_t addr, i2c_port_t port, ...)`. Attention: both arguments are ints, so compiler will not throw an error when building your firmware without changing it!
+- (common) Dropped support for ESP-IDF v3.x
+
+### Features
+
+- (common) Added support for ESP32-C3
+- (hts221) Driver for HTS221 temperature and humidity sensor
+- (hdc1000) Driver for HDC1000 temperature and humidity sensor
+- (examples) Constant parameters in examples have been moved to Kconfig.projbuild files, so you can now setup examples by `idf.py menuconfig` or `make menuconfig` instead of modifying source code.
+- (examples) Added README to all examples
+- (hx711) Added function to read average data
+- (bh1900nux) Added software reset function
+- (ds3231) Added functions to set and get aging offset register
+- (esp_idf_lib_helper): Moved ets_sys.h includes to the separate file
+
+### Bugfixes
+
+- (i2cdev) Showing error name in error logging
+- (color) Fixed narrowing conversion error
+- (examples) Use SPI2_HOST in examples with ESP-IDF v4.x
+- (rda5807) Replaced `ESP_LOGI()` to `ESP_LOGD()`
+- (led_strip_spi) Fixed pointer arithmetic for esp8266
+- (led_strip_spi) Fixed "initialized field overwritten" warning
+- (mcp960x) Fixed incorrect I2C addressing
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.8.3/
+
 ## v.0.8.2
 
 ### Features
