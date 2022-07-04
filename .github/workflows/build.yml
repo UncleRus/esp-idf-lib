@@ -343,17 +343,16 @@ jobs:
           # find out drivers that do not support the target
           EXCLUDE_COMPONENTS=""
           ALL_COMPONENTS=`ls -1 components`
-          TARGET="esp32"
           for C in ${ALL_COMPONENTS}; do
-            echo "see if component ${C} supports the target ${TARGET}"
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
             if [ ! -f "components/${C}/.eil.yml" ]; then
               echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
               exit 1
             fi
-            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${TARGET}; then
-              echo "component ${C} supports ${TARGET}"
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
             else
-              echo "component ${C} does not support ${TARGET}. adding it to EXCLUDE_COMPONENTS"
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
               EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
             fi
           done
@@ -588,17 +587,16 @@ jobs:
           # find out drivers that do not support the target
           EXCLUDE_COMPONENTS=""
           ALL_COMPONENTS=`ls -1 components`
-          TARGET="esp32"
           for C in ${ALL_COMPONENTS}; do
-            echo "see if component ${C} supports the target ${TARGET}"
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
             if [ ! -f "components/${C}/.eil.yml" ]; then
               echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
               exit 1
             fi
-            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${TARGET}; then
-              echo "component ${C} supports ${TARGET}"
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
             else
-              echo "component ${C} does not support ${TARGET}. adding it to EXCLUDE_COMPONENTS"
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
               EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
             fi
           done
@@ -699,7 +697,9 @@ jobs:
           # XXX actions/checkout does not allow to checkout a repository other
           # than under __PROJECT_PATH
           IDF_PATH="${__PROJECT_PATH}/idf"
+
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=esp8266" >> ${GITHUB_ENV}
 
           # cache-idf-tools needs PROJECT_TOOLCHAIN_DIR
           echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
@@ -766,17 +766,16 @@ jobs:
           # find out drivers that do not support the target
           EXCLUDE_COMPONENTS=""
           ALL_COMPONENTS=`ls -1 components`
-          TARGET="esp8266"
           for C in ${ALL_COMPONENTS}; do
-            echo "see if component ${C} supports the target ${TARGET}"
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
             if [ ! -f "components/${C}/.eil.yml" ]; then
               echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
               exit 1
             fi
-            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${TARGET}; then
-              echo "component ${C} supports ${TARGET}"
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
             else
-              echo "component ${C} does not support ${TARGET}. adding it to EXCLUDE_COMPONENTS"
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
               EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
             fi
           done
@@ -876,7 +875,9 @@ jobs:
           # XXX actions/checkout does not allow to checkout a repository other
           # than under __PROJECT_PATH
           IDF_PATH="${__PROJECT_PATH}/idf"
+
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=esp8266" >> ${GITHUB_ENV}
 
           # cache-idf-tools needs PROJECT_DISTFILE_DIR
           echo "::set-output name=PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
@@ -958,17 +959,16 @@ jobs:
           # find out drivers that do not support the target
           EXCLUDE_COMPONENTS=""
           ALL_COMPONENTS=`ls -1 components`
-          TARGET="esp8266"
           for C in ${ALL_COMPONENTS}; do
-            echo "see if component ${C} supports the target ${TARGET}"
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
             if [ ! -f "components/${C}/.eil.yml" ]; then
               echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
               exit 1
             fi
-            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${TARGET}; then
-              echo "component ${C} supports ${TARGET}"
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
             else
-              echo "component ${C} does not support ${TARGET}. adding it to EXCLUDE_COMPONENTS"
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
               EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
             fi
           done
@@ -1112,17 +1112,16 @@ jobs:
           # find out drivers that do not support the target
           EXCLUDE_COMPONENTS=""
           ALL_COMPONENTS=`ls -1 components`
-          TARGET="esp32s2"
           for C in ${ALL_COMPONENTS}; do
-            echo "see if component ${C} supports the target ${TARGET}"
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
             if [ ! -f "components/${C}/.eil.yml" ]; then
               echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
               exit 1
             fi
-            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${TARGET}; then
-              echo "component ${C} supports ${TARGET}"
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
             else
-              echo "component ${C} does not support ${TARGET}. adding it to EXCLUDE_COMPONENTS"
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
               EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
             fi
           done
@@ -1254,17 +1253,16 @@ jobs:
           # find out drivers that do not support the target
           EXCLUDE_COMPONENTS=""
           ALL_COMPONENTS=`ls -1 components`
-          TARGET="esp32c3"
           for C in ${ALL_COMPONENTS}; do
-            echo "see if component ${C} supports the target ${TARGET}"
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
             if [ ! -f "components/${C}/.eil.yml" ]; then
               echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
               exit 1
             fi
-            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${TARGET}; then
-              echo "component ${C} supports ${TARGET}"
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
             else
-              echo "component ${C} does not support ${TARGET}. adding it to EXCLUDE_COMPONENTS"
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
               EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
             fi
           done
