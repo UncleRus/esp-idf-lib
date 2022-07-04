@@ -54,30 +54,59 @@
 #define MAX1704X_REGISTER_SOC           0x04
 #define MAX1704X_REGISTER_MODE          0x06
 #define MAX1704X_REGISTER_VERSION       0x08
+#define MAX1704X_REGISTER_HIBRT         0x0A
 #define MAX1704X_REGISTER_CONFIG        0x0C
-#define MAX1704X_REGISTER_CRATE         0x16
+#define MAX1704X_REGISTER_VALRT         0x14    // MAX17048/MAX17049 only
+#define MAX1704X_REGISTER_CRATE         0x16    // MAX17048/MAX17049 only
+#define MAX1704X_REGISTER_VRESET        0x18    // MAX17048/MAX17049 only
+#define MAX1704X_REGISTER_STATUS        0x1A    // MAX17048/MAX17049 only
 #define MAX1704X_REGISTER_COMMAND       0xFE
-#define MAX1704X_RESET_COMMAND          0x5400
-#define MAX1704X_QUICKSTART_MODE        0x4000
 
 /**
  * MAX1704X modes
  */
-#define WRITE_BIT I2C_MASTER_WRITE              /*!< I2C master write */
-#define READ_BIT I2C_MASTER_READ                /*!< I2C master read */
-#define ACK_CHECK_EN 0x1                        /*!< I2C master will check ack from slave*/
-#define ACK_CHECK_DIS 0x0                       /*!< I2C master will not check ack from slave */
-#define ACK_VAL 0x0                             /*!< I2C ack value */
-#define NACK_VAL 0x1                            /*!< I2C nack value */
+
+#define MAX1704X_RESET_COMMAND          0x5400
+#define MAX1704X_QUICKSTART_MODE        0x4000
+
+/**
+ * MAX1704X config register bits
+ */
+
+#define MAX1704X_CONFIG_ALRT_BIT        ((1U << 5))
+#define MAX1704X_CONFIG_ALSC_BIT        ((1U << 6))
+#define MAX1704X_CONFIG_SLEEP_BIT       ((1U << 7))
+#define MAX1704X_CONFIG_ATHD_MASK       0x1F
+#define MAX1704X_CONFIG_ATHD_SHIFT      0
+#define MAX1704X_STATUS_RI_BIT          ((1U << 0))
+#define MAX1704X_STATUS_VH_BIT          ((1U << 1))
+#define MAX1704X_STATUS_VL_BIT          ((1U << 2))
+#define MAX1704X_STATUS_VR_BIT          ((1U << 3))
+#define MAX1704X_STATUS_SL_BIT          ((1U << 4))
+#define MAX1704X_STATUS_SC_BIT          ((1U << 5))
+#define MAX1704X_STATUS_VRA_BIT         ((1U << 6))
+
+// #define WRITE_BIT I2C_MASTER_WRITE              /*!< I2C master write */
+// #define READ_BIT I2C_MASTER_READ                /*!< I2C master read */
+// #define ACK_CHECK_EN 0x1                        /*!< I2C master will check ack from slave*/
+// #define ACK_CHECK_DIS 0x0                       /*!< I2C master will not check ack from slave */
+// #define ACK_VAL 0x0                             /*!< I2C ack value */
+// #define NACK_VAL 0x1                            /*!< I2C nack value */
 
 #define MAX1704X_DEFER_ADDRESS          (uint8_t)0
 
 /**
- * MAX1704X constants
+ * MAX1704X precision constants:
+ * 
+ * Precision calculated is by per bit, not per LSB.
  */
-#define MAX17043_MV_PRECISION           1.25
-#define MAX17048_MV_PRECISION           0.078125
-#define MAX1704X_CRATE_PRECISION        0.208
+ 
+#define MAX17043_MV_PRECISION           1.25        // 1.25mV precision
+#define MAX17048_MV_PRECISION           0.078125    // 0.078125mV precision
+#define MAX1704X_CRATE_PRECISION        0.208       // 0.208% precision
+#define MAX1704X_VALRT_PRECISION        20.0        // 20mV precision
+#define MAX1704X_HIBRT_VCELL_PRECISION  1.25        // 1.25mV precision
+#define MAX1704X_HIBRT_CRATE_PRECISION  0.208       // 0.208% precision
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(ARG) do { if (!(ARG)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -126,13 +155,16 @@ esp_err_t max1704x_free_desc(i2c_dev_t *dev)
     return i2c_dev_delete_mutex(dev);
 }
 
-esp_err_t max1704x_init(max1704x_t *dev, i2c_dev_t *i2c_dev, max1704x_model_t model)
+esp_err_t max1704x_init(max1704x_t *dev, i2c_dev_t *i2c_dev)
 {
     CHECK_ARG(dev);
     CHECK_ARG(i2c_dev);
-    CHECK_ARG(model == MAX17043_4 || model == MAX17048_9);
     dev->i2c_dev = i2c_dev;
-    dev->model = model;
+#if CONFIG_MAX1704X_MODEL_3_4
+    dev->model = MAX17043_4;
+#else
+    dev->model = MAX17048_9;
+#endif
 
     return ESP_OK;
 }
@@ -204,7 +236,6 @@ esp_err_t max1704x_get_crate(max1704x_t *dev, float *crate)
     I2C_DEV_TAKE_MUTEX(dev->i2c_dev);
     I2C_DEV_CHECK(dev->i2c_dev, i2c_dev_read_reg(dev->i2c_dev, MAX1704X_REGISTER_CRATE, data, 2));
     I2C_DEV_GIVE_MUTEX(dev->i2c_dev);
-    // ESP_LOG_BUFFER_HEXDUMP("crate", data, 2, ESP_LOG_INFO);
     
     if (dev->model == MAX17043_4) {
         ESP_LOGW(tag, "MAX1704X_REGISTER_CRATE is not supported by MAX17043");
@@ -225,8 +256,128 @@ esp_err_t  max1704x_get_version(max1704x_t *dev, uint16_t *version)
     I2C_DEV_TAKE_MUTEX(dev->i2c_dev);
     I2C_DEV_CHECK(dev->i2c_dev, i2c_dev_read_reg(dev->i2c_dev, MAX1704X_REGISTER_VERSION, data, 2));
     I2C_DEV_GIVE_MUTEX(dev->i2c_dev);
-    // ESP_LOG_BUFFER_HEXDUMP("version", data, 2, ESP_LOG_INFO);
     
     *version = (data[0] << 8) | data[1];
+    return ESP_OK;
+}
+
+esp_err_t max1704x_get_config(max1704x_t *dev)
+{
+    CHECK_ARG(dev);
+    uint8_t data[2];
+    
+    I2C_DEV_TAKE_MUTEX(dev->i2c_dev);
+    I2C_DEV_CHECK(dev->i2c_dev, i2c_dev_read_reg(dev->i2c_dev, MAX1704X_REGISTER_CONFIG, data, 2));
+    I2C_DEV_GIVE_MUTEX(dev->i2c_dev);
+
+    dev->config.rcomp = data[0];
+    dev->config.sleep_mode = (data[1] & MAX1704X_CONFIG_SLEEP_BIT) ? true : false;
+    dev->config.soc_change_alert = (data[1] & MAX1704X_CONFIG_ALSC_BIT) ? true : false;
+    dev->config.alert_status = (data[1] & MAX1704X_CONFIG_ALRT_BIT) ? true : false;
+    dev->config.empty_alert_thresh = 32 - ((data[1] & MAX1704X_CONFIG_ATHD_MASK) >> MAX1704X_CONFIG_ATHD_SHIFT);
+
+    return ESP_OK;
+}
+
+esp_err_t max1704x_set_config(max1704x_t *dev, max1704x_config_t *config)
+{
+    CHECK_ARG(dev);
+    CHECK_ARG(config);
+    uint8_t data[2];
+    
+    if (config->rcomp) {
+       data[0] = config->rcomp;
+       dev->config.rcomp = config->rcomp;
+    }
+
+    data[1] = 0;
+    dev->config.sleep_mode = config->sleep_mode;
+    if (config->sleep_mode) {
+        data[1] |= MAX1704X_CONFIG_SLEEP_BIT;
+    }
+
+    dev->config.soc_change_alert = config->soc_change_alert;
+    if (config->soc_change_alert) {
+        data[1] |= MAX1704X_CONFIG_ALSC_BIT;
+    }
+
+    dev->config.alert_status = config->alert_status;
+    if (config->alert_status) {
+        data[1] |= MAX1704X_CONFIG_ALRT_BIT;
+    }
+
+    dev->config.empty_alert_thresh = 32 - config->empty_alert_thresh;
+    data[1] |= (32 - config->empty_alert_thresh) << MAX1704X_CONFIG_ATHD_SHIFT;
+    
+    I2C_DEV_TAKE_MUTEX(dev->i2c_dev);
+    I2C_DEV_CHECK(dev->i2c_dev, i2c_dev_write_reg(dev->i2c_dev, MAX1704X_REGISTER_CONFIG, data, 2));
+    I2C_DEV_GIVE_MUTEX(dev->i2c_dev);
+    
+    return ESP_OK;
+}
+
+esp_err_t max1704x_get_status(max1704x_t *dev)
+{
+    CHECK_ARG(dev);
+    uint8_t data[2];
+    
+    if (dev->model == MAX17043_4) {
+        ESP_LOGW(tag, "MAX1704X STATUS is not supported by MAX17043");
+        return ESP_ERR_NOT_SUPPORTED;
+    }
+
+    I2C_DEV_TAKE_MUTEX(dev->i2c_dev);
+    I2C_DEV_CHECK(dev->i2c_dev, i2c_dev_read_reg(dev->i2c_dev, MAX1704X_REGISTER_STATUS, data, 2));
+    I2C_DEV_GIVE_MUTEX(dev->i2c_dev);
+
+    dev->status.reset_indicator = (data[0] & MAX1704X_STATUS_RI_BIT) ? true : false;
+    dev->status.voltage_high = (data[0] & MAX1704X_STATUS_VH_BIT) ? true : false;
+    dev->status.voltage_low = (data[0] & MAX1704X_STATUS_VL_BIT) ? true : false;
+    dev->status.voltage_reset = (data[0] & MAX1704X_STATUS_VR_BIT) ? true : false; 
+    dev->status.soc_low = (data[0] & MAX1704X_STATUS_SL_BIT) ? true : false;
+    dev->status.soc_change = (data[0] & MAX1704X_STATUS_SC_BIT) ? true : false;
+    dev->status.vreset_alert = (data[0] & MAX1704X_STATUS_VRA_BIT) ? true : false;
+
+    return ESP_OK;
+}
+
+esp_err_t max1704x_set_status(max1704x_t *dev, max1704x_status_t *status)
+{
+    CHECK_ARG(dev);
+    CHECK_ARG(status);
+    uint8_t data[2];
+    
+    if (dev->model == MAX17043_4) {
+        ESP_LOGW(tag, "MAX1704X STATUS is not supported by MAX17043");
+        return ESP_ERR_NOT_SUPPORTED;
+    }
+
+    data[0] = 0;
+    if (status->reset_indicator) {
+        data[0] |= MAX1704X_STATUS_RI_BIT;
+    }
+    if (status->voltage_high) {
+        data[0] |= MAX1704X_STATUS_VH_BIT;
+    }
+    if (status->voltage_low) {
+        data[0] |= MAX1704X_STATUS_VL_BIT;
+    }
+    if (status->voltage_reset) {
+        data[0] |= MAX1704X_STATUS_VR_BIT;
+    }
+    if (status->soc_low) {
+        data[0] |= MAX1704X_STATUS_SL_BIT;
+    }
+    if (status->soc_change) {
+        data[0] |= MAX1704X_STATUS_SC_BIT;
+    }
+    if (status->vreset_alert) {
+        data[0] |= MAX1704X_STATUS_VRA_BIT;
+    }
+    data[1] = 0;
+    
+    I2C_DEV_TAKE_MUTEX(dev->i2c_dev);
+    I2C_DEV_CHECK(dev->i2c_dev, i2c_dev_write_reg(dev->i2c_dev, MAX1704X_REGISTER_STATUS, data, 2));
+    I2C_DEV_GIVE_MUTEX(dev->i2c_dev);
     return ESP_OK;
 }
