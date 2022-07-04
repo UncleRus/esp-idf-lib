@@ -534,6 +534,30 @@ jobs:
           echo "The component whose examples need to be built:"
           echo "${components_to_build}"
 
+          # find out drivers that do not support the target
+          EXCLUDE_COMPONENTS=""
+          ALL_COMPONENTS=`ls -1 components`
+          for C in ${ALL_COMPONENTS}; do
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
+            if [ ! -f "components/${C}/.eil.yml" ]; then
+              echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
+              exit 1
+            fi
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
+            else
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
+              EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
+            fi
+          done
+          echo "EXCLUDE_COMPONENTS=${EXCLUDE_COMPONENTS}"
+          export EXCLUDE_COMPONENTS
+
+          # remove components in EXCLUDE_COMPONENTS from components_to_build
+          for ec in ${EXCLUDE_COMPONENTS}; do
+            components_to_build=`echo ${components_to_build} | tr ' ' '\n' | grep -v ${ec} | tr '\n' ' '`
+          done
+
           . ${IDF_PATH}/export.sh
 
           # XXX share cache between examples.
@@ -545,6 +569,8 @@ jobs:
           export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
           export CCACHE_NOHASHDIR=true
 
+          echo "final components_to_build:"
+          echo "${components_to_build}"
           for component_to_build in ${components_to_build}; do
             cd ${GITHUB_WORKSPACE}
             echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
