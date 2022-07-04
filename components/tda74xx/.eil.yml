@@ -13,10 +13,11 @@ components:
     targets:
       - name: esp32
       - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
     licenses:
       - name: MIT
     copyrights:
       - author:
           name: UncleRus
         year: 2018
-
