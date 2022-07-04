@@ -123,7 +123,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **color**                | Common library for RGB and HSV colors                                            | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **esp_idf_lib_helpers**  | Common support library for esp-idf-lib                                           | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
-| **framebuffer**          | RGB framebuffer component                                                        | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **framebuffer**          | RGB framebuffer component                                                        | MIT     | `esp32`, `esp32s2`, `esp32c3` | Yes
 | **i2cdev**               | ESP-IDF I2C master thread-safe utilities                                         | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **lib8tion**             | Math functions specifically designed for LED programming                         | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **noise**                | Noise generation functions                                                       | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
