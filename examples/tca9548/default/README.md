@@ -1,16 +1,19 @@
-# Example application for `example` component
+# Example for `bmp180` driver
 
-## What the example does
+## What it does
 
-The example does nothing but waits in a loop.
+It shows temperature and pressure in a loop.
 
-## Configuration
+## Wiring
 
-No configuration is available.
+Connect `SCL` and `SDA` pins to the following pins with appropriate pull-up
+resistors.
+
+| Name | Description | Defaults |
+|------|-------------|----------|
+| `CONFIG_EXAMPLE_I2C_MASTER_SCL` | GPIO number for `SCL` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
+| `CONFIG_EXAMPLE_I2C_MASTER_SDA` | GPIO number for `SDA` | "4" for `esp8266`, "5" for `esp32c3`, "18" for `esp32`, `esp32s2`, and `esp32s3` |
 
 ## Notes
 
-This is an example application of `example`. It is intended as an example
-application for new component.
-
-The code under `main` should conform the code style.
+`CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL` must be `y` on `esp8266`.
