@@ -8,6 +8,7 @@
 * [How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
 * [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
 * [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+* [Porting I2C libs to I2Cdev](#porting-i2c-libs-to-i2cdev)
 
 <!-- vim-markdown-toc -->
 
