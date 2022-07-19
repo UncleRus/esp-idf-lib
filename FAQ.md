@@ -137,3 +137,8 @@ With default configuration you can't. Since the drivers use mutexes, this will
 crash the system.  But you can disable use of any I2C mutexes (both port and
 device) in configuration: just enable CONFIG_I2CDEV_NOLOCK. Keep in mind that
 after enabling this option all i2c device drivers will become non-thread safe.
+
+
+## Porting I2C libs to I2Cdev
+
+See [porting.md](docs/porting.md).
