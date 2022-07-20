@@ -149,7 +149,7 @@ extern "C"
      *      `ESP_INVALID_ARG` null dev
      *      `ESP_OK` on success
      */
-    esp_err_t lc709203f_get_apt(i2c_dev_t *dev, uint8_t *apt);
+    esp_err_t lc709203f_get_apt(i2c_dev_t *dev, uint16_t *apt);
 
     /**
      * @brief Get battery profile
@@ -185,15 +185,32 @@ extern "C"
     esp_err_t lc709203f_get_cell_ite(i2c_dev_t *dev, uint16_t *ite);
 
     /**
-     * @brief Get cell temperature
+     * @brief Get cell temperature in ºK. Min. unit is 0.1K
+     *
+     * @note Conversion ºK -> ºC = ºK + 273
+     *       Conversion ºC -> ºK = ºK + 273
+     *       Typical values:
+     *          0ºC -> 0x0AAC
+     *          25ºC -> 0x0BA6 (default)
      *
      * @param[in] dev Device descriptor
-     * @param[out] voltage Current voltage
+     * @param[out] temperature Current temperature
      * @return
      *      `ESP_INVALID_ARG` null dev
      *      `ESP_OK` on success
      */
-    esp_err_t lc709203f_get_cell_temperature(i2c_dev_t *dev, uint16_t *temperature);
+    esp_err_t lc709203f_get_cell_temperature(i2c_dev_t *dev, float *temperature);
+
+    /**
+     * @brief Get cell temperature in ºC.
+     *
+     * @param[in] dev Device descriptor
+     * @param[out] temperature Current temperature
+     * @return
+     *      `ESP_INVALID_ARG` null dev
+     *      `ESP_OK` on success
+     */
+    esp_err_t lc709203f_get_cell_temperature_celsius(i2c_dev_t *dev, float *temperature);
 
     /**
      * @brief Get cell voltage
@@ -228,7 +245,7 @@ extern "C"
      */
     esp_err_t lc709203f_get_ic_version(i2c_dev_t *dev, uint16_t *ic_version);
 
-        /**
+    /**
      * @brief Get power mode
      *
      * @param[in] dev Device descriptor
@@ -330,15 +347,32 @@ extern "C"
     esp_err_t lc709203f_set_battery_profile(i2c_dev_t *dev, lc709203f_battery_profile_t profile);
 
     /**
-     * @brief Set cell temperature
+     * @brief Set cell temperature in ºK. Min. unit is 0.1ºK
+     *
+     * @note Conversion ºK -> ºC = ºK - 273
+     *       Conversion ºC -> ºK = ºK + 273
+     *       Typical values:
+     *          0ºC -> 0x0AAC
+     *          25ºC -> 0x0BA6 (default)
      *
      * @param[in] dev Device descriptor
-     * @param[in] voltage Current voltage
+     * @param[in] temperature Temperature to set
      * @return
      *      `ESP_INVALID_ARG` null dev
      *      `ESP_OK` on success
      */
-    esp_err_t lc709203f_set_cell_temperature(i2c_dev_t *dev, uint16_t temperature);
+    esp_err_t lc709203f_set_cell_temperature(i2c_dev_t *dev, float temperature);
+
+    /**
+     * @brief Set cell temperature in ºC.
+     * 
+     * @param[in] dev Device descriptor
+     * @param[in] temperature Temperature to set
+     * @return
+     *      `ESP_INVALID_ARG` null dev
+     *      `ESP_OK` on success
+     */
+    esp_err_t lc709203f_set_cell_temperature_celsius(i2c_dev_t *dev, float temperature);
 
     /**
      * @brief Set current direction
@@ -346,7 +380,7 @@ extern "C"
      * @param[in] dev Device descriptor
      * @param[in] direction Current direction
      * @return
-     *      `ESP_INVALID_ARG` null dev
+     *      `ESP_INVALID_ARG` null dev. In I2C mode, temperature not in range 0x09E4-0x0D04 ()
      *      `ESP_OK` on success
      */
     esp_err_t lc709203f_set_current_direction(i2c_dev_t *dev, lc709203f_direction_t direction);

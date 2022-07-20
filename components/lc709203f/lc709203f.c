@@ -26,7 +26,7 @@
 #include "lc709203f.h"
 
 #define LC709203F_I2C_ADDR        0x0B   ///< LC709203F default i2c address
-#define LC709003F_I2C_MAX_FREQ_HZ 400000 ///< 400kHz
+#define LC709003F_I2C_MAX_FREQ_HZ 100000 ///< 400kHz
 
 #define LC709203F_REG_BEFORE_RSOC       0x04 ///< Initialize before RSOC
 #define LC709203F_REG_THERMISTOR_B      0x06 ///< Read/write thermistor B
@@ -46,9 +46,10 @@
 #define LC709203F_REG_STATUS_BIT        0x16 ///< Temperature obtaining method
 #define LC709203F_REG_NUM_PARAMETER     0x1A ///< Batt profile code
 
-static const uint16_t s_lc709203f_init_rsoc_val = 0xAA55; ///< Value to init RSOC
+#define LC709203F_INIT_RSOC_VAL  0xAA55 ///< Value to init RSOC
+#define LC709203F_CRC_POLYNOMIAL 0x07   /// Polynomial to calculare CRC-8-ATM
 
-static char *tag = "lc709203f";
+// static char *tag = "lc709203f";
 
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -65,18 +66,59 @@ static char *tag = "lc709203f";
             return ESP_ERR_INVALID_ARG;                                                                                \
     } while (0)
 
+static uint8_t s_lc709203f_calc_crc(uint8_t *data, size_t data_len)
+{
+    uint8_t crc = 0;
+
+    for (size_t j = data_len; j; --j)
+    {
+        crc ^= *data++;
+
+        for (size_t i = 8; i; --i)
+        {
+            crc = (crc & 0x80) ? (crc << 1) ^ LC709203F_CRC_POLYNOMIAL : (crc << 1);
+        }
+    }
+
+    return crc;
+}
+
 inline static esp_err_t s_i2c_dev_read_word(i2c_dev_t *dev, uint8_t reg, uint16_t *value)
 {
-    uint8_t reg_val[] = { 0, 0 };
+    uint8_t read_data[6] = { 0 };
+    uint8_t crc = 0;
 
-    CHECK(i2c_dev_read_reg(dev, reg, reg_val, 2));
+    CHECK(i2c_dev_read_reg(dev, reg, read_data + 3, 3));
+
+    read_data[0] = dev->addr << 1;
+    read_data[1] = reg;
+    read_data[2] = read_data[0] | 0x01;
+
+    crc = s_lc709203f_calc_crc(read_data, 5);
+
+    if (crc != read_data[5])
+    {
+        return ESP_ERR_INVALID_CRC;
+    }
 
     if (value)
     {
-        *value = reg_val[0] | (reg_val[1] << 8);
+        *value = read_data[3] | (read_data[4] << 8);
     }
 
     return ESP_OK;
+}
+
+inline static esp_err_t s_i2c_dev_write_reg_word(i2c_dev_t *dev, uint8_t reg, uint16_t value)
+{
+    uint8_t write_data[5];
+    write_data[0] = dev->addr << 1;
+    write_data[1] = reg;
+    write_data[2] = value & 0xFF;
+    write_data[3] = value >> 8;
+    write_data[4] = s_lc709203f_calc_crc(write_data, 4);
+
+    return i2c_dev_write_reg(dev, reg, write_data + 2, 3);
 }
 
 esp_err_t lc709203f_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -104,23 +146,20 @@ esp_err_t lc709203f_free_desc(i2c_dev_t *dev)
 esp_err_t lc709203f_before_rsoc(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_BEFORE_RSOC;
-    return i2c_dev_write(dev, &reg, 1, &s_lc709203f_init_rsoc_val, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_BEFORE_RSOC, LC709203F_INIT_RSOC_VAL);
 }
 
 esp_err_t lc709203f_initial_rsoc(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);
-
-    return i2c_dev_write(dev, LC709203F_REG_INITIAL_RSOC, 1, &s_lc709203f_init_rsoc_val, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_INITIAL_RSOC, LC709203F_INIT_RSOC_VAL);
 }
 
 esp_err_t lc709203f_get_alarm_low_rsoc(i2c_dev_t *dev, uint8_t *rsoc)
 {
     CHECK_ARG(dev);
 
-    return s_i2c_dev_read_word(dev, LC709203F_REG_ALARM_LOW_RSOC, rsoc);
+    return s_i2c_dev_read_word(dev, LC709203F_REG_ALARM_LOW_RSOC, (uint16_t *)rsoc);
 }
 
 esp_err_t lc709203f_get_alarm_low_voltage(i2c_dev_t *dev, uint16_t *voltage)
@@ -134,10 +173,10 @@ esp_err_t lc709203f_get_apa(i2c_dev_t *dev, uint8_t *apa)
 {
     CHECK_ARG(dev);
 
-    return s_i2c_dev_read_word(dev, LC709203F_REG_APA, apa);
+    return s_i2c_dev_read_word(dev, LC709203F_REG_APA, (uint16_t *)apa);
 }
 
-esp_err_t lc709203f_get_apt(i2c_dev_t *dev, uint8_t *apt)
+esp_err_t lc709203f_get_apt(i2c_dev_t *dev, uint16_t *apt)
 {
     CHECK_ARG(dev);
 
@@ -165,11 +204,32 @@ esp_err_t lc709203f_get_cell_ite(i2c_dev_t *dev, uint16_t *ite)
     return s_i2c_dev_read_word(dev, LC709203F_REG_CELL_ITE, ite);
 }
 
-esp_err_t lc709203f_get_cell_temperature(i2c_dev_t *dev, uint16_t *temperature)
+esp_err_t lc709203f_get_cell_temperature(i2c_dev_t *dev, float *temperature)
 {
     CHECK_ARG(dev);
 
-    return s_i2c_dev_read_word(dev, LC709203F_REG_CELL_TEMPERATURE, temperature);
+    uint16_t temp = 0;
+
+    esp_err_t ret = s_i2c_dev_read_word(dev, LC709203F_REG_CELL_TEMPERATURE, &temp);
+
+    if (ret == ESP_OK)
+    {
+        *temperature = temp / 10.0;
+    }
+
+    return ret;
+}
+
+esp_err_t lc709203f_get_cell_temperature_celsius(i2c_dev_t *dev, float *temperature)
+{
+    esp_err_t ret = lc709203f_get_cell_temperature(dev, temperature);
+
+    if (ret == ESP_OK)
+    {
+        *temperature = *temperature - 273;
+    }
+
+    return ret;
 }
 
 esp_err_t lc709203f_get_cell_voltage(i2c_dev_t *dev, uint16_t *voltage)
@@ -197,7 +257,7 @@ esp_err_t lc709203f_get_power_mode(i2c_dev_t *dev, lc709203f_power_mode_t *mode)
 {
     CHECK_ARG(dev);
 
-    return s_i2c_dev_read_word(dev, LC709203F_REG_IC_POWER_MODE, mode);
+    return s_i2c_dev_read_word(dev, LC709203F_REG_IC_POWER_MODE, (uint16_t *)mode);
 }
 
 esp_err_t lc709203f_get_rsoc(i2c_dev_t *dev, uint16_t *rsoc)
@@ -211,7 +271,7 @@ esp_err_t lc709203f_get_temp_mode(i2c_dev_t *dev, lc709203f_temp_mode_t *mode)
 {
     CHECK_ARG(dev);
 
-    return s_i2c_dev_read_word(dev, LC709203F_REG_STATUS_BIT, mode);
+    return s_i2c_dev_read_word(dev, LC709203F_REG_STATUS_BIT, (uint16_t *)mode);
 }
 
 esp_err_t lc709203f_get_thermistor_b(i2c_dev_t *dev, uint16_t *value)
@@ -224,80 +284,70 @@ esp_err_t lc709203f_get_thermistor_b(i2c_dev_t *dev, uint16_t *value)
 esp_err_t lc709203f_set_alarm_low_rsoc(i2c_dev_t *dev, uint8_t rsoc)
 {
     CHECK_ARG(dev);
-    CHECK_ARG(rsoc >= 0 && rsoc <= 100);
-    uint8_t reg = LC709203F_REG_ALARM_LOW_RSOC;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t)&rsoc, 2);
+    CHECK_ARG(rsoc <= 100);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_ALARM_LOW_RSOC, (uint16_t)rsoc);
 }
 
 esp_err_t lc709203f_set_alarm_low_voltage(i2c_dev_t *dev, uint16_t voltage)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_ALARM_LOW_VOLTAGE;
-    return i2c_dev_write(dev, &reg, 1, &voltage, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_ALARM_LOW_VOLTAGE, voltage);
 }
 
 esp_err_t lc709203f_set_apa(i2c_dev_t *dev, uint8_t apa)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_APA;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t *)&apa, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_APA, (uint16_t)apa);
 }
 
 esp_err_t lc709203f_set_apt(i2c_dev_t *dev, uint16_t apt)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_APA;
-    return i2c_dev_write(dev, &reg, 1, &apt, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_APT, apt);
 }
 
 esp_err_t lc709203f_set_battery_profile(i2c_dev_t *dev, lc709203f_battery_profile_t profile)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_CHANGE_PARAMETER;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t *)&profile, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_CHANGE_PARAMETER, (uint16_t)profile);
 }
 
-esp_err_t lc709203f_set_cell_temperature(i2c_dev_t *dev, uint16_t temperature)
+esp_err_t lc709203f_set_cell_temperature(i2c_dev_t *dev, float temperature)
 {
+    uint16_t temp = (uint16_t)(temperature * 10);
+
     CHECK_ARG(dev);
-    CHECK_ARG(temperature >= 0x09e4 && temperature <= 0x0D04);
-    
+    CHECK_ARG(temp >= 0x09e4 && temperature <= 0x0D04);
+
     uint8_t reg = LC709203F_REG_CELL_TEMPERATURE;
-    return i2c_dev_write(dev, &reg, 1, &temperature, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_CELL_TEMPERATURE, temp);
+}
+
+esp_err_t lc709203f_set_cell_temperature_celsius(i2c_dev_t *dev, float temperature)
+{
+    return lc709203f_set_cell_temperature(dev, temperature + 273);
 }
 
 esp_err_t lc709203f_set_current_direction(i2c_dev_t *dev, lc709203f_direction_t direction)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_CURRENT_DIRECTION;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t *)&direction, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_CURRENT_DIRECTION, (uint16_t)direction);
 }
 
 esp_err_t lc709203f_set_power_mode(i2c_dev_t *dev, lc709203f_power_mode_t mode)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_IC_POWER_MODE;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t *)&mode, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_IC_POWER_MODE, (uint16_t)mode);
 }
 
 esp_err_t lc709203f_set_temp_mode(i2c_dev_t *dev, lc709203f_temp_mode_t mode)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_STATUS_BIT;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t *)&mode, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_STATUS_BIT, (uint16_t)mode);
 }
 
 esp_err_t lc709203f_set_thermistor_b(i2c_dev_t *dev, uint16_t value)
 {
     CHECK_ARG(dev);
-
-    uint8_t reg = LC709203F_REG_THERMISTOR_B;
-    return i2c_dev_write(dev, &reg, 1, (uint16_t *)&value, 2);
+    return s_i2c_dev_write_reg_word(dev, LC709203F_REG_THERMISTOR_B, value);
 }
