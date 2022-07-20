@@ -26,7 +26,7 @@
 #include "lc709203f.h"
 
 #define LC709203F_I2C_ADDR        0x0B   ///< LC709203F default i2c address
-#define LC709003F_I2C_MAX_FREQ_HZ 100000 ///< 400kHz
+#define LC709003F_I2C_MAX_FREQ_HZ 400000 ///< 400kHz
 
 #define LC709203F_REG_BEFORE_RSOC       0x04 ///< Initialize before RSOC
 #define LC709203F_REG_THERMISTOR_B      0x06 ///< Read/write thermistor B
