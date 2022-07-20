@@ -29,13 +29,13 @@ static esp_err_t initialize_lc709203f(i2c_dev_t *lc)
     ESP_ERROR_CHECK(lc709203f_set_cell_temperature_celsius(lc, 20));
 
     uint16_t value = 0;
-    ESP_ERROR_CHECK(lc709203f_get_power_mode(lc, &value));
+    ESP_ERROR_CHECK(lc709203f_get_power_mode(lc, (lc709203f_power_mode_t *)&value));
     ESP_LOGI(TAG, "Power Mode: 0x%X", value);
-    ESP_ERROR_CHECK(lc709203f_get_apa(lc, &value));
+    ESP_ERROR_CHECK(lc709203f_get_apa(lc, (uint8_t *)&value));
     ESP_LOGI(TAG, "APA: 0x%X", value);
-    ESP_ERROR_CHECK(lc709203f_get_battery_profile(lc, &value));
+    ESP_ERROR_CHECK(lc709203f_get_battery_profile(lc, (lc709203f_battery_profile_t *)&value));
     ESP_LOGI(TAG, "Battery Profile: 0x%X", value);
-    ESP_ERROR_CHECK(lc709203f_get_temp_mode(lc, &value));
+    ESP_ERROR_CHECK(lc709203f_get_temp_mode(lc, (lc709203f_temp_mode_t *)&value));
     ESP_LOGI(TAG, "Temp Mode: 0x%X", value);
 
     return ESP_OK;
