@@ -51,20 +51,10 @@
 
 // static char *tag = "lc709203f";
 
-#define CHECK(x)                                                                                                       \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        esp_err_t __;                                                                                                  \
-        if ((__ = x) != ESP_OK)                                                                                        \
-            return __;                                                                                                 \
-    } while (0)
-
-#define CHECK_ARG(VAL)                                                                                                 \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (!(VAL))                                                                                                    \
-            return ESP_ERR_INVALID_ARG;                                                                                \
-    } while (0)
+// clang-format off
+#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+// clang-format on
 
 static uint8_t s_lc709203f_calc_crc(uint8_t *data, size_t data_len)
 {
