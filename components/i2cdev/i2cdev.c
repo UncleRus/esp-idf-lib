@@ -190,7 +190,7 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
     if (dev->port >= I2C_NUM_MAX) return ESP_ERR_INVALID_ARG;
 
     esp_err_t res;
-    if (!cfg_equal(&dev->cfg, &states[dev->port].config))
+    if (!cfg_equal(&dev->cfg, &states[dev->port].config) || !states[dev->port].installed)
     {
         ESP_LOGD(TAG, "Reconfiguring I2C driver on port %d", dev->port);
         i2c_config_t temp;
@@ -199,7 +199,10 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
 
         // Driver reinstallation
         if (states[dev->port].installed)
+        {
             i2c_driver_delete(dev->port);
+            states[dev->port].installed = false;
+        }
 #if HELPER_TARGET_IS_ESP32
         if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
             return res;
