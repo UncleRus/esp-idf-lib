@@ -68,15 +68,18 @@ void lc709203f_test(void *pvParameters)
 
 void app_main(void)
 {
-    /// Adafruit Feather esp32s3 need to pull up GPIO7 to enable board I2C pull ups
+#ifdef CONFIG_EXAMPLE_BOARD_ADAFRUIT_FEATHER_ESP32S2 || CONFIG_EXAMPLE_BOARD_ADAFRUIT_FEATHER_ESP32S3
+    /// Adafruit Feather esp32ss/s3 needs to set GPIO7 as HIGH level output to enable onboard I2C pull ups
+    /// We needn't internal pull ups.
     gpio_config_t io_conf = {};
     io_conf.pin_bit_mask = (1 << GPIO_NUM_7);
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pull_down_en = 1;
+    io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
     gpio_set_level(GPIO_NUM_7, 1);
+#endif
 
     ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreate(lc709203f_test, "lc709203f_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);

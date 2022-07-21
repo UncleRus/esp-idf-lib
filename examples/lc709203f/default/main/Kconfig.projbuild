@@ -14,4 +14,23 @@ menu "Example configuration"
         default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
         help
             GPIO number for I2C Master data line.
+    
+    choice EXAMPLE_BOARD
+        prompt "Example Board"
+        default EXAMPLE_BOARD_CUSTOM
+        help 
+            Selects board to upload example
+        
+        config EXAMPLE_BOARD_CUSTOM
+            bool
+            prompt "Custom"
+
+        config EXAMPLE_BOARD_ADAFRUIT_FEATHER_ESP32S2
+            bool
+            prompt "Adafruit Feather esp32s2"
+        
+        config EXAMPLE_BOARD_ADAFRUIT_FEATHER_ESP32S3
+            bool
+            prompt "Adafruit Feather esp32s3"
+    endchoice
 endmenu

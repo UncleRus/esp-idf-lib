@@ -24,18 +24,10 @@ You can change `SCL` and `SDA` pins in Example configuration.
 
 ## Notes
 
-Adafruit Feather esp32s3 is used to test. It requires to set GPIO7 HIGH to enable I2C pulls up. If you use any other board or configuration, remove from main:
+Adafruit Feather esp32s3 is used to test. It requires to set GPIO7 as HIGH output to enable I2C pulls up. 
 
-```
-    gpio_config_t io_conf = {};
-    io_conf.pin_bit_mask = (1 << GPIO_NUM_7);
-    io_conf.intr_type = GPIO_INTR_DISABLE;
-    io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pull_down_en = 1;
-    io_conf.pull_up_en = 0;
-    gpio_config(&io_conf);
-    gpio_set_level(GPIO_NUM_7, 1);  
-```
+You can select board in menuconfig.
+
 
 ## Log
 
