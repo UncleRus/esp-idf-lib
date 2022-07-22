@@ -15,8 +15,8 @@ Runs a loop that shows, every 10 seconds, temperature, voltage (V), rsoc (batter
 Connect `SCL` and `SDA` pins to the following pins with appropriate pull-up
 resistors.
 
-| Name | Description | Defaults |
-|------|-------------|----------|
+| Name                            | Description           | Defaults                                                                         |
+| ------------------------------- | --------------------- | -------------------------------------------------------------------------------- |
 | `CONFIG_EXAMPLE_I2C_MASTER_SCL` | GPIO number for `SCL` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
 | `CONFIG_EXAMPLE_I2C_MASTER_SDA` | GPIO number for `SDA` | "4" for `esp8266`, "5" for `esp32c3`, "18" for `esp32`, `esp32s2`, and `esp32s3` |
 
@@ -24,10 +24,9 @@ You can change `SCL` and `SDA` pins in Example configuration.
 
 ## Notes
 
-Adafruit Feather esp32s3 is used to test. It requires to set GPIO7 as HIGH output to enable I2C pulls up. 
+Boards like Adafruit Feather esp32s2/s3 have onboard pullup resistors for I2C, which can be enabled (or disabled) by setting output to HIGH (or LOW).
 
-You can select board in menuconfig.
-
+You can configure this feature in Example configuration. 
 
 ## Log
 
@@ -78,15 +77,14 @@ I (266) sleep: Configure to isolate all GPIO pins in sleep state
 I (273) sleep: Enable automatic switching of GPIO sleep configuration
 I (280) cpu_start: Starting scheduler on PRO CPU.
 I (0) cpu_start: Starting scheduler on APP CPU.
-I (300) gpio: GPIO[7]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 1| Intr:0 
 I (340) Exammple: Power Mode: 0x1
 I (340) Exammple: APA: 0x32
 I (340) Exammple: Battery Profile: 0x1
 I (340) Exammple: Temp Mode: 0x0
-I (350) Exammple: Temp: 20.0    Voltage: 3.75   RSOC: 20%       ITE: 20.4%
-I (10350) Exammple: Temp: 20.0  Voltage: 3.94   RSOC: 20%       ITE: 20.5%
-I (20350) Exammple: Temp: 20.0  Voltage: 3.99   RSOC: 20%       ITE: 20.6%
-I (30350) Exammple: Temp: 20.0  Voltage: 3.94   RSOC: 20%       ITE: 20.8%
+I (350) Exammple: Temp: 20.0    Voltage: 4.21   RSOC: 100%       ITE: 100.0%
+I (10350) Exammple: Temp: 20.0  Voltage: 4.21   RSOC: 100%       ITE: 100.0%
+I (20350) Exammple: Temp: 20.0  Voltage: 4.21   RSOC: 100%       ITE: 100.0%
+I (30350) Exammple: Temp: 20.0  Voltage: 4.21   RSOC: 100%       ITE: 100.0%
 ...
 ```
 

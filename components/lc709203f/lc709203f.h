@@ -34,6 +34,24 @@ extern "C"
 {
 #endif
 
+    #define LC709203F_REG_BEFORE_RSOC       0x04 ///< Initialize before RSOC
+    #define LC709203F_REG_THERMISTOR_B      0x06 ///< Read/write thermistor B
+    #define LC709203F_REG_INITIAL_RSOC      0x07 ///< Initialize RSOC calculation
+    #define LC709203F_REG_CELL_TEMPERATURE  0x08 ///< Read/write batt temperature
+    #define LC709203F_REG_CELL_VOLTAGE      0x09 ///< Read batt voltage
+    #define LC709203F_REG_CURRENT_DIRECTION 0x0A ///< Read/write current direction
+    #define LC709203F_REG_APA               0x0B ///< Read/write Adjustment Pack Application
+    #define LC709203F_REG_APT               0x0C ///< Read/write Adjustment Pack Thermistor
+    #define LC709203F_REG_RSOC              0x0D ///< Read state of charge
+    #define LC709203F_REG_CELL_ITE          0x0F ///< Read batt indicator to empty
+    #define LC709203F_REG_IC_VERSION        0x11 ///< Read IC version
+    #define LC709203F_REG_CHANGE_PARAMETER  0x12 ///< Set the battery profile
+    #define LC709203F_REG_ALARM_LOW_RSOC    0x13 ///< Alarm on percent threshold
+    #define LC709203F_REG_ALARM_LOW_VOLTAGE 0x14 ///< Alarm on voltage threshold
+    #define LC709203F_REG_IC_POWER_MODE     0x15 ///< Sets sleep/power mode
+    #define LC709203F_REG_STATUS_BIT        0x16 ///< Temperature obtaining method
+    #define LC709203F_REG_NUM_PARAMETER     0x1A ///< Batt profile code
+    
     /*!  Battery temperature source */
     typedef enum
     {
@@ -365,7 +383,7 @@ extern "C"
 
     /**
      * @brief Set cell temperature in ºC.
-     * 
+     *
      * @param[in] dev Device descriptor
      * @param[in] temperature Temperature to set
      * @return
