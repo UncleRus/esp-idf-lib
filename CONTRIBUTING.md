@@ -263,6 +263,9 @@ except some cases, notably brace wrapping. Here is a brief list of the styles.
 * Use suffix `_cb_t` for function `typedef`, e.g.`my_function_cb_t`
 * Use suffix `_s` for `struct`, e.g. `my_struct_s`
 * Wrap numbers in macro definition with parenthesis, e.g. `#define N_FOO (1)`
+* Use `#include <foo.h> for headers that are not part of the component, such
+  as `string.h`, `esp_log,h`, and `i2cdev.h`. Use `#include "foo.h" when the
+  header is private, i.e. the header is the part of the component.
 
 The style should be followed for all new code. In general, code can be
 considered "new code" when it makes up about 50% or more of the file(s)
