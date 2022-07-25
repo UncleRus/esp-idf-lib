@@ -230,6 +230,7 @@ Other
    groups/tca9548
    groups/ds3502
    groups/wiegand
+   groups/lc709203f
    
 
 ===========
