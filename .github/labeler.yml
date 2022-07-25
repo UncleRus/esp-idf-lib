@@ -4,7 +4,7 @@
 version: v1
 labels:
 
-  # thses labels are used to draft relases.
+  # these labels are used to draft releases.
   - label: "enhancement"
     matcher:
       branch: "^(feat|feature)-.*"
@@ -288,6 +288,14 @@ labels:
           - "components/ina3221/**"
           - "components/ina3221/.eil.yml"
           - "examples/ina3221/**"
+  - label: "area:components:lc709203f"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/lc709203f/**"
+          - "components/lc709203f/.eil.yml"
+          - "examples/lc709203f/**"
   - label: "area:components:led_strip"
     sync: true
     matcher:
