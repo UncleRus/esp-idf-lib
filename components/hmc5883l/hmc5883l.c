@@ -28,7 +28,7 @@
 /**
  * @file hmc5883l.c
  *
- * ESP-IDF Driver for 3-axis digital compass HMC5883L
+ * ESP-IDF Driver for 3-axis digital compass HMC5883L and HMC5983L
  *
  * Ported from esp-open-rtos
  *

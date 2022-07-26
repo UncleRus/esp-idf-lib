@@ -2,7 +2,7 @@
 components:
   - name: hmc5883l
     description: |
-      Driver for 3-axis digital compass HMC5883L
+      Driver for 3-axis digital compass HMC5883L and HMC5983L
     group: magnetic
     groups: []
     code_owners:
