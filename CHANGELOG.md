@@ -1,5 +1,24 @@
 # Changelog
 
+## v.0.9.1
+
+### Features
+- (lc709203f): Driver for LC709203F battery fuel gauge by @jmpmscorp in https://github.com/UncleRus/esp-idf-lib/pull/433
+- (hmc5883l): Added support for HMC5983 by @dizcza in https://github.com/UncleRus/esp-idf-lib/pull/431
+
+### Bugfixes
+- (i2cdev): Fixed I2C driver reinstallation bug by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/430
+- (chore): Updated io-console by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/435
+- (doc): Reordered Usages of metadata in the project section by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/439
+- (all): Fixed xprintf() format specifications in components and examples to support ESP-IDF v5 by @UncleRus
+- (ci): Fixed generation of components list by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/446
+
+## New Contributors
+- @jmpmscorp made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/433
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.1/
+
+
 ## v.0.9.0
 
 ### Features
