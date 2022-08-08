@@ -160,7 +160,7 @@ jobs:
         id: select_components_to_build
         if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         run: |
-          component_labels=`echo ${{ steps.get_component_labels.outputs.result }} | sed -e 's/,/ /'`
+          component_labels=`echo ${{ steps.get_component_labels.outputs.result }} | sed -e 's/,/ /g'`
           echo "The PR has the following component labels:"
           for component_label in ${component_labels}; do
             echo "${component_label}"
