@@ -39,7 +39,7 @@
 
 #include "pca9685.h"
 #include <esp_idf_lib_helpers.h>
-
+#include <inttypes.h>
 #include <esp_system.h>
 #include <esp_log.h>
 #include <ets_sys.h>

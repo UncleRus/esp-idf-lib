@@ -37,6 +37,7 @@
  * BSD Licensed as described in the file LICENSE
  */
 #include "hmc5883l.h"
+#include <inttypes.h>
 #include <esp_log.h>
 #include <esp_err.h>
 #include <esp_timer.h>
