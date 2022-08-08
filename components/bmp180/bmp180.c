@@ -35,7 +35,7 @@
  * MIT Licensed as described in the file LICENSE
  */
 #include "bmp180.h"
-
+#include <inttypes.h>
 #include <esp_err.h>
 #include <esp_log.h>
 #include <ets_sys.h>

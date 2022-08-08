@@ -35,6 +35,7 @@
  * BSD Licensed as described in the file LICENSE
  */
 #include "rda5807m.h"
+#include <inttypes.h>
 #include <esp_idf_lib_helpers.h>
 #include <esp_log.h>
 #include <string.h>

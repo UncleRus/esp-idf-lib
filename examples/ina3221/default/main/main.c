@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -91,7 +92,7 @@ void task(void *pvParameters)
             // Get voltage in millivolts and current in milliamperes
             ESP_ERROR_CHECK(ina3221_get_shunt_value(&dev, i, &shunt_voltage, &shunt_current));
 
-            printf("\nC%u:Measure number %lu\n", i + 1, measure_number);
+            printf("\nC%u:Measure number %" PRIu32 "\n", i + 1, measure_number);
             if (warning && (i + 1) == WARNING_CHANNEL)
                 printf("C%u:Warning Current > %.2f mA !!\n", i + 1, WARNING_CURRENT);
             printf("C%u:Bus voltage: %.02f V\n", i + 1, bus_voltage);

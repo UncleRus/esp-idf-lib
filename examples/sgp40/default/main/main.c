@@ -1,6 +1,7 @@
 /**
  * Simple example with humidity sensor and SGP40
  */
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
