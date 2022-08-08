@@ -72,7 +72,7 @@ void task(void *pvParamters)
         int32_t voc_index;
         ESP_ERROR_CHECK(sgp40_measure_voc(&sgp, humidity, temperature, &voc_index));
 
-        ESP_LOGI(TAG, "%.2f °C, %.2f %%, VOC index: %d, Air is [%s]",
+        ESP_LOGI(TAG, "%.2f °C, %.2f %%, VOC index: %" PRIi32 ", Air is [%s]",
                 temperature, humidity, voc_index, voc_index_name(voc_index));
 
         // Wait until 1 seconds (VOC cycle time) are over.

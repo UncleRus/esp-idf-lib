@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_system.h>
@@ -28,7 +29,7 @@ void tsl2561_test(void *pvParameters)
         if ((res = tsl2561_read_lux(&dev, &lux)) != ESP_OK)
             ESP_LOGI(TAG, "Could not read illuminance value: %d (%s)", res, esp_err_to_name(res));
         else
-            ESP_LOGI(TAG, "Illuminance: %u Lux", lux);
+            ESP_LOGI(TAG, "Illuminance: %" PRIu32 " Lux", lux);
     }
 }
 
@@ -38,4 +39,3 @@ void app_main()
 
     xTaskCreatePinnedToCore(tsl2561_test, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
-

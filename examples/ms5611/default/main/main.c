@@ -44,7 +44,7 @@ void ms5611_test(void *pvParameters)
          * sdkconfig for ESP8266, which is enabled by default for this
          * example. see sdkconfig.defaults.esp8266
          */
-        ESP_LOGI(TAG, "Pressure: %d Pa, Temperature: %.2f C\n", pressure, temperature);
+        ESP_LOGI(TAG, "Pressure: %" PRIi32 " Pa, Temperature: %.2f C\n", pressure, temperature);
     }
 }
 
@@ -55,4 +55,3 @@ void app_main()
 
     xTaskCreatePinnedToCore(ms5611_test, "ms5611_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
-

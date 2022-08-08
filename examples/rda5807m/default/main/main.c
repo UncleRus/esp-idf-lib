@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -28,7 +29,7 @@ static void display(void *pvParameters)
     while (1)
     {
         ESP_ERROR_CHECK(rda5807m_get_state(&dev, &state));
-        ESP_LOGI(TAG, "[ %3d.%d MHz ] [ %s ] [ %c ] [ %6s ] [ %3s ] [ RSSI: %3d ]",
+        ESP_LOGI(TAG, "[ %3" PRIi32 ".%" PRIi32 " MHz ] [ %s ] [ %c ] [ %6s ] [ %3s ] [ RSSI: %3d ]",
                  state.frequency / 1000, (state.frequency % 1000) / 100,
                  states[state.seek_status],
                  state.station ? 'S' : ' ',
@@ -78,4 +79,3 @@ void app_main()
     // Start task
     xTaskCreatePinnedToCore(test, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
-

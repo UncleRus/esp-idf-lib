@@ -220,7 +220,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
     if (temperature)
         *temperature = T / 10.0;
 
-    ESP_LOGD(TAG, "T:= %d.%d", T / 10, abs(T % 10));
+    ESP_LOGD(TAG, "T:= %" PRIi32 ".%d", T / 10, abs(T % 10));
 
     if (pressure)
     {
@@ -254,7 +254,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
 
         *pressure = P;
 
-        ESP_LOGD(TAG, "P:= %d", P);
+        ESP_LOGD(TAG, "P:= %" PRIi32, P);
     }
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);

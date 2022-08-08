@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -48,7 +49,7 @@ void i2c_switch_test(void *pvParameters)
                  * sdkconfig for ESP8266, which is enabled by default for this
                  * example. see sdkconfig.defaults.esp8266
                  */
-                printf("[Sensor %d] Temperature: %.2f degrees Celsius; Pressure: %d Pa\n", i, temp, pressure);
+                printf("[Sensor %d] Temperature: %.2f degrees Celsius; Pressure: %" PRIu32 " Pa\n", i, temp, pressure);
         }
 
         vTaskDelay(pdMS_TO_TICKS(500));

@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -34,7 +35,7 @@ void test(void *pvParameters)
             continue;
         }
 
-        ESP_LOGI(TAG, "Raw data: %d\n", data);
+        ESP_LOGI(TAG, "Raw data: %" PRIi32, data);
 
         vTaskDelay(pdMS_TO_TICKS(500));
     }
@@ -44,4 +45,3 @@ void app_main()
 {
     xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 5, NULL, 5, NULL);
 }
-

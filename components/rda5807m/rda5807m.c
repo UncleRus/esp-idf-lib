@@ -34,8 +34,8 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-#include <esp_idf_lib_helpers.h>
 #include "rda5807m.h"
+#include <esp_idf_lib_helpers.h>
 #include <esp_log.h>
 #include <string.h>
 #include <esp_err.h>
@@ -427,7 +427,7 @@ esp_err_t rda5807m_set_band(rda5807m_t *dev, rda5807m_band_t band)
 
     dev->band = band;
 
-    ESP_LOGD(TAG, "Band: %d..%d kHz", band_limits[band].lower, band_limits[band].upper);
+    ESP_LOGD(TAG, "Band: %" PRIu32 "..%" PRIu32 " kHz", band_limits[band].lower, band_limits[band].upper);
 
     return ESP_OK;
 }
@@ -472,7 +472,7 @@ esp_err_t rda5807m_set_frequency_khz(rda5807m_t *dev, uint32_t frequency)
 
     if (frequency < band_limits[dev->band].lower || frequency > band_limits[dev->band].upper)
     {
-        ESP_LOGE(TAG, "Could not set frequency: %d kHz is out of bounds (%d..%d)",
+        ESP_LOGE(TAG, "Could not set frequency: %" PRIu32 " kHz is out of bounds (%" PRIu32 "..%" PRIu32 ")",
                 frequency, band_limits[dev->band].lower, band_limits[dev->band].upper);
         return ESP_ERR_INVALID_ARG;
     }
@@ -480,14 +480,14 @@ esp_err_t rda5807m_set_frequency_khz(rda5807m_t *dev, uint32_t frequency)
     uint16_t chan = (frequency - band_limits[dev->band].lower) / spacings[dev->spacing];
     if (chan > MAX_CHAN)
     {
-        ESP_LOGE(TAG, "Could not set frequency to %d kHz with current band/spacing settings", frequency);
+        ESP_LOGE(TAG, "Could not set frequency to %" PRIu32 " kHz with current band/spacing settings", frequency);
         return ESP_ERR_INVALID_ARG;
     }
 
     CHECK(update_register(dev, REG_CHAN, MASK_CHAN_CHAN | BV(BIT_CHAN_TUNE),
             (chan << BIT_CHAN_CHAN) | BV(BIT_CHAN_TUNE)));
 
-    ESP_LOGD(TAG, "Frequency: %d kHz", chan * spacings[dev->spacing] + band_limits[dev->band].lower);
+    ESP_LOGD(TAG, "Frequency: %" PRIu32 " kHz", chan * spacings[dev->spacing] + band_limits[dev->band].lower);
 
     return ESP_OK;
 }
@@ -536,4 +536,3 @@ esp_err_t rda5807m_seek_stop(rda5807m_t *dev)
 
     return ESP_OK;
 }
-

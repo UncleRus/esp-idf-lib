@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <inttypes.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <string.h>
@@ -46,7 +46,7 @@ void test(void *arg)
     rotary_encoder_event_t e;
     int32_t val = 0;
 
-    ESP_LOGI(TAG, "Initial value: %d", val);
+    ESP_LOGI(TAG, "Initial value: %" PRIi32, val);
     while (1)
     {
         xQueueReceive(event_queue, &e, portMAX_DELAY);
@@ -67,7 +67,7 @@ void test(void *arg)
                 break;
             case RE_ET_CHANGED:
                 val += e.diff;
-                ESP_LOGI(TAG, "Value = %d", val);
+                ESP_LOGI(TAG, "Value = %" PRIi32, val);
                 break;
             default:
                 break;

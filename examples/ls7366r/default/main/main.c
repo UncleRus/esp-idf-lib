@@ -75,7 +75,7 @@ static void gpio_recv_task(void* arg)
 	{
 		if (xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY))
 		{
-			printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
+			printf("GPIO[%" PRIu32 "] intr, val: %d\n", io_num, gpio_get_level(io_num));
 		}
 
 	}
@@ -129,7 +129,7 @@ void app_main(void)
 	{
 		int32_t count;
 		ls7366r_get_count(&dev, &count);
-		ESP_LOGI(TAG, "Count: %d", count);
+		ESP_LOGI(TAG, "Count: %" PRIi32, count);
 		vTaskDelay(500 / portTICK_PERIOD_MS);
 	}
 }

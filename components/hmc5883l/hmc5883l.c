@@ -36,12 +36,11 @@
  *
  * BSD Licensed as described in the file LICENSE
  */
-
+#include "hmc5883l.h"
 #include <esp_log.h>
 #include <esp_err.h>
 #include <esp_timer.h>
 #include <esp_idf_lib_helpers.h>
-#include "hmc5883l.h"
 
 #define REG_CR_A 0x00
 #define REG_CR_B 0x01
@@ -148,7 +147,7 @@ esp_err_t hmc5883l_init(hmc5883l_dev_t *dev)
     if (id != HMC5883L_ID)
     {
         I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-        ESP_LOGE(TAG, "Unknown ID: 0x%08x != 0x%08x", id, HMC5883L_ID);
+        ESP_LOGE(TAG, "Unknown ID: 0x%08" PRIx32 " != 0x%08x", id, HMC5883L_ID);
         return ESP_ERR_NOT_FOUND;
     }
 
