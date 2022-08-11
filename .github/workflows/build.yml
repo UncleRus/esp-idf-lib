@@ -254,17 +254,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-
-          # XXX install python 3.8 because the official python package
-          # segfaults when installing modules in the runner.
-          #
-          # 2020-09-03T02:29:58.2517141Z Successfully installed cffi-1.14.2 cryptography-3.1 future-0.18.2 pycparser-2.20 pyparsing-2.3.1 pyserial-3.4 setuptools-50.1.0 six-1.15.0
-          # 2020-09-03T02:30:09.0409148Z /home/runner/work/_temp/66c91304-eef8-456d-84a1-7299428a62f7.sh: line 5:  4140 Segmentation fault      (core dumped) python3 -m pip install --user -r ${IDF_PATH}/requirements.txt
-          # 2020-09-03T02:30:09.0414254Z ##[error]Process completed with exit code 139.
-          #
-          # possibly related issue:
-          # https://github.com/actions/virtual-environments/issues/159
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -284,14 +274,8 @@ jobs:
       - name: Set environment variables
         id: set_env
         run: |
-          SDK_NAME="esp-idf"
-          GCC_PREFIX="xtensa-${{ matrix.target }}-elf"
-          GCC_FILE="${GCC_PREFIX}-gcc"
-          TOOLCHAIN_DIR="${HOME}/.espressif/tools"
-          TOOLCHAIN_VERSION="esp-2021r2-8.4.0"
           REPO_DIR=`pwd`
           EXAMPLE_DIR="${REPO_DIR}/examples"
-          DISTFILE_DIR="${HOME}/distfiles"
           __PROJECT_PATH=`pwd`
 
           # XXX actions/checkout does not allow to checkout a repository other
@@ -301,21 +285,8 @@ jobs:
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
 
-          # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
-          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
-
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
-          echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
-          echo "__PROJECT_GCC_PREFIX=${GCC_PREFIX}" >> ${GITHUB_ENV}
-          echo "__PROJECT_SDK_NAME=${SDK_NAME}" >> ${GITHUB_ENV}
-          echo "__PROJECT_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}" >> ${GITHUB_ENV}
-          echo "__PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> ${GITHUB_ENV}
-          echo "__PROJECT_TOOLCHAIN_VERSION=${TOOLCHAIN_VERSION}" >> ${GITHUB_ENV}
-          echo "__PROJECT_DISTFILE_DIR=${DISTFILE_DIR}" >> ${GITHUB_ENV}
-          echo "__PROJECT_PATH=${__PROJECT_PATH}" >> ${GITHUB_ENV}
-          echo "__PROJECT_BUILD_COMMAND=${__PROJECT_BUILD_COMMAND}" >> ${GITHUB_ENV}
-          echo "__PROJECT_BUILD_COMMAND_ARG=${__PROJECT_BUILD_COMMAND_ARG}" >> ${GITHUB_ENV}
 
       - name: Checkout the SDK
         uses: actions/checkout@v2
@@ -405,7 +376,7 @@ jobs:
           - v4.1.3
           - v4.2.3
           - v4.3.3
-          - v4.4.1
+          - v4.4.2
         target:
           - esp32
     steps:
@@ -415,17 +386,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-
-          # XXX install python 3.8 because the official python package
-          # segfaults when installing modules in the runner.
-          #
-          # 2020-09-03T02:29:58.2517141Z Successfully installed cffi-1.14.2 cryptography-3.1 future-0.18.2 pycparser-2.20 pyparsing-2.3.1 pyserial-3.4 setuptools-50.1.0 six-1.15.0
-          # 2020-09-03T02:30:09.0409148Z /home/runner/work/_temp/66c91304-eef8-456d-84a1-7299428a62f7.sh: line 5:  4140 Segmentation fault      (core dumped) python3 -m pip install --user -r ${IDF_PATH}/requirements.txt
-          # 2020-09-03T02:30:09.0414254Z ##[error]Process completed with exit code 139.
-          #
-          # possibly related issue:
-          # https://github.com/actions/virtual-environments/issues/159
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -681,7 +642,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -857,7 +818,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -1055,7 +1016,7 @@ jobs:
           - master
           - v4.2.3
           - v4.3.3
-          - v4.4.1
+          - v4.4.2
         target:
           - esp32s2
     steps:
@@ -1065,7 +1026,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -1196,7 +1157,7 @@ jobs:
           # esp32c3 support was introduced in v4.3.
           - master
           - v4.3.3
-          - v4.4.1
+          - v4.4.2
         target:
           - esp32c3
     steps:
@@ -1206,7 +1167,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
