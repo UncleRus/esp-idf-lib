@@ -1,7 +1,7 @@
 # Driver for the MPU6050
 
 **NOTES:**
-This driver is heavily inspired from [ElectronicCats/mpu6050](https://github.com/ElectronicCats/mpu6050).
+This driver is taken from https://github.com/gabrielbvicari/esp32-mpu6050
 
 ## Description:
 
