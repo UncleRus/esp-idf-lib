@@ -1,0 +1,26 @@
+menu "MPU6050 Example Configuration"
+
+    config EXAMPLE_MPU6050_ADDRESS_LOW
+	    bool "mpu6050 i2c addr 0x68"
+	    default true
+
+    config EXAMPLE_MPU6050_ADDRESS_HIGH
+	    bool "mpu6050 i2c addr 0x69"
+	    default false
+
+    config EXAMPLE_MPU6050_I2C_MASTER_SCL
+        int "MPU6050 SCL GPIO Number"
+        default 22 if IDF_TARGET_ESP32 
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_MPU6050_I2C_MASTER_SDA
+        int "MPU6050 SDA GPIO Number"
+        default 21 if IDF_TARGET_ESP32 
+        help
+            GPIO number for I2C Master data line.
+     
+    config EXAMPLE_MPU6050_I2C_CLOCK_HZ
+        int "I2C clock frequency, Hz"
+        default 100000
+endmenu
