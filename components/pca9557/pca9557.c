@@ -75,7 +75,7 @@ static esp_err_t read_bit(i2c_dev_t *dev, uint8_t reg, uint8_t bit, uint32_t *va
     CHECK_ARG(dev && val);
 
     uint8_t v;
-    CHECK(read_reg_8(dev, REG_IN, &v));
+    CHECK(read_reg_8(dev, reg, &v));
     *val = v & BIT(bit) ? 1 : 0;
 
     return ESP_OK;
@@ -88,9 +88,9 @@ static esp_err_t write_bit(i2c_dev_t *dev, uint8_t reg, uint8_t bit, uint32_t va
     uint8_t v;
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_OUT, &v, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg, &v, 1));
     v = (v & ~BIT(bit)) | (val ? BIT(bit) : 0);
-    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_OUT, &v, 1));
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg, &v, 1));
     I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
