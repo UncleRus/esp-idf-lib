@@ -1,0 +1,23 @@
+---
+components:
+  - name: icm42670
+    description: Driver for TDK ICM-42670-P IMU (found on ESP-RS board)
+    group: imu
+    groups: []
+    code_owners: Jan Veeh
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: Jan Veeh
+        year: 2022
