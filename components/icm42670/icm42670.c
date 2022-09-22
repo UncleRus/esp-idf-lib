@@ -376,7 +376,7 @@ esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t
     return ESP_OK;
 }
 
-esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, int16_t *data)
+esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, uint16_t *data)
 {
     CHECK_ARG(dev && data_register && data);
 
