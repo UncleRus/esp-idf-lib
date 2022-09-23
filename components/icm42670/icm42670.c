@@ -30,8 +30,6 @@
  *
  * ESP-IDF driver for TDK ICM-42670-P IMU (found on ESP-RS board)
  *
- * Ported from esp-open-rtos
- *
  * Copyright (c) 2022 Jan Veeh (jan.veeh@motius.de)
  *
  * BSD Licensed as described in the file LICENSE
@@ -289,6 +287,18 @@ static inline esp_err_t read_register_16(icm42670_t *dev, uint8_t upper_byte_reg
     return err;
 }
 
+static inline esp_err_t manipulate_register(icm42670_t *dev, uint8_t reg_addr, uint8_t mask, uint8_t shift, uint8_t value)
+{
+    uint8_t reg;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, reg_addr, &reg));
+    reg = (reg & ~mask) | (value << shift);
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, reg_addr, reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+
+    return ESP_OK;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 esp_err_t icm42670_init_desc(icm42670_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -351,29 +361,13 @@ esp_err_t icm42670_init(icm42670_t *dev)
 esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t pwr_mode)
 {
     CHECK_ARG(dev && pwr_mode);
-
-    uint8_t reg;
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_PWR_MGMT0, &reg));
-    reg = (reg & ~ICM42670_GYRO_MODE_BITS) | (pwr_mode << ICM42670_GYRO_MODE_SHIFT);
-    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_PWR_MGMT0, reg));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-
-    return ESP_OK;
+    return manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_GYRO_MODE_BITS, ICM42670_GYRO_MODE_SHIFT, pwr_mode);
 }
 
 esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t pwr_mode)
 {
     CHECK_ARG(dev && pwr_mode);
-
-    uint8_t reg;
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_PWR_MGMT0, &reg));
-    reg = (reg & ~ICM42670_ACCEL_MODE_BITS) | (pwr_mode << ICM42670_ACCEL_MODE_SHIFT);
-    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_PWR_MGMT0, reg));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-
-    return ESP_OK;
+    return manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_ACCEL_MODE_BITS, ICM42670_ACCEL_MODE_SHIFT, pwr_mode);
 }
 
 esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, uint16_t *data)
@@ -391,9 +385,71 @@ esp_err_t icm42670_read_temperature(icm42670_t *dev, float *temperature)
     CHECK_ARG(dev && temperature);
 
     uint16_t reg;
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, read_register_16(dev, ICM42670_REG_TEMP_DATA1, &reg));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    icm42670_read_raw_data(dev, ICM42670_REG_TEMP_DATA1, &reg);
     *temperature = (reg / 128.0) + 25;
     return ESP_OK;
+}
+
+esp_err_t icm42670_reset(icm42670_t *dev)
+{
+    CHECK_ARG(dev);
+
+    uint8_t reg = 1 << ICM42670_SOFT_RESET_DEVICE_CONFIG_SHIFT;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_SIGNAL_PATH_RESET, reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+
+    return ESP_OK;
+}
+
+esp_err_t icm42670_flush_fifo(icm42670_t *dev)
+{
+    CHECK_ARG(dev);
+
+    uint8_t reg = 1 << ICM42670_FIFO_FLUSH_SHIFT;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_SIGNAL_PATH_RESET, reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    vTaskDelay(pdMS_TO_TICKS(0.002)); //flush is done within 1.5us
+
+    return ESP_OK;
+}
+
+esp_err_t icm42670_set_gyro_range(icm42670_t *dev, icm42670_gyro_range_t range)
+{
+    CHECK_ARG(dev && range);
+    return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG0, ICM42670_GYRO_UI_FS_SEL_BITS, ICM42670_GYRO_UI_FS_SEL_SHIFT, range);
+}
+
+esp_err_t icm42670_set_gyro_odr(icm42670_t *dev, icm42670_gyro_odr_t odr)
+{
+    CHECK_ARG(dev && odr);
+    return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG0, ICM42670_GYRO_ODR_BITS, ICM42670_GYRO_ODR_SHIFT, odr);
+}
+
+esp_err_t icm42670_set_accel_range(icm42670_t *dev, icm42670_accel_range_t range)
+{
+    CHECK_ARG(dev && range);
+    return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG0, ICM42670_ACCEL_UI_FS_SEL_BITS, ICM42670_ACCEL_UI_FS_SEL_SHIFT, range);
+}
+
+esp_err_t icm42670_set_accel_odr(icm42670_t *dev, icm42670_accel_odr_t odr)
+{
+    CHECK_ARG(dev && odr);
+    return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG0, ICM42670_ACCEL_ODR_BITS, ICM42670_ACCEL_ODR_SHIFT, odr);
+}
+
+esp_err_t icm42670_set_int_config(icm42670_t *dev, uint8_t int_pin, icm42670_int_config_t config)
+{
+    CHECK_ARG(dev && int_pin);
+
+    uint8_t reg = config.mode << 2 | config.drive << 1 | config.polarity;
+    if(int_pin == 2){
+        return manipulate_register(dev, ICM42670_REG_INT_CONFIG, 0b00111000, ICM42670_INT2_POLARITY_SHIFT, reg);
+    }else if (int_pin == 1){
+        return manipulate_register(dev, ICM42670_REG_INT_CONFIG, 0b00000111, ICM42670_INT1_POLARITY_SHIFT, reg);
+    }else{
+        printf("Error, only INT pins 1 and 2 available\n");
+        return ESP_ERR_INVALID_ARG;
+    }
 }
