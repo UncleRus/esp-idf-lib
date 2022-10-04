@@ -176,33 +176,7 @@ static const char *TAG = "icm42670";
 #define ICM42670_WOM_X_INT1_EN_BITS                 0x01    // ICM42670_REG_INT_SOURCE1<0>
 #define ICM42670_WOM_X_INT1_EN_SHIFT                0       // ICM42670_REG_INT_SOURCE1<0>
 
-#define ICM42670_ST_INT2_EN_BITS                    0x80    // ICM42670_REG_INT_SOURCE3<7>
-#define ICM42670_ST_INT2_EN_SHIFT                   7       // ICM42670_REG_INT_SOURCE3<7>
-#define ICM42670_FSYNC_INT2_EN_BITS                 0x40    // ICM42670_REG_INT_SOURCE3<6>
-#define ICM42670_FSYNC_INT2_EN_SHIFT                6       // ICM42670_REG_INT_SOURCE3<6>
-#define ICM42670_PLL_RDY_INT2_EN_BITS               0x20    // ICM42670_REG_INT_SOURCE3<5>
-#define ICM42670_PLL_RDY_INT2_EN_SHIFT              5       // ICM42670_REG_INT_SOURCE3<5>
-#define ICM42670_RESET_DONE_INT2_EN_BITS            0x10    // ICM42670_REG_INT_SOURCE3<4>
-#define ICM42670_RESET_DONE_INT2_EN_SHIFT           4       // ICM42670_REG_INT_SOURCE3<4>
-#define ICM42670_DRDY_INT2_EN_BITS                  0x08    // ICM42670_REG_INT_SOURCE3<3>
-#define ICM42670_DRDY_INT2_EN_SHIFT                 3       // ICM42670_REG_INT_SOURCE3<3>
-#define ICM42670_FIFO_THS_INT2_EN_BITS              0x04    // ICM42670_REG_INT_SOURCE3<2>
-#define ICM42670_FIFO_THS_INT2_EN_SHIFT             2       // ICM42670_REG_INT_SOURCE3<2>
-#define ICM42670_FIFO_FULL_INT2_EN_BITS             0x02    // ICM42670_REG_INT_SOURCE3<1>
-#define ICM42670_FIFO_FULL_INT2_EN_SHIFT            1       // ICM42670_REG_INT_SOURCE3<1>
-#define ICM42670_AGC_RDY_INT2_EN_BITS               0x01    // ICM42670_REG_INT_SOURCE3<0>
-#define ICM42670_AGC_RDY_INT2_EN_SHIFT              0       // ICM42670_REG_INT_SOURCE3<0>
-
-#define ICM42670_I3C_PROTOCOL_ERROR_INT2_EN_BITS    0x40    // ICM42670_REG_INT_SOURCE4<6>
-#define ICM42670_I3C_PROTOCOL_ERROR_INT2_EN_SHIFT   6       // ICM42670_REG_INT_SOURCE4<6>
-#define ICM42670_SMD_INT2_EN_BITS                   0x08    // ICM42670_REG_INT_SOURCE4<3>
-#define ICM42670_SMD_INT2_EN_SHIFT                  3       // ICM42670_REG_INT_SOURCE4<3>
-#define ICM42670_WOM_Z_INT2_EN_BITS                 0x04    // ICM42670_REG_INT_SOURCE4<2>
-#define ICM42670_WOM_Z_INT2_EN_SHIFT                2       // ICM42670_REG_INT_SOURCE4<2>
-#define ICM42670_WOM_Y_INT2_EN_BITS                 0x02    // ICM42670_REG_INT_SOURCE4<1>
-#define ICM42670_WOM_Y_INT2_EN_SHIFT                1       // ICM42670_REG_INT_SOURCE4<1>
-#define ICM42670_WOM_X_INT2_EN_BITS                 0x01    // ICM42670_REG_INT_SOURCE4<0>
-#define ICM42670_WOM_X_INT2_EN_SHIFT                0       // ICM42670_REG_INT_SOURCE4<0>
+// ICM42670_REG_INT_SOURCE3 and ICM42670_REG_INT_SOURCE4 same as 0 and 1
 
 #define ICM42670_DMP_IDLE_BITS                      0x04    // ICM42670_REG_APEX_DATA3<2>
 #define ICM42670_DMP_IDLE_SHIFT                     2       // ICM42670_REG_APEX_DATA3<2>
@@ -415,7 +389,7 @@ esp_err_t icm42670_flush_fifo(icm42670_t *dev)
     return ESP_OK;
 }
 
-esp_err_t icm42670_set_gyro_range(icm42670_t *dev, icm42670_gyro_range_t range)
+esp_err_t icm42670_set_gyro_fsr(icm42670_t *dev, icm42670_gyro_fsr_t range)
 {
     CHECK_ARG(dev && range);
     return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG0, ICM42670_GYRO_UI_FS_SEL_BITS, ICM42670_GYRO_UI_FS_SEL_SHIFT, range);
@@ -427,7 +401,7 @@ esp_err_t icm42670_set_gyro_odr(icm42670_t *dev, icm42670_gyro_odr_t odr)
     return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG0, ICM42670_GYRO_ODR_BITS, ICM42670_GYRO_ODR_SHIFT, odr);
 }
 
-esp_err_t icm42670_set_accel_range(icm42670_t *dev, icm42670_accel_range_t range)
+esp_err_t icm42670_set_accel_fsr(icm42670_t *dev, icm42670_accel_fsr_t range)
 {
     CHECK_ARG(dev && range);
     return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG0, ICM42670_ACCEL_UI_FS_SEL_BITS, ICM42670_ACCEL_UI_FS_SEL_SHIFT, range);
@@ -439,7 +413,31 @@ esp_err_t icm42670_set_accel_odr(icm42670_t *dev, icm42670_accel_odr_t odr)
     return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG0, ICM42670_ACCEL_ODR_BITS, ICM42670_ACCEL_ODR_SHIFT, odr);
 }
 
-esp_err_t icm42670_set_int_config(icm42670_t *dev, uint8_t int_pin, icm42670_int_config_t config)
+esp_err_t icm42670_set_temp_lpf(icm42670_t *dev, icm42670_temp_lfp_t lpf_bw)
+{
+    CHECK_ARG(dev && lpf_bw);
+    return manipulate_register(dev, ICM42670_REG_TEMP_CONFIG0, ICM42670_TEMP_FILT_BW_BITS, ICM42670_TEMP_FILT_BW_SHIFT, lpf_bw);
+}
+
+esp_err_t icm42670_set_gyro_lpf(icm42670_t *dev, icm42670_gyro_lfp_t lpf_bw)
+{
+    CHECK_ARG(dev && lpf_bw);
+    return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG1, ICM42670_GYRO_UI_FILT_BW_BITS, ICM42670_GYRO_UI_FILT_BW_SHIFT, lpf_bw);
+}
+
+esp_err_t icm42670_set_accel_lpf(icm42670_t *dev, icm42670_accel_lfp_t lpf_bw)
+{
+    CHECK_ARG(dev && lpf_bw);
+    return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG1, ICM42670_ACCEL_UI_FILT_BW_BITS, ICM42670_ACCEL_UI_FILT_BW_SHIFT, lpf_bw);
+}
+
+esp_err_t icm42670_set_accel_avg(icm42670_t *dev, icm42670_accel_avg_t avg)
+{
+    CHECK_ARG(dev && avg);
+    return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG1, ICM42670_ACCEL_UI_AVG_BITS, ICM42670_ACCEL_UI_AVG_SHIFT, avg);
+}
+
+esp_err_t icm42670_config_int_pin(icm42670_t *dev, uint8_t int_pin, icm42670_int_config_t config)
 {
     CHECK_ARG(dev && int_pin);
 
@@ -452,4 +450,66 @@ esp_err_t icm42670_set_int_config(icm42670_t *dev, uint8_t int_pin, icm42670_int
         printf("Error, only INT pins 1 and 2 available\n");
         return ESP_ERR_INVALID_ARG;
     }
+}
+
+esp_err_t icm42670_set_int_sources(icm42670_t *dev, uint8_t int_pin, icm42670_int_source_t sources)
+{
+    CHECK_ARG(dev && int_pin);
+
+    uint8_t err, reg1, reg2 = 0;
+    if(sources.self_test_done)
+        reg1 = reg1 | (1 << ICM42670_ST_INT1_EN_SHIFT);
+    if(sources.fsync)
+        reg1 = reg1 | (1 << ICM42670_FSYNC_INT1_EN_SHIFT);
+    if(sources.pll_ready)
+        reg1 = reg1 | (1 << ICM42670_PLL_RDY_INT1_EN_SHIFT);
+    if(sources.reset_done)
+        reg1 = reg1 | (1 << ICM42670_RESET_DONE_INT1_EN_SHIFT);
+    if(sources.data_ready)
+        reg1 = reg1 | (1 << ICM42670_DRDY_INT1_EN_SHIFT);
+    if(sources.fifo_threshold)
+        reg1 = reg1 | (1 << ICM42670_FIFO_THS_INT1_EN_SHIFT);
+    if(sources.fifo_full)
+        reg1 = reg1 | (1 << ICM42670_FIFO_FULL_INT1_EN_SHIFT);
+    if(sources.agc_ready)
+        reg1 = reg1 | (1 << ICM42670_AGC_RDY_INT1_EN_SHIFT);
+    if(sources.i3c_error)
+        reg2 = reg2 | (1 << ICM42670_I3C_PROTOCOL_ERROR_INT1_EN_SHIFT);
+    if(sources.smd)
+        reg2 = reg2 | (1 << ICM42670_SMD_INT1_EN_SHIFT);
+    if(sources.wom_z)
+        reg2 = reg2 | (1 << ICM42670_WOM_Z_INT1_EN_SHIFT);
+    if(sources.wom_y)
+        reg2 = reg2 | (1 << ICM42670_WOM_Y_INT1_EN_SHIFT);
+    if(sources.wom_x)
+        reg2 = reg2 | (1 << ICM42670_WOM_X_INT1_EN_SHIFT);
+
+    if(int_pin == 1){
+        err =  write_register(dev, ICM42670_REG_INT_SOURCE0, reg1);
+        err =  write_register(dev, ICM42670_REG_INT_SOURCE1, reg2);
+    }else if (int_pin == 2){
+        err =  write_register(dev, ICM42670_REG_INT_SOURCE3, reg1);
+        err =  write_register(dev, ICM42670_REG_INT_SOURCE4, reg2);
+    }else{
+        printf("Error, only INT pins 1 and 2 available\n");
+        return ESP_ERR_INVALID_ARG;
+    }
+}
+
+esp_err_t icm42670_config_wom(icm42670_t *dev, icm42670_wom_config_t config)
+{
+    CHECK_ARG(dev);
+
+    uint8_t err;
+    err = manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_INT_DUR_BITS, ICM42670_WOM_INT_DUR_SHIFT, config.trigger);
+    err = manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_INT_MODE_BITS, ICM42670_WOM_INT_MODE_SHIFT, config.logical_mode);
+    err = manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_MODE_BITS, ICM42670_WOM_MODE_SHIFT, config.reference);
+
+    // TODO: add WoM threshold values
+}
+
+esp_err_t icm42670_enable_wom(icm42670_t *dev, bool enable)
+{
+    CHECK_ARG(dev && enable);
+    return manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_EN_BITS, ICM42670_WOM_EN_SHIFT, enable);
 }
