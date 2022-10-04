@@ -351,6 +351,28 @@ esp_err_t icm42670_read_temperature(icm42670_t *dev, float *temperature);
  */
 esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, uint16_t *data);
 
+esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t pwr_mode);
+
+esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t pwr_mode);
+
+esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, uint16_t *data);
+
+esp_err_t icm42670_read_temperature(icm42670_t *dev, float *temperature);
+
+esp_err_t icm42670_reset(icm42670_t *dev);
+
+esp_err_t icm42670_flush_fifo(icm42670_t *dev);
+
+esp_err_t icm42670_set_gyro_range(icm42670_t *dev, icm42670_gyro_range_t range);
+
+esp_err_t icm42670_set_gyro_odr(icm42670_t *dev, icm42670_gyro_odr_t odr);
+
+esp_err_t icm42670_set_accel_range(icm42670_t *dev, icm42670_accel_range_t range);
+
+esp_err_t icm42670_set_accel_odr(icm42670_t *dev, icm42670_accel_odr_t odr);
+
+esp_err_t icm42670_set_int_config(icm42670_t *dev, uint8_t int_pin, icm42670_int_config_t config);
+
 #ifdef __cplusplus
 }
 #endif
