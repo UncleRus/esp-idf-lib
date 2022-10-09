@@ -213,6 +213,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **pca9685**              | Driver for 16-channel, 12-bit PWM PCA9685                                        | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **shift_reg**            | Driver for generic shift register interface.                                     | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tda74xx**              | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                            | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **ultrasonic**           | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
