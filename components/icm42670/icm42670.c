@@ -273,6 +273,52 @@ static inline esp_err_t manipulate_register(icm42670_t *dev, uint8_t reg_addr, u
     return ESP_OK;
 }
 
+static inline esp_err_t read_mreg_register(icm42670_t *dev, icm42670_mreg_number_t mreg_num, uint8_t reg, uint8_t *value)
+{
+    bool mclk_rdy;
+    CHECK(icm42670_get_mclk_rdy(dev, &mclk_rdy));
+    if(!mclk_rdy){
+        ESP_LOGE(TAG, "MCLK not running, required to access MREG");
+        return ESP_ERR_INVALID_RESPONSE;
+    }
+
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_BLK_SEL_R, mreg_num));
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_MADDR_R, reg));
+    vTaskDelay(pdMS_TO_TICKS(0.01)); //Wait for 10us until MREG write is complete
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_M_R, value));
+    vTaskDelay(pdMS_TO_TICKS(0.01)); 
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    return ESP_OK;
+}
+
+static inline esp_err_t write_mreg_register(icm42670_t *dev, icm42670_mreg_number_t mreg_num, uint8_t reg, uint8_t value)
+{
+    bool mclk_rdy;
+    CHECK(icm42670_get_mclk_rdy(dev, &mclk_rdy));
+    if(!mclk_rdy){
+        ESP_LOGE(TAG, "MCLK not running, required to access MREG");
+        return ESP_ERR_INVALID_RESPONSE;
+    }
+
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_BLK_SEL_W, mreg_num));
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_MADDR_W, reg));
+    I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_M_W, value));
+    vTaskDelay(pdMS_TO_TICKS(0.01)); //Wait for 10us until MREG write is complete
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    return err;
+}
+
+static inline esp_err_t manipulate_mreg_register(icm42670_t *dev, icm42670_mreg_number_t mreg_num, uint8_t reg_addr, uint8_t mask, uint8_t shift, uint8_t value)
+{
+    uint8_t reg;
+    CHECK(read_mreg_register(dev, mreg_num, reg_addr, &reg));
+    reg = (reg & ~mask) | (value << shift);
+    CHECK(write_mreg_register(dev, mreg_num, reg_addr, reg));
+
+    return ESP_OK;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 esp_err_t icm42670_init_desc(icm42670_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -320,11 +366,11 @@ esp_err_t icm42670_init(icm42670_t *dev)
         return ESP_ERR_INVALID_RESPONSE;
     }
     // check if internal clock is running
-    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_MCLK_RDY, &reg));
-    if (((reg & ICM42670_MCLK_RDY_BITS) >> ICM42670_MCLK_RDY_SHIFT))
+    bool mclk_rdy = false;
+    CHECK(icm42670_get_mclk_rdy(dev, &mclk_rdy));
+    if(!mclk_rdy)
     {
         ESP_LOGE(TAG, "Error initializing icm42670, Internal clock not running");
-        I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
         return ESP_ERR_INVALID_RESPONSE;
     }
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
@@ -335,13 +381,17 @@ esp_err_t icm42670_init(icm42670_t *dev)
 esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t pwr_mode)
 {
     CHECK_ARG(dev && pwr_mode);
-    return manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_GYRO_MODE_BITS, ICM42670_GYRO_MODE_SHIFT, pwr_mode);
+
+    CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_GYRO_MODE_BITS, ICM42670_GYRO_MODE_SHIFT, pwr_mode));
+    return ESP_OK;
 }
 
 esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t pwr_mode)
 {
     CHECK_ARG(dev && pwr_mode);
-    return manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_ACCEL_MODE_BITS, ICM42670_ACCEL_MODE_SHIFT, pwr_mode);
+
+    CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_ACCEL_MODE_BITS, ICM42670_ACCEL_MODE_SHIFT, pwr_mode));
+    return ESP_OK;
 }
 
 esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, uint16_t *data)
@@ -359,7 +409,7 @@ esp_err_t icm42670_read_temperature(icm42670_t *dev, float *temperature)
     CHECK_ARG(dev && temperature);
 
     uint16_t reg;
-    icm42670_read_raw_data(dev, ICM42670_REG_TEMP_DATA1, &reg);
+    CHECK(icm42670_read_raw_data(dev, ICM42670_REG_TEMP_DATA1, &reg));
     *temperature = (reg / 128.0) + 25;
     return ESP_OK;
 }
@@ -372,7 +422,6 @@ esp_err_t icm42670_reset(icm42670_t *dev)
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_SIGNAL_PATH_RESET, reg));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-
     return ESP_OK;
 }
 
@@ -456,7 +505,7 @@ esp_err_t icm42670_set_int_sources(icm42670_t *dev, uint8_t int_pin, icm42670_in
 {
     CHECK_ARG(dev && int_pin);
 
-    uint8_t err, reg1, reg2 = 0;
+    uint8_t reg1, reg2 = 0;
     if(sources.self_test_done)
         reg1 = reg1 | (1 << ICM42670_ST_INT1_EN_SHIFT);
     if(sources.fsync)
@@ -485,31 +534,54 @@ esp_err_t icm42670_set_int_sources(icm42670_t *dev, uint8_t int_pin, icm42670_in
         reg2 = reg2 | (1 << ICM42670_WOM_X_INT1_EN_SHIFT);
 
     if(int_pin == 1){
-        err =  write_register(dev, ICM42670_REG_INT_SOURCE0, reg1);
-        err =  write_register(dev, ICM42670_REG_INT_SOURCE1, reg2);
+        I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+        I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_INT_SOURCE0, reg1));
+        I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_INT_SOURCE1, reg2));
+        I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
     }else if (int_pin == 2){
-        err =  write_register(dev, ICM42670_REG_INT_SOURCE3, reg1);
-        err =  write_register(dev, ICM42670_REG_INT_SOURCE4, reg2);
+        I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+        I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_INT_SOURCE3, reg1));
+        I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_INT_SOURCE4, reg2));
+        I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
     }else{
         printf("Error, only INT pins 1 and 2 available\n");
         return ESP_ERR_INVALID_ARG;
     }
+    return ESP_OK;
 }
 
 esp_err_t icm42670_config_wom(icm42670_t *dev, icm42670_wom_config_t config)
 {
     CHECK_ARG(dev);
 
-    uint8_t err;
-    err = manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_INT_DUR_BITS, ICM42670_WOM_INT_DUR_SHIFT, config.trigger);
-    err = manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_INT_MODE_BITS, ICM42670_WOM_INT_MODE_SHIFT, config.logical_mode);
-    err = manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_MODE_BITS, ICM42670_WOM_MODE_SHIFT, config.reference);
+    CHECK(manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_INT_DUR_BITS, ICM42670_WOM_INT_DUR_SHIFT, config.trigger));
+    CHECK(manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_INT_MODE_BITS, ICM42670_WOM_INT_MODE_SHIFT, config.logical_mode));
+    CHECK(manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_MODE_BITS, ICM42670_WOM_MODE_SHIFT, config.reference));
 
-    // TODO: add WoM threshold values
+    // WoM threshold values
+    CHECK(write_mreg_register(dev, ICM42670_MREG1_RW, ICM42670_REG_ACCEL_WOM_X_THR, config.wom_x_threshold));
+    CHECK(write_mreg_register(dev, ICM42670_MREG1_RW, ICM42670_REG_ACCEL_WOM_Y_THR, config.wom_y_threshold));
+    CHECK(write_mreg_register(dev, ICM42670_MREG1_RW, ICM42670_REG_ACCEL_WOM_Z_THR, config.wom_z_threshold));
+
 }
 
 esp_err_t icm42670_enable_wom(icm42670_t *dev, bool enable)
 {
     CHECK_ARG(dev && enable);
     return manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_EN_BITS, ICM42670_WOM_EN_SHIFT, enable);
+}
+
+esp_err_t icm42670_get_mclk_rdy(icm42670_t *dev, bool *mclk_rdy)
+{
+    CHECK_ARG(dev && mclk_rdy);
+
+    uint8_t reg;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_MCLK_RDY, &reg));
+    if ((reg & ICM42670_MCLK_RDY_BITS) >> ICM42670_MCLK_RDY_SHIFT)
+        *mclk_rdy = true;
+    else
+        *mclk_rdy = false;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    return ESP_OK;
 }

@@ -47,8 +47,8 @@
 extern "C" {
 #endif
 
-#define ICM42670_I2C_ADDR_GND   0x68
-#define ICM42670_I2C_ADDR_VCC   0x69
+#define ICM42670_I2C_ADDR_GND           0x68
+#define ICM42670_I2C_ADDR_VCC           0x69
 
 // Registers USER BANK 0
 #define ICM42670_REG_MCLK_RDY           0x00
@@ -114,6 +114,61 @@ extern "C" {
 #define ICM42670_REG_BLK_SEL_R          0x7C
 #define ICM42670_REG_MADDR_R            0x7D
 #define ICM42670_REG_M_R                0x7E
+
+
+// MREG1 registers
+#define ICM42670_REG_TMST_CONFIG1       0x00
+#define ICM42670_REG_FIFO_CONFIG5       0x01
+#define ICM42670_REG_FIFO_CONFIG6       0x02
+#define ICM42670_REG_FSYNC_CONFIG       0x03
+#define ICM42670_REG_INT_CONFIG0        0x04
+#define ICM42670_REG_INT_CONFIG1        0x05
+#define ICM42670_REG_SENSOR_CONFIG3     0x06
+#define ICM42670_REG_ST_CONFIG          0x13
+#define ICM42670_REG_SELFTEST           0x14
+#define ICM42670_REG_INTF_CONFIG6       0x23
+#define ICM42670_REG_INTF_CONFIG10      0x25
+#define ICM42670_REG_INTF_CONFIG7       0x28
+#define ICM42670_REG_OTP_CONFIG         0x2B
+#define ICM42670_REG_INT_SOURCE6        0x2F
+#define ICM42670_REG_INT_SOURCE7        0x30
+#define ICM42670_REG_INT_SOURCE8        0x31
+#define ICM42670_REG_INT_SOURCE9        0x32
+#define ICM42670_REG_INT_SOURCE10       0x33
+#define ICM42670_REG_APEX_CONFIG2       0x44
+#define ICM42670_REG_APEX_CONFIG3       0x45
+#define ICM42670_REG_APEX_CONFIG4       0x46
+#define ICM42670_REG_APEX_CONFIG5       0x47
+#define ICM42670_REG_APEX_CONFIG9       0x48
+#define ICM42670_REG_APEX_CONFIG10      0x49
+#define ICM42670_REG_APEX_CONFIG11      0x4A
+#define ICM42670_REG_ACCEL_WOM_X_THR    0x4B
+#define ICM42670_REG_ACCEL_WOM_Y_THR    0x4C
+#define ICM42670_REG_ACCEL_WOM_Z_THR    0x4D
+#define ICM42670_REG_OFFSET_USER0       0x4E
+#define ICM42670_REG_OFFSET_USER1       0x4F
+#define ICM42670_REG_OFFSET_USER2       0x50
+#define ICM42670_REG_OFFSET_USER3       0x51
+#define ICM42670_REG_OFFSET_USER4       0x52
+#define ICM42670_REG_OFFSET_USER5       0x53
+#define ICM42670_REG_OFFSET_USER6       0x54
+#define ICM42670_REG_OFFSET_USER7       0x55
+#define ICM42670_REG_OFFSET_USER8       0x56
+#define ICM42670_REG_ST_STATUS1         0x63
+#define ICM42670_REG_ST_STATUS2         0x64
+#define ICM42670_REG_FDR_CONFIG         0x66
+#define ICM42670_REG_APEX_CONFIG12      0x67
+
+// MREG2 registers
+#define ICM42670_REG_OTP_CTRL7          0x06
+
+// MREG3 registers
+#define ICM42670_REG_XA_ST_DATA         0x00
+#define ICM42670_REG_YA_ST_DATA         0x01
+#define ICM42670_REG_ZA_ST_DATA         0x02
+#define ICM42670_REG_XG_ST_DATA         0x03
+#define ICM42670_REG_YG_ST_DATA         0x04
+#define ICM42670_REG_ZG_ST_DATA         0x05
 
 /* Gyro power mode */
 typedef enum
@@ -310,8 +365,18 @@ typedef struct
     icm42670_wom_int_dur_t trigger;
     icm42670_wom_int_mode_t logical_mode;
     icm42670_wom_mode_t reference;
+    uint8_t wom_x_threshold;        // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
+    uint8_t wom_y_threshold;        // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
+    uint8_t wom_z_threshold;        // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
 } icm42670_wom_config_t;
 
+/* MREG 1-3 access */
+typedef enum
+{
+    ICM42670_MREG1_RW = 0x00,
+    ICM42670_MREG2_RW = 0x28,
+    ICM42670_MREG3_RW = 0x50
+} icm42670_mreg_number_t;
 
 
 
