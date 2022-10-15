@@ -2,40 +2,52 @@
 /*
  * The MIT License (MIT)
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
+/**
+ * @file mpu6050.c
+ *  Thanks to @see https://github.com/gabrielbvicari/esp32-mpu6050 for driver.
+ *  Improved by Raghav Jha https://github.com/horsemann07
+ */
+
 /* C headers */
-#include <string.h>
+#include <math.h>
 
 /* esp headers */
-#include <esp_utils.h>
+#include <esp_log.h>
 
 /* mpu6050 headers */
 #include "mpu6050.h"
 
-#define TAG __FILENAME__
+#define TAG (__FILENAME__)
 
-/**
- * MPU6050 internal registers definitions:
- */
-#define MPU6050_REGISTER_XG_OFFS_TC         (0x00)
+// Internal Registers Definitions
+#define MPU6050_REGISTER_XG_OFFS_TC         (0)
 #define MPU6050_REGISTER_YG_OFFS_TC         (0x01)
 #define MPU6050_REGISTER_ZG_OFFS_TC         (0x02)
 #define MPU6050_REGISTER_X_FINE_GAIN        (0x03)
@@ -150,1075 +162,1428 @@
 #define MPU6050_REGISTER_FIFO_R_W           (0x74)
 #define MPU6050_REGISTER_WHO_AM_I           (0x75)
 
+// DLPF values
+#define MPU6050_DLPF_BW_256 (0x00)
+#define MPU6050_DLPF_BW_188 (0x01)
+#define MPU6050_DLPF_BW_98  (0x02)
+#define MPU6050_DLPF_BW_42  (0x03)
+#define MPU6050_DLPF_BW_20  (0x04)
+#define MPU6050_DLPF_BW_10  (0x05)
+#define MPU6050_DLPF_BW_5   (0x06)
+
+// DHPF values:
+#define MPU6050_DHPF_RESET (0x00)
+#define MPU6050_DHPF_5     (0x01)
+#define MPU6050_DHPF_2P5   (0x02)
+#define MPU6050_DHPF_1P25  (0x03)
+#define MPU6050_DHPF_0P63  (0x04)
+#define MPU6050_DHPF_HOLD  (0x07)
+
+// Full scale gyroscope range:
+#define MPU6050_GYRO_FULL_SCALE_RANGE_250  (0x00)
+#define MPU6050_GYRO_FULL_SCALE_RANGE_500  (0x01)
+#define MPU6050_GYRO_FULL_SCALE_RANGE_1000 (0x02)
+#define MPU6050_GYRO_FULL_SCALE_RANGE_2000 (0x03)
+
+// Full scale accelerometer range:
+#define MPU6050_ACCEL_FULL_SCALE_RANGE_2  (0x00)
+#define MPU6050_ACCEL_FULL_SCALE_RANGE_4  (0x01)
+#define MPU6050_ACCEL_FULL_SCALE_RANGE_8  (0x02)
+#define MPU6050_ACCEL_FULL_SCALE_RANGE_16 (0x03)
+
+// Interrupt values:
+#define MPU6050_INTMODE_ACTIVEHIGH  (0x00)
+#define MPU6050_INTMODE_ACTIVELOW   (0x01)
+#define MPU6050_INTDRV_PUSHPULL     (0x00)
+#define MPU6050_INTDRV_OPENDRAIN    (0x01)
+#define MPU6050_INTLATCH_50USPULSE  (0x00)
+#define MPU6050_INTLATCH_WAITCLEAR  (0x01)
+#define MPU6050_INTCLEAR_STATUSREAD (0x00)
+#define MPU6050_INTCLEAR_ANYREAD    (0x01)
+
+// Clock sources:
+#define MPU6050_CLOCK_INTERNAL         (0x00)
+#define MPU6050_CLOCK_PLL_XGYRO        (0x01)
+#define MPU6050_CLOCK_PLL_YGYRO        (0x02)
+#define MPU6050_CLOCK_PLL_ZGYRO        (0x03)
+#define MPU6050_CLOCK_PLL_EXTERNAL_32K (0x04)
+#define MPU6050_CLOCK_PLL_EXTERNAL_19M (0x05)
+#define MPU6050_CLOCK_KEEP_RESET       (0x07)
+
+// Wake frequencies:
+#define MPU6050_WAKE_FREQ_1P25 (0x0)
+#define MPU6050_WAKE_FREQ_2P5  (0x1)
+#define MPU6050_WAKE_FREQ_5    (0x2)
+#define MPU6050_WAKE_FREQ_10   (0x3)
+
+// Decrement values:
+#define MPU6050_DETECT_DECREMENT_RESET (0x0)
+#define MPU6050_DETECT_DECREMENT_1     (0x1)
+#define MPU6050_DETECT_DECREMENT_2     (0x2)
+#define MPU6050_DETECT_DECREMENT_4     (0x3)
+
+// External sync values:
+#define MPU6050_EXT_SYNC_DISABLED     (0x0)
+#define MPU6050_EXT_SYNC_TEMP_OUT_L   (0x1)
+#define MPU6050_EXT_SYNC_GYRO_XOUT_L  (0x2)
+#define MPU6050_EXT_SYNC_GYRO_YOUT_L  (0x3)
+#define MPU6050_EXT_SYNC_GYRO_ZOUT_L  (0x4)
+#define MPU6050_EXT_SYNC_ACCEL_XOUT_L (0x5)
+#define MPU6050_EXT_SYNC_ACCEL_YOUT_L (0x6)
+#define MPU6050_EXT_SYNC_ACCEL_ZOUT_L (0x7)
+
+// Clock division values:
+#define MPU6050_CLOCK_DIV_348 (0x0)
+#define MPU6050_CLOCK_DIV_333 (0x1)
+#define MPU6050_CLOCK_DIV_320 (0x2)
+#define MPU6050_CLOCK_DIV_308 (0x3)
+#define MPU6050_CLOCK_DIV_296 (0x4)
+#define MPU6050_CLOCK_DIV_286 (0x5)
+#define MPU6050_CLOCK_DIV_276 (0x6)
+#define MPU6050_CLOCK_DIV_267 (0x7)
+#define MPU6050_CLOCK_DIV_258 (0x8)
+#define MPU6050_CLOCK_DIV_500 (0x9)
+#define MPU6050_CLOCK_DIV_471 (0xA)
+#define MPU6050_CLOCK_DIV_444 (0xB)
+#define MPU6050_CLOCK_DIV_421 (0xC)
+#define MPU6050_CLOCK_DIV_400 (0xD)
+#define MPU6050_CLOCK_DIV_381 (0xE)
+#define MPU6050_CLOCK_DIV_364 (0xF)
+
+// Bit and length defines for SELF_TEST register:
+#define MPU6050_SELF_TEST_XA_1_BIT    (0x07)
+#define MPU6050_SELF_TEST_XA_1_LENGTH (0x03)
+#define MPU6050_SELF_TEST_XA_2_BIT    (0x05)
+#define MPU6050_SELF_TEST_XA_2_LENGTH (0x02)
+#define MPU6050_SELF_TEST_YA_1_BIT    (0x07)
+#define MPU6050_SELF_TEST_YA_1_LENGTH (0x03)
+#define MPU6050_SELF_TEST_YA_2_BIT    (0x03)
+#define MPU6050_SELF_TEST_YA_2_LENGTH (0x02)
+#define MPU6050_SELF_TEST_ZA_1_BIT    (0x07)
+#define MPU6050_SELF_TEST_ZA_1_LENGTH (0x03)
+#define MPU6050_SELF_TEST_ZA_2_BIT    (0x01)
+#define MPU6050_SELF_TEST_ZA_2_LENGTH (0x02)
+#define MPU6050_SELF_TEST_XG_1_BIT    (0x04)
+#define MPU6050_SELF_TEST_XG_1_LENGTH (0x05)
+#define MPU6050_SELF_TEST_YG_1_BIT    (0x04)
+#define MPU6050_SELF_TEST_YG_1_LENGTH (0x05)
+#define MPU6050_SELF_TEST_ZG_1_BIT    (0x04)
+#define MPU6050_SELF_TEST_ZG_1_LENGTH (0x05)
+
+// Bit and length defines for CONFIG register:
+#define MPU6050_CFG_EXT_SYNC_SET_BIT    (5)
+#define MPU6050_CFG_EXT_SYNC_SET_LENGTH (3)
+#define MPU6050_CFG_DLPF_CFG_BIT        (2)
+#define MPU6050_CFG_DLPF_CFG_LENGTH     (3)
+
+// Bit and length defines for GYRO_CONFIG register:
+#define MPU6050_GCONFIG_FS_SEL_BIT    (4)
+#define MPU6050_GCONFIG_FS_SEL_LENGTH (2)
+
+// Bit and length defines for ACCEL_CONFIG register:
+#define MPU6050_ACONFIG_XA_ST_BIT        (7)
+#define MPU6050_ACONFIG_YA_ST_BIT        (6)
+#define MPU6050_ACONFIG_ZA_ST_BIT        (5)
+#define MPU6050_ACONFIG_AFS_SEL_BIT      (4)
+#define MPU6050_ACONFIG_AFS_SEL_LENGTH   (2)
+#define MPU6050_ACONFIG_ACCEL_HPF_BIT    (2)
+#define MPU6050_ACONFIG_ACCEL_HPF_LENGTH (3)
+
+// Bit and length defines for FIFO_EN register:
+#define MPU6050_TEMP_FIFO_EN_BIT  (7)
+#define MPU6050_XG_FIFO_EN_BIT    (6)
+#define MPU6050_YG_FIFO_EN_BIT    (5)
+#define MPU6050_ZG_FIFO_EN_BIT    (4)
+#define MPU6050_ACCEL_FIFO_EN_BIT (3)
+#define MPU6050_SLV2_FIFO_EN_BIT  (2)
+#define MPU6050_SLV1_FIFO_EN_BIT  (1)
+#define MPU6050_SLV0_FIFO_EN_BIT  (0)
+
+// Bit and length defines for I2C_MST_CTRL register:
+#define MPU6050_MULT_MST_EN_BIT    (7)
+#define MPU6050_WAIT_FOR_ES_BIT    (6)
+#define MPU6050_SLV_3_FIFO_EN_BIT  (5)
+#define MPU6050_I2C_MST_P_NSR_BIT  (4)
+#define MPU6050_I2C_MST_CLK_BIT    (3)
+#define MPU6050_I2C_MST_CLK_LENGTH (4)
+
+// Bit and length defines for I2C_SLV* register:
+#define MPU6050_I2C_SLV_RW_BIT      (7)
+#define MPU6050_I2C_SLV_ADDR_BIT    (6)
+#define MPU6050_I2C_SLV_ADDR_LENGTH (7)
+#define MPU6050_I2C_SLV_EN_BIT      (7)
+#define MPU6050_I2C_SLV_BYTE_SW_BIT (6)
+#define MPU6050_I2C_SLV_REG_DIS_BIT (5)
+#define MPU6050_I2C_SLV_GRP_BIT     (4)
+#define MPU6050_I2C_SLV_LEN_BIT     (3)
+#define MPU6050_I2C_SLV_LEN_LENGTH  (4)
+
+// Bit and length defines for I2C_SLV4 register:
+#define MPU6050_I2C_SLV4_RW_BIT         (7)
+#define MPU6050_I2C_SLV4_ADDR_BIT       (6)
+#define MPU6050_I2C_SLV4_ADDR_LENGTH    (7)
+#define MPU6050_I2C_SLV4_EN_BIT         (7)
+#define MPU6050_I2C_SLV4_INT_EN_BIT     (6)
+#define MPU6050_I2C_SLV4_REG_DIS_BIT    (5)
+#define MPU6050_I2C_SLV4_MST_DLY_BIT    (4)
+#define MPU6050_I2C_SLV4_MST_DLY_LENGTH (5)
+
+// Bit and length defines for I2C_MST_STATUS register:
+#define MPU6050_MST_PASS_THROUGH_BIT  (7)
+#define MPU6050_MST_I2C_SLV4_DONE_BIT (6)
+#define MPU6050_MST_I2C_LOST_ARB_BIT  (5)
+#define MPU6050_MST_I2C_SLV4_NACK_BIT (4)
+#define MPU6050_MST_I2C_SLV3_NACK_BIT (3)
+#define MPU6050_MST_I2C_SLV2_NACK_BIT (2)
+#define MPU6050_MST_I2C_SLV1_NACK_BIT (1)
+#define MPU6050_MST_I2C_SLV0_NACK_BIT (0)
+
+// Bit and length defines for INT_PIN_CFG register:
+#define MPU6050_INTCFG_INT_LEVEL_BIT       (7)
+#define MPU6050_INTCFG_INT_OPEN_BIT        (6)
+#define MPU6050_INTCFG_LATCH_INT_EN_BIT    (5)
+#define MPU6050_INTCFG_INT_RD_CLEAR_BIT    (4)
+#define MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT (3)
+#define MPU6050_INTCFG_FSYNC_INT_EN_BIT    (2)
+#define MPU6050_INTCFG_I2C_BYPASS_EN_BIT   (1)
+#define MPU6050_INTCFG_CLKOUT_EN_BIT       (0)
+
+// Bit and length defines for INT_ENABLE and INT_STATUS registers:
+#define MPU6050_INTERRUPT_FF_BIT          (7)
+#define MPU6050_INTERRUPT_MOT_BIT         (6)
+#define MPU6050_INTERRUPT_ZMOT_BIT        (5)
+#define MPU6050_INTERRUPT_FIFO_OFLOW_BIT  (4)
+#define MPU6050_INTERRUPT_I2C_MST_INT_BIT (3)
+#define MPU6050_INTERRUPT_PLL_RDY_INT_BIT (2)
+#define MPU6050_INTERRUPT_DMP_INT_BIT     (1)
+#define MPU6050_INTERRUPT_DATA_RDY_BIT    (0)
+
+// Bit and length defines for MOT_DETECT_STATUS register:
+#define MPU6050_MOTION_MOT_XNEG_BIT  (7)
+#define MPU6050_MOTION_MOT_XPOS_BIT  (6)
+#define MPU6050_MOTION_MOT_YNEG_BIT  (5)
+#define MPU6050_MOTION_MOT_YPOS_BIT  (4)
+#define MPU6050_MOTION_MOT_ZNEG_BIT  (3)
+#define MPU6050_MOTION_MOT_ZPOS_BIT  (2)
+#define MPU6050_MOTION_MOT_ZRMOT_BIT (0)
+
+// Bit and length defines for I2C_MST_DELAY_CTRL register:
+#define MPU6050_DLYCTRL_DELAY_ES_SHADOW_BIT (7)
+#define MPU6050_DLYCTRL_I2C_SLV4_DLY_EN_BIT (4)
+#define MPU6050_DLYCTRL_I2C_SLV3_DLY_EN_BIT (3)
+#define MPU6050_DLYCTRL_I2C_SLV2_DLY_EN_BIT (2)
+#define MPU6050_DLYCTRL_I2C_SLV1_DLY_EN_BIT (1)
+#define MPU6050_DLYCTRL_I2C_SLV0_DLY_EN_BIT (0)
+
+// Bit and length defines for SIGNAL_PATH_RESET register:
+#define MPU6050_PATHRESET_GYRO_RESET_BIT  (2)
+#define MPU6050_PATHRESET_ACCEL_RESET_BIT (1)
+#define MPU6050_PATHRESET_TEMP_RESET_BIT  (0)
+
+// Bit and length defines for MOT_DETECT_CTRL register:
+#define MPU6050_DETECT_ACCEL_DELAY_BIT    (5)
+#define MPU6050_DETECT_ACCEL_DELAY_LENGTH (2)
+#define MPU6050_DETECT_FF_COUNT_BIT       (3)
+#define MPU6050_DETECT_FF_COUNT_LENGTH    (2)
+#define MPU6050_DETECT_MOT_COUNT_BIT      (1)
+#define MPU6050_DETECT_MOT_COUNT_LENGTH   (2)
+
+// Bit and length defines for USER_CTRL register:
+#define MPU6050_USERCTRL_DMP_EN_BIT         (7)
+#define MPU6050_USERCTRL_FIFO_EN_BIT        (6)
+#define MPU6050_USERCTRL_I2C_MST_EN_BIT     (5)
+#define MPU6050_USERCTRL_I2C_IF_DIS_BIT     (4)
+#define MPU6050_USERCTRL_DMP_RESET_BIT      (3)
+#define MPU6050_USERCTRL_FIFO_RESET_BIT     (2)
+#define MPU6050_USERCTRL_I2C_MST_RESET_BIT  (1)
+#define MPU6050_USERCTRL_SIG_COND_RESET_BIT (0)
+
+// Bit and length defines for PWR_MGMT_1 register:
+#define MPU6050_PWR1_DEVICE_RESET_BIT (7)
+#define MPU6050_PWR1_SLEEP_BIT        (6)
+#define MPU6050_PWR1_CYCLE_BIT        (5)
+#define MPU6050_PWR1_TEMP_DIS_BIT     (3)
+#define MPU6050_PWR1_CLKSEL_BIT       (2)
+#define MPU6050_PWR1_CLKSEL_LENGTH    (3)
+
+// Bit and length defines for PWR_MGMT_2 register:
+#define MPU6050_PWR2_LP_WAKE_CTRL_BIT    (7)
+#define MPU6050_PWR2_LP_WAKE_CTRL_LENGTH (2)
+#define MPU6050_PWR2_STBY_XA_BIT         (5)
+#define MPU6050_PWR2_STBY_YA_BIT         (4)
+#define MPU6050_PWR2_STBY_ZA_BIT         (3)
+#define MPU6050_PWR2_STBY_XG_BIT         (2)
+#define MPU6050_PWR2_STBY_YG_BIT         (1)
+#define MPU6050_PWR2_STBY_ZG_BIT         (0)
+
+// Bit and length defines for WHO_AM_I register:
+#define MPU6050_WHO_AM_I_BIT    (6)
+#define MPU6050_WHO_AM_I_LENGTH (6)
+
+// Undocumented bits and lengths:
+#define MPU6050_TC_PWR_MODE_BIT    (7)
+#define MPU6050_TC_OFFSET_BIT      (6)
+#define MPU6050_TC_OFFSET_LENGTH   (6)
+#define MPU6050_TC_OTP_BNK_VLD_BIT (0)
+#define MPU6050_DMPINT_5_BIT       (5)
+#define MPU6050_DMPINT_4_BIT       (4)
+#define MPU6050_DMPINT_3_BIT       (3)
+#define MPU6050_DMPINT_2_BIT       (2)
+#define MPU6050_DMPINT_1_BIT       (1)
+#define MPU6050_DMPINT_0_BIT       (0)
+
 #define PI              (3.14159265358979323846f)
 #define GYRO_MEAS_ERROR (PI * (60.0f / 180.0f))
 #define GYRO_MEAS_DRIFT (PI * (1.0f / 180.0f))
 #define BETA            (sqrt(3.0f / 4.0f) * GYRO_MEAS_ERROR)
 #define ZETA            (sqrt(3.0f / 4.0f) * GYRO_MEAS_DRIFT)
 
+#define ENABLE  (ESP_OK)
+#define DISABLE (ESP_FAIL)
+
+// Max 1MHz for esp-idf, but device supports up to 1.7Mhz
+#define I2C_FREQ_HZ (1000000)
+
+/*
+ * Macro which can be used to check parameters.
+ * Prints the error code, error location, and the failed statement to serial output.
+ */
+#define ESP_PARAM_CHECK(con)                                                                                           \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(con))                                                                                                    \
+        {                                                                                                              \
+            ESP_LOGE(TAG, "[%s, %d]: <ESP_ERR_INVALID_ARG> !(%s)", __func__, __LINE__, #con);                          \
+            return ESP_ERR_INVALID_ARG;                                                                                \
+        }                                                                                                              \
+    }                                                                                                                  \
+    while (0)
+
+/*
+ * Macro which can be used to check the error code,
+ * and terminate the program in case the code is not ESP_OK.
+ */
+#define ESP_ERROR_RETURN(ret)                                                                                          \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        esp_err_t __ = ret;                                                                                            \
+        if (__ != ESP_OK)                                                                                              \
+        {                                                                                                              \
+            return __;                                                                                                 \
+        }                                                                                                              \
+    }                                                                                                                  \
+    while (0)
+
+/**
+ * Macro which can be used to check the error code,
+ * and terminate the program in case the code is not ESP_OK.
+ * In debug mode, it prints the error code, error location to serial output.
+ */
+#define ESP_ERROR_CDEBUG(ret)                                                                                          \
+    if (ret != ESP_OK)                                                                                                 \
+    {                                                                                                                  \
+        ESP_LOGD(TAG, "[%s, %d] <%s> ", __func__, __LINE__, esp_err_to_name(ret));                                     \
+        return ret;                                                                                                    \
+    }
+
 static float quart[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 static float delta_t = 0.0f;
 
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_aux_vddio_level(const mpu6050_config_t *setting)
+/* ----------------------------------------------------- */
+static esp_err_t i2c_read_bytes(i2c_dev_t *dev, uint8_t reg_addr, size_t size, uint8_t *data)
 {
-    uint8_t level;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, &(level));
-    return level;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_aux_vddio_level(const mpu6050_config_t *setting, uint8_t level)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, level);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_rate(const mpu6050_config_t *setting)
-{
-    uint8_t rate;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SMPLRT_DIV, &(rate));
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read(dev, &(reg_addr), sizeof(uint8_t), data, size));
+    I2C_DEV_GIVE_MUTEX(dev);
 
-    return rate;
+    return ESP_OK;
 }
-/* ------------------------------------------------------ */
-void mpu6050_set_rate(const mpu6050_config_t *setting, uint8_t rate)
+/* ----------------------------------------------------- */
+static esp_err_t i2c_read_byte(i2c_dev_t *dev, uint8_t reg_addr, uint8_t *data)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_SMPLRT_DIV, rate);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_external_frame_sync(const mpu6050_config_t *setting)
-{
-    uint8_t frame;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH,
-        &(frame));
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg_addr, (void *)data, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
 
-    return frame;
+    return ESP_OK;
 }
-/* ------------------------------------------------------ */
-void mpu6050_set_external_frame_sync(const mpu6050_config_t *setting, uint8_t sync)
+/* ----------------------------------------------------- */
+static esp_err_t i2c_read_bits(i2c_dev_t *dev, uint8_t reg_addr, uint8_t bit_start, uint8_t size, uint8_t *data)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT,
-        MPU6050_CFG_EXT_SYNC_SET_LENGTH, sync);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_dlpf_mode(const mpu6050_config_t *setting)
-{
-    uint8_t dlpf;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH,
-        &(dlpf));
+    I2C_DEV_TAKE_MUTEX(dev);
 
-    return dlpf;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_dlpf_mode(const mpu6050_config_t *setting, uint8_t mode)
-{
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_full_scale_gyro_range(const mpu6050_config_t *setting)
-{
-    uint8_t gyro_range;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT,
-        MPU6050_GCONFIG_FS_SEL_LENGTH, &(gyro_range));
-    return gyro_range;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_full_scale_gyro_range(const mpu6050_config_t *setting, uint8_t range)
-{
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT,
-        MPU6050_GCONFIG_FS_SEL_LENGTH, range);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_accel_x_self_test_factory_trim(const mpu6050_config_t *setting)
-{
-    uint8_t buffer[2];
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_X, &buffer[0]);
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_A, &buffer[1]);
+    uint8_t bit;
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg_addr, (void *)&(bit), 1));
 
-    return ((buffer[0] >> 3) | ((buffer[1] >> 4) & 0x03));
+    uint8_t mask = ((1 << size) - 1) << (bit_start - size + 1);
+    bit &= mask;
+    bit >>= (bit_start - size + 1);
+    *data = bit;
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+/* ----------------------------------------------------- */
+static esp_err_t i2c_read_bit(i2c_dev_t *dev, uint8_t reg_addr, uint8_t bit_number, uint8_t *data)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+
+    uint8_t bit;
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg_addr, (void *)&(bit), 1));
+    *data = bit & (1 << bit_number);
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+/* ----------------------------------------------------- */
+// static esp_err_t i2c_write_bytes(i2c_dev_t *dev, uint8_t reg_addr, uint8_t *data, uint8_t size)
+// {
+//     I2C_DEV_TAKE_MUTEX(dev);
+//     I2C_DEV_CHECK(dev, i2c_dev_write(dev, &(reg_addr), sizeof(reg_addr), data, size));
+//     I2C_DEV_GIVE_MUTEX(dev);
+//     return ESP_OK;
+// }
+/* ----------------------------------------------------- */
+static esp_err_t i2c_write_byte(i2c_dev_t *dev, uint8_t reg_addr, uint8_t data)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg_addr, &(data), 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+/* ----------------------------------------------------- */
+static esp_err_t i2c_write_bits(i2c_dev_t *dev, uint8_t reg_addr, uint8_t bit_start, uint8_t size, uint8_t data)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+    uint8_t bit = 0;
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg_addr, (void *)&(bit), 1));
+
+    uint8_t mask = ((1 << size) - 1) << (bit_start - size + 1);
+    data <<= (bit_start - size + 1);
+    data &= mask;
+    bit &= ~(mask);
+    bit |= data;
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg_addr, &(bit), 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+/* ----------------------------------------------------- */
+static esp_err_t i2c_write_bit(i2c_dev_t *dev, uint8_t reg_addr, uint8_t bit_number, uint8_t data)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+    uint8_t bit;
+
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, reg_addr, (void *)&(bit), 1));
+
+    if (data != 0)
+    {
+        bit = (bit | (1 << bit_number));
+    }
+    else
+    {
+        bit = (bit & ~(1 << bit_number));
+    }
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, reg_addr, &(bit), 1));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+/* ----------------------------------------------------- */
+static esp_err_t i2c_write_word(i2c_dev_t *dev, uint8_t reg_addr, uint8_t data)
+{
+    I2C_DEV_TAKE_MUTEX(dev);
+    uint8_t data_1[] = { (uint8_t)(data >> 8), (uint8_t)(data & 0xFF) };
+    I2C_DEV_CHECK(dev, i2c_dev_write(dev, &(reg_addr), sizeof(reg_addr), (uint8_t *)&(data_1), 2));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_aux_vddio_level(mpu6050_dev_t *setting, uint8_t *level)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, level));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_accel_y_self_test_factory_trim(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_aux_vddio_level(mpu6050_dev_t *setting, uint8_t level)
 {
-    uint8_t buffer[2];
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Y, &buffer[0]);
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_A, &buffer[1]);
-
-    return ((buffer[0] >> 3) | ((buffer[1] >> 2) & 0x03));
-}
-/* ---------------------------------------------------uint8_t byte = 0;--- */
-uint8_t mpu6050_get_accel_z_self_test_factory_trim(const mpu6050_config_t *setting)
-{
-    uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_SELF_TEST_Z, 2, (uint8_t *)buffer);
-
-    return ((buffer[0] >> 3) | (buffer[1] & 0x03));
+    return (i2c_write_bit(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, level));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_gyro_x_self_test_factory_trim(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_rate(mpu6050_dev_t *setting, uint8_t *rate)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_SMPLRT_DIV, rate));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_rate(mpu6050_dev_t *setting, uint8_t rate)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_SMPLRT_DIV, rate));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_external_frame_sync(mpu6050_dev_t *setting, uint8_t *sync)
+{
+    return (i2c_read_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT,
+        MPU6050_CFG_EXT_SYNC_SET_LENGTH, sync));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_external_frame_sync(mpu6050_dev_t *setting, uint8_t sync)
+{
+    return (i2c_write_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT,
+        MPU6050_CFG_EXT_SYNC_SET_LENGTH, sync));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dlpf_mode(mpu6050_dev_t *setting, uint8_t *mode)
+{
+    return (
+        i2c_read_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_dlpf_mode(mpu6050_dev_t *setting, uint8_t mode)
+{
+    return (
+        i2c_write_bits(setting, MPU6050_REGISTER_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_full_scale_gyro_range(mpu6050_dev_t *setting, uint8_t *gyro_range)
+{
+    return (i2c_read_bits(setting, MPU6050_REGISTER_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT,
+        MPU6050_GCONFIG_FS_SEL_LENGTH, gyro_range));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_full_scale_gyro_range(mpu6050_dev_t *setting, uint8_t range)
+{
+    return (i2c_write_bits(setting, MPU6050_REGISTER_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT,
+        MPU6050_GCONFIG_FS_SEL_LENGTH, range));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_accel_x_self_test_factory_trim(mpu6050_dev_t *setting, uint8_t *accel_x)
+{
+    uint8_t a = 0;
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_X, accel_x));
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_A, &a));
+    *accel_x = ((*accel_x) >> 3) | ((a >> 4) & 0x03);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_accel_y_self_test_factory_trim(mpu6050_dev_t *setting, uint8_t *accel_y)
+{
+    uint8_t a = 0;
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Y, accel_y));
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_A, &a));
+    *accel_y = ((*accel_y) >> 3) | ((a >> 2) & 0x03);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_accel_z_self_test_factory_trim(mpu6050_dev_t *setting, uint8_t *accel_z)
+{
+    uint8_t a = 0;
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Z, accel_z));
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_A, &a));
+    *accel_z = ((*accel_z) >> 3) | (a & 0x03);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_gyro_x_self_test_factory_trim(mpu6050_dev_t *setting, uint8_t *gypr_x)
+{
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_X, gypr_x));
+    *gypr_x = ((*gypr_x) & 0x1F);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_gyro_y_self_test_factory_trim(mpu6050_dev_t *setting, uint8_t *gypr_y)
+{
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Y, gypr_y));
+    *gypr_y = (*gypr_y & 0x1F);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_gyro_z_self_test_factory_trim(mpu6050_dev_t *setting, uint8_t *gypr_z)
+{
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Z, gypr_z));
+    *gypr_z = (*gypr_z & 0x1F);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_accel_x_self_test(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_X, &(byte));
-
-    return ((byte & 0x1F));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, &(byte)));
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_gyro_y_self_test_factory_trim(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_accel_x_self_test(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_accel_y_self_test(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Y, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, &(byte)));
 
-    return ((byte & 0x1F));
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_gyro_z_self_test_factory_trim(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_accel_y_self_test(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_accel_z_self_test(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_SELF_TEST_Z, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, &(byte)));
 
-    return ((byte & 0x1F));
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_accel_x_self_test(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_accel_z_self_test(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_full_scale_accel_range(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT,
+        MPU6050_ACONFIG_AFS_SEL_LENGTH, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_accel_x_self_test(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_full_scale_accel_range(mpu6050_dev_t *setting, uint8_t range)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, enabled);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT,
+        MPU6050_ACONFIG_AFS_SEL_LENGTH, range));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_accel_y_self_test(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_dhpf_mode(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ACCEL_HPF_BIT,
+        MPU6050_ACONFIG_ACCEL_HPF_LENGTH, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_accel_y_self_test(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_dhpf_mode(mpu6050_dev_t *setting, uint8_t mode)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, enabled);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ACCEL_HPF_BIT,
+        MPU6050_ACONFIG_ACCEL_HPF_LENGTH, mode));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_accel_z_self_test(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_freefall_detection_threshold(mpu6050_dev_t *setting, uint8_t *threshold)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_FF_THR, threshold));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_freefall_detection_threshold(mpu6050_dev_t *setting, uint8_t threshold)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_FF_THR, threshold));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_freefall_detection_duration(mpu6050_dev_t *setting, uint8_t *duration)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_FF_DUR, duration));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_freefall_detection_duration(mpu6050_dev_t *setting, uint8_t duration)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_FF_DUR, duration));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_motion_detection_threshold(mpu6050_dev_t *setting, uint8_t *threshold)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_MOT_THR, threshold));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_motion_detection_threshold(mpu6050_dev_t *setting, uint8_t threshold)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_MOT_THR, threshold));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_motion_detection_duration(mpu6050_dev_t *setting, uint8_t *duration)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_MOT_DUR, duration));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_motion_detection_duration(mpu6050_dev_t *setting, uint8_t duration)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_MOT_DUR, duration));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_zero_motion_detection_threshold(mpu6050_dev_t *setting, uint8_t *threshold)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_ZRMOT_THR, threshold));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_zero_motion_detection_threshold(mpu6050_dev_t *setting, uint8_t threshold)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_ZRMOT_THR, threshold));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_zero_motion_detection_duration(mpu6050_dev_t *setting, uint8_t *duration)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_ZRMOT_DUR, duration));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_zero_motion_detection_duration(mpu6050_dev_t *setting, uint8_t duration)
+{
+    return i2c_write_byte(setting, MPU6050_REGISTER_ZRMOT_DUR, duration);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_temp_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_TEMP_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_accel_z_self_test(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_temp_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, enabled);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_TEMP_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_full_scale_accel_range(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_gyro_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT,
-        MPU6050_ACONFIG_AFS_SEL_LENGTH, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_XG_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_full_scale_accel_range(const mpu6050_config_t *setting, uint8_t range)
+esp_err_t mpu6050_set_x_gyro_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT,
-        MPU6050_ACONFIG_AFS_SEL_LENGTH, range);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_XG_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_dhpf_mode(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_y_gyro_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ACCEL_HPF_BIT,
-        MPU6050_ACONFIG_ACCEL_HPF_LENGTH, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_YG_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_dhpf_mode(const mpu6050_config_t *setting, uint8_t mode)
+esp_err_t mpu6050_set_y_gyro_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_ACCEL_CONFIG, MPU6050_ACONFIG_ACCEL_HPF_BIT,
-        MPU6050_ACONFIG_ACCEL_HPF_LENGTH, mode);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_YG_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_freefall_detection_threshold(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_z_gyro_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_FF_THR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ZG_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_freefall_detection_threshold(const mpu6050_config_t *setting, uint8_t threshold)
+esp_err_t mpu6050_set_z_gyro_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_FF_THR, threshold);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ZG_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_freefall_detection_duration(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_accel_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_FF_DUR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ACCEL_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_freefall_detection_duration(const mpu6050_config_t *setting, uint8_t duration)
+esp_err_t mpu6050_set_accel_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_FF_DUR, duration);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ACCEL_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_motion_detection_threshold(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_2_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_MOT_THR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV2_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_motion_detection_threshold(const mpu6050_config_t *setting, uint8_t threshold)
+esp_err_t mpu6050_set_slave_2_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_MOT_THR, threshold);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV2_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_motion_detection_duration(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_1_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_MOT_DUR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV1_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_motion_detection_duration(const mpu6050_config_t *setting, uint8_t duration)
+esp_err_t mpu6050_set_slave_1_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_MOT_DUR, duration);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV1_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_zero_motion_detection_threshold(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_0_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_ZRMOT_THR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV0_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_zero_motion_detection_threshold(const mpu6050_config_t *setting, uint8_t threshold)
+esp_err_t mpu6050_set_slave_0_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_ZRMOT_THR, threshold);
+    return i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV0_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_zero_motion_detection_duration(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_multi_master_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_ZRMOT_DUR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_MULT_MST_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_zero_motion_detection_duration(const mpu6050_config_t *setting, uint8_t duration)
+esp_err_t mpu6050_set_multi_master_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_ZRMOT_DUR, duration);
+    return i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_MULT_MST_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_temp_fifo_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_wait_for_external_sensor_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_TEMP_FIFO_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_WAIT_FOR_ES_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_temp_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_wait_for_external_sensor_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_TEMP_FIFO_EN_BIT, enabled);
+    return i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_WAIT_FOR_ES_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_x_gyro_fifo_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_3_fifo_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_XG_FIFO_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_SLV_3_FIFO_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_x_gyro_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_slave_3_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_XG_FIFO_EN_BIT, enabled);
+    return i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_SLV_3_FIFO_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_y_gyro_fifo_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_read_write_transition_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_YG_FIFO_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_P_NSR_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_y_gyro_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_slave_read_write_transition_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_YG_FIFO_EN_BIT, enabled);
+    return i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_P_NSR_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_z_gyro_fifo_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_master_clock_speed(mpu6050_dev_t *setting, uint8_t *clk_spd)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ZG_FIFO_EN_BIT, &(byte));
+    return (i2c_read_bits(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_CLK_BIT, MPU6050_I2C_MST_CLK_LENGTH,
+        clk_spd));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_master_clock_speed(mpu6050_dev_t *setting, uint8_t clk_spd)
+{
+    return (i2c_write_bits(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_CLK_BIT, MPU6050_I2C_MST_CLK_LENGTH,
+        clk_spd));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_slave_address(mpu6050_dev_t *setting, uint8_t num, uint8_t *addr)
+{
+    if (num > 3)
+        return ESP_FAIL;
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV0_ADDR + num * 3, addr));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_z_gyro_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_slave_address(mpu6050_dev_t *setting, uint8_t num, uint8_t address)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ZG_FIFO_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_accel_fifo_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ACCEL_FIFO_EN_BIT, &(byte));
+    if (num > 3)
+        return ESP_FAIL;
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV0_ADDR + num * 3, address);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_accel_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_get_slave_register(mpu6050_dev_t *setting, uint8_t num, uint8_t *reg)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_ACCEL_FIFO_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_2_fifo_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV2_FIFO_EN_BIT, &(byte));
+    if (num > 3)
+        return ESP_FAIL;
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV0_REG + num * 3, reg));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_2_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_slave_register(mpu6050_dev_t *setting, uint8_t num, uint8_t reg)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV2_FIFO_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_1_fifo_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV1_FIFO_EN_BIT, &(byte));
+    if (num > 3)
+        return ESP_FAIL;
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV0_REG + num * 3, reg);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_1_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_get_slave_enabled(mpu6050_dev_t *setting, uint8_t num)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV1_FIFO_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_0_fifo_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV0_FIFO_EN_BIT, &(byte));
+    uint8_t enabled = 0;
+    if (num > 3)
+        return ESP_FAIL;
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_0_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_FIFO_EN, MPU6050_SLV0_FIFO_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_multi_master_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_MULT_MST_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(
+        i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_EN_BIT, &(enabled)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_multi_master_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_slave_enabled(mpu6050_dev_t *setting, uint8_t num, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_MULT_MST_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_wait_for_external_sensor_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_WAIT_FOR_ES_BIT, &(byte));
+    if (num > 3)
+        return ESP_FAIL;
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_wait_for_external_sensor_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_WAIT_FOR_ES_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_3_fifo_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_SLV_3_FIFO_EN_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_3_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_SLV_3_FIFO_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_read_write_transition_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_P_NSR_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_read_write_transition_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_P_NSR_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_master_clock_speed(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_CLK_BIT, MPU6050_I2C_MST_CLK_LENGTH,
-        &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_master_clock_speed(const mpu6050_config_t *setting, uint8_t speed)
-{
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_I2C_MST_CTRL, MPU6050_I2C_MST_CLK_BIT, MPU6050_I2C_MST_CLK_LENGTH,
-        speed);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_address(const mpu6050_config_t *setting, uint8_t num)
+esp_err_t mpu6050_get_slave_word_byte_swap(mpu6050_dev_t *setting, uint8_t num)
 {
     uint8_t byte = 0;
     if (num > 3)
-        return (0);
+        return ESP_FAIL;
 
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV0_ADDR + num * 3, &(byte));
+    ESP_ERROR_RETURN(
+        i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_BYTE_SW_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_address(const mpu6050_config_t *setting, uint8_t num, uint8_t address)
+esp_err_t mpu6050_set_slave_word_byte_swap(mpu6050_dev_t *setting, uint8_t num, bool enabled)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV0_ADDR + num * 3, address);
+    return i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_BYTE_SW_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_register(const mpu6050_config_t *setting, uint8_t num)
-{
-    uint8_t byte = 0;
-    if (num > 3)
-        return (0);
-
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV0_REG + num * 3, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_register(const mpu6050_config_t *setting, uint8_t num, uint8_t reg)
+esp_err_t mpu6050_get_slave_write_mode(mpu6050_dev_t *setting, uint8_t num, bool *mode)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV0_REG + num * 3, reg);
+    return (
+        i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_REG_DIS_BIT, (uint8_t *)mode));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_enabled(const mpu6050_config_t *setting, uint8_t num)
-{
-    uint8_t byte = 0;
-    if (num > 3)
-        return (0);
-
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_EN_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_enabled(const mpu6050_config_t *setting, uint8_t num, bool enabled)
+esp_err_t mpu6050_set_slave_write_mode(mpu6050_dev_t *setting, uint8_t num, bool mode)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_EN_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_REG_DIS_BIT, mode));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_word_byte_swap(const mpu6050_config_t *setting, uint8_t num)
-{
-    uint8_t byte = 0;
-    if (num > 3)
-        return (0);
-
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_BYTE_SW_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_word_byte_swap(const mpu6050_config_t *setting, uint8_t num, bool enabled)
+esp_err_t mpu6050_get_slave_word_group_offset(mpu6050_dev_t *setting, uint8_t num, bool *enabled)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_BYTE_SW_BIT, enabled);
+    return (
+        i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_GRP_BIT, (uint8_t *)enabled));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_write_mode(const mpu6050_config_t *setting, uint8_t num)
-{
-    uint8_t byte = 0;
-    if (num > 3)
-        return (0);
-
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_REG_DIS_BIT, &(byte));
-
-    return byte;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_write_mode(const mpu6050_config_t *setting, uint8_t num, bool mode)
+esp_err_t mpu6050_set_slave_word_group_offset(mpu6050_dev_t *setting, uint8_t num, bool enabled)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_REG_DIS_BIT, mode);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_GRP_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_word_group_offset(const mpu6050_config_t *setting, uint8_t num)
-{
-    uint8_t byte = 0;
-    if (num > 3)
-        return (0);
-
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_GRP_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_word_group_offset(const mpu6050_config_t *setting, uint8_t num, bool enabled)
+esp_err_t mpu6050_get_slave_data_length(mpu6050_dev_t *setting, uint8_t num, uint8_t *length)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_GRP_BIT, enabled);
+    return (i2c_read_bits(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_LEN_BIT,
+        MPU6050_I2C_SLV_LEN_LENGTH, length));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_data_length(const mpu6050_config_t *setting, uint8_t num)
-{
-    uint8_t byte = 0;
-    if (num > 3)
-        return (0);
-
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_LEN_BIT,
-        MPU6050_I2C_SLV_LEN_LENGTH, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_data_length(const mpu6050_config_t *setting, uint8_t num, uint8_t length)
+esp_err_t mpu6050_set_slave_data_length(mpu6050_dev_t *setting, uint8_t num, uint8_t length)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_LEN_BIT,
-        MPU6050_I2C_SLV_LEN_LENGTH, length);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_I2C_SLV0_CTRL + num * 3, MPU6050_I2C_SLV_LEN_BIT,
+        MPU6050_I2C_SLV_LEN_LENGTH, length));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_4_address(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_4_address(mpu6050_dev_t *setting, uint8_t *address)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV4_ADDR, address));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_address(mpu6050_dev_t *setting, uint8_t address)
+{
+    return i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV4_ADDR, address);
+}
+/* ------------------------------------------------------ */
+uint8_t mpu6050_get_slave_4_register(mpu6050_dev_t *setting, uint8_t *reg)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV4_REG, reg));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_register(mpu6050_dev_t *setting, uint8_t reg)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV4_REG, reg));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_output_byte(mpu6050_dev_t *setting, uint8_t data)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV4_DO, data));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_slave_4_enabled(mpu6050_dev_t *setting, bool *enabled)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_EN_BIT, (uint8_t *)enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_EN_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_slave_4_interrupt_enabled(mpu6050_dev_t *setting, bool *enabled)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_INT_EN_BIT, (uint8_t *)enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_interrupt_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_INT_EN_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_slave_4_write_mode(mpu6050_dev_t *setting, uint8_t *mode)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_REG_DIS_BIT, (uint8_t *)mode));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_write_mode(mpu6050_dev_t *setting, bool mode)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_REG_DIS_BIT, mode));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_slave_4_master_delay(mpu6050_dev_t *setting, uint8_t *delay)
+{
+    return (i2c_read_bits(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_MST_DLY_BIT,
+        MPU6050_I2C_SLV4_MST_DLY_LENGTH, delay));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_slave_4_master_delay(mpu6050_dev_t *setting, uint8_t delay)
+{
+    return (i2c_write_bits(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_MST_DLY_BIT,
+        MPU6050_I2C_SLV4_MST_DLY_LENGTH, delay));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_slave_4_input_byte(mpu6050_dev_t *setting, uint8_t *byte)
+{
+    return (i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV4_DI, byte));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_passthrough_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV4_ADDR, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_PASS_THROUGH_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_4_address(const mpu6050_config_t *setting, uint8_t address)
-{
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV4_ADDR, address);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_4_register(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_4_is_done(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV4_REG, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV4_DONE_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_4_register(const mpu6050_config_t *setting, uint8_t reg)
-{
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV4_REG, reg);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_slave_4_output_byte(const mpu6050_config_t *setting, uint8_t data)
-{
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV4_DO, data);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_4_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_lost_arbitration(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_LOST_ARB_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_4_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_4_interrupt_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_4_nack(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_INT_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV4_NACK_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_4_interrupt_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_INT_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_4_write_mode(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_3_nack(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_REG_DIS_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV3_NACK_BIT, &(byte)));
 
-    return byte;
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_4_write_mode(const mpu6050_config_t *setting, bool mode)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_REG_DIS_BIT, mode);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_4_master_delay(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_2_nack(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_MST_DLY_BIT,
-        MPU6050_I2C_SLV4_MST_DLY_LENGTH, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV2_NACK_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_4_master_delay(const mpu6050_config_t *setting, uint8_t delay)
-{
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_I2C_SLV4_CTRL, MPU6050_I2C_SLV4_MST_DLY_BIT,
-        MPU6050_I2C_SLV4_MST_DLY_LENGTH, delay);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_slave_4_input_byte(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_1_nack(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_I2C_SLV4_DI, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV1_NACK_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_passthrough_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_slave_0_nack(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_PASS_THROUGH_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV0_NACK_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_4_is_done(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_interrupt_mode(mpu6050_dev_t *setting, bool *mode)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_LEVEL_BIT, (uint8_t *)mode));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_interrupt_mode(mpu6050_dev_t *setting, bool mode)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_LEVEL_BIT, mode));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_interrupt_drive(mpu6050_dev_t *setting, bool *drive)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_OPEN_BIT, (uint8_t *)drive));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_interrupt_drive(mpu6050_dev_t *setting, bool drive)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_OPEN_BIT, drive));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_interrupt_latch(mpu6050_dev_t *setting, bool *latch)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_LATCH_INT_EN_BIT, (uint8_t *)latch));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_interrupt_latch(mpu6050_dev_t *setting, bool latch)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_LATCH_INT_EN_BIT, latch));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_interrupt_latch_clear(mpu6050_dev_t *setting, bool *clear)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_RD_CLEAR_BIT, (uint8_t *)clear));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_interrupt_latch_clear(mpu6050_dev_t *setting, bool clear)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_RD_CLEAR_BIT, clear);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_fsync_interrupt_level(mpu6050_dev_t *setting, bool *level)
+{
+    return (i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT, (uint8_t *)level));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_fsync_interrupt_level(mpu6050_dev_t *setting, bool level)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT, level);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_fsync_interrupt_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV4_DONE_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_lost_arbitration(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_fsync_interrupt_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_EN_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_i2c_bypass_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_LOST_ARB_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_4_nack(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_i2c_bypass_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_clock_output_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV4_NACK_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_CLKOUT_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_3_nack(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_clock_output_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_CLKOUT_EN_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+uint8_t mpu6050_get_int_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV3_NACK_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_INT_ENABLE, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_2_nack(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_int_enabled(mpu6050_dev_t *setting, uint8_t enabled)
+{
+    return (i2c_write_byte(setting, MPU6050_REGISTER_INT_ENABLE, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_freefall_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV2_NACK_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FF_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_1_nack(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_int_freefall_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FF_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_motion_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV1_NACK_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_MOT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_0_nack(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_int_motion_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_MOT_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_zero_motion_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_STATUS, MPU6050_MST_I2C_SLV0_NACK_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_ZMOT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_interrupt_mode(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_int_zero_motion_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_ZMOT_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_fifo_byte_overflow_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_LEVEL_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_interrupt_mode(const mpu6050_config_t *setting, bool mode)
+esp_err_t mpu6050_set_int_fifo_byte_overflow_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_LEVEL_BIT, mode);
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_interrupt_drive(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_i2c_master_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_OPEN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_I2C_MST_INT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_interrupt_drive(const mpu6050_config_t *setting, bool drive)
+esp_err_t mpu6050_set_int_i2c_master_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_OPEN_BIT, drive);
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_I2C_MST_INT_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_interrupt_latch(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_data_ready_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_LATCH_INT_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DATA_RDY_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_interrupt_latch(const mpu6050_config_t *setting, bool latch)
+esp_err_t mpu6050_set_int_data_ready_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_LATCH_INT_EN_BIT, latch);
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DATA_RDY_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_interrupt_latch_clear(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_RD_CLEAR_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_INT_STATUS, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_interrupt_latch_clear(const mpu6050_config_t *setting, bool clear)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_INT_RD_CLEAR_BIT, clear);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_fsync_interrupt_level(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_freefall_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_FF_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_fsync_interrupt_level(const mpu6050_config_t *setting, bool level)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT, level);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_fsync_interrupt_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_motion_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_MOT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_fsync_interrupt_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_FSYNC_INT_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_i2c_bypass_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_zero_motion_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_ZMOT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_i2c_bypass_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_clock_output_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_fifo_byte_overflow_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_CLKOUT_EN_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_clock_output_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_PIN_CFG, MPU6050_INTCFG_CLKOUT_EN_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_int_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_i2c_master_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_INT_ENABLE, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_I2C_MST_INT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_int_enabled(const mpu6050_config_t *setting, uint8_t enabled)
-{
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_INT_ENABLE, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_freefall_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_data_ready_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FF_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_DATA_RDY_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_int_freefall_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FF_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_motion_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_MOT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_motion_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_MOT_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_zero_motion_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_ZMOT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_zero_motion_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_ZMOT_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_fifo_byte_overflow_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_fifo_byte_overflow_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_i2c_master_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_I2C_MST_INT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_i2c_master_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_I2C_MST_INT_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_data_ready_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DATA_RDY_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_data_ready_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DATA_RDY_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_INT_STATUS, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_freefall_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_FF_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_motion_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_MOT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_zero_motion_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_ZMOT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_fifo_byte_overflow_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_FIFO_OFLOW_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_i2c_master_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_I2C_MST_INT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_data_ready_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_DATA_RDY_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_get_acceleration(const mpu6050_config_t *setting, mpu6050_acceleration_t *data)
+esp_err_t mpu6050_get_acceleration(mpu6050_dev_t *setting, mpu6050_acceleration_t *data)
 {
     uint8_t buffer[6];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 6, (uint8_t *)buffer);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 6, (uint8_t *)buffer));
     data->accel_x = (((int16_t)buffer[0]) << 8) | buffer[1];
     data->accel_y = (((int16_t)buffer[2]) << 8) | buffer[3];
     data->accel_z = (((int16_t)buffer[4]) << 8) | buffer[5];
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_acceleration_x(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_acceleration_x(mpu6050_dev_t *setting, int16_t *accel_x)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 2, buffer);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 2, buffer));
 
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    *accel_x = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_acceleration_y(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_acceleration_y(mpu6050_dev_t *setting, int16_t *accel_y)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_YOUT_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_YOUT_H, 2, buffer));
+    *accel_y = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_acceleration_z(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_acceleration_z(mpu6050_dev_t *setting, int16_t *accel_z)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_ZOUT_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_ZOUT_H, 2, buffer));
+    *accel_z = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_temperature(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_temperature(mpu6050_dev_t *setting, int16_t *temp)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_TEMP_OUT_H, 2, buffer);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_TEMP_OUT_H, 2, buffer));
 
     int16_t rawtemp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
-    return (rawtemp / 340.0) + 36.53;
+    *temp = (rawtemp / 340.0) + 36.53;
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_get_rotation(const mpu6050_config_t *setting, mpu6050_rotation_t *data)
+esp_err_t mpu6050_get_rotation(mpu6050_dev_t *setting, mpu6050_rotation_t *data)
 {
     uint8_t buffer[6];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_XOUT_H, 6, buffer);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_XOUT_H, 6, buffer));
     data->gyro_x = (((int16_t)buffer[0]) << 8) | buffer[1];
     data->gyro_y = (((int16_t)buffer[2]) << 8) | buffer[3];
     data->gyro_z = (((int16_t)buffer[4]) << 8) | buffer[5];
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_rotation_x(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_rotation_x(mpu6050_dev_t *setting, int16_t *rotation_x)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_XOUT_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_XOUT_H, 2, buffer));
+    *rotation_x = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_rotation_y(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_rotation_y(mpu6050_dev_t *setting, int16_t *rotation_y)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_YOUT_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_YOUT_H, 2, buffer));
+    *rotation_y = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_rotation_z(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_rotation_z(mpu6050_dev_t *setting, int16_t *rotation_z)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_ZOUT_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_ZOUT_H, 2, buffer));
+    *rotation_z = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_get_motion(const mpu6050_config_t *setting, mpu6050_acceleration_t *data_accel,
+esp_err_t mpu6050_get_motion(mpu6050_dev_t *setting, mpu6050_acceleration_t *data_accel,
     mpu6050_rotation_t *data_gyro)
 {
     uint8_t buffer[14];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 14, buffer);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 14, buffer));
 
     data_accel->accel_x = (((int16_t)buffer[0]) << 8) | buffer[1];
     data_accel->accel_y = (((int16_t)buffer[2]) << 8) | buffer[3];
@@ -1226,735 +1591,659 @@ void mpu6050_get_motion(const mpu6050_config_t *setting, mpu6050_acceleration_t 
     data_gyro->gyro_x = (((int16_t)buffer[8]) << 8) | buffer[9];
     data_gyro->gyro_y = (((int16_t)buffer[10]) << 8) | buffer[11];
     data_gyro->gyro_z = (((int16_t)buffer[12]) << 8) | buffer[13];
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_external_sensor_byte(const mpu6050_config_t *setting, int position)
+esp_err_t mpu6050_get_external_sensor_byte(mpu6050_dev_t *setting, int position, uint8_t *byte)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_EXT_SENS_DATA_00 + position, &(byte));
-
-    return byte;
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_EXT_SENS_DATA_00 + position, byte));
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-uint16_t mpu6050_get_external_sensor_word(const mpu6050_config_t *setting, int position)
+esp_err_t mpu6050_get_external_sensor_word(mpu6050_dev_t *setting, int position, uint16_t *word)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_EXT_SENS_DATA_00 + position, 2, buffer);
-
-    return ((((uint16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_EXT_SENS_DATA_00 + position, 2, buffer));
+    *word = ((((uint16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-uint32_t mpu6050_get_external_sensor_dword(const mpu6050_config_t *setting, int position)
+esp_err_t mpu6050_get_external_sensor_dword(mpu6050_dev_t *setting, int position, uint32_t *dword)
 {
     uint8_t buffer[4];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_EXT_SENS_DATA_00 + position, 4, buffer);
-
-    return ((((uint32_t)buffer[0]) << 24) | (((uint32_t)buffer[1]) << 16) | (((uint16_t)buffer[2]) << 8) | buffer[3]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_EXT_SENS_DATA_00 + position, 4, buffer));
+    *dword = ((((uint32_t)buffer[0]) << 24) | (((uint32_t)buffer[1]) << 16) | (((uint16_t)buffer[2]) << 8) | buffer[3]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_motion_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_motion_status(mpu6050_dev_t *setting, uint8_t *status)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, &(byte));
-
-    return byte;
+    return (i2c_read_byte(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, status));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_x_negative_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_negative_motion_detected(mpu6050_dev_t *setting, uint8_t *motion)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_XNEG_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_XNEG_BIT, motion));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_x_positive_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_positive_motion_detected(mpu6050_dev_t *setting, uint8_t *detected)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_XPOS_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_XPOS_BIT, detected));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_y_negative_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_y_negative_motion_detected(mpu6050_dev_t *setting, uint8_t *detected)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_YNEG_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_YNEG_BIT, detected));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_y_positive_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_y_positive_motion_detected(mpu6050_dev_t *setting, uint8_t *detected)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_YPOS_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_YPOS_BIT, detected));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_z_negative_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_z_negative_motion_detected(mpu6050_dev_t *setting, uint8_t *detected)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_ZNEG_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_ZNEG_BIT, detected));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_z_positive_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_z_positive_motion_detected(mpu6050_dev_t *setting, uint8_t *detected)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_ZPOS_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_ZPOS_BIT, detected));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_zero_motion_detected(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_zero_motion_detected(mpu6050_dev_t *setting, uint8_t *detected)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_ZRMOT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_MOT_DETECT_STATUS, MPU6050_MOTION_MOT_ZRMOT_BIT, detected));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_output_byte(const mpu6050_config_t *setting, uint8_t num, uint8_t data)
+esp_err_t mpu6050_set_slave_output_byte(mpu6050_dev_t *setting, uint8_t num, uint8_t data)
 {
     if (num > 3)
-        return;
+        return ESP_FAIL;
 
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV0_DO + num, data);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_I2C_SLV0_DO + num, data));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_external_shadow_delay_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_external_shadow_delay_enabled(mpu6050_dev_t *setting, bool *enabled)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, MPU6050_DLYCTRL_DELAY_ES_SHADOW_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, MPU6050_DLYCTRL_DELAY_ES_SHADOW_BIT,
+        (uint8_t *)enabled));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_external_shadow_delay_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_external_shadow_delay_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, MPU6050_DLYCTRL_DELAY_ES_SHADOW_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, MPU6050_DLYCTRL_DELAY_ES_SHADOW_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_slave_delay_enabled(const mpu6050_config_t *setting, uint8_t num)
+esp_err_t mpu6050_get_slave_delay_enabled(mpu6050_dev_t *setting, uint8_t num)
 {
     uint8_t byte = 0;
     if (num > 4)
-        return (0);
+        return ESP_FAIL;
 
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, num, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, num, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_slave_delay_enabled(const mpu6050_config_t *setting, uint8_t num, bool enabled)
+esp_err_t mpu6050_set_slave_delay_enabled(mpu6050_dev_t *setting, uint8_t num, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, num, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_I2C_MST_DELAY_CTRL, num, enabled));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset_gyroscope_path(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset_gyroscope_path(mpu6050_dev_t *setting)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_SIGNAL_PATH_RESET, MPU6050_PATHRESET_GYRO_RESET_BIT, 1);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_SIGNAL_PATH_RESET, MPU6050_PATHRESET_GYRO_RESET_BIT, 1));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset_accelerometer_path(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset_accelerometer_path(mpu6050_dev_t *setting)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_SIGNAL_PATH_RESET, MPU6050_PATHRESET_ACCEL_RESET_BIT, 1);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_SIGNAL_PATH_RESET, MPU6050_PATHRESET_ACCEL_RESET_BIT, 1));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset_temperature_path(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset_temperature_path(mpu6050_dev_t *setting)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_SIGNAL_PATH_RESET, MPU6050_PATHRESET_TEMP_RESET_BIT, 1);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_SIGNAL_PATH_RESET, MPU6050_PATHRESET_TEMP_RESET_BIT, 1));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_accelerometer_power_on_delay(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_accelerometer_power_on_delay(mpu6050_dev_t *setting, uint8_t *delay)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_ACCEL_DELAY_BIT,
-        MPU6050_DETECT_ACCEL_DELAY_LENGTH, &(byte));
-
-    return byte;
+    return (i2c_read_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_ACCEL_DELAY_BIT,
+        MPU6050_DETECT_ACCEL_DELAY_LENGTH, delay));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_accelerometer_power_on_delay(const mpu6050_config_t *setting, uint8_t delay)
+esp_err_t mpu6050_set_accelerometer_power_on_delay(mpu6050_dev_t *setting, uint8_t delay)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_ACCEL_DELAY_BIT,
-        MPU6050_DETECT_ACCEL_DELAY_LENGTH, delay);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_ACCEL_DELAY_BIT,
+        MPU6050_DETECT_ACCEL_DELAY_LENGTH, delay));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_freefall_detection_counter_decrement(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_freefall_detection_counter_decrement(mpu6050_dev_t *setting, uint8_t *decrement)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_FF_COUNT_BIT,
-        MPU6050_DETECT_FF_COUNT_LENGTH, &(byte));
-
-    return byte;
+    return (i2c_read_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_FF_COUNT_BIT,
+        MPU6050_DETECT_FF_COUNT_LENGTH, decrement));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_freefall_detection_counter_decrement(const mpu6050_config_t *setting, uint8_t decrement)
+esp_err_t mpu6050_set_freefall_detection_counter_decrement(mpu6050_dev_t *setting, uint8_t decrement)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_FF_COUNT_BIT,
-        MPU6050_DETECT_FF_COUNT_LENGTH, decrement);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_FF_COUNT_BIT,
+        MPU6050_DETECT_FF_COUNT_LENGTH, decrement));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_motion_detection_counter_decrement(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_motion_detection_counter_decrement(mpu6050_dev_t *setting, uint8_t *decrement)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_MOT_COUNT_BIT,
-        MPU6050_DETECT_MOT_COUNT_LENGTH, &(byte));
-
-    return byte;
+    return (i2c_read_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_MOT_COUNT_BIT,
+        MPU6050_DETECT_MOT_COUNT_LENGTH, decrement));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_motion_detection_counter_decrement(const mpu6050_config_t *setting, uint8_t decrement)
+esp_err_t mpu6050_set_motion_detection_counter_decrement(mpu6050_dev_t *setting, uint8_t decrement)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_MOT_COUNT_BIT,
-        MPU6050_DETECT_MOT_COUNT_LENGTH, decrement);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_MOT_DETECT_CTRL, MPU6050_DETECT_MOT_COUNT_BIT,
+        MPU6050_DETECT_MOT_COUNT_LENGTH, decrement));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_fifo_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_fifo_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, &(byte));
-
-    return byte;
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, &(enabled)));
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_fifo_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_fifo_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_i2c_master_mode_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_i2c_master_mode_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, &(enabled)));
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_i2c_master_mode_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_i2c_master_mode_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, enabled));
 }
 
-void mpu6050_switch_spie_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_switch_spie_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_I2C_IF_DIS_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_I2C_IF_DIS_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset_fifo(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset_fifo(mpu6050_dev_t *setting)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_FIFO_RESET_BIT, 1));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset_sensors(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset_sensors(mpu6050_dev_t *setting)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_SIG_COND_RESET_BIT, 1);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_SIG_COND_RESET_BIT, 1));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset(mpu6050_dev_t *setting)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, 1));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_sleep_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_sleep_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, &(byte));
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, &(enabled)));
+    return ((enabled == 0) ? DISABLE : ENABLE);
+}
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+esp_err_t mpu6050_set_sleep_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled);
 }
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_wake_cycle_enabled(mpu6050_dev_t *setting)
+{
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CYCLE_BIT, &(enabled)));
 
-void mpu6050_set_sleep_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled);
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_wake_cycle_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_wake_cycle_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CYCLE_BIT, &(byte));
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CYCLE_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_temp_sensor_enabled(mpu6050_dev_t *setting)
+{
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_TEMP_DIS_BIT, &(enabled)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_wake_cycle_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_temp_sensor_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CYCLE_BIT, enabled);
+    return i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_TEMP_DIS_BIT, !enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_temp_sensor_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_clock_source(mpu6050_dev_t *setting, uint8_t *clk_setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_TEMP_DIS_BIT, &(byte));
+    return (i2c_read_bits(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH,
+        clk_setting));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_clock_source(mpu6050_dev_t *setting, uint8_t source)
+{
+    return (i2c_write_bits(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH,
+        source));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_wake_frequency(mpu6050_dev_t *setting, uint8_t *frequency)
+{
+    ESP_ERROR_RETURN(i2c_read_bits(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_LP_WAKE_CTRL_BIT,
+        MPU6050_PWR2_LP_WAKE_CTRL_LENGTH, frequency));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_temp_sensor_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_wake_frequency(mpu6050_dev_t *setting, uint8_t frequency)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_TEMP_DIS_BIT, !enabled);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_LP_WAKE_CTRL_BIT,
+        MPU6050_PWR2_LP_WAKE_CTRL_LENGTH, frequency));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_clock_source(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_standby_x_accel_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH,
-        &(byte));
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XA_BIT, &(enabled)));
 
-    return byte;
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_clock_source(const mpu6050_config_t *setting, uint8_t source)
+esp_err_t mpu6050_set_standby_x_accel_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH,
-        source);
+    return i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XA_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_wake_frequency(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_standby_y_accel_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_LP_WAKE_CTRL_BIT,
-        MPU6050_PWR2_LP_WAKE_CTRL_LENGTH, &(byte));
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YA_BIT, &(enabled)));
 
-    return byte;
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_wake_frequency(const mpu6050_config_t *setting, uint8_t frequency)
+esp_err_t mpu6050_set_standby_y_accel_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_LP_WAKE_CTRL_BIT,
-        MPU6050_PWR2_LP_WAKE_CTRL_LENGTH, frequency);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YA_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_standby_x_accel_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_standby_z_accel_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XA_BIT, &(byte));
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZA_BIT, &(enabled)));
+    return ((enabled == 0) ? DISABLE : ENABLE);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_standby_z_accel_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZA_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_standby_x_gyro_enabled(mpu6050_dev_t *setting)
+{
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XG_BIT, &(enabled)));
+    return ((enabled == 0) ? DISABLE : ENABLE);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_standby_x_gyro_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XG_BIT, enabled));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_standby_y_gyro_enabled(mpu6050_dev_t *setting)
+{
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YG_BIT, &(enabled)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_standby_x_accel_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_standby_y_gyro_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XA_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YG_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_standby_y_accel_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_standby_z_gyro_enabled(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YA_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZG_BIT, &(enabled)));
+    return ((enabled == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_standby_y_accel_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_set_standby_z_gyro_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YA_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZG_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_standby_z_accel_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZA_BIT, &(byte));
-
-    return byte;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_standby_z_accel_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZA_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_standby_x_gyro_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XG_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_standby_x_gyro_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_XG_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_standby_y_gyro_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YG_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_standby_y_gyro_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_YG_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_standby_z_gyro_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZG_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_standby_z_gyro_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_PWR_MGMT_2, MPU6050_PWR2_STBY_ZG_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-uint16_t mpu6050_get_fifo_count(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_fifo_count(mpu6050_dev_t *setting, uint16_t *count)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_FIFO_COUNTH, 2, buffer);
-
-    return ((((uint16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_FIFO_COUNTH, 2, buffer));
+    *count = ((((uint16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_fifo_byte(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_fifo_byte(mpu6050_dev_t *setting, uint8_t *byte)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_FIFO_R_W, &(byte));
-
-    return byte;
+    ESP_ERROR_RETURN(i2c_read_byte(setting, MPU6050_REGISTER_FIFO_R_W, byte));
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_get_fifo_bytes(const mpu6050_config_t *setting, uint8_t *data, uint8_t length)
+esp_err_t mpu6050_get_fifo_bytes(mpu6050_dev_t *setting, uint8_t *data, uint8_t length)
 {
-    if (length > 0)
-    {
-        esp32_i2c_read_bytes(setting, MPU6050_REGISTER_FIFO_R_W, length, data);
-    }
-    else
+    if (length <= 0)
     {
         *data = 0;
+        return ESP_ERR_INVALID_ARG;
     }
-    return;
+    return (i2c_read_bytes(setting, MPU6050_REGISTER_FIFO_R_W, length, data));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_fifo_byte(const mpu6050_config_t *setting, uint8_t data)
+esp_err_t mpu6050_set_fifo_byte(mpu6050_dev_t *setting, uint8_t data)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_FIFO_R_W, data);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_FIFO_R_W, data));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_device_id(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_device_id(mpu6050_dev_t *setting, uint8_t *id)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_WHO_AM_I, MPU6050_WHO_AM_I_BIT, MPU6050_WHO_AM_I_LENGTH, &(byte));
-
-    return byte;
+    return (i2c_read_bits(setting, MPU6050_REGISTER_WHO_AM_I, MPU6050_WHO_AM_I_BIT, MPU6050_WHO_AM_I_LENGTH, id));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_device_id(const mpu6050_config_t *setting, uint8_t id)
+esp_err_t mpu6050_set_device_id(mpu6050_dev_t *setting, uint8_t id)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_WHO_AM_I, MPU6050_WHO_AM_I_BIT, MPU6050_WHO_AM_I_LENGTH, id);
+    return (i2c_write_bits(setting, MPU6050_REGISTER_WHO_AM_I, MPU6050_WHO_AM_I_BIT, MPU6050_WHO_AM_I_LENGTH, id));
 }
 /* ------------------------------------------------------ */
-uint8_t mpu6050_get_otp_bank_valid(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_otp_bank_valid(mpu6050_dev_t *setting, uint8_t *valid)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OTP_BNK_VLD_BIT, &(byte));
-
-    return byte;
+    return (i2c_read_bit(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OTP_BNK_VLD_BIT, valid));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_otp_bank_valid(const mpu6050_config_t *setting, int8_t enabled)
+esp_err_t mpu6050_set_otp_bank_valid(mpu6050_dev_t *setting, int8_t enabled)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OTP_BNK_VLD_BIT, enabled);
+    return (i2c_write_bit(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OTP_BNK_VLD_BIT, enabled));
 }
 /* ------------------------------------------------------ */
-int8_t mpu6050_get_x_gyro_offset_tc(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_gyro_offset_tc(mpu6050_dev_t *setting, int8_t *offset)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, &(byte));
-
-    return ((int8_t)byte);
+    return (i2c_read_bits(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH,
+        (uint8_t *)offset));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_x_gyro_offset_tc(const mpu6050_config_t *setting, int8_t offset)
+esp_err_t mpu6050_set_x_gyro_offset_tc(mpu6050_dev_t *setting, int8_t offset)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset);
+    return (
+        i2c_write_bits(setting, MPU6050_REGISTER_XG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset));
 }
 /* ------------------------------------------------------ */
-int8_t mpu6050_get_y_gyro_offset_tc(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_y_gyro_offset_tc(mpu6050_dev_t *setting, int8_t *offset)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, &(byte));
-
-    return ((int8_t)byte);
+    return (i2c_read_bits(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH,
+        (uint8_t *)offset));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_y_gyro_offset_tc(const mpu6050_config_t *setting, int8_t offset)
+esp_err_t mpu6050_set_y_gyro_offset_tc(mpu6050_dev_t *setting, int8_t offset)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset);
+    return (
+        i2c_write_bits(setting, MPU6050_REGISTER_YG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset));
 }
 /* ------------------------------------------------------ */
-int8_t mpu6050_get_z_gyro_offset_tc(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_z_gyro_offset_tc(mpu6050_dev_t *setting, int8_t *offset)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bits(setting, MPU6050_REGISTER_ZG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, &(byte));
-
-    return ((int8_t)byte);
+    return (i2c_read_bits(setting, MPU6050_REGISTER_ZG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH,
+        (uint8_t *)offset));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_z_gyro_offset_tc(const mpu6050_config_t *setting, int8_t offset)
+esp_err_t mpu6050_set_z_gyro_offset_tc(mpu6050_dev_t *setting, int8_t offset)
 {
-    esp32_i2c_write_bits(setting, MPU6050_REGISTER_ZG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset);
+    return (
+        i2c_write_bits(setting, MPU6050_REGISTER_ZG_OFFS_TC, MPU6050_TC_OFFSET_BIT, MPU6050_TC_OFFSET_LENGTH, offset));
 }
 /* ------------------------------------------------------ */
-int8_t mpu6050_get_x_fine_gain(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_fine_gain(mpu6050_dev_t *setting, int8_t *gain)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_X_FINE_GAIN, &(byte));
-
-    return ((int8_t)byte);
+    return (i2c_read_byte(setting, MPU6050_REGISTER_X_FINE_GAIN, (uint8_t *)gain));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_x_fine_gain(const mpu6050_config_t *setting, int8_t gain)
+esp_err_t mpu6050_set_x_fine_gain(mpu6050_dev_t *setting, int8_t gain)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_X_FINE_GAIN, gain);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_X_FINE_GAIN, gain));
 }
 /* ------------------------------------------------------ */
-int8_t mpu6050_get_y_fine_gain(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_y_fine_gain(mpu6050_dev_t *setting, int8_t *gain)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_Y_FINE_GAIN, &(byte));
-
-    return ((int8_t)byte);
-    ;
+    return (i2c_read_byte(setting, MPU6050_REGISTER_Y_FINE_GAIN, (uint8_t *)gain));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_y_fine_gain(const mpu6050_config_t *setting, int8_t gain)
+esp_err_t mpu6050_set_y_fine_gain(mpu6050_dev_t *setting, int8_t gain)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_Y_FINE_GAIN, gain);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_Y_FINE_GAIN, gain));
 }
 /* ------------------------------------------------------ */
-int8_t mpu6050_get_z_fine_gain(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_z_fine_gain(mpu6050_dev_t *setting, int8_t *gain)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_Z_FINE_GAIN, &(byte));
-
-    return ((int8_t)byte);
+    return (i2c_read_byte(setting, MPU6050_REGISTER_Z_FINE_GAIN, (uint8_t *)gain));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_z_fine_gain(const mpu6050_config_t *setting, int8_t gain)
+esp_err_t mpu6050_set_z_fine_gain(mpu6050_dev_t *setting, int8_t gain)
 {
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_Z_FINE_GAIN, gain);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_Z_FINE_GAIN, gain));
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_x_accel_offset(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_accel_offset(mpu6050_dev_t *setting, int16_t *offset)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_XA_OFFS_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_XA_OFFS_H, 2, buffer));
+    *offset = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_x_accel_offset(const mpu6050_config_t *setting, int16_t offset)
+esp_err_t mpu6050_set_x_accel_offset(mpu6050_dev_t *setting, int16_t offset)
 {
-    esp32_i2c_write_word(setting, MPU6050_REGISTER_XA_OFFS_H, offset);
+    return (i2c_write_word(setting, MPU6050_REGISTER_XA_OFFS_H, offset));
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_y_accel_offset(const mpu6050_config_t *setting)
-{
-    uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_YA_OFFS_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_y_accel_offset(const mpu6050_config_t *setting, int16_t offset)
-{
-    esp32_i2c_write_word(setting, MPU6050_REGISTER_YA_OFFS_H, offset);
-}
-/* ------------------------------------------------------ */
-int16_t mpu6050_get_z_accel_offset(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_y_accel_offset(mpu6050_dev_t *setting, int16_t *offset)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ZA_OFFS_H, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_YA_OFFS_H, 2, buffer));
+    *offset = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_z_accel_offset(const mpu6050_config_t *setting, int16_t offset)
+esp_err_t mpu6050_set_y_accel_offset(mpu6050_dev_t *setting, int16_t offset)
 {
-    esp32_i2c_write_word(setting, MPU6050_REGISTER_ZA_OFFS_H, offset);
+    return (i2c_write_word(setting, MPU6050_REGISTER_YA_OFFS_H, offset));
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_x_gyro_offset(const mpu6050_config_t *setting)
-{
-    uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_XG_OFFS_USRH, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_x_gyro_offset(const mpu6050_config_t *setting, int16_t offset)
-{
-    esp32_i2c_write_word(setting, MPU6050_REGISTER_XG_OFFS_USRH, offset);
-}
-/* ------------------------------------------------------ */
-int16_t mpu6050_get_y_gyro_offset(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_z_accel_offset(mpu6050_dev_t *setting, int16_t *offset)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_YG_OFFS_USRH, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ZA_OFFS_H, 2, buffer));
+    *offset = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_y_gyro_offset(const mpu6050_config_t *setting, int16_t offset)
+esp_err_t mpu6050_set_z_accel_offset(mpu6050_dev_t *setting, int16_t offset)
 {
-    esp32_i2c_write_word(setting, MPU6050_REGISTER_YG_OFFS_USRH, offset);
+    return (i2c_write_word(setting, MPU6050_REGISTER_ZA_OFFS_H, offset));
 }
 /* ------------------------------------------------------ */
-int16_t mpu6050_get_z_gyro_offset(const mpu6050_config_t *setting)
-{
-    uint8_t buffer[2];
-    esp32_i2c_read_bytes(setting, MPU6050_REGISTER_ZG_OFFS_USRH, 2, buffer);
-
-    return ((((int16_t)buffer[0]) << 8) | buffer[1]);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_z_gyro_offset(const mpu6050_config_t *setting, int16_t offset)
-{
-    esp32_i2c_write_word(setting, MPU6050_REGISTER_ZG_OFFS_USRH, offset);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_pll_ready_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_PLL_RDY_INT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_pll_ready_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_PLL_RDY_INT_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_dmp_enabled(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DMP_INT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_int_dmp_enabled(const mpu6050_config_t *setting, bool enabled)
-{
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DMP_INT_BIT, enabled);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_int_5_status(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_5_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
-}
-/* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_int_4_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_x_gyro_offset(mpu6050_dev_t *setting, int16_t *offset)
 {
     uint8_t buffer[2];
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_4_BIT, buffer);
-
-    return ((buffer == 0x00) ? ESP_FAIL : ESP_OK);
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_XG_OFFS_USRH, 2, buffer));
+    *offset = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_int_3_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_x_gyro_offset(mpu6050_dev_t *setting, int16_t offset)
+{
+    return (i2c_write_word(setting, MPU6050_REGISTER_XG_OFFS_USRH, offset));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_y_gyro_offset(mpu6050_dev_t *setting, int16_t *offset)
+{
+    uint8_t buffer[2];
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_YG_OFFS_USRH, 2, buffer));
+    *offset = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_y_gyro_offset(mpu6050_dev_t *setting, int16_t offset)
+{
+    return (i2c_write_word(setting, MPU6050_REGISTER_YG_OFFS_USRH, offset));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_z_gyro_offset(mpu6050_dev_t *setting, int16_t *offset)
+{
+    uint8_t buffer[2];
+    ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ZG_OFFS_USRH, 2, buffer));
+    *offset = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+    return ESP_OK;
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_z_gyro_offset(mpu6050_dev_t *setting, int16_t offset)
+{
+    return (i2c_write_word(setting, MPU6050_REGISTER_ZG_OFFS_USRH, offset));
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_pll_ready_enabled(mpu6050_dev_t *setting)
+{
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_PLL_RDY_INT_BIT, &(enabled)));
+
+    return ((enabled == 0) ? DISABLE : ENABLE);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_int_pll_ready_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_PLL_RDY_INT_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_dmp_enabled(mpu6050_dev_t *setting)
+{
+    uint8_t enabled = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DMP_INT_BIT, &(enabled)));
+
+    return ((enabled == 0) ? DISABLE : ENABLE);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_set_int_dmp_enabled(mpu6050_dev_t *setting, bool enabled)
+{
+    return i2c_write_bit(setting, MPU6050_REGISTER_INT_ENABLE, MPU6050_INTERRUPT_DMP_INT_BIT, enabled);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dmp_int_5_status(mpu6050_dev_t *setting)
+{
+    uint8_t status = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_5_BIT, &(status)));
+
+    return ((status == 0) ? ESP_FAIL : ESP_OK);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dmp_int_4_status(mpu6050_dev_t *setting)
+{
+    uint8_t status = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_4_BIT, &(status)));
+
+    return ((status == 0) ? ESP_FAIL : ESP_OK);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dmp_int_3_status(mpu6050_dev_t *setting)
+{
+    uint8_t status = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_3_BIT, &(status)));
+
+    return ((status == 0) ? ESP_FAIL : ESP_OK);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dmp_int_2_status(mpu6050_dev_t *setting)
+{
+    uint8_t status = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_2_BIT, &(status)));
+
+    return ((status == 0) ? ESP_FAIL : ESP_OK);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dmp_int_1_status(mpu6050_dev_t *setting)
+{
+    uint8_t status = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_1_BIT, &(status)));
+
+    return ((status == 0) ? ESP_FAIL : ESP_OK);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_dmp_int_0_status(mpu6050_dev_t *setting)
+{
+    uint8_t status = 0;
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_0_BIT, &(status)));
+
+    return ((status == 0) ? ESP_FAIL : ESP_OK);
+}
+/* ------------------------------------------------------ */
+esp_err_t mpu6050_get_int_ppl_ready_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_3_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_PLL_RDY_INT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_int_2_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_int_dmp_status(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_2_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_DMP_INT_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_int_1_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_dmp_enabled(mpu6050_dev_t *setting)
 {
     uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_1_BIT, &(byte));
+    ESP_ERROR_RETURN(i2c_read_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, &(byte)));
 
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_int_0_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_dmp_enabled(mpu6050_dev_t *setting, bool enabled)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_DMP_INT_STATUS, MPU6050_DMPINT_0_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, enabled);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_ppl_ready_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_reset_dmp(mpu6050_dev_t *setting)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_PLL_RDY_INT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_int_dmp_status(const mpu6050_config_t *setting)
+esp_err_t mpu6050_get_dmp_config_1(mpu6050_dev_t *setting, uint8_t *config)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_INT_STATUS, MPU6050_INTERRUPT_DMP_INT_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_read_byte(setting, MPU6050_REGISTER_DMP_CFG_1, config));
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_dmp_enabled(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_dmp_config_1(mpu6050_dev_t *setting, uint8_t config)
 {
-    uint8_t byte = 0;
-    esp32_i2c_read_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, &(byte));
-
-    return ((byte == 0x00) ? ESP_FAIL : ESP_OK);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_DMP_CFG_1, config));
 }
 /* ------------------------------------------------------ */
-void mpu6050_set_dmp_enabled(const mpu6050_config_t *setting, bool enabled)
+esp_err_t mpu6050_get_dmp_config_2(mpu6050_dev_t *setting, uint8_t *config)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_DMP_EN_BIT, enabled);
+    return (i2c_read_byte(setting, MPU6050_REGISTER_DMP_CFG_2, config));
 }
 /* ------------------------------------------------------ */
-void mpu6050_reset_dmp(const mpu6050_config_t *setting)
+esp_err_t mpu6050_set_dmp_config_2(mpu6050_dev_t *setting, uint8_t config)
 {
-    esp32_i2c_write_bit(setting, MPU6050_REGISTER_USER_CTRL, MPU6050_USERCTRL_DMP_RESET_BIT, 1);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_dmp_config_1(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_DMP_CFG_1, &(byte));
-
-    return byte;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_dmp_config_1(const mpu6050_config_t *setting, uint8_t config)
-{
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_DMP_CFG_1, config);
-}
-/* ------------------------------------------------------ */
-uint8_t mpu6050_get_dmp_config_2(const mpu6050_config_t *setting)
-{
-    uint8_t byte = 0;
-    esp32_i2c_read_byte(setting, MPU6050_REGISTER_DMP_CFG_2, &(byte));
-
-    return byte;
-}
-/* ------------------------------------------------------ */
-void mpu6050_set_dmp_config_2(const mpu6050_config_t *setting, uint8_t config)
-{
-    esp32_i2c_write_byte(setting, MPU6050_REGISTER_DMP_CFG_2, config);
+    return (i2c_write_byte(setting, MPU6050_REGISTER_DMP_CFG_2, config));
 }
 /* ------------------------------------------------------ */
 float mpu6050_get_accel_res(uint8_t accel_scale)
@@ -2003,8 +2292,9 @@ float mpu6050_get_gyro_res(uint8_t gyro_scale)
     return (gyro_res);
 }
 /* ------------------------------------------------------ */
-void mpu6050_calibrate(const mpu6050_config_t *setting, float *accel_bias_res, float *gyro_bias_res)
+esp_err_t mpu6050_calibrate(mpu6050_dev_t *setting, float *accel_bias_res, float *gyro_bias_res)
 {
+    int16_t temp_offset[3];
     int32_t accel_bias[3] = { 0, 0, 0 };
     int32_t gyro_bias[3] = { 0, 0, 0 };
     int32_t accel_bias_reg[3] = { 0, 0, 0 };
@@ -2017,60 +2307,61 @@ void mpu6050_calibrate(const mpu6050_config_t *setting, float *accel_bias_res, f
     uint8_t tmp_data[12];
     uint16_t packet_count;
 
-    mpu6050_reset(setting);
+    ESP_ERROR_CDEBUG(mpu6050_reset(setting));
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
-    mpu6050_set_clock_source(setting, MPU6050_CLOCK_PLL_XGYRO);
+    ESP_ERROR_CDEBUG(mpu6050_set_clock_source(setting, MPU6050_CLOCK_PLL_XGYRO));
     vTaskDelay(200 / portTICK_PERIOD_MS);
 
     // Configure device for bias calculation:
-    mpu6050_set_int_enabled(setting, 0);
-    mpu6050_set_fifo_enabled(setting, 0);
-    mpu6050_set_accel_fifo_enabled(setting, 0);
-    mpu6050_set_z_gyro_fifo_enabled(setting, 0);
-    mpu6050_set_y_gyro_fifo_enabled(setting, 0);
-    mpu6050_set_x_gyro_fifo_enabled(setting, 0);
-    mpu6050_set_temp_fifo_enabled(setting, 0);
-    mpu6050_set_clock_source(setting, MPU6050_CLOCK_INTERNAL);
-    mpu6050_set_multi_master_enabled(setting, 0);
-    mpu6050_set_fifo_enabled(setting, 0);
-    mpu6050_set_i2c_master_mode_enabled(setting, 0);
-    mpu6050_reset_sensors(setting);
+    ESP_ERROR_CDEBUG(mpu6050_set_int_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_accel_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_z_gyro_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_y_gyro_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_x_gyro_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_temp_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_clock_source(setting, MPU6050_CLOCK_INTERNAL));
+    ESP_ERROR_CDEBUG(mpu6050_set_multi_master_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_i2c_master_mode_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_reset_sensors(setting));
     vTaskDelay(15 / portTICK_PERIOD_MS);
 
     // Configure MPU6050 gyro and accelerometer for bias calculation:
-    mpu6050_set_rate(setting, 0x00); // Set sample rate to 1 kHz.
-    mpu6050_set_dlpf_mode(setting, MPU6050_DLPF_BW_188);
-    mpu6050_set_full_scale_accel_range(setting, MPU6050_ACCEL_FULL_SCALE_RANGE_2);
-    mpu6050_set_full_scale_gyro_range(setting, MPU6050_GYRO_FULL_SCALE_RANGE_250);
+    ESP_ERROR_CDEBUG(mpu6050_set_rate(setting, false)); // Set sample rate to 1 kHz.
+    ESP_ERROR_CDEBUG(mpu6050_set_dlpf_mode(setting, MPU6050_DLPF_BW_188));
+    ESP_ERROR_CDEBUG(mpu6050_set_full_scale_accel_range(setting, MPU6050_ACCEL_FULL_SCALE_RANGE_2));
+    ESP_ERROR_CDEBUG(mpu6050_set_full_scale_gyro_range(setting, MPU6050_GYRO_FULL_SCALE_RANGE_250));
 
     /**
      * Configure FIFO to capture data for bias calculation.
      */
 
     // Enable gyroscope and accelerometer sensors for FIFO:
-    mpu6050_set_fifo_enabled(setting, 1);
-    mpu6050_set_accel_fifo_enabled(setting, 1);
-    mpu6050_set_z_gyro_fifo_enabled(setting, 1);
-    mpu6050_set_y_gyro_fifo_enabled(setting, 1);
-    mpu6050_set_x_gyro_fifo_enabled(setting, 1);
+    ESP_ERROR_CDEBUG(mpu6050_set_fifo_enabled(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_accel_fifo_enabled(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_z_gyro_fifo_enabled(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_y_gyro_fifo_enabled(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_x_gyro_fifo_enabled(setting, true));
     vTaskDelay(80 / portTICK_PERIOD_MS); // Accumulate 80 samples in 80 ms.
 
     // At end of sample accumulation, turn off FIFO sensor read:
-    mpu6050_set_fifo_enabled(setting, 0);
-    mpu6050_set_accel_fifo_enabled(setting, 0);
-    mpu6050_set_z_gyro_fifo_enabled(setting, 0);
-    mpu6050_set_y_gyro_fifo_enabled(setting, 0);
-    mpu6050_set_x_gyro_fifo_enabled(setting, 0);
-    mpu6050_set_temp_fifo_enabled(setting, 0);
+    ESP_ERROR_CDEBUG(mpu6050_set_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_accel_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_z_gyro_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_y_gyro_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_x_gyro_fifo_enabled(setting, false));
+    ESP_ERROR_CDEBUG(mpu6050_set_temp_fifo_enabled(setting, false));
 
     // Sets of full gyro and accelerometer data for averaging:
-    packet_count = mpu6050_get_fifo_count(setting) / 12;
+    ESP_ERROR_CDEBUG(mpu6050_get_fifo_count(setting, &(packet_count)));
+    packet_count /= 12;
 
     for (int i = 0; i < packet_count; i++)
     {
         // Read data for averaging:
-        mpu6050_get_fifo_bytes(setting, &tmp_data[0], 6);
+        ESP_ERROR_CDEBUG(mpu6050_get_fifo_bytes(setting, &tmp_data[0], 6));
         accel_temp[0] = (int16_t)(((int16_t)tmp_data[0] << 8) | tmp_data[1]);
         accel_temp[1] = (int16_t)(((int16_t)tmp_data[2] << 8) | tmp_data[3]);
         accel_temp[2] = (int16_t)(((int16_t)tmp_data[4] << 8) | tmp_data[5]);
@@ -2116,9 +2407,9 @@ void mpu6050_calibrate(const mpu6050_config_t *setting, float *accel_bias_res, f
     tmp_data[5] = (-gyro_bias[2] / 4) & 0xFF;
 
     // Push gyro biases to hardware registers:
-    mpu6050_set_x_gyro_offset(setting, ((int16_t)tmp_data[0]) << 8 | tmp_data[1]);
-    mpu6050_set_y_gyro_offset(setting, ((int16_t)tmp_data[2]) << 8 | tmp_data[3]);
-    mpu6050_set_z_gyro_offset(setting, ((int16_t)tmp_data[4]) << 8 | tmp_data[5]);
+    ESP_ERROR_CDEBUG(mpu6050_set_x_gyro_offset(setting, ((int16_t)tmp_data[0]) << 8 | tmp_data[1]));
+    ESP_ERROR_CDEBUG(mpu6050_set_y_gyro_offset(setting, ((int16_t)tmp_data[2]) << 8 | tmp_data[3]));
+    ESP_ERROR_CDEBUG(mpu6050_set_z_gyro_offset(setting, ((int16_t)tmp_data[4]) << 8 | tmp_data[5]));
 
     // Construct gyro bias in deg/s for later manual subtraction:
     gyro_bias_res[0] = (float)gyro_bias[0] / (float)gyro_sensitivity;
@@ -2136,9 +2427,9 @@ void mpu6050_calibrate(const mpu6050_config_t *setting, float *accel_bias_res, f
      */
 
     // Read factory accelerometer trim values:
-    tmp_data[0] = mpu6050_get_x_accel_offset(setting);
-    tmp_data[1] = mpu6050_get_y_accel_offset(setting);
-    tmp_data[2] = mpu6050_get_z_accel_offset(setting);
+    ESP_ERROR_CDEBUG(mpu6050_get_x_accel_offset(setting, &(temp_offset[0])));
+    ESP_ERROR_CDEBUG(mpu6050_get_y_accel_offset(setting, &(temp_offset[1])));
+    ESP_ERROR_CDEBUG(mpu6050_get_z_accel_offset(setting, &(temp_offset[2])));
 
     for (int i = 0; i < 3; i++)
     {
@@ -2176,26 +2467,28 @@ void mpu6050_calibrate(const mpu6050_config_t *setting, float *accel_bias_res, f
     accel_bias_res[0] = (float)accel_bias[0] / (float)accel_sensitivity;
     accel_bias_res[1] = (float)accel_bias[1] / (float)accel_sensitivity;
     accel_bias_res[2] = (float)accel_bias[2] / (float)accel_sensitivity;
+
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_self_test(const mpu6050_config_t *setting, float *destination)
+esp_err_t mpu6050_self_test(mpu6050_dev_t *setting, float *destination)
 {
     uint8_t self_test[6];
     float factory_trim[6];
 
     // Configure the accelerometer for self-test:
-    mpu6050_set_accel_x_self_test(setting, true);
-    mpu6050_set_accel_y_self_test(setting, true);
-    mpu6050_set_accel_z_self_test(setting, true);
-    mpu6050_set_full_scale_accel_range(setting, MPU6050_ACCEL_FULL_SCALE_RANGE_8);
-    mpu6050_set_full_scale_gyro_range(setting, MPU6050_GYRO_FULL_SCALE_RANGE_250);
+    ESP_ERROR_CDEBUG(mpu6050_set_accel_x_self_test(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_accel_y_self_test(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_accel_z_self_test(setting, true));
+    ESP_ERROR_CDEBUG(mpu6050_set_full_scale_accel_range(setting, MPU6050_ACCEL_FULL_SCALE_RANGE_8));
+    ESP_ERROR_CDEBUG(mpu6050_set_full_scale_gyro_range(setting, MPU6050_GYRO_FULL_SCALE_RANGE_250));
 
-    self_test[0] = mpu6050_get_accel_x_self_test_factory_trim(setting);
-    self_test[1] = mpu6050_get_accel_y_self_test_factory_trim(setting);
-    self_test[2] = mpu6050_get_accel_z_self_test_factory_trim(setting);
-    self_test[3] = mpu6050_get_gyro_x_self_test_factory_trim(setting);
-    self_test[4] = mpu6050_get_gyro_y_self_test_factory_trim(setting);
-    self_test[5] = mpu6050_get_gyro_z_self_test_factory_trim(setting);
+    mpu6050_get_accel_x_self_test_factory_trim(setting, &(self_test[0]));
+    mpu6050_get_accel_y_self_test_factory_trim(setting, &(self_test[1]));
+    mpu6050_get_accel_z_self_test_factory_trim(setting, &(self_test[2]));
+    mpu6050_get_gyro_x_self_test_factory_trim(setting, &(self_test[3]));
+    mpu6050_get_gyro_y_self_test_factory_trim(setting, &(self_test[4]));
+    mpu6050_get_gyro_z_self_test_factory_trim(setting, &(self_test[5]));
 
     // Process results to allow final comparison with factory set values:
     factory_trim[0] = (4096.0f * 0.34f) * (pow((0.92f / 0.34f), ((self_test[0] - 1.0f) / 30.0f)));
@@ -2209,10 +2502,13 @@ void mpu6050_self_test(const mpu6050_config_t *setting, float *destination)
     // Trim of the Self-Test Response).
     // To get to percent, must multiply by 100 and subtract result from 100.
     for (int i = 0; i < 6; i++)
+    {
         destination[i] = 100.0f + 100.0f * (self_test[i] - factory_trim[i]) / factory_trim[i];
+    }
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-void mpu6050_madgwick_quaternion_update(float accel_x, float accel_y, float accel_z, float gyro_x, float gyro_y,
+esp_err_t mpu6050_madgwick_quaternion_update(float accel_x, float accel_y, float accel_z, float gyro_x, float gyro_y,
     float gyro_z)
 {
     float func_1, func_2, func_3;
@@ -2237,7 +2533,7 @@ void mpu6050_madgwick_quaternion_update(float accel_x, float accel_y, float acce
 
     // Handle NaN:
     if (norm == 0.0f)
-        return;
+        return ESP_FAIL;
 
     norm = 1.0f / norm;
     accel_x *= norm;
@@ -2297,48 +2593,66 @@ void mpu6050_madgwick_quaternion_update(float accel_x, float accel_y, float acce
     quart[1] *= norm;
     quart[2] *= norm;
     quart[3] *= norm;
+
+    return ESP_OK;
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_test_connection(const mpu6050_config_t *setting)
+esp_err_t mpu6050_test_connection(mpu6050_dev_t *setting)
 {
-    return ((mpu6050_get_device_id(setting) == 0x34) ? ESP_OK : ESP_FAIL);
+    uint8_t id;
+    return (((mpu6050_get_device_id(setting, &(id)) == ESP_OK) && (id == 0x34)) ? ESP_OK : ESP_FAIL);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_init(mpu6050_config_t *mpu6050_config)
+esp_err_t mpu6050_init_desc(mpu6050_dev_t *mpu6050_config, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio,
+    gpio_num_t scl_gpio)
 {
     ESP_PARAM_CHECK(mpu6050_config);
 
     esp_err_t ret = ESP_OK;
 
+    if ((addr != MPU6050_ADDRESS_LOW) && (addr != MPU6050_ADDRESS_HIGH))
+    {
+        ESP_LOGE(TAG, "Invalid device address: 0x%02x", addr);
+        return ESP_ERR_INVALID_ARG;
+    }
     // Init i2cdev library
-    ESP_ERROR_CHECK(i2cdev_init());
+    ESP_ERROR_RETURN(i2cdev_init());
+
+    mpu6050_config->port = port;
+    mpu6050_config->addr = addr;
+    mpu6050_config->cfg.sda_io_num = sda_gpio;
+    mpu6050_config->cfg.scl_io_num = scl_gpio;
+#if HELPER_TARGET_IS_ESP32
+    mpu6050_config->cfg.master.clk_speed = I2C_FREQ_HZ;
+#endif
 
     ret = i2c_dev_probe(mpu6050_config, I2C_DEV_READ);
-    ESP_ERROR_RETURN(ret != ESP_OK, ret, "device not available");
-
-#if defined(AUTO_CONFIG_ADDR)
-    mpu6050_config->addr = mpu_6050_get_device_addr();
-    ESP_ERROR_RETURN(mpu6050_config->addr == I2C_DEVICE_ADDR_NONE, ESP_FAIL, "failed to retrive i2c addr.");
-#endif /* AUTO_CONFIG_ADDR */
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "[%s, %d] device not available <%s>", __func__, __LINE__, esp_err_to_name(ret));
+        return ret;
+    }
 
     ret = i2c_dev_create_mutex(mpu6050_config);
-    ESP_ERROR_RETURN(ret != ESP_OK, ret, "failed to create mutex for i2c dev.");
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "[%s, %d] failed to create mutex for i2c dev. <%s>", __func__, __LINE__, esp_err_to_name(ret));
+        return ret;
+    }
 
-    mpu6050_set_clock_source(mpu6050_config, MPU6050_CLOCK_PLL_XGYRO);
-    mpu6050_set_full_scale_gyro_range(mpu6050_config, MPU6050_GYRO_FULL_SCALE_RANGE_250);
-    mpu6050_set_full_scale_accel_range(mpu6050_config, MPU6050_ACCEL_FULL_SCALE_RANGE_2);
-    mpu6050_set_sleep_enabled(mpu6050_config, 0);
+    ESP_ERROR_CDEBUG(mpu6050_set_clock_source(mpu6050_config, MPU6050_CLOCK_PLL_XGYRO));
+    ESP_ERROR_CDEBUG(mpu6050_set_full_scale_gyro_range(mpu6050_config, MPU6050_GYRO_FULL_SCALE_RANGE_250));
+    ESP_ERROR_CDEBUG(mpu6050_set_full_scale_accel_range(mpu6050_config, MPU6050_ACCEL_FULL_SCALE_RANGE_2));
+    ESP_ERROR_CDEBUG(mpu6050_set_sleep_enabled(mpu6050_config, false));
 
-    return ESP_OK;
+    return ret;
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_deinit(mpu6050_config_t *mpu6050_config)
+esp_err_t mpu6050_deinit_desc(mpu6050_dev_t *mpu6050_config)
 {
     ESP_PARAM_CHECK(mpu6050_config);
 
-    ESP_ERROR_CHECK(i2cdev_done());
-
-    ESP_ERROR_CHECK(i2c_dev_delete_mutex(mpu6050_config));
-    return ESP_OK;
+    ESP_ERROR_RETURN(i2cdev_done());
+    return (i2c_dev_delete_mutex(mpu6050_config));
 }
 /* ------------------------------------------------------ */
