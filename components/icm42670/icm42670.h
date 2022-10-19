@@ -193,7 +193,7 @@ typedef enum
     ICM42670_GYRO_RANGE_1000DPS = 0b01,
     ICM42670_GYRO_RANGE_500DPS = 0b10,
     ICM42670_GYRO_RANGE_250DPS = 0b11
-} icm42670_gyro_range_t;
+} icm42670_gyro_fsr_t;
 
 /* Gyro ODR (output data rate) */
 typedef enum
@@ -215,7 +215,7 @@ typedef enum
     ICM42670_ACCEL_RANGE_8G = 0b01,
     ICM42670_ACCEL_RANGE_4G = 0b10,
     ICM42670_ACCEL_RANGE_2G = 0b11
-} icm42670_accel_range_t;
+} icm42670_accel_fsr_t;
 
 /* Accelerometer ODR (output data rate) */
 typedef enum
