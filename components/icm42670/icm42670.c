@@ -563,6 +563,7 @@ esp_err_t icm42670_config_wom(icm42670_t *dev, icm42670_wom_config_t config)
     CHECK(write_mreg_register(dev, ICM42670_MREG1_RW, ICM42670_REG_ACCEL_WOM_Y_THR, config.wom_y_threshold));
     CHECK(write_mreg_register(dev, ICM42670_MREG1_RW, ICM42670_REG_ACCEL_WOM_Z_THR, config.wom_z_threshold));
 
+    return ESP_OK;
 }
 
 esp_err_t icm42670_enable_wom(icm42670_t *dev, bool enable)

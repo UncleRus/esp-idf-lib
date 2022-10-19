@@ -332,7 +332,7 @@ typedef struct
     bool wom_z;
     bool wom_y;
     bool wom_x;
-} icm42670_int_source_t = 0;
+} icm42670_int_source_t;
 
 
 
