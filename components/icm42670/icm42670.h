@@ -585,6 +585,15 @@ esp_err_t icm42670_config_wom(icm42670_t *dev, icm42670_wom_config_t config);
  */
 esp_err_t icm42670_enable_wom(icm42670_t *dev, bool enable);
 
+/**
+ * @brief Get the status of the internal clock
+ *
+ * @param dev Device descriptor
+ * @param mclk_rdy true if internal clock is running
+ * @return `ESP_OK` on success
+ */
+esp_err_t icm42670_get_mclk_rdy(icm42670_t *dev, bool *mclk_rdy);
+
 #ifdef __cplusplus
 }
 #endif

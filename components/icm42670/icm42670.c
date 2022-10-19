@@ -307,7 +307,7 @@ static inline esp_err_t write_mreg_register(icm42670_t *dev, icm42670_mreg_numbe
     I2C_DEV_CHECK(&dev->i2c_dev, write_register(dev, ICM42670_REG_M_W, value));
     vTaskDelay(pdMS_TO_TICKS(0.01)); //Wait for 10us until MREG write is complete
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-    return err;
+    return ESP_OK;
 }
 
 static inline esp_err_t manipulate_mreg_register(icm42670_t *dev, icm42670_mreg_number_t mreg_num, uint8_t reg_addr, uint8_t mask, uint8_t shift, uint8_t value)
