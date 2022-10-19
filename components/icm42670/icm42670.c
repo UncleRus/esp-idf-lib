@@ -47,7 +47,7 @@ static const char *TAG = "icm42670";
 
 
 // register structure definitions
-#define ICM42670_MCLK_RDY_BITS                      0x04    // ICM42670_REG_MCLK_RDY<3>
+#define ICM42670_MCLK_RDY_BITS                      0x08    // ICM42670_REG_MCLK_RDY<3>
 #define ICM42670_MCLK_RDY_SHIFT                     3       // ICM42670_REG_MCLK_RDY<3>
 
 #define ICM42670_SPI_AP_4WIRE_BITS                  0x04    // ICM42670_REG_DEVICE_CONFIG<2>
@@ -359,12 +359,13 @@ esp_err_t icm42670_init(icm42670_t *dev)
     
     // check who_am_i register
     I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_WHO_AM_I, &reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
     if (reg != 0x67)
     {
         ESP_LOGE(TAG, "Error initializing icm42670, who_am_i register did not return 0x67");
-        I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
         return ESP_ERR_INVALID_RESPONSE;
     }
+
     // check if internal clock is running
     bool mclk_rdy = false;
     CHECK(icm42670_get_mclk_rdy(dev, &mclk_rdy));
@@ -373,7 +374,7 @@ esp_err_t icm42670_init(icm42670_t *dev)
         ESP_LOGE(TAG, "Error initializing icm42670, Internal clock not running");
         return ESP_ERR_INVALID_RESPONSE;
     }
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    
 
     return ESP_OK;
 }
@@ -579,10 +580,11 @@ esp_err_t icm42670_get_mclk_rdy(icm42670_t *dev, bool *mclk_rdy)
     uint8_t reg;
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_MCLK_RDY, &reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
     if ((reg & ICM42670_MCLK_RDY_BITS) >> ICM42670_MCLK_RDY_SHIFT)
         *mclk_rdy = true;
     else
         *mclk_rdy = false;
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    
     return ESP_OK;
 }
