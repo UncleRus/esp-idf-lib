@@ -505,7 +505,7 @@ esp_err_t icm42670_set_int_sources(icm42670_t *dev, uint8_t int_pin, icm42670_in
 {
     CHECK_ARG(dev && int_pin);
 
-    uint8_t reg1, reg2 = 0;
+    uint8_t reg1 = 0, reg2 = 0;
     if(sources.self_test_done)
         reg1 = reg1 | (1 << ICM42670_ST_INT1_EN_SHIFT);
     if(sources.fsync)
