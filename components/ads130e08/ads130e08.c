@@ -9,6 +9,7 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -36,34 +37,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <string.h>
-
-#define ADS130E08_CMD_WAKEUP  (0x02)
-#define ADS130E08_CMD_STANDBY (0x04)
-#define ADS130E08_CMD_RESET   (0x06)
-#define ADS130E08_CMD_START   (0x08)
-#define ADS130E08_CMD_STOP    (0x0A)
-#define ADS130E08_CMD_RDATAC  (0x10)
-#define ADS130E08_CMD_SDATAC  (0x11)
-#define ADS130E08_CMD_RDATA   (0x12)
-#define ADS130E08_CMD_RREG    (0x20)
-#define ADS130E08_CMD_WREG    (0x40)
-
-#define ADS130E08_REG_ID          (0x00)
-#define ADS130E08_REG_CONFIG1     (0x01)
-#define ADS130E08_REG_CONFIG2     (0x02)
-#define ADS130E08_REG_CONFIG3     (0x03)
-#define ADS130E08_REG_FAULT       (0x04)
-#define ADS130E08_REG_CH1SET      (0x05)
-#define ADS130E08_REG_CH2SET      (0x06)
-#define ADS130E08_REG_CH3SET      (0x07)
-#define ADS130E08_REG_CH4SET      (0x08)
-#define ADS130E08_REG_CH5SET      (0x09)
-#define ADS130E08_REG_CH6SET      (0x0A)
-#define ADS130E08_REG_CH7SET      (0x0B)
-#define ADS130E08_REG_CH8SET      (0x0C)
-#define ADS130E08_REG_FAULT_STATP (0x12)
-#define ADS130E08_REG_FAULT_STATN (0x13)
-#define ADS130E08_REG_GPIO        (0x14)
 
 #define ID_MASK_LOW_BITS  (0x08)
 #define ID_MASK_HIGH_BITS (0x10)
@@ -317,9 +290,9 @@ esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data)
 
     status_bits = ((rx[1] | rx[2] | rx[3]) & 0x00FFFFFF);
 
-    raw_data->fault_statp_dev1 = (uint8_t)(status_bits & 0x000FF000);
-    raw_data->fault_statn_dev1 = (uint8_t)(status_bits & 0x00000FF0);
-    raw_data->gpios_level_dev1 = (uint8_t)(status_bits & 0x0000000F);
+    raw_data->fault_statp = (uint8_t)(status_bits & 0x000FF000);
+    raw_data->fault_statn = (uint8_t)(status_bits & 0x00000FF0);
+    raw_data->gpios_level = (uint8_t)(status_bits & 0x0000000F);
 
     uint16_t adc_raw_two_complememt;
 
@@ -329,69 +302,6 @@ esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data)
     {
         adc_raw_two_complememt = ((uint16_t)(rx[4 + j] << 8) | (uint16_t)(rx[4 + j + 1] << 0));
         raw_data->channels_raw_dev1[i] = (int16_t)adc_raw_two_complememt;
-
-        j += 2;
-    }
-
-    return ESP_OK;
-}
-
-esp_err_t ads130e08_get_rdata_daisy(ads130e08_t *dev, ads130e08_raw_data_t *raw_data)
-{
-    CHECK_ARG(dev);
-
-    spi_transaction_t t;
-    memset(&t, 0, sizeof(spi_transaction_t));
-
-    uint8_t tx[] = { (ADS130E08_CMD_RDATA), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    uint8_t rx[sizeof(tx)] = { 0 };
-
-    t.tx_buffer = tx;
-    t.rx_buffer = rx;
-    t.length = sizeof(tx) * 8;
-
-    CHECK(spi_device_transmit(dev->spi_dev, &t));
-
-    uint32_t status_bits;
-
-    status_bits = ((rx[1] | rx[2] | rx[3]) & 0x00FFFFFF);
-
-    raw_data->fault_statp_dev1 = (uint8_t)(status_bits & 0x000FF000);
-    raw_data->fault_statn_dev1 = (uint8_t)(status_bits & 0x00000FF0);
-    raw_data->gpios_level_dev1 = (uint8_t)(status_bits & 0x0000000F);
-
-    uint16_t adc_raw_two_complememt;
-
-    size_t j = 0;
-
-    for (size_t i = 0; i < 8; i++)
-    {
-        adc_raw_two_complememt = ((uint16_t)(rx[4 + j] << 8) | (uint16_t)(rx[4 + j + 1] << 0));
-        raw_data->channels_raw_dev1[i] = (int16_t)adc_raw_two_complememt;
-
-        j += 2;
-    }
-
-    uint8_t aux_rx[19];
-
-    for (size_t i = 0; i < sizeof(aux_rx); i++)
-    {
-        aux_rx[i] = ((uint8_t)((rx[20 + i] & LOWER_7_BITS) << 1) | (uint8_t)(rx[20 + i + 1] & UPPER_1_BITS) >> 7);
-    }
-
-    status_bits = ((aux_rx[0] | aux_rx[1] | aux_rx[2]) & 0x00FFFFFF);
-
-    raw_data->fault_statp_dev2 = (uint8_t)(status_bits & 0x000FF000);
-    raw_data->fault_statn_dev2 = (uint8_t)(status_bits & 0x00000FF0);
-    raw_data->gpios_level_dev2 = (uint8_t)(status_bits & 0x0000000F);
-
-    j = 0;
-
-    for (size_t i = 0; i < 8; i++)
-    {
-        adc_raw_two_complememt = ((uint16_t)(aux_rx[3 + j] << 8) | (uint16_t)(aux_rx[3 + j + 1] << 0));
-        raw_data->channels_raw_dev2[i] = (int16_t)adc_raw_two_complememt;
 
         j += 2;
     }

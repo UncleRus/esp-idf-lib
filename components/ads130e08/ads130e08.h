@@ -9,6 +9,7 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -227,14 +228,10 @@ typedef struct
 
 typedef struct
 {
-    uint8_t fault_statp_dev1;
-    uint8_t fault_statn_dev1;
-    uint8_t gpios_level_dev1;
-    int16_t channels_raw_dev1[8];
-    uint8_t fault_statp_dev2;
-    uint8_t fault_statn_dev2;
-    uint8_t gpios_level_dev2;
-    int16_t channels_raw_dev2[8];
+    uint8_t fault_statp;
+    uint8_t fault_statn;
+    uint8_t gpios_level;
+    int16_t channels_raw[8];
 } ads130e08_raw_data_t;
 
 /**
@@ -309,15 +306,6 @@ esp_err_t ads130e08_get_device_config(ads130e08_t *dev, ads130e08_dev_config_t *
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data);
-
-/**
- * @brief Reads raw data in "Read data by command" mode of 2 devices in daisy chain mode
- *
- * @param dev        Device descriptor
- * @param raw_data_t Raw data
- * @return `ESP_OK` on success
- */
-esp_err_t ads130e08_get_rdata_daisy(ads130e08_t *dev, ads130e08_raw_data_t *raw_data);
 
 /**
  * @brief Converts raw adc value to voltage
