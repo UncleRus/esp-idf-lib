@@ -8,16 +8,16 @@
 #include <esp_task_wdt.h>
 #include <ads130e08.h>
 
-#define HOST HSPI_HOST // VSPI_HOST
+#define HOST HSPI_HOST
+
+static const char *TAG_ADS130E08 = "ads130e08";
 
 ads130e08_t adc_dev;
 ads130e08_raw_data_t raw_data;
 
-volatile bool data_ready = false;
-
 void IRAM_ATTR gpio_isr_handler(void *arg)
 {
-    data_ready = true;
+    /* data ready */
 }
 
 // Main task
@@ -63,6 +63,7 @@ void ads130e08_test(void *pvParameters)
     };
 
     ESP_ERROR_CHECK(gpio_config(&int_ads130e08));
+    ESP_ERROR_CHECK(gpio_install_isr_service(0));
     ESP_ERROR_CHECK(gpio_isr_handler_add(CONFIG_EXAMPLE_INT_GPIO, gpio_isr_handler, (void *)CONFIG_EXAMPLE_INT_GPIO));
 
     // Start conversion
@@ -70,16 +71,16 @@ void ads130e08_test(void *pvParameters)
 
     for (;;)
     {
-        if (data_ready == true)
-        {
-            ads130e08_get_rdata(&adc_dev, &raw_data);
-            data_ready = false;
-        }
-        else
-        {
-            esp_task_wdt_reset();
-			ets_delay_us(1);
-        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        
+        ESP_ERROR_CHECK(ads130e08_get_rdata(&adc_dev, &raw_data));
+
+        ESP_LOGI(TAG_ADS130E08, "Fault status -> Positive %02x, Negative %02x", raw_data.fault_statp,
+            raw_data.fault_statn);
+        ESP_LOGI(TAG_ADS130E08, "Gpios level -> %02x", raw_data.gpios_level);
+        ESP_LOGI(TAG_ADS130E08, "Raw data -> CH1: %d CH2: %d CH3: %d CH4: %d CH5: %d CH6: %d CH7: %d CH8: %d",
+            raw_data.channels_raw[0], raw_data.channels_raw[1], raw_data.channels_raw[2], raw_data.channels_raw[3],
+            raw_data.channels_raw[4], raw_data.channels_raw[5], raw_data.channels_raw[6], raw_data.channels_raw[7]);
     }
 }
 

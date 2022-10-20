@@ -38,6 +38,34 @@
 #include <freertos/task.h>
 #include <string.h>
 
+#define ADS130E08_CMD_WAKEUP  (0x02)
+#define ADS130E08_CMD_STANDBY (0x04)
+#define ADS130E08_CMD_RESET   (0x06)
+#define ADS130E08_CMD_START   (0x08)
+#define ADS130E08_CMD_STOP    (0x0A)
+#define ADS130E08_CMD_RDATAC  (0x10)
+#define ADS130E08_CMD_SDATAC  (0x11)
+#define ADS130E08_CMD_RDATA   (0x12)
+#define ADS130E08_CMD_RREG    (0x20)
+#define ADS130E08_CMD_WREG    (0x40)
+
+#define ADS130E08_REG_ID          (0x00)
+#define ADS130E08_REG_CONFIG1     (0x01)
+#define ADS130E08_REG_CONFIG2     (0x02)
+#define ADS130E08_REG_CONFIG3     (0x03)
+#define ADS130E08_REG_FAULT       (0x04)
+#define ADS130E08_REG_CH1SET      (0x05)
+#define ADS130E08_REG_CH2SET      (0x06)
+#define ADS130E08_REG_CH3SET      (0x07)
+#define ADS130E08_REG_CH4SET      (0x08)
+#define ADS130E08_REG_CH5SET      (0x09)
+#define ADS130E08_REG_CH6SET      (0x0A)
+#define ADS130E08_REG_CH7SET      (0x0B)
+#define ADS130E08_REG_CH8SET      (0x0C)
+#define ADS130E08_REG_FAULT_STATP (0x12)
+#define ADS130E08_REG_FAULT_STATN (0x13)
+#define ADS130E08_REG_GPIO        (0x14)
+
 #define ID_MASK_LOW_BITS  (0x08)
 #define ID_MASK_HIGH_BITS (0x10)
 
@@ -301,7 +329,7 @@ esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data)
     for (size_t i = 0; i < 8; i++)
     {
         adc_raw_two_complememt = ((uint16_t)(rx[4 + j] << 8) | (uint16_t)(rx[4 + j + 1] << 0));
-        raw_data->channels_raw_dev1[i] = (int16_t)adc_raw_two_complememt;
+        raw_data->channels_raw[i] = (int16_t)adc_raw_two_complememt;
 
         j += 2;
     }
