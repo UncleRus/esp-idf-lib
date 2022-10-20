@@ -18,6 +18,8 @@ Connect `MOSI`, `MISO`, `SCLK`, `CS` and `INT` pins to the following pins:
 | `CONFIG_EXAMPLE_CS_GPIO` | GPIO number for `CS` | "5" for `esp32` |
 | `CONFIG_EXAMPLE_INT_GPIO` | GPIO number for `INT` | "26" for `esp32` |
 
+The driver was only tested in ESP32, but should also work on other ESP boards.
+
 ## Notes
 
 1. Please configure the SPI connections to ADS130E08 under `Example configuration` in `menuconfig`.
