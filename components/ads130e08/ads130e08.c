@@ -265,7 +265,7 @@ esp_err_t ads130e08_set_device_config(ads130e08_t *dev, ads130e08_dev_config_t c
 
 esp_err_t ads130e08_get_device_config(ads130e08_t *dev, ads130e08_dev_config_t *config)
 {
-    CHECK_ARG(dev);
+    CHECK_ARG(dev && config);
 
     uint8_t config1, config2, config3;
 
