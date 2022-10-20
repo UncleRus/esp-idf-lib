@@ -640,3 +640,11 @@ labels:
           - "components/wiegand/**"
           - "components/wiegand/.eil.yml"
           - "examples/wiegand/**"
+  - label: "area:components:ads130e08"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ads130e08/**"
+          - "components/ads130e08/.eil.yml"
+          - "examples/ads130e08/**"

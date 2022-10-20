@@ -24,6 +24,8 @@
 
 /**
  * @file ads130e08.h
+ * @defgroup ads130e08 ads130e08
+ * @{
  *
  * ESP-IDF driver for ADS130E08 ADC
  *
