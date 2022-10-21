@@ -6,6 +6,8 @@ components:
     groups: []
     code_owners: weslleymfd
     depends:
+      - driver
+      - log
     thread_safe: yes
     targets:
       - name: esp32
