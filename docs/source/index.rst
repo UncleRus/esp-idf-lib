@@ -158,6 +158,7 @@ ADC/DAC
    groups/pcf8591
    groups/mcp4725
    groups/mcp342x
+   groups/ads130e08
 
 Power/Current monitors
 ======================
