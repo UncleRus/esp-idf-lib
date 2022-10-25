@@ -257,9 +257,9 @@ typedef struct {
  */
 
 /* 7 Register Map */
-#define DPS310_REG_PSR_B2       0x00
-#define DPS310_REG_PSR_B1       0x01
-#define DPS310_REG_PSR_B0       0x02
+#define DPS310_REG_PRS_B2       0x00
+#define DPS310_REG_PRS_B1       0x01
+#define DPS310_REG_PRS_B0       0x02
 #define DPS310_REG_TMP_B2       0x03
 #define DPS310_REG_TMP_B1       0x04
 #define DPS310_REG_TMP_B0       0x05
