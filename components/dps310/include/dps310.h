@@ -291,8 +291,17 @@ typedef struct {
 #define DPS310_I2C_FREQ_MAX_ESP_IDF_HZ  (1000000)
 #define DPS310_SPI_FREQ_MAX_HZ  (10000000) // Max 10 MHz
                                            //
-/* See 4.3 Start-up sequence */
-#define DPS310_STARTUP_DELAY_MS (40 + 5) // 40 ms + extra
+/* See 4.3 Start-up sequence
+ *
+ * XXX the datasheet is ambiguous in the start-up sequence. Trim_complete is
+ * mentioned in nowhere. the DPS310-Pressure-Sensor by Infineon uses 50 ms.
+ * don't know what the "40ms" in the chart means. to be safe, use the sum of
+ * all the numbers in the chart.
+ */
+#define DPS310_TRIM_READY_DELAY_MS  (3) // 2.5 ms
+#define DPS310_SENSOR_READY_DELAY_MS  (12)
+#define DPS310_COEFFICIENTS_READY_DELAY_MS  (40)
+#define DPS310_STARTUP_DELAY_MS (DPS310_TRIM_READY_DELAY_MS + DPS310_SENSOR_READY_DELAY_MS + DPS310_COEFFICIENTS_READY_DELAY_MS)
 
 #define DPS310_PROD_ID  0x01
 
