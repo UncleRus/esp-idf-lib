@@ -281,6 +281,7 @@ typedef struct {
 #define DPS310_REG_RESET_SOFT_RST_MASK      0x0f
 #define DPS310_REG_PRS_CFG_PM_RATE_SHIFT    (4)
 #define DPS310_REG_PRS_CFG_PM_RATE_MASK     (0b111 << DPS310_REG_PRS_CFG_PM_RATE_SHIFT)
+#define DPS310_REG_PRS_CFG_PM_PRC_MASK      (0b1111)
 
 /* See 3.6 Timing Characteristics */
 #define DPS310_I2C_FREQ_MAX_HZ  (3400000)  // Max 3.4 MHz
@@ -384,6 +385,25 @@ esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value);
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value);
+
+/**
+ * @brief Get pressure oversampling rate.
+ *
+ * @param[in] dev pointer to the device descriptor
+ * @param[out] value the value in the resister
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
+ * `value` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value);
+
+/**
+ * @brief Set pressure oversampling rate.
+ *
+ * @param[in] dev The pointer to the device descriptor.
+ * @param[in] value The value to set.
+ * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value);
 
 #ifdef __cplusplus
 }

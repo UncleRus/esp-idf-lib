@@ -236,3 +236,17 @@ esp_err_t dps310_reset(dps310_t *dev)
 fail:
     return err;
 }
+
+esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
+}
+
+esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
+}

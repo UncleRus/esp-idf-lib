@@ -91,6 +91,33 @@ void dps310_task(void *pvParameters)
     }
     assert(reg_value == DPS310_PM_RATE_16);
 
+    ESP_LOGI(TAG, "Get Pressure oversampling rate");
+    err = dps310_get_pm_prc(&dev, &reg_value);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_pm_prc(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    assert(reg_value == DPS310_TMP_PRC_1);
+
+    ESP_LOGI(TAG, "Set Pressure oversampling rate to DPS310_TMP_PRC_16");
+    err = dps310_set_pm_prc(&dev, DPS310_TMP_PRC_16);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_pm_prc(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    ESP_LOGI(TAG, "Get Pressure oversampling rate");
+    err = dps310_get_pm_prc(&dev, &reg_value);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_pm_prc(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    ESP_LOGI(TAG, "reg_value: %d", reg_value);
+    assert(reg_value == DPS310_TMP_PRC_16);
+
     ESP_LOGI(TAG, "Starting the loop");
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(1000));
