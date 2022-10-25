@@ -68,6 +68,20 @@ esp_err_t _read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *val)
     return ESP_OK;
 }
 
+esp_err_t _read_reg_mask(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t *val)
+{
+    uint8_t reg_value = 0;
+
+    CHECK_ARG(dev && val);
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, _read_reg_nolock(dev, reg, &reg_value));
+    I2C_DEV_GIVE_MUTEX(dev);
+    *val = (reg_value & mask) >> count_trailing_zero_bits(mask);
+    ESP_LOGV(TAG, "reg_value: %02X, val: %02X", reg_value, *val);
+    return ESP_OK;
+}
+
 esp_err_t _write_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t val)
 {
     return i2c_dev_write_reg(dev, reg, &val, 1);

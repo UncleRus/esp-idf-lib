@@ -35,6 +35,8 @@ esp_err_t _read_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
 
 esp_err_t _read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
 
+esp_err_t _read_reg_mask(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t *val);
+
 esp_err_t _write_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t val);
 
 esp_err_t _write_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *value);
