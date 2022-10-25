@@ -1500,13 +1500,13 @@ esp_err_t mpu6050_get_int_data_ready_status(mpu6050_dev_t *setting)
     return ((byte == 0) ? DISABLE : ENABLE);
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_acceleration(mpu6050_dev_t *setting, mpu6050_acceleration_t *data)
+esp_err_t mpu6050_get_acceleration(mpu6050_dev_t *setting, mpu6050_acceleration_t *accel)
 {
     uint8_t buffer[6];
     ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 6, (uint8_t *)buffer));
-    data->accel_x = (((int16_t)buffer[0]) << 8) | buffer[1];
-    data->accel_y = (((int16_t)buffer[2]) << 8) | buffer[3];
-    data->accel_z = (((int16_t)buffer[4]) << 8) | buffer[5];
+    accel->x = (((int16_t)buffer[0]) << 8) | buffer[1];
+    accel->y = (((int16_t)buffer[2]) << 8) | buffer[3];
+    accel->z = (((int16_t)buffer[4]) << 8) | buffer[5];
     return ESP_OK;
 }
 /* ------------------------------------------------------ */
@@ -1545,13 +1545,13 @@ esp_err_t mpu6050_get_temperature(mpu6050_dev_t *setting, int16_t *temp)
     return ESP_OK;
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_rotation(mpu6050_dev_t *setting, mpu6050_rotation_t *data)
+esp_err_t mpu6050_get_rotation(mpu6050_dev_t *setting, mpu6050_rotation_t *rotat)
 {
     uint8_t buffer[6];
     ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_GYRO_XOUT_H, 6, buffer));
-    data->gyro_x = (((int16_t)buffer[0]) << 8) | buffer[1];
-    data->gyro_y = (((int16_t)buffer[2]) << 8) | buffer[3];
-    data->gyro_z = (((int16_t)buffer[4]) << 8) | buffer[5];
+    rotat->x = (((int16_t)buffer[0]) << 8) | buffer[1];
+    rotat->y = (((int16_t)buffer[2]) << 8) | buffer[3];
+    rotat->z = (((int16_t)buffer[4]) << 8) | buffer[5];
     return ESP_OK;
 }
 /* ------------------------------------------------------ */
@@ -1579,18 +1579,17 @@ esp_err_t mpu6050_get_rotation_z(mpu6050_dev_t *setting, int16_t *rotation_z)
     return ESP_OK;
 }
 /* ------------------------------------------------------ */
-esp_err_t mpu6050_get_motion(mpu6050_dev_t *setting, mpu6050_acceleration_t *data_accel,
-    mpu6050_rotation_t *data_gyro)
+esp_err_t mpu6050_get_motion(mpu6050_dev_t *setting, mpu6050_acceleration_t *data_accel, mpu6050_rotation_t *data_gyro)
 {
     uint8_t buffer[14];
     ESP_ERROR_RETURN(i2c_read_bytes(setting, MPU6050_REGISTER_ACCEL_XOUT_H, 14, buffer));
 
-    data_accel->accel_x = (((int16_t)buffer[0]) << 8) | buffer[1];
-    data_accel->accel_y = (((int16_t)buffer[2]) << 8) | buffer[3];
-    data_accel->accel_z = (((int16_t)buffer[4]) << 8) | buffer[5];
-    data_gyro->gyro_x = (((int16_t)buffer[8]) << 8) | buffer[9];
-    data_gyro->gyro_y = (((int16_t)buffer[10]) << 8) | buffer[11];
-    data_gyro->gyro_z = (((int16_t)buffer[12]) << 8) | buffer[13];
+    data_accel->x = (((int16_t)buffer[0]) << 8) | buffer[1];
+    data_accel->y = (((int16_t)buffer[2]) << 8) | buffer[3];
+    data_accel->z = (((int16_t)buffer[4]) << 8) | buffer[5];
+    data_gyro->x = (((int16_t)buffer[8]) << 8) | buffer[9];
+    data_gyro->y = (((int16_t)buffer[10]) << 8) | buffer[11];
+    data_gyro->z = (((int16_t)buffer[12]) << 8) | buffer[13];
     return ESP_OK;
 }
 /* ------------------------------------------------------ */

@@ -61,9 +61,9 @@ extern "C" {
  */
 typedef struct
 {
-    int16_t accel_x; /**< acceleration axis x */
-    int16_t accel_y; /**< acceleration axis y */
-    int16_t accel_z; /**< acceleration axis z */
+    int16_t x; /**< acceleration axis x */
+    int16_t y; /**< acceleration axis y */
+    int16_t z; /**< acceleration axis z */
 } mpu6050_acceleration_t;
 
 /**
@@ -72,9 +72,9 @@ typedef struct
  */
 typedef struct
 {
-    int16_t gyro_x; /**< rotation axis x */
-    int16_t gyro_y; /**< rotation axis y */
-    int16_t gyro_z; /**< rotation axis z */
+    int16_t x; /**< rotation axis x */
+    int16_t y; /**< rotation axis y */
+    int16_t z; /**< rotation axis z */
 } mpu6050_rotation_t;
 
 /**
@@ -1921,13 +1921,13 @@ esp_err_t mpu6050_get_int_data_ready_status(mpu6050_dev_t *setting);
  * 3       | +/- 16g          | 1024 LSB/mg
  *
  * @param[in] setting mpu6050 i2cdev setting
- * @param[in] data acceleration struct.
+ * @param[in] accel acceleration struct.
  *
  * @return
  *      - ESP_OK on success
  *      - else 'i2c_master_cmd_begin' return error.
  */
-esp_err_t mpu6050_get_acceleration(mpu6050_dev_t *setting, mpu6050_acceleration_t *data);
+esp_err_t mpu6050_get_acceleration(mpu6050_dev_t *setting, mpu6050_acceleration_t *accel);
 
 /**
  * @brief Get X-axis accelerometer reading.
@@ -1998,13 +1998,13 @@ esp_err_t mpu6050_get_temperature(mpu6050_dev_t *setting, int16_t *temp);
  * 3      | +/- 2000 degrees/s | 16.4 LSB/deg/s
  *
  * @param[in] setting mpu6050 i2cdev setting
- * @param[in] data rotation struct.
+ * @param[in] rotat rotation struct.
  *
  * @return
  *      - ESP_OK on success
  *      - else 'i2c_master_cmd_begin' return error.
  */
-esp_err_t mpu6050_get_rotation(mpu6050_dev_t *setting, mpu6050_rotation_t *data);
+esp_err_t mpu6050_get_rotation(mpu6050_dev_t *setting, mpu6050_rotation_t *rotat);
 
 /**
  * @brief Get X-axis gyroscope reading.
@@ -2051,8 +2051,7 @@ esp_err_t mpu6050_get_rotation_z(mpu6050_dev_t *setting, int16_t *rotation_z);
  *      - ESP_OK on success
  *      - else 'i2c_master_cmd_begin' return error.
  */
-esp_err_t mpu6050_get_motion(mpu6050_dev_t *setting, mpu6050_acceleration_t *data_accel,
-    mpu6050_rotation_t *data_gyro);
+esp_err_t mpu6050_get_motion(mpu6050_dev_t *setting, mpu6050_acceleration_t *data_accel, mpu6050_rotation_t *data_gyro);
 
 /**
  * @brief Read single byte from external sensor data register.

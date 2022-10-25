@@ -1,9 +1,5 @@
 menu "MPU6050 Example Configuration"
 
-    config EXAMPLE_MPU6050_ADDRESS_LOW
-	    bool "mpu6050 i2c addr 0x68"
-	    default true
-
     config EXAMPLE_MPU6050_ADDRESS_HIGH
 	    bool "mpu6050 i2c addr 0x69"
 	    default false
@@ -23,4 +19,8 @@ menu "MPU6050 Example Configuration"
     config EXAMPLE_MPU6050_I2C_CLOCK_HZ
         int "I2C clock frequency, Hz"
         default 100000
+    
+    config EXAMPLE_MPU6050_I2C_PORT
+        int "I2C port number"
+        default 1
 endmenu
