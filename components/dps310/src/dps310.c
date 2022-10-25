@@ -250,3 +250,125 @@ esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value)
 
     return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
 }
+
+esp_err_t dps310_get_tmp_ext(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_PRS_CFG_TMP_EXT_MASK, value);
+}
+
+esp_err_t dps310_set_tmp_ext(dps310_t *dev, dps310_tmp_src_ext_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_PRS_CFG_TMP_EXT_MASK, value);
+}
+
+esp_err_t dsp310_get_int_hl(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_HL_MASK, value);
+}
+
+esp_err_t dps310_set_int_hl(dps310_t *dev, dps310_int_hl_active_level_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_PRS_CFG_TMP_EXT_MASK, value);
+}
+
+esp_err_t dps310_get_int_fifo(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_FIFO_MASK, value);
+}
+
+esp_err_t dps310_set_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_FIFO_MASK, value);
+}
+
+esp_err_t dps310_get_int_tmp(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_TMP_MASK, value);
+}
+
+esp_err_t dps310_set_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t value)
+{
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_TMP_MASK, value);
+}
+
+esp_err_t dps310_get_int_prs(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_PRS_MASK, value);
+}
+
+esp_err_t dps310_set_int_prs(dps310_t *dev, dps310_int_prs_mode_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_INT_PRS_MASK, value);
+}
+
+esp_err_t dps310_get_t_shift(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_T_SHIFT_MASK, value);
+}
+
+esp_err_t dps310_set_t_shift(dps310_t *dev, dps310_t_shift_mode_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_T_SHIFT_MASK, value);
+}
+
+esp_err_t dps310_get_p_shift(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_P_SHIFT_MASK, value);
+}
+
+esp_err_t dps310_set_p_shift(dps310_t *dev, dps310_p_shift_mode_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_P_SHIFT_MASK, value);
+}
+
+esp_err_t dps310_get_fifo_en(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_FIFO_EN_MASK, value);
+}
+
+esp_err_t dps310_set_fifo_en(dps310_t *dev, dps310_fifo_en_mode_t value)
+{
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_FIFO_EN_MASK, value);
+}
+
+esp_err_t dps310_get_spi_mode(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_SPI_MODE_MASK, value);
+}
+
+esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_SPI_MODE_MASK, value);
+}
