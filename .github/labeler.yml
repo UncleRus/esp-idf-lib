@@ -136,6 +136,14 @@ labels:
           - "components/dht/**"
           - "components/dht/.eil.yml"
           - "examples/dht/**"
+  - label: "area:components:dps310"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/dps310/**"
+          - "components/dps310/.eil.yml"
+          - "examples/dps310/**"
   - label: "area:components:ds1302"
     sync: true
     matcher:
