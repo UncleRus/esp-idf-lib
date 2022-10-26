@@ -134,7 +134,7 @@ esp_err_t _update_reg(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val)
     return ESP_OK;
 }
 
-esp_err_t _wait_for_reg_bits(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val, uint8_t max_attempt, uint16_t delay)
+esp_err_t _wait_for_reg_bits(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val, uint8_t max_attempt, uint16_t delay_ms)
 {
     esp_err_t err = ESP_FAIL;
     uint8_t reg_value = 0;
@@ -153,7 +153,7 @@ esp_err_t _wait_for_reg_bits(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t 
         {
             return ESP_OK;
         }
-        vTaskDelay(delay);
+        vTaskDelay(pdMS_TO_TICKS(delay_ms));
     }
     return ESP_ERR_TIMEOUT;
 }
