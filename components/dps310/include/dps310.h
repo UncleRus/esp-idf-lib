@@ -244,12 +244,27 @@ typedef struct {
 }
 
 /**
+ * Calibration Coefficients (COEF).
+ */
+typedef struct {
+    int32_t c0;
+    int32_t c1;
+    int32_t c00;
+    int32_t c10;
+    int32_t c01;
+    int32_t c11;
+    int32_t c20;
+    int32_t c21;
+    int32_t c30;
+} dps310_coef_t;
+/**
  * Device descriptor.
  */
 typedef struct {
     i2c_dev_t i2c_dev;          //!< I2C device descriptor
     uint8_t prod_id;            //!< Product ID
     uint8_t prod_rev;           //!< Product revision
+    dps310_coef_t coef;         //!< coefficients
 } dps310_t;
 
 /**
@@ -272,6 +287,7 @@ typedef struct {
 #define DPS310_REG_RESET        0x0c
 #define DPS310_REG_ID           0x0d
 #define DPS310_REG_COEF         0x10
+#define DPS310_REG_COEF_LEN     (18)
 #define DPS310_REG_COEF_SRCE    0x28
 
 /* various masks */
@@ -291,6 +307,10 @@ typedef struct {
 #define DPS310_REG_CFG_REG_P_SHIFT_MASK     (1 << 2)
 #define DPS310_REG_CFG_REG_FIFO_EN_MASK     (1 << 1)
 #define DPS310_REG_CFG_REG_SPI_MODE_MASK    (1 << 0)
+#define DPS310_REG_MEAS_CFG_COEF_RDY_MASK   (1 << 7)
+#define DPS310_REG_MEAS_CFG_SENSOR_RDY_MASK (1 << 6)
+#define DPS310_REG_MEAS_CFG_TMP_RDY_MASK    (1 << 5)
+#define DPS310_REG_MEAS_CFG_PRS_RDY_MASK    (1 << 4)
 
 /* See 3.6 Timing Characteristics */
 #define DPS310_I2C_FREQ_MAX_HZ  (3400000)  // Max 3.4 MHz
@@ -579,6 +599,15 @@ esp_err_t dps310_get_spi_mode(dps310_t *dev, uint8_t *value);
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value);
+
+/**
+ * @brief Get Calibration Coefficients (COEF), update COEF in the device
+ * descriptor.
+ *
+ * @param[in] dev The device descriptor.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_get_coef(dps310_t *dev);
 
 #ifdef __cplusplus
 }

@@ -41,6 +41,19 @@
 
 static const char *TAG = "dps310";
 
+/* see 4.9.3 Compensation Scale Factors */
+#define N_SCALE_FACTORS (8)
+const int32_t scale_factors[N_SCALE_FACTORS] = {
+    524288,
+    1572864,
+    3670016,
+    7864320,
+    253952,
+    516096,
+    1040384,
+    2088960
+};
+
 /* a magic function to reset undocumented resisters to workaround an unknown
  * issue.
  *
@@ -371,4 +384,72 @@ esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value)
     CHECK_ARG(dev);
 
     return _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_SPI_MODE_MASK, value);
+}
+
+static int32_t two_complement_of(uint32_t value, uint8_t length)
+{
+    int32_t result = value;
+    if (value & (1u << (length - 1u)))
+    {
+        result -= ((uint32_t) 1 << length);
+    }
+    return result;
+}
+
+esp_err_t dps310_get_coef(dps310_t *dev)
+{
+    uint8_t reg_values[DPS310_REG_COEF_LEN];
+
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev);
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    err = i2c_dev_read_reg(&dev->i2c_dev, DPS310_REG_COEF, reg_values, DPS310_REG_COEF_LEN);
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "i2c_dev_read_reg(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    dev->coef.c0 = two_complement_of(
+            ((uint32_t)reg_values[0] << 4) | (((uint32_t)reg_values[1] >> 4) & 0x0F),
+            12
+    );
+    dev->coef.c1 = two_complement_of(
+            (((uint32_t)reg_values[1] & 0x0F) << 8) | (uint32_t)reg_values[2],
+            12
+    );
+    dev->coef.c00 = two_complement_of(
+            ((uint32_t)reg_values[3] << 12) | ((uint32_t)reg_values[4] << 4) | (((uint32_t)reg_values[5] >> 4) & 0x0F),
+            20
+    );
+    dev->coef.c10 = two_complement_of(
+            (((uint32_t)reg_values[5] & 0x0F) << 16) | ((uint32_t)reg_values[6] << 8) | (uint32_t)reg_values[7],
+            20
+    );
+    dev->coef.c01 = two_complement_of(
+            ((uint32_t)reg_values[8] << 8) | (uint32_t)reg_values[9],
+            16
+    );
+    dev->coef.c11 = two_complement_of(
+            ((uint32_t)reg_values[10] << 8) | (uint32_t)reg_values[11],
+            16
+    );
+    dev->coef.c20 = two_complement_of(
+            ((uint32_t)reg_values[12] << 8) | (uint32_t)reg_values[13],
+            16
+    );
+
+    dev->coef.c21 = two_complement_of(
+            ((uint32_t)reg_values[14] << 8) | (uint32_t)reg_values[15],
+            16
+    );
+    dev->coef.c30 = two_complement_of(
+            ((uint32_t)reg_values[16] << 8) | (uint32_t)reg_values[17],
+            16
+    );
+fail:
+    return err;
+
 }
