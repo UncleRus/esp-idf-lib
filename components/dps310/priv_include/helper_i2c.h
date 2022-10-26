@@ -45,6 +45,8 @@ esp_err_t _update_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t 
 
 esp_err_t _update_reg(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val);
 
+esp_err_t _wait_for_reg_bits(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val, uint8_t max_attempt, uint16_t delay);
+
 #ifdef __cplusplus
 }
 #endif

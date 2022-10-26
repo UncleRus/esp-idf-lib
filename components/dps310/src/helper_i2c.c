@@ -21,6 +21,8 @@
 #include <inttypes.h>
 
 /* esp-idf headers */
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <esp_err.h>
 #include <esp_log.h>
 #include <i2cdev.h>
@@ -130,6 +132,30 @@ esp_err_t _update_reg(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val)
     I2C_DEV_CHECK(dev, _update_reg_nolock(dev, reg, mask, val));
     I2C_DEV_GIVE_MUTEX(dev);
     return ESP_OK;
+}
+
+esp_err_t _wait_for_reg_bits(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t val, uint8_t max_attempt, uint16_t delay)
+{
+    esp_err_t err = ESP_FAIL;
+    uint8_t reg_value = 0;
+    uint8_t attempts = 0;
+
+    while (attempts < max_attempt)
+    {
+        attempts++;
+        err = _read_reg_mask(dev, reg, mask, &reg_value);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "_wait_for_reg_bits(): %s", esp_err_to_name(err));
+            return err;
+        }
+        if (reg_value == val)
+        {
+            return ESP_OK;
+        }
+        vTaskDelay(delay);
+    }
+    return ESP_ERR_TIMEOUT;
 }
 
 #ifdef __cplusplus
