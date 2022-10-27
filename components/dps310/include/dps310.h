@@ -337,8 +337,8 @@ typedef struct {
 #define DPS310_PROD_ID  0x01
 
 /* See 8.9 Soft Reset and FIFO flush (RESET) */
-#define DPS310_FIFO_FLUSH_VALUE 0b1000
-#define DPS310_SOFT_RST_VALUE   0b1001
+#define DPS310_FIFO_FLUSH_VALUE (1 << 7)
+#define DPS310_SOFT_RST_VALUE   (0b1001)
 
 /**
  * @brief Initialize device descriptor
@@ -617,6 +617,25 @@ esp_err_t dps310_get_coef(dps310_t *dev);
  * @param[out] mode The operating mode.
  */
 esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode);
+
+/**
+ * @brief Flush FIFO.
+ *
+ * @param[in] dev The device descriptor.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dsp310_flush_fifo(dps310_t *dev);
+
+/**
+ * @brief Enable or disable FIFO.
+ *
+ * The function performs flush (`dsp310_flush_fifo()`) before disabling FIFO.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] enable Enable FIFO when true, disable FIFO when false.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dsp310_enable_fifo(dps310_t *dev, bool enable);
 
 #ifdef __cplusplus
 }

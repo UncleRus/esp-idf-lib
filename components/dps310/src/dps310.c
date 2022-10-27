@@ -458,3 +458,35 @@ esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode)
 {
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK, mode);
 }
+
+esp_err_t dsp310_flush_fifo(dps310_t *dev)
+{
+    uint8_t value = DPS310_FIFO_FLUSH_VALUE;
+
+    CHECK_ARG(dev);
+    return _write_reg(&dev->i2c_dev, DPS310_REG_RESET, &value);
+}
+
+esp_err_t dsp310_enable_fifo(dps310_t *dev, bool enable)
+{
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev);
+    if (!enable)
+    {
+        err = dsp310_flush_fifo(dev);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dsp310_flush_fifo(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    }
+    err = _update_reg(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_FIFO_EN_MASK, enable ? 1 : 0);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "_update_reg(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+fail:
+    return err;
+}
