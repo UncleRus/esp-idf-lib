@@ -311,6 +311,7 @@ typedef struct {
 #define DPS310_REG_MEAS_CFG_SENSOR_RDY_MASK (1 << 6)
 #define DPS310_REG_MEAS_CFG_TMP_RDY_MASK    (1 << 5)
 #define DPS310_REG_MEAS_CFG_PRS_RDY_MASK    (1 << 4)
+#define DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK  (0b111)
 
 /* See 3.6 Timing Characteristics */
 #define DPS310_I2C_FREQ_MAX_HZ  (3400000)  // Max 3.4 MHz
@@ -608,6 +609,14 @@ esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_get_coef(dps310_t *dev);
+
+/**
+ * @brief Get operating mode.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] mode The operating mode.
+ */
+esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode);
 
 #ifdef __cplusplus
 }

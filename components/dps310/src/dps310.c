@@ -453,3 +453,8 @@ fail:
     return err;
 
 }
+
+esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode)
+{
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK, mode);
+}

@@ -36,11 +36,13 @@ static const char *TAG = "dps310_example_default";
 
 void dps310_task(void *pvParameters)
 {
-    esp_err_t err = ESP_FAIL;
     uint8_t reg_value = 0;
-    dps310_t dev;
+    uint8_t mode;
+    esp_err_t err = ESP_FAIL;
     dps310_config_t config = DPS310_CONFIG_DEFAULT();
+    dps310_t dev;
 
+    memset(&dev, 0, sizeof(dps310_t));
     ESP_LOGI(TAG, "Initializing I2C");
     err = i2cdev_init();
     if (err != ESP_OK)
@@ -117,6 +119,18 @@ void dps310_task(void *pvParameters)
     }
     ESP_LOGI(TAG, "reg_value: %d", reg_value);
     assert(reg_value == DPS310_TMP_PRC_16);
+
+    ESP_LOGI(TAG, "Get current operating mode");
+    err = dsp310_get_mode(&dev, &mode);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dsp310_get_mode(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    if (mode != DPS310_MODE_STANDBY)
+    {
+        ESP_LOGE(TAG, "the device is not in standby mode");
+    }
 
     ESP_LOGI(TAG, "Starting the loop");
     while (1) {
