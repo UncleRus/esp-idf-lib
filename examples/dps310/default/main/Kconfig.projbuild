@@ -18,5 +18,5 @@ menu "Example configuration"
         hex "I2C address"
         default 0x77
         help
-            I2C address of DSP310. When SDO is pulled low, 0x76. When pulled high, 0x77.
+            I2C address of DPS310. When SDO is pulled low, 0x76. When pulled high, 0x77.
 endmenu
