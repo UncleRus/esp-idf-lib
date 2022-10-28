@@ -44,7 +44,7 @@ static const char *TAG = "dps310";
 
 /* see 4.9.3 Compensation Scale Factors */
 #define N_SCALE_FACTORS (8)
-const int32_t scale_factors[N_SCALE_FACTORS] = {
+static const int32_t scale_factors[N_SCALE_FACTORS] = {
     524288,
     1572864,
     3670016,
