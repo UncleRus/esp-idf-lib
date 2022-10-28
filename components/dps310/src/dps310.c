@@ -23,6 +23,8 @@
 
 /* standard headers */
 #include <inttypes.h>
+#include <string.h>
+#include <math.h>
 
 /* esp-idf headers */
 #include <freertos/FreeRTOS.h>
@@ -191,6 +193,98 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
         goto fail;
     }
 
+    ESP_LOGD(TAG, "Pressure measurement rate: %i measurements / sec", (int)pow(2, config->pm_rate));
+    err = dps310_set_pm_rate(dev, config->pm_rate);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Pressure oversampling: %i time(s)", (int)pow(2, config->pm_prc));
+    err = dps310_set_pm_prc(dev, config->pm_prc);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Temperature measurement rate: %i measurements / sec", (int)pow(2, config->tmp_rate));
+    err = dps310_set_tmp_rate(dev, config->tmp_rate);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Temperature oversampling: %i time(s)", (int)pow(2, config->tmp_prc));
+    err = dps310_set_tmp_prc(dev, config->tmp_prc);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Temperature source: %s", config->tmp_src == DPS310_TMP_SRC_INTERNAL ? "internal" : "external");
+    err = dps310_set_tmp_ext(dev, config->tmp_src);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Temperature COEF source: %s", config->tmp_coef == DPS310_TMP_SRC_INTERNAL ? "internal" : "external");
+    err = dps310_set_tmp_coef_ext(dev, config->tmp_coef);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    if (config->tmp_src != config->tmp_coef)
+    {
+
+        /* XXX don't know when DPS310_TMP_SRC_INTERNAL should be used. the
+         * datasheet does not mention the differece.
+         */
+        ESP_LOGW(TAG, "tmp_src and tmp_coef should be an identical source. Use DPS310_TMP_SRC_EXTERNAL in the config");
+    }
+    ESP_LOGD(TAG, "Interrupt FIFO: %s", config->int_fifo_mode == DPS310_INT_FIFO_ENABLE ? "enabled" : "disabled");
+    err = dps310_set_int_fifo(dev, config->int_fifo_mode);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Interrupt temperature: %s", config->int_tmp_mode == DPS310_INT_TMP_ENABLE ? "enabled" : "disabled");
+    err = dps310_set_int_tmp(dev, config->int_tmp_mode);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "Interrupt pressure: %s", config->int_prs_mode == DPS310_INT_PRS_ENABLE ? "enabled" : "disabled");
+    err = dps310_set_int_prs(dev, config->int_prs_mode);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "Temperature result bit-shift: %s", config->t_shift_mode == DPS310_T_SHIFT_ENABLE ? "enabled" : "disabled");
+    if (config->tmp_prc > DPS310_TMP_PRC_8 && config->t_shift_mode != DPS310_T_SHIFT_ENABLE)
+    {
+        ESP_LOGW(TAG, "Temperature result bit-shift must be enabled, but is disabled. Set DPS310_T_SHIFT_ENABLE");
+    }
+    err = dps310_set_t_shift(dev, config->t_shift_mode);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "Pressure result bit-shift: %s", config->p_shift_mode == DPS310_P_SHIFT_ENABLE ? "enabled" : "disabled");
+    if (config->pm_prc > DPS310_PM_PRC_8 && config->p_shift_mode != DPS310_P_SHIFT_ENABLE)
+    {
+        ESP_LOGW(TAG, "Pressure result bit-shift must be enabled, but is disabled. Set DPS310_P_SHIFT_ENABLE");
+    }
+    err = dps310_set_p_shift(dev, config->p_shift_mode);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "FIFO: %s", config->fifo_en_mode == DPS310_FIFO_ENABLE ? "enabled" : "disabled");
+    err = dps310_set_fifo_en(dev, config->fifo_en_mode);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+
     err = dps310_quirk(dev);
     if (err != ESP_OK)
     {
@@ -231,6 +325,33 @@ esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value)
     return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_RATE_MASK, value);
 }
 
+esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value)
+{
+    uint8_t reg_value = 0;
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev && value);
+
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    err = i2c_dev_read_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, &reg_value, 1);
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "i2c_dev_read_reg(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    *value = (reg_value & DPS310_REG_PRS_CFG_TMP_RATE_MASK) >> DPS310_REG_PRS_CFG_TMP_RATE_SHIFT;
+fail:
+    return err;
+}
+
+esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_PRS_CFG_TMP_RATE_MASK, value);
+}
+
 esp_err_t dps310_reset(dps310_t *dev)
 {
     esp_err_t err = ESP_FAIL;
@@ -264,6 +385,20 @@ esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value)
     return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
 }
 
+esp_err_t dps310_get_tmp_prc(dps310_t *dev, uint8_t *value)
+{
+    CHECK_ARG(dev && value);
+
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
+}
+
+esp_err_t dps310_set_tmp_prc(dps310_t *dev, dps310_pm_rate_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
+}
+
 esp_err_t dps310_get_tmp_ext(dps310_t *dev, uint8_t *value)
 {
     CHECK_ARG(dev && value);
@@ -278,7 +413,14 @@ esp_err_t dps310_set_tmp_ext(dps310_t *dev, dps310_tmp_src_ext_t value)
     return _update_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_PRS_CFG_TMP_EXT_MASK, value);
 }
 
-esp_err_t dsp310_get_int_hl(dps310_t *dev, uint8_t *value)
+esp_err_t dps310_set_tmp_coef_ext(dps310_t *dev, dps310_tmp_src_ext_t value)
+{
+    CHECK_ARG(dev);
+
+    return _update_reg(&dev->i2c_dev, DPS310_REG_COEF_SRCE, DPS310_REG_COEF_SRCE_MASK, value);
+}
+
+esp_err_t dps310_get_int_hl(dps310_t *dev, uint8_t *value)
 {
     CHECK_ARG(dev && value);
 
@@ -379,7 +521,7 @@ esp_err_t dps310_get_spi_mode(dps310_t *dev, uint8_t *value)
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_CFG_REG, DPS310_REG_CFG_REG_SPI_MODE_MASK, value);
 }
 
-esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value)
+esp_err_t dps310_set_spi_mode(dps310_t *dev, dps310_spi_mode_t value)
 {
     CHECK_ARG(dev);
 
@@ -388,8 +530,8 @@ esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value)
 
 static int32_t two_complement_of(uint32_t value, uint8_t length)
 {
-    int32_t result = value;
-    if (value & (1u << (length - 1u)))
+    int32_t result = (uint32_t)value;
+    if (value & ((uint32_t)1 << (length - (uint32_t)1)))
     {
         result -= ((uint32_t) 1 << length);
     }
@@ -412,54 +554,48 @@ esp_err_t dps310_get_coef(dps310_t *dev)
         goto fail;
     }
 
-    dev->coef.c0 = two_complement_of(
-            ((uint32_t)reg_values[0] << 4) | (((uint32_t)reg_values[1] >> 4) & 0x0F),
-            12
-    );
-    dev->coef.c1 = two_complement_of(
-            (((uint32_t)reg_values[1] & 0x0F) << 8) | (uint32_t)reg_values[2],
-            12
-    );
-    dev->coef.c00 = two_complement_of(
-            ((uint32_t)reg_values[3] << 12) | ((uint32_t)reg_values[4] << 4) | (((uint32_t)reg_values[5] >> 4) & 0x0F),
-            20
-    );
-    dev->coef.c10 = two_complement_of(
-            (((uint32_t)reg_values[5] & 0x0F) << 16) | ((uint32_t)reg_values[6] << 8) | (uint32_t)reg_values[7],
-            20
-    );
-    dev->coef.c01 = two_complement_of(
-            ((uint32_t)reg_values[8] << 8) | (uint32_t)reg_values[9],
-            16
-    );
-    dev->coef.c11 = two_complement_of(
-            ((uint32_t)reg_values[10] << 8) | (uint32_t)reg_values[11],
-            16
-    );
-    dev->coef.c20 = two_complement_of(
-            ((uint32_t)reg_values[12] << 8) | (uint32_t)reg_values[13],
-            16
-    );
+    dev->coef.c0 = ((uint32_t)reg_values[0] << 4) | (((uint32_t)reg_values[1] >> 4) & 0x0F);
+    dev->coef.c0 = two_complement_of(dev->coef.c0, 12);
 
-    dev->coef.c21 = two_complement_of(
-            ((uint32_t)reg_values[14] << 8) | (uint32_t)reg_values[15],
-            16
-    );
-    dev->coef.c30 = two_complement_of(
-            ((uint32_t)reg_values[16] << 8) | (uint32_t)reg_values[17],
-            16
-    );
+    dev->coef.c1 = (((uint32_t)reg_values[1] & 0x0F) << 8) | (uint32_t)reg_values[2];
+    dev->coef.c1 = two_complement_of(dev->coef.c1, 12);
+
+    dev->coef.c00 = ((uint32_t)reg_values[3] << 12) | ((uint32_t)reg_values[4] << 4) | (((uint32_t)reg_values[5] >> 4) & 0x0F);
+    dev->coef.c00 = two_complement_of(dev->coef.c00, 20);
+
+    dev->coef.c10 = (((uint32_t)reg_values[5] & 0x0F) << 16) | ((uint32_t)reg_values[6] << 8) | (uint32_t)reg_values[7];
+    dev->coef.c10 = two_complement_of(dev->coef.c10, 20);
+
+    dev->coef.c01 = ((uint32_t)reg_values[8] << 8) | (uint32_t)reg_values[9];
+    dev->coef.c01 = two_complement_of(dev->coef.c01, 16);
+
+    dev->coef.c11 = ((uint32_t)reg_values[10] << 8) | (uint32_t)reg_values[11];
+    dev->coef.c11 = two_complement_of(dev->coef.c11, 16);
+
+    dev->coef.c20 = ((uint32_t)reg_values[12] << 8) | (uint32_t)reg_values[13];
+    dev->coef.c20 = two_complement_of(dev->coef.c20, 16);
+
+    dev->coef.c21 = ((uint32_t)reg_values[14] << 8) | (uint32_t)reg_values[15];
+    dev->coef.c21 = two_complement_of(dev->coef.c21, 16);
+
+    dev->coef.c30 = ((uint32_t)reg_values[16] << 8) | (uint32_t)reg_values[17];
+    dev->coef.c30 = two_complement_of(dev->coef.c30, 16);
 fail:
     return err;
 
 }
 
-esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode)
+esp_err_t dps310_get_mode(dps310_t *dev, uint8_t *mode)
 {
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK, mode);
 }
 
-esp_err_t dsp310_flush_fifo(dps310_t *dev)
+esp_err_t dps310_set_mode(dps310_t *dev, dps310_mode_t mode)
+{
+    return _update_reg(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK, mode);
+}
+
+esp_err_t dps310_flush_fifo(dps310_t *dev)
 {
     uint8_t value = DPS310_FIFO_FLUSH_VALUE;
 
@@ -467,17 +603,17 @@ esp_err_t dsp310_flush_fifo(dps310_t *dev)
     return _write_reg(&dev->i2c_dev, DPS310_REG_RESET, &value);
 }
 
-esp_err_t dsp310_enable_fifo(dps310_t *dev, bool enable)
+esp_err_t dps310_enable_fifo(dps310_t *dev, bool enable)
 {
     esp_err_t err = ESP_FAIL;
 
     CHECK_ARG(dev);
     if (!enable)
     {
-        err = dsp310_flush_fifo(dev);
+        err = dps310_flush_fifo(dev);
         if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "dsp310_flush_fifo(): %s", esp_err_to_name(err));
+            ESP_LOGE(TAG, "dps310_flush_fifo(): %s", esp_err_to_name(err));
             goto fail;
         }
     }
@@ -489,4 +625,171 @@ esp_err_t dsp310_enable_fifo(dps310_t *dev, bool enable)
     }
 fail:
     return err;
+}
+
+esp_err_t dps310_read_raw(dps310_t *dev, uint8_t reg, int32_t *value)
+{
+    uint8_t reg_values[DPS310_REG_SENSOR_VALUE_LEN] = {0};
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev && value);
+    if (reg != DPS310_REG_TMP_B2 && reg != DPS310_REG_PRS_B2)
+    {
+        err = ESP_ERR_INVALID_ARG;
+        goto fail;
+    }
+    err = i2c_dev_read_reg(&dev->i2c_dev, reg, reg_values, DPS310_REG_SENSOR_VALUE_LEN);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "i2c_dev_read_reg(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    *value = ((uint32_t)reg_values[0] << 16) | ((uint32_t)reg_values[1] << 8) | (uint32_t)reg_values[2];
+    *value = two_complement_of(*value, DPS310_REG_SENSOR_VALUE_LEN * 8);
+    ESP_LOGD(TAG, "raw value in %s resister: %i", reg == DPS310_REG_TMP_B2 ? "temperature" : "pressure", *value);
+fail:
+    return err;
+}
+
+static float compensate_temp(dps310_t *dev, uint32_t T_raw, uint8_t rate)
+{
+
+    /* 4.9.2 How to Calculate Compensated Temperature Values */
+    float T_raw_scaled = 0;
+    float result = 0;
+    int32_t kT = 0;
+
+    kT = scale_factors[rate];
+    ESP_LOGD(TAG, "kT: %i", kT);
+
+    /* scale_factors is a const, no divided by zero check */
+    T_raw_scaled = (float)T_raw / (float)kT;
+
+    /* Traw_sc = Traw / kT
+     * Tcomp (°C) = c0 * 0.5 + c1 * Traw_sc
+     */
+    result = ((float)dev->coef.c0 * 0.5) + ((float)dev->coef.c1 * T_raw_scaled);
+    return result;
+}
+
+static float compensate_pressure(dps310_t *dev, int32_t T_raw, int32_t T_rate, int32_t P_raw, int32_t P_rate)
+{
+
+    /* 4.9.1 How to Calculate Compensated Pressure Values */
+    float T_raw_scaled = 0;
+    float P_raw_scaled = 0;
+    int32_t kT = scale_factors[T_rate];
+    int32_t kP = scale_factors[P_rate];
+
+    /* scale_factors is a const, no divided by zero check */
+    T_raw_scaled = (float)T_raw / (float)kT;
+    P_raw_scaled = (float)P_raw / (float)kP;
+
+    /* Pcomp(Pa) = c00
+     *             + Praw_sc * (c10 + Praw_sc * (c20 + Praw_sc * c30))
+     *             + Traw_sc * c01
+     *             + Traw_sc * Praw_sc * (c11 + Praw_sc * c21)
+     */
+    return (float)dev->coef.c00
+           + P_raw_scaled * ((float)dev->coef.c10 + P_raw_scaled * ((float)dev->coef.c20 + P_raw_scaled * (float)dev->coef.c30))
+           + T_raw_scaled * (float)dev->coef.c01
+           + T_raw_scaled * P_raw_scaled * ((float)dev->coef.c11 + P_raw_scaled * (float)dev->coef.c21);
+}
+
+esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure)
+{
+    esp_err_t err = ESP_FAIL;
+    int32_t T_raw = 0;
+    int32_t P_raw = 0;
+    uint8_t T_rate = 0;
+    uint8_t P_rate = 0;
+
+    err = dps310_get_tmp_prc(dev, &T_rate);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_tmp_prc(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    err = dps310_get_pm_prc(dev, &P_rate);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_pm_prc(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    err = dps310_read_raw(dev, DPS310_REG_TMP_B2, &T_raw);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_raw(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    err = dps310_read_raw(dev, DPS310_REG_PRS_B2, &P_raw);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_raw(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    *pressure = compensate_pressure(dev, T_raw, T_rate, P_raw, P_rate);
+fail:
+    return err;
+}
+
+esp_err_t dps310_read_temp(dps310_t *dev, float *temperature)
+{
+    esp_err_t err = ESP_FAIL;
+    int32_t T_raw = 0;
+    uint8_t rate = 0;
+
+    err = dps310_get_tmp_prc(dev, &rate);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_tmp_prc(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    err = dps310_read_raw(dev, DPS310_REG_TMP_B2, &T_raw);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_raw(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    *temperature = compensate_temp(dev, T_raw, rate);
+fail:
+    return err;
+}
+
+esp_err_t dps310_is_ready_for(dps310_t *dev, uint8_t reg, uint8_t mask, bool *ready)
+{
+    esp_err_t err = ESP_FAIL;
+    uint8_t reg_value;
+
+    err = _read_reg_mask(&dev->i2c_dev, reg, mask, &reg_value);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "_read_reg_mask(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    *ready = reg_value == 1 ? true : false;
+fail:
+    return err;
+}
+
+esp_err_t dps310_is_ready_for_coef(dps310_t *dev, bool *ready)
+{
+    return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_COEF_RDY_MASK, ready);
+}
+
+esp_err_t dps310_is_ready_for_sensor(dps310_t *dev, bool *ready)
+{
+    return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_SENSOR_RDY_MASK, ready);
+}
+
+esp_err_t dps310_is_ready_for_temp(dps310_t *dev, bool *ready)
+{
+    return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_TMP_RDY_MASK, ready);
+}
+
+esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready)
+{
+    return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_PRS_RDY_MASK, ready);
 }

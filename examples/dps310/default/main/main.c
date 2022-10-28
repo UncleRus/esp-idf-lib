@@ -36,13 +36,18 @@ static const char *TAG = "dps310_example_default";
 
 void dps310_task(void *pvParameters)
 {
+    bool ready = false;
     uint8_t reg_value = 0;
     uint8_t mode;
+    float temperature = 0;
+    float pressure = 0;
     esp_err_t err = ESP_FAIL;
     dps310_config_t config = DPS310_CONFIG_DEFAULT();
     dps310_t dev;
 
     memset(&dev, 0, sizeof(dps310_t));
+    config.tmp_prc = DPS310_TMP_PRC_128;
+    config.pm_prc = DPS310_PM_PRC_128;
     ESP_LOGI(TAG, "Initializing I2C");
     err = i2cdev_init();
     if (err != ESP_OK)
@@ -67,70 +72,75 @@ void dps310_task(void *pvParameters)
         goto fail;
     }
 
-    ESP_LOGI(TAG, "Get Pressure measurement rate");
-    err = dps310_get_pm_rate(&dev, &reg_value);
-    if (err != ESP_OK)
+    ESP_LOGI(TAG, "Waiting for the sensor to be ready");
+    do
     {
-        ESP_LOGE(TAG, "dps310_set_pm_rate(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    assert(reg_value == DPS310_PM_RATE_1);
+        vTaskDelay(pdMS_TO_TICKS(10));
+        err = dps310_is_ready_for_sensor(&dev, &ready);
+        if (err != ESP_OK)
+        {
+            goto fail;
+        }
+    } while (!ready);
 
-    ESP_LOGI(TAG, "Set Pressure measurement rate to DPS310_PM_RATE_16");
-    err = dps310_set_pm_rate(&dev, DPS310_PM_RATE_16);
+    /* Temperature */
+    ESP_LOGI(TAG, "Setting manual temperature measurement mode");
+    err = dps310_set_mode(&dev, DPS310_MODE_COMMAND_TEMPERATURE);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "dps310_set_pm_rate(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-
-    ESP_LOGI(TAG, "Get Pressure measurement rate");
-    err = dps310_get_pm_rate(&dev, &reg_value);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "dps310_set_pm_rate(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    assert(reg_value == DPS310_PM_RATE_16);
-
-    ESP_LOGI(TAG, "Get Pressure oversampling rate");
-    err = dps310_get_pm_prc(&dev, &reg_value);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "dps310_set_pm_prc(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    assert(reg_value == DPS310_TMP_PRC_1);
-
-    ESP_LOGI(TAG, "Set Pressure oversampling rate to DPS310_TMP_PRC_16");
-    err = dps310_set_pm_prc(&dev, DPS310_TMP_PRC_16);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "dps310_set_pm_prc(): %s", esp_err_to_name(err));
         goto fail;
     }
 
-    ESP_LOGI(TAG, "Get Pressure oversampling rate");
-    err = dps310_get_pm_prc(&dev, &reg_value);
-    if (err != ESP_OK)
+    ESP_LOGI(TAG, "Waiting for the temperature value to be ready");
+    do
     {
-        ESP_LOGE(TAG, "dps310_set_pm_prc(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    ESP_LOGI(TAG, "reg_value: %d", reg_value);
-    assert(reg_value == DPS310_TMP_PRC_16);
+        vTaskDelay(pdMS_TO_TICKS(10));
+        err = dps310_is_ready_for_temp(&dev, &ready);
+        if (err != ESP_OK)
+        {
+            goto fail;
+        }
+    } while (!ready);
 
-    ESP_LOGI(TAG, "Get current operating mode");
-    err = dsp310_get_mode(&dev, &mode);
+    err = dps310_get_coef(&dev);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "dsp310_get_mode(): %s", esp_err_to_name(err));
         goto fail;
     }
-    if (mode != DPS310_MODE_STANDBY)
+    err = dps310_read_temp(&dev, &temperature);
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "the device is not in standby mode");
+        ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
+        goto fail;
     }
+    ESP_LOGI(TAG, "Temperature: %0.2f", temperature);
+
+    /* Pressure */
+    ESP_LOGI(TAG, "Setting manual pressure measurement mode");
+    err = dps310_set_mode(&dev, DPS310_MODE_COMMAND_PRESSURE);
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+
+    ESP_LOGI(TAG, "Waiting for the pressure value to be ready");
+    do
+    {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        err = dps310_is_ready_for_pressure(&dev, &ready);
+        if (err != ESP_OK)
+        {
+            goto fail;
+        }
+    } while (!ready);
+
+    err = dps310_read_pressure(&dev, &pressure);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    ESP_LOGI(TAG, "Pressure: %0.2f", pressure);
 
     ESP_LOGI(TAG, "Starting the loop");
     while (1) {

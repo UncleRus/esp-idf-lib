@@ -148,31 +148,31 @@ typedef enum {
  */
 typedef enum {
     DPS310_INT_FIFO_DISABLE = 0, //!< Disable interupt when the FIFO is full
-    DPS310_INT_FIFO_DNABLE  = 1, //!< Enable interupt when the FIFO is full
+    DPS310_INT_FIFO_ENABLE  = 1, //!< Enable interupt when the FIFO is full
 } dps310_int_fifo_mode_t;
 
 /**
  * Mode of interupt when a temperature measurement is ready
  */
 typedef enum {
-    DSP310_INT_TMP_DISABLE  = 0, //!< Disable interupt when a temperature measurement is ready
-    DSP310_INT_TMP_ENABLE   = 1, //!< Enable interupt when a temperature measurement is ready
+    DPS310_INT_TMP_DISABLE  = 0, //!< Disable interupt when a temperature measurement is ready
+    DPS310_INT_TMP_ENABLE   = 1, //!< Enable interupt when a temperature measurement is ready
 } dps310_int_tmp_mode_t;
 
 /**
  * Mode of interupt when a pressure measurement is ready
  */
 typedef enum {
-    DSP310_INT_PRS_DISABLE  = 0, //!< Disable interupt when a pressure measurement is ready
-    DSP310_INT_PRS_ENABLE   = 1, //!< Enable interupt when a pressure measurement is ready
+    DPS310_INT_PRS_DISABLE  = 0, //!< Disable interupt when a pressure measurement is ready
+    DPS310_INT_PRS_ENABLE   = 1, //!< Enable interupt when a pressure measurement is ready
 } dps310_int_prs_mode_t;
 
 /**
  * Mode of temperature result bit-shift.
  */
 typedef enum {
-    DSP310_T_SHIFT_DISABLE  = 0, //!< No shift.
-    DSP310_T_SHIFT_ENABLE   = 1, //!< Shift result right in data register.
+    DPS310_T_SHIFT_DISABLE  = 0, //!< No shift.
+    DPS310_T_SHIFT_ENABLE   = 1, //!< Shift result right in data register.
                                  //   Must be set to '1' when the oversampling
                                  //   rate is >8 times.
 } dps310_t_shift_mode_t;
@@ -181,8 +181,8 @@ typedef enum {
  * Mode of pressure result bit-shift.
  */
 typedef enum {
-    DSP310_P_SHIFT_DISABLE  = 0, //!< No shift.
-    DSP310_P_SHIFT_ENABLE   = 1, //!< Shift result right in data register.
+    DPS310_P_SHIFT_DISABLE  = 0, //!< No shift.
+    DPS310_P_SHIFT_ENABLE   = 1, //!< Shift result right in data register.
                                  //   Must be set to '1' when the oversampling
                                  //   rate is >8 times.
 } dps310_p_shift_mode_t;
@@ -191,17 +191,17 @@ typedef enum {
  * Mode of FIFO.
  */
 typedef enum {
-    DSP310_FIFO_DISABLE = 0, //!< Disable FIFO.
-    DSP310_FIFO_ENABLE  = 1, //!< Enable FIFO.
+    DPS310_FIFO_DISABLE = 0, //!< Disable FIFO.
+    DPS310_FIFO_ENABLE  = 1, //!< Enable FIFO.
 } dps310_fifo_en_mode_t;
 
 /**
  * SPI mode.
  */
 typedef enum {
-    DSP310_SPI_MODE_4WIRE = 0, //!< SPI 4-wires
-    DSP310_SPI_MODE_3WIRE = 1, //!< SPI 3-wires
-} dsp310_spi_mode_t;
+    DPS310_SPI_MODE_4WIRE = 0, //!< SPI 4-wires
+    DPS310_SPI_MODE_3WIRE = 1, //!< SPI 3-wires
+} dps310_spi_mode_t;
 
 /**
  * Configuration parameters for DPS310.
@@ -219,7 +219,7 @@ typedef struct {
     dps310_t_shift_mode_t t_shift_mode;
     dps310_p_shift_mode_t p_shift_mode;
     dps310_fifo_en_mode_t fifo_en_mode;
-    dsp310_spi_mode_t spi_mode;
+    dps310_spi_mode_t spi_mode;
 
 } dps310_config_t;
 
@@ -235,12 +235,12 @@ typedef struct {
     .tmp_src = DPS310_TMP_SRC_EXTERNAL, \
     .tmp_coef = DPS310_TMP_SRC_EXTERNAL, \
     .int_fifo_mode = DPS310_INT_FIFO_DISABLE, \
-    .int_tmp_mode = DSP310_INT_TMP_DISABLE, \
-    .int_prs_mode = DSP310_INT_PRS_DISABLE, \
-    .t_shift_mode = DSP310_T_SHIFT_ENABLE, \
-    .p_shift_mode = DSP310_P_SHIFT_ENABLE, \
-    .fifo_en_mode = DSP310_FIFO_ENABLE, \
-    .spi_mode = DSP310_SPI_MODE_4WIRE, \
+    .int_tmp_mode = DPS310_INT_TMP_DISABLE, \
+    .int_prs_mode = DPS310_INT_PRS_DISABLE, \
+    .t_shift_mode = DPS310_T_SHIFT_ENABLE, \
+    .p_shift_mode = DPS310_P_SHIFT_ENABLE, \
+    .fifo_en_mode = DPS310_FIFO_DISABLE, \
+    .spi_mode = DPS310_SPI_MODE_4WIRE, \
 }
 
 /**
@@ -297,8 +297,11 @@ typedef struct {
 #define DPS310_REG_RESET_SOFT_RST_MASK      0x0f
 #define DPS310_REG_PRS_CFG_PM_RATE_SHIFT    (4)
 #define DPS310_REG_PRS_CFG_PM_RATE_MASK     (0b111 << DPS310_REG_PRS_CFG_PM_RATE_SHIFT)
+#define DPS310_REG_PRS_CFG_TMP_RATE_SHIFT    (4)
+#define DPS310_REG_PRS_CFG_TMP_RATE_MASK     (0b111 << DPS310_REG_PRS_CFG_TMP_RATE_SHIFT)
 #define DPS310_REG_PRS_CFG_PM_PRC_MASK      (0b1111)
 #define DPS310_REG_PRS_CFG_TMP_EXT_MASK     (1 << 7)
+#define DPS310_REG_TMP_CFG_TMP_PRC_MASK     (0b1111)
 #define DPS310_REG_CFG_REG_INT_HL_MASK      (1 << 7)
 #define DPS310_REG_CFG_REG_INT_FIFO_MASK    (1 << 6)
 #define DPS310_REG_CFG_REG_INT_TMP_MASK     (1 << 5)
@@ -312,6 +315,7 @@ typedef struct {
 #define DPS310_REG_MEAS_CFG_TMP_RDY_MASK    (1 << 5)
 #define DPS310_REG_MEAS_CFG_PRS_RDY_MASK    (1 << 4)
 #define DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK  (0b111)
+#define DPS310_REG_COEF_SRCE_MASK           (1 << 7)
 
 /* See 3.6 Timing Characteristics */
 #define DPS310_I2C_FREQ_MAX_HZ  (3400000)  // Max 3.4 MHz
@@ -335,6 +339,9 @@ typedef struct {
 #define DPS310_STARTUP_DELAY_MS (DPS310_TRIM_READY_DELAY_MS + DPS310_SENSOR_READY_DELAY_MS + DPS310_COEFFICIENTS_READY_DELAY_MS)
 
 #define DPS310_PROD_ID  0x01
+
+/* temperature and pressure use three resisters for 24 bits values. */
+#define DPS310_REG_SENSOR_VALUE_LEN (3)
 
 /* See 8.9 Soft Reset and FIFO flush (RESET) */
 #define DPS310_FIFO_FLUSH_VALUE (1 << 7)
@@ -417,6 +424,25 @@ esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value);
 esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value);
 
 /**
+ * @brief Get temperature measurement rate.
+ *
+ * @param[in] dev pointer to the device descriptor
+ * @param[out] value the value in the resister
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
+ * `value` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value);
+
+/**
+ * @brief Set temperature measurement rate.
+ *
+ * @param[in] dev The pointer to the device descriptor.
+ * @param[in] value The value to set.
+ * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value);
+
+/**
  * @brief Get pressure oversampling rate.
  *
  * @param[in] dev pointer to the device descriptor
@@ -434,6 +460,25 @@ esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value);
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value);
+
+/**
+ * @brief Get temperature oversampling rate.
+ *
+ * @param[in] dev pointer to the device descriptor
+ * @param[out] value the value in the resister
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
+ * `value` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_get_tmp_prc(dps310_t *dev, uint8_t *value);
+
+/**
+ * @brief Set temperature oversampling rate.
+ *
+ * @param[in] dev The pointer to the device descriptor.
+ * @param[in] value The value to set.
+ * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_set_tmp_prc(dps310_t *dev, dps310_pm_rate_t value);
 
 /**
  * @brief Get temperature measurement source.
@@ -454,13 +499,22 @@ esp_err_t dps310_get_tmp_ext(dps310_t *dev, uint8_t *value);
 esp_err_t dps310_set_tmp_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
 
 /**
+ * @brief Set temperature coefficient source.
+ *
+ * @param[in] dev The pointer to the device descriptor.
+ * @param[in] value The value to set.
+ * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_set_tmp_coef_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
+
+/**
  * @brief Get interupt active level.
  *
  * @param[in] dev The pointer to the device descriptor.
  * @param[out] value the value in the resister.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dsp310_get_int_hl(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_int_hl(dps310_t *dev, uint8_t *value);
 
 /**
  * @brief Set interupt active level.
@@ -537,7 +591,7 @@ esp_err_t dps310_get_t_shift(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set the status of temperature result bit-shift.
  *
- * Must be set to DSP310_T_SHIFT_ENABLE when the oversampling rate is >8 times.
+ * Must be set to DPS310_T_SHIFT_ENABLE when the oversampling rate is >8 times.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value The value to set.
@@ -557,7 +611,7 @@ esp_err_t dps310_get_p_shift(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set the status of pressure result bit-shift.
  *
- * Must be set to DSP310_P_SHIFT_ENABLE when the oversampling rate is >8 times.
+ * Must be set to DPS310_P_SHIFT_ENABLE when the oversampling rate is >8 times.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value The value to set.
@@ -599,7 +653,7 @@ esp_err_t dps310_get_spi_mode(dps310_t *dev, uint8_t *value);
  * @param[out] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_set_spi_mode(dps310_t *dev, dsp310_spi_mode_t value);
+esp_err_t dps310_set_spi_mode(dps310_t *dev, dps310_spi_mode_t value);
 
 /**
  * @brief Get Calibration Coefficients (COEF), update COEF in the device
@@ -616,7 +670,16 @@ esp_err_t dps310_get_coef(dps310_t *dev);
  * @param[in] dev The device descriptor.
  * @param[out] mode The operating mode.
  */
-esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode);
+esp_err_t dps310_get_mode(dps310_t *dev, uint8_t *mode);
+
+/**
+ * @brief Set operating mode.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] mode The operating mode.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_set_mode(dps310_t *dev, dps310_mode_t mode);
 
 /**
  * @brief Flush FIFO.
@@ -624,18 +687,96 @@ esp_err_t dsp310_get_mode(dps310_t *dev, uint8_t *mode);
  * @param[in] dev The device descriptor.
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dsp310_flush_fifo(dps310_t *dev);
+esp_err_t dps310_flush_fifo(dps310_t *dev);
 
 /**
  * @brief Enable or disable FIFO.
  *
- * The function performs flush (`dsp310_flush_fifo()`) before disabling FIFO.
+ * The function performs flush (`dps310_flush_fifo()`) before disabling FIFO.
  *
  * @param[in] dev The device descriptor.
  * @param[in] enable Enable FIFO when true, disable FIFO when false.
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dsp310_enable_fifo(dps310_t *dev, bool enable);
+esp_err_t dps310_enable_fifo(dps310_t *dev, bool enable);
+
+/**
+ * @brief Read the raw sensor value from resisters.
+ *
+ * The real raw value is 2's complement. The function internally converts the
+ * value from the 2's complement to uint32_t number.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] reg Either `DPS310_REG_TMP_B2` or `DPS310_REG_PRS_B2`.
+ * @param[out] value The raw value in the resisters.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_read_raw(dps310_t *dev, uint8_t reg, int32_t *value);
+
+/**
+ * @brief Read compensated pressure value.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] pressure Compensated pressure value.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure);
+
+/**
+ * @brief Read compensated temperature value.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] temperature Compensated temperature value.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_read_temp(dps310_t *dev, float *temperature);
+
+/**
+ * @brief Test if a single bit in a resister is set.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] reg The resister
+ * @param[in] mask bit mask to test
+ * @param[out] ready true when the bit is set, false when the bit is cleared.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_is_ready_for(dps310_t *dev, uint8_t reg, uint8_t mask, bool *ready);
+
+/**
+ * @brief Test COEF_RDY in MEAS_CFG resister is set.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] ready true when the bit is set, false when the bit is cleared.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_is_ready_for_coef(dps310_t *dev, bool *ready);
+
+/**
+ * @brief Test SENSOR_RDY in MEAS_CFG resister is set.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] ready true when the bit is set, false when the bit is cleared.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_is_ready_for_sensor(dps310_t *dev, bool *ready);
+
+/**
+ * @brief Test TMP_RDY in MEAS_CFG resister is set.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] ready true when the bit is set, false when the bit is cleared.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_is_ready_for_temp(dps310_t *dev, bool *ready);
+
+/**
+ * @brief Test PRS_RDY in MEAS_CFG resister is set.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] ready true when the bit is set, false when the bit is cleared.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready);
 
 #ifdef __cplusplus
 }
