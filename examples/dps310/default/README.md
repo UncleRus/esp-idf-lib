@@ -2,11 +2,11 @@
 
 ## What it does
 
-The example application initializes `DPS310` device. In a loop, it reads
-the measured pressure and temperature values, and print them.
+The example application initializes `DPS310` device. At startup, it reads
+temperature and pressure once.
 
-The default I2C address, which is used in this example, is 0x76. Make sure
-`SDO` is pulled low.
+The default I2C address, which is used in this example, is 0x77. Change the
+address by `idf.py menuconfig`.
 
 ## Wiring
 
