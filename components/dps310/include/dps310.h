@@ -708,7 +708,7 @@ esp_err_t dps310_enable_fifo(dps310_t *dev, bool enable);
  *
  * @param[in] dev The device descriptor.
  * @param[in] reg Either `DPS310_REG_TMP_B2` or `DPS310_REG_PRS_B2`.
- * @param[out] value The raw value in the resisters.
+ * @param[out] value The raw value in the three resisters.
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_read_raw(dps310_t *dev, uint8_t reg, int32_t *value);
@@ -717,7 +717,7 @@ esp_err_t dps310_read_raw(dps310_t *dev, uint8_t reg, int32_t *value);
  * @brief Read compensated pressure value.
  *
  * @param[in] dev The device descriptor.
- * @param[out] pressure Compensated pressure value.
+ * @param[out] pressure Compensated pressure value in Pascal (not hPa).
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure);
