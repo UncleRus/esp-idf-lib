@@ -17,10 +17,6 @@
  */
 
 /**
- * XXX time between command mode?
- */
-
-/**
  * @file dps310.h
  * @defgroup dps310 dps310
  * @{
@@ -31,6 +27,12 @@
  * driver currently supports:
  *
  * * I2C
+ *
+ * The driver currently does not support:
+ *
+ * * SPI
+ * * backgroung mode
+ * * read measurements by interrupt
  *
  */
 #if !defined(__DPS310_H__)
