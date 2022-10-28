@@ -24,7 +24,6 @@
 /* standard headers */
 #include <inttypes.h>
 #include <string.h>
-#include <math.h>
 
 /* esp-idf headers */
 #include <freertos/FreeRTOS.h>
@@ -151,6 +150,17 @@ fail:
     return err;
 }
 
+static int pow_int(int base, int x)
+{
+    int result = 1;
+
+    for (int i = 0; i < x ; ++i)
+    {
+        result *= base;
+    }
+    return result;
+}
+
 esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
 {
     uint8_t reg_value = 0;
@@ -193,25 +203,25 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
         goto fail;
     }
 
-    ESP_LOGD(TAG, "Pressure measurement rate: %i measurements / sec", (int)pow(2, config->pm_rate));
+    ESP_LOGD(TAG, "Pressure measurement rate: %i measurements / sec", pow_int(2, config->pm_rate));
     err = dps310_set_pm_rate(dev, config->pm_rate);
     if (err != ESP_OK)
     {
         goto fail;
     }
-    ESP_LOGD(TAG, "Pressure oversampling: %i time(s)", (int)pow(2, config->pm_prc));
+    ESP_LOGD(TAG, "Pressure oversampling: %i time(s)", pow_int(2, config->pm_prc));
     err = dps310_set_pm_prc(dev, config->pm_prc);
     if (err != ESP_OK)
     {
         goto fail;
     }
-    ESP_LOGD(TAG, "Temperature measurement rate: %i measurements / sec", (int)pow(2, config->tmp_rate));
+    ESP_LOGD(TAG, "Temperature measurement rate: %i measurements / sec", pow_int(2, config->tmp_rate));
     err = dps310_set_tmp_rate(dev, config->tmp_rate);
     if (err != ESP_OK)
     {
         goto fail;
     }
-    ESP_LOGD(TAG, "Temperature oversampling: %i time(s)", (int)pow(2, config->tmp_prc));
+    ESP_LOGD(TAG, "Temperature oversampling: %i time(s)", pow_int(2, config->tmp_prc));
     err = dps310_set_tmp_prc(dev, config->tmp_prc);
     if (err != ESP_OK)
     {
