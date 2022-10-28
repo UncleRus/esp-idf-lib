@@ -1,8 +1,8 @@
 ---
 components:
-  - name: dsp310
+  - name: dps310
     description: |
-      Driver for DSP310 barometric pressure sensor
+      Driver for DPS310 barometric pressure sensor
     group:
       name: pressure
     groups:
