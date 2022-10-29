@@ -656,7 +656,7 @@ esp_err_t dps310_read_raw(dps310_t *dev, uint8_t reg, int32_t *value)
     }
     *value = ((uint32_t)reg_values[0] << 16) | ((uint32_t)reg_values[1] << 8) | (uint32_t)reg_values[2];
     *value = two_complement_of(*value, DPS310_REG_SENSOR_VALUE_LEN * 8);
-    ESP_LOGD(TAG, "raw value in %s resister: %i", reg == DPS310_REG_TMP_B2 ? "temperature" : "pressure", *value);
+    ESP_LOGD(TAG, "raw value in %s resister: %" PRIi32, reg == DPS310_REG_TMP_B2 ? "temperature" : "pressure", *value);
 fail:
     return err;
 }
@@ -670,7 +670,7 @@ static float compensate_temp(dps310_t *dev, uint32_t T_raw, uint8_t rate)
     int32_t kT = 0;
 
     kT = scale_factors[rate];
-    ESP_LOGD(TAG, "kT: %i", kT);
+    ESP_LOGD(TAG, "kT: %" PRIi32, kT);
 
     /* scale_factors is a const, no divided by zero check */
     T_raw_scaled = (float)T_raw / (float)kT;

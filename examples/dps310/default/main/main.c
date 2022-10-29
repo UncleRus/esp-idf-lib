@@ -37,8 +37,8 @@ static const char *TAG = "dps310_example_default";
 void dps310_task(void *pvParameters)
 {
     bool ready = false;
-    uint8_t reg_value = 0;
-    uint8_t mode;
+    //uint8_t reg_value = 0;
+    //uint8_t mode;
     float temperature = 0;
     float pressure = 0;
     esp_err_t err = ESP_FAIL;
