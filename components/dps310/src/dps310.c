@@ -19,6 +19,9 @@
  *
  * ESP-IDF driver for DPS310. Sponserd by @beriberikix.
  *
+ * Note that the driver always tries to compensate raw values from the sensor.
+ * When compensation is not required, or undesired, users should implement
+ * their own functions to bypass compensation.
  */
 
 /* standard headers */
