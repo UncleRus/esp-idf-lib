@@ -40,11 +40,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Read a single byte from a 8-bit resister without locking,
- */
-esp_err_t _read_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
-
-/**
  * @brief Read a single byte from a 8-bit resister with locking.
  */
 esp_err_t _read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
@@ -56,11 +51,6 @@ esp_err_t _read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
  * value in the resister is `0b00010000`, `val` is `0b0001`.
  */
 esp_err_t _read_reg_mask(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t *val);
-
-/**
- * @brief Write a single byte to a 8-bit resister without locking.
- */
-esp_err_t _write_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t val);
 
 /**
  * @brief Write a single byte to a 8-bit resister with locking.

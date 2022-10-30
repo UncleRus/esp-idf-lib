@@ -37,6 +37,16 @@ extern "C" {
 
 static const char *TAG = "dps310/helper_i2c";
 
+/**
+ * @brief Read a single byte from a 8-bit resister without locking,
+ */
+inline esp_err_t _read_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
+
+/**
+ * @brief Write a single byte to a 8-bit resister without locking.
+ */
+inline esp_err_t _write_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t val);
+
 /* count the number of trailing zero in a value, usually bitmasks. */
 static uint8_t count_trailing_zero_bits(uint8_t v)
 {
