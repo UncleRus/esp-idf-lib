@@ -106,7 +106,7 @@ typedef enum {
 
 typedef enum {
     DPS310_TMP_SRC_INTERNAL = 0,    //!< Internal sensor (in ASIC)
-    DPS310_TMP_SRC_EXTERNAL = 1,         //!< External sensor (in pressure sensor MEMS element)
+    DPS310_TMP_SRC_EXTERNAL = 1,    //!< External sensor (in pressure sensor MEMS element)
 } dps310_tmp_src_ext_t;
 
 /**
@@ -293,14 +293,12 @@ typedef struct {
 #define DPS310_REG_COEF_SRCE    0x28
 
 /* various masks */
-#define DPS310_REG_ID_REV_MASK  0x0f
-#define DPS310_REG_ID_PROD_MASK 0xf0
+#define DPS310_REG_ID_REV_MASK              (0x0f)
+#define DPS310_REG_ID_PROD_MASK             (0xf0)
 #define DPS310_REG_RESET_FIFO_FLUSH_MASK    (1 << 7)
-#define DPS310_REG_RESET_SOFT_RST_MASK      0x0f
-#define DPS310_REG_PRS_CFG_PM_RATE_SHIFT    (4)
-#define DPS310_REG_PRS_CFG_PM_RATE_MASK     (0b111 << DPS310_REG_PRS_CFG_PM_RATE_SHIFT)
-#define DPS310_REG_PRS_CFG_TMP_RATE_SHIFT    (4)
-#define DPS310_REG_PRS_CFG_TMP_RATE_MASK     (0b111 << DPS310_REG_PRS_CFG_TMP_RATE_SHIFT)
+#define DPS310_REG_RESET_SOFT_RST_MASK      (0x0f)
+#define DPS310_REG_PRS_CFG_PM_RATE_MASK     (0b111 << 4)
+#define DPS310_REG_PRS_CFG_TMP_RATE_MASK    (0b111 << 4)
 #define DPS310_REG_PRS_CFG_PM_PRC_MASK      (0b1111)
 #define DPS310_REG_PRS_CFG_TMP_EXT_MASK     (1 << 7)
 #define DPS310_REG_TMP_CFG_TMP_PRC_MASK     (0b1111)
