@@ -48,7 +48,7 @@ inline esp_err_t _read_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t *val);
 inline esp_err_t _write_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t val);
 
 /* count the number of trailing zero in a value, usually bitmasks. */
-static uint8_t count_trailing_zero_bits(uint8_t v)
+static uint8_t _count_trailing_zero_bits(uint8_t v)
 {
     uint8_t count = 0;
     if (v)
@@ -89,7 +89,7 @@ esp_err_t _read_reg_mask(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t *val
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, _read_reg_nolock(dev, reg, &reg_value));
     I2C_DEV_GIVE_MUTEX(dev);
-    *val = (reg_value & mask) >> count_trailing_zero_bits(mask);
+    *val = (reg_value & mask) >> _count_trailing_zero_bits(mask);
     ESP_LOGV(TAG, "reg_value: %02X, val: %02X", reg_value, *val);
     return ESP_OK;
 }
@@ -107,7 +107,7 @@ esp_err_t _update_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t 
     CHECK_ARG(dev);
     CHECK(_read_reg_nolock(dev, reg, &reg_value));
 
-    n_shift = count_trailing_zero_bits(mask);
+    n_shift = _count_trailing_zero_bits(mask);
     if (((reg_value >> n_shift) & val) == val)
     {
         ESP_LOGD(TAG, "register unchanged");

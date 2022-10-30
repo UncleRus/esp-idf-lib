@@ -18,6 +18,9 @@
  * A private header for I2C interface. Most of them are a wrapper of i2cdev
  * functions.
  *
+ * Functions in the header should be prefixed with `_` to indicate they are
+ * a private function.
+ *
  * A postfix, `_nolock` in function name means the function does not acquire
  * I2C lock in `i2cdev`.
  */
