@@ -396,7 +396,7 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config);
  * Perform "soft reset" and ensure the chip is fully functional by delaying
  * `DPS310_STARTUP_DELAY_MS`.
  *
- * @param[in] dev Device descriptor
+ * @param[in] dev The device descriptor
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_reset(dps310_t *dev);
@@ -404,7 +404,7 @@ esp_err_t dps310_reset(dps310_t *dev);
 /**
  * @brief Get pressure measurement rate.
  *
- * @param[in] dev pointer to the device descriptor
+ * @param[in] dev The device descriptor
  * @param[out] value the value in the resister
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
@@ -414,7 +414,7 @@ esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set pressure measurement rate.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
@@ -423,7 +423,7 @@ esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value);
 /**
  * @brief Get temperature measurement rate.
  *
- * @param[in] dev pointer to the device descriptor
+ * @param[in] dev The device descriptor
  * @param[out] value the value in the resister
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
@@ -433,7 +433,7 @@ esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set temperature measurement rate.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
@@ -442,7 +442,7 @@ esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value);
 /**
  * @brief Get pressure oversampling rate.
  *
- * @param[in] dev pointer to the device descriptor
+ * @param[in] dev The device descriptor
  * @param[out] value the value in the resister
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
@@ -452,7 +452,7 @@ esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set pressure oversampling rate.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
@@ -461,7 +461,7 @@ esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value);
 /**
  * @brief Get temperature oversampling rate.
  *
- * @param[in] dev pointer to the device descriptor
+ * @param[in] dev The device descriptor
  * @param[out] value the value in the resister
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
@@ -471,7 +471,7 @@ esp_err_t dps310_get_tmp_prc(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set temperature oversampling rate.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
@@ -480,7 +480,7 @@ esp_err_t dps310_set_tmp_prc(dps310_t *dev, dps310_pm_rate_t value);
 /**
  * @brief Get temperature measurement source.
  *
- * @param[in] dev the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[out] value the value in the resister.
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
@@ -489,7 +489,7 @@ esp_err_t dps310_get_tmp_ext(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set temperature measurement source.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
@@ -498,7 +498,7 @@ esp_err_t dps310_set_tmp_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
 /**
  * @brief Set temperature coefficient source.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
@@ -507,7 +507,7 @@ esp_err_t dps310_set_tmp_coef_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
 /**
  * @brief Get interupt active level.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[out] value the value in the resister.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
@@ -516,7 +516,7 @@ esp_err_t dps310_get_int_hl(dps310_t *dev, uint8_t *value);
 /**
  * @brief Set interupt active level.
  *
- * @param[in] dev The pointer to the device descriptor.
+ * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
