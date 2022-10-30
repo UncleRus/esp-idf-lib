@@ -775,6 +775,27 @@ esp_err_t dps310_is_ready_for_temp(dps310_t *dev, bool *ready);
  */
 esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready);
 
+/**
+ * @brief Reset undocumented internal resisters.
+ *
+ * The function is supposed to fix an issue in the sensor by writing magic
+ * values to magic resisters. However, the issue is not documented. The
+ * latest datasheet does not mention the issue, nor an errata.
+ *
+ * After issuing magic commands, the function re-reads COEF so that the
+ * subsequent temperature reads return compensated values.
+ *
+ * See:
+ * https://github.com/Infineon/DPS310-Pressure-Sensor#temperature-measurement-issue
+ * https://github.com/Infineon/DPS310-Pressure-Sensor/blob/3edb0e58dfd7691491ae8d7f6a86277b001ad93f/src/DpsClass.cpp#L442-L461
+ * https://github.com/Infineon/DPS310-Pressure-Sensor/blob/ed02f803fc780cbcab54ed8b35dd3d718f2ebbda/src/Dps310.cpp#L84-L86
+ * https://github.com/Infineon/DPS310-Pressure-Sensor/issues/15#issuecomment-475394536
+ *
+ * @param[in] dev The device descriptor.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_quirk(dps310_t *dev);
+
 #ifdef __cplusplus
 }
 #endif

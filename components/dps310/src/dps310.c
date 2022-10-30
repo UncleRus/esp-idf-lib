@@ -58,12 +58,6 @@ static const int32_t scale_factors[N_SCALE_FACTORS] = {
     2088960
 };
 
-/* a magic function to reset undocumented resisters to workaround an unknown
- * issue.
- *
- * https://github.com/Infineon/DPS310-Pressure-Sensor/blob/3edb0e58dfd7691491ae8d7f6a86277b001ad93f/src/DpsClass.cpp#L442-L461
- * https://github.com/Infineon/DPS310-Pressure-Sensor/issues/15#issuecomment-475394536
- */
 esp_err_t dps310_quirk(dps310_t *dev)
 {
     esp_err_t err = ESP_FAIL;
@@ -87,14 +81,23 @@ esp_err_t dps310_quirk(dps310_t *dev)
         err = _write_reg(&dev->i2c_dev, reg, &value);
         if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "_write_reg(): %s at 0x%02X", esp_err_to_name(err), reg);
+            ESP_LOGE(TAG, "_write_reg(): %s (reg: 0x%02X)", esp_err_to_name(err), reg);
             break;
         }
     }
+    if (err != ESP_OK)
+    {
+        goto fail;
+    }
+    ESP_LOGD(TAG, "dps310_quirk(): reading COEF");
+    err = dps310_get_coef(dev);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_coef(): %s", esp_err_to_name(err));
+        goto fail;
+    }
 
-    /* TODO read temperature once here
-     * measureTempOnce(trash);
-     */
+fail:
     return err;
 }
 
