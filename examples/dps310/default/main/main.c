@@ -54,8 +54,8 @@ void dps310_task(void *pvParameters)
     memset(&dev, 0, sizeof(dps310_t));
 
     /* Modify dps310_config_t */
-    config.tmp_prc = DPS310_TMP_PRC_128;
-    config.pm_prc = DPS310_PM_PRC_128;
+    config.tmp_oversampling = DPS310_TMP_PRC_128;
+    config.pm_oversampling = DPS310_PM_PRC_128;
 
     /* Initialize the I2C */
     ESP_LOGI(TAG, "Initializing I2C");

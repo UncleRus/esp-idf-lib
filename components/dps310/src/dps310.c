@@ -210,25 +210,25 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
     }
 
     ESP_LOGD(TAG, "Pressure measurement rate: %i measurements / sec", pow_int(2, config->pm_rate));
-    err = dps310_set_pm_rate(dev, config->pm_rate);
+    err = dps310_set_rate_p(dev, config->pm_rate);
     if (err != ESP_OK)
     {
         goto fail;
     }
-    ESP_LOGD(TAG, "Pressure oversampling: %i time(s)", pow_int(2, config->pm_prc));
-    err = dps310_set_pm_prc(dev, config->pm_prc);
+    ESP_LOGD(TAG, "Pressure oversampling: %i time(s)", pow_int(2, config->pm_oversampling));
+    err = dps310_set_oversampling_p(dev, config->pm_oversampling);
     if (err != ESP_OK)
     {
         goto fail;
     }
     ESP_LOGD(TAG, "Temperature measurement rate: %i measurements / sec", pow_int(2, config->tmp_rate));
-    err = dps310_set_tmp_rate(dev, config->tmp_rate);
+    err = dps310_set_rate_t(dev, config->tmp_rate);
     if (err != ESP_OK)
     {
         goto fail;
     }
-    ESP_LOGD(TAG, "Temperature oversampling: %i time(s)", pow_int(2, config->tmp_prc));
-    err = dps310_set_tmp_prc(dev, config->tmp_prc);
+    ESP_LOGD(TAG, "Temperature oversampling: %i time(s)", pow_int(2, config->tmp_oversampling));
+    err = dps310_set_oversampling_t(dev, config->tmp_oversampling);
     if (err != ESP_OK)
     {
         goto fail;
@@ -273,7 +273,7 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
     }
 
     ESP_LOGD(TAG, "Temperature result bit-shift: %s", config->t_shift_mode == DPS310_T_SHIFT_ENABLE ? "enabled" : "disabled");
-    if (config->tmp_prc > DPS310_TMP_PRC_8 && config->t_shift_mode != DPS310_T_SHIFT_ENABLE)
+    if (config->tmp_oversampling > DPS310_TMP_PRC_8 && config->t_shift_mode != DPS310_T_SHIFT_ENABLE)
     {
         ESP_LOGW(TAG, "Temperature result bit-shift must be enabled, but is disabled. Set DPS310_T_SHIFT_ENABLE");
     }
@@ -284,7 +284,7 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
     }
 
     ESP_LOGD(TAG, "Pressure result bit-shift: %s", config->p_shift_mode == DPS310_P_SHIFT_ENABLE ? "enabled" : "disabled");
-    if (config->pm_prc > DPS310_PM_PRC_8 && config->p_shift_mode != DPS310_P_SHIFT_ENABLE)
+    if (config->pm_oversampling > DPS310_PM_PRC_8 && config->p_shift_mode != DPS310_P_SHIFT_ENABLE)
     {
         ESP_LOGW(TAG, "Pressure result bit-shift must be enabled, but is disabled. Set DPS310_P_SHIFT_ENABLE");
     }
@@ -314,28 +314,28 @@ fail:
     return err;
 }
 
-esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value)
+esp_err_t dps310_get_rate_p(dps310_t *dev, uint8_t *value)
 {
     CHECK_ARG(dev && value);
 
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_RATE_MASK, value);
 }
 
-esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value)
+esp_err_t dps310_set_rate_p(dps310_t *dev, dps310_pm_rate_t value)
 {
     CHECK_ARG(dev);
 
     return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_RATE_MASK, value);
 }
 
-esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value)
+esp_err_t dps310_get_rate_t(dps310_t *dev, uint8_t *value)
 {
     CHECK_ARG(dev && value);
 
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_PRS_CFG_TMP_RATE_MASK, value);
 }
 
-esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value)
+esp_err_t dps310_set_rate_t(dps310_t *dev, dps310_tmp_rate_t value)
 {
     CHECK_ARG(dev);
 
@@ -361,28 +361,28 @@ fail:
     return err;
 }
 
-esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value)
+esp_err_t dps310_get_oversampling_p(dps310_t *dev, uint8_t *value)
 {
     CHECK_ARG(dev && value);
 
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
 }
 
-esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value)
+esp_err_t dps310_set_oversampling_p(dps310_t *dev, dps310_pm_oversampling_t value)
 {
     CHECK_ARG(dev);
 
     return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
 }
 
-esp_err_t dps310_get_tmp_prc(dps310_t *dev, uint8_t *value)
+esp_err_t dps310_get_oversampling_t(dps310_t *dev, uint8_t *value)
 {
     CHECK_ARG(dev && value);
 
     return _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
 }
 
-esp_err_t dps310_set_tmp_prc(dps310_t *dev, dps310_pm_rate_t value)
+esp_err_t dps310_set_oversampling_t(dps310_t *dev, dps310_pm_oversampling_t value)
 {
     CHECK_ARG(dev);
 
@@ -694,17 +694,17 @@ esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure)
     uint8_t T_rate = 0;
     uint8_t P_rate = 0;
 
-    err = dps310_get_tmp_prc(dev, &T_rate);
+    err = dps310_get_oversampling_t(dev, &T_rate);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "dps310_get_tmp_prc(): %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "dps310_get_oversampling_t(): %s", esp_err_to_name(err));
         goto fail;
     }
 
-    err = dps310_get_pm_prc(dev, &P_rate);
+    err = dps310_get_oversampling_p(dev, &P_rate);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "dps310_get_pm_prc(): %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "dps310_get_oversampling_p(): %s", esp_err_to_name(err));
         goto fail;
     }
 
@@ -731,10 +731,10 @@ esp_err_t dps310_read_temp(dps310_t *dev, float *temperature)
     int32_t T_raw = 0;
     uint8_t rate = 0;
 
-    err = dps310_get_tmp_prc(dev, &rate);
+    err = dps310_get_oversampling_t(dev, &rate);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "dps310_get_tmp_prc(): %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "dps310_get_oversampling_t(): %s", esp_err_to_name(err));
         goto fail;
     }
     err = dps310_read_raw(dev, DPS310_REG_TMP_B2, &T_raw);

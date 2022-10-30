@@ -97,7 +97,7 @@ typedef enum {
     DPS310_PM_PRC_32  = 0b101, //!<  32 times
     DPS310_PM_PRC_64  = 0b110, //!<  64 times (High Precision)
     DPS310_PM_PRC_128 = 0b111, //!< 128 times
-} dps310_pm_prc_t;
+} dps310_pm_oversampling_t;
 
 /**
  * Temperature measurement source. Used for temperature measurement and
@@ -135,7 +135,7 @@ typedef enum {
     DPS310_TMP_PRC_32  = 0b101, //!<  32 times
     DPS310_TMP_PRC_64  = 0b110, //!<  64 times (High Precision)
     DPS310_TMP_PRC_128 = 0b111, //!< 128 times
-} dps310_tmp_prc_t;
+} dps310_tmp_oversampling_t;
 
 /**
  * Interupt (on SDO pin) active level.
@@ -210,9 +210,9 @@ typedef enum {
  */
 typedef struct {
     dps310_pm_rate_t pm_rate;
-    dps310_pm_prc_t pm_prc;
+    dps310_pm_oversampling_t pm_oversampling;
     dps310_tmp_rate_t tmp_rate;
-    dps310_tmp_prc_t tmp_prc;
+    dps310_tmp_oversampling_t tmp_oversampling;
     dps310_tmp_src_ext_t tmp_src;
     dps310_tmp_src_ext_t tmp_coef;
     dps310_int_fifo_mode_t int_fifo_mode;
@@ -231,9 +231,9 @@ typedef struct {
 
 #define DPS310_CONFIG_DEFAULT() { \
     .pm_rate = DPS310_PM_RATE_1, \
-    .pm_prc = DPS310_PM_PRC_16, \
+    .pm_oversampling = DPS310_PM_PRC_16, \
     .tmp_rate = DPS310_TMP_RATE_1, \
-    .tmp_prc = DPS310_TMP_PRC_16, \
+    .tmp_oversampling = DPS310_TMP_PRC_16, \
     .tmp_src = DPS310_TMP_SRC_EXTERNAL, \
     .tmp_coef = DPS310_TMP_SRC_EXTERNAL, \
     .int_fifo_mode = DPS310_INT_FIFO_DISABLE, \
@@ -407,7 +407,7 @@ esp_err_t dps310_reset(dps310_t *dev);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_rate_p(dps310_t *dev, uint8_t *value);
 
 /**
  * @brief Set pressure measurement rate.
@@ -416,7 +416,7 @@ esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value);
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value);
+esp_err_t dps310_set_rate_p(dps310_t *dev, dps310_pm_rate_t value);
 
 /**
  * @brief Get temperature measurement rate.
@@ -426,7 +426,7 @@ esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_rate_t(dps310_t *dev, uint8_t *value);
 
 /**
  * @brief Set temperature measurement rate.
@@ -435,7 +435,7 @@ esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value);
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value);
+esp_err_t dps310_set_rate_t(dps310_t *dev, dps310_tmp_rate_t value);
 
 /**
  * @brief Get pressure oversampling rate.
@@ -445,7 +445,7 @@ esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_oversampling_p(dps310_t *dev, uint8_t *value);
 
 /**
  * @brief Set pressure oversampling rate.
@@ -454,7 +454,7 @@ esp_err_t dps310_get_pm_prc(dps310_t *dev, uint8_t *value);
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value);
+esp_err_t dps310_set_oversampling_p(dps310_t *dev, dps310_pm_oversampling_t value);
 
 /**
  * @brief Get temperature oversampling rate.
@@ -464,7 +464,7 @@ esp_err_t dps310_set_pm_prc(dps310_t *dev, dps310_pm_rate_t value);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_tmp_prc(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_oversampling_t(dps310_t *dev, uint8_t *value);
 
 /**
  * @brief Set temperature oversampling rate.
@@ -473,7 +473,7 @@ esp_err_t dps310_get_tmp_prc(dps310_t *dev, uint8_t *value);
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_set_tmp_prc(dps310_t *dev, dps310_pm_rate_t value);
+esp_err_t dps310_set_oversampling_t(dps310_t *dev, dps310_pm_oversampling_t value);
 
 /**
  * @brief Get temperature measurement source.
