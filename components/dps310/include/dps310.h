@@ -352,14 +352,9 @@ typedef struct {
 /**
  * @brief Initialize device descriptor
  *
- * The device descriptor is dynamically allocated by the driver, and keeps its
- * internal states. The returned device descriptor is not public, and should
- * not be directly touched by user code. The device descriptor must be freed
- * by `dps310_free_desc()`.
- *
- * @param dev[out] Device descriptor. Must be NULL.
- * @param addr[in] DPS310 I2C address
- * @param port[in] I2C port number.
+ * @param dev[out] The device descriptor.
+ * @param addr[in] DPS310's I2C address
+ * @param port[in] I2C port number to use.
  *                 See available I2C port at:
  *                 https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html#_CPPv410i2c_port_t
  * @param sda_gpio[in] GPIO pin for SDA
