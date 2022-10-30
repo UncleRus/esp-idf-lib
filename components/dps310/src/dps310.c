@@ -316,22 +316,9 @@ fail:
 
 esp_err_t dps310_get_pm_rate(dps310_t *dev, uint8_t *value)
 {
-    uint8_t reg_value = 0;
-    esp_err_t err = ESP_FAIL;
-
     CHECK_ARG(dev && value);
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    err = i2c_dev_read_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, &reg_value, 1);
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "i2c_dev_read_reg(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    *value = (reg_value & DPS310_REG_PRS_CFG_PM_RATE_MASK) >> DPS310_REG_PRS_CFG_PM_RATE_SHIFT;
-fail:
-    return err;
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_RATE_MASK, value);
 }
 
 esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value)
@@ -343,22 +330,9 @@ esp_err_t dps310_set_pm_rate(dps310_t *dev, dps310_pm_rate_t value)
 
 esp_err_t dps310_get_tmp_rate(dps310_t *dev, uint8_t *value)
 {
-    uint8_t reg_value = 0;
-    esp_err_t err = ESP_FAIL;
-
     CHECK_ARG(dev && value);
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    err = i2c_dev_read_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, &reg_value, 1);
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "i2c_dev_read_reg(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    *value = (reg_value & DPS310_REG_PRS_CFG_TMP_RATE_MASK) >> DPS310_REG_PRS_CFG_TMP_RATE_SHIFT;
-fail:
-    return err;
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_PRS_CFG_TMP_RATE_MASK, value);
 }
 
 esp_err_t dps310_set_tmp_rate(dps310_t *dev, dps310_tmp_rate_t value)
