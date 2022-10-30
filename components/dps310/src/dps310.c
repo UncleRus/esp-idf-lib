@@ -751,7 +751,7 @@ fail:
 esp_err_t dps310_is_ready_for(dps310_t *dev, uint8_t reg, uint8_t mask, bool *ready)
 {
     esp_err_t err = ESP_FAIL;
-    uint8_t reg_value;
+    uint8_t reg_value = 0;
 
     err = _read_reg_mask(&dev->i2c_dev, reg, mask, &reg_value);
     if (err != ESP_OK)
