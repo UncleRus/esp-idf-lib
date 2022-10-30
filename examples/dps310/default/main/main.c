@@ -150,7 +150,7 @@ void dps310_task(void *pvParameters)
         ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
         goto fail;
     }
-    ESP_LOGI(TAG, "Temperature: %0.2f", temperature);
+    ESP_LOGI(TAG, "Temperature: %0.2f °C", temperature);
 
     /* Pressure command mode
      *
@@ -195,7 +195,7 @@ void dps310_task(void *pvParameters)
         ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
         goto fail;
     }
-    ESP_LOGI(TAG, "Pressure: %0.2f", pressure);
+    ESP_LOGI(TAG, "Pressure: %0.2f Pa", pressure);
 
     ESP_LOGI(TAG, "Starting the loop");
     while (1) {
