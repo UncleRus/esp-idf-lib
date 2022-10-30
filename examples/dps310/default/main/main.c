@@ -118,87 +118,87 @@ void dps310_task(void *pvParameters)
         goto fail;
     }
 
-    /* Temperature command mode.
-     *
-     * The sensor measures temperature once, stores the raw value in a
-     * resister, and sets TMP_RDY bit. The sensor goes back to standby mode
-     * after measurement.
-     */
-    ESP_LOGI(TAG, "Setting manual temperature measurement mode");
-    err = dps310_set_mode(&dev, DPS310_MODE_COMMAND_TEMPERATURE);
-    if (err != ESP_OK)
-    {
-        goto fail;
-    }
-
-    /* wait for the result by polling TMP_RDY bit */
-    ESP_LOGI(TAG, "Waiting for the temperature value to be ready");
-    do
-    {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        err = dps310_is_ready_for_temp(&dev, &temperature_ready);
-        if (err != ESP_OK)
-        {
-            goto fail;
-        }
-    } while (!temperature_ready);
-
-    /* Read the result of temperature measurement */
-    err = dps310_read_temp(&dev, &temperature);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    ESP_LOGI(TAG, "Temperature: %0.2f °C", temperature);
-
-    /* Pressure command mode
-     *
-     * The sensor measures pressure once, stores the raw value in a resister,
-     * and sets PRS_RDY bit. The sensor goes back to standby mode after
-     * measurement.
-     */
-    ESP_LOGI(TAG, "Setting manual pressure measurement mode");
-    err = dps310_set_mode(&dev, DPS310_MODE_COMMAND_PRESSURE);
-    if (err != ESP_OK)
-    {
-        goto fail;
-    }
-
-    /* wait for the result by polling PRS_RDY bit */
-    ESP_LOGI(TAG, "Waiting for the pressure value to be ready");
-    do
-    {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        err = dps310_is_ready_for_pressure(&dev, &pressure_ready);
-        if (err != ESP_OK)
-        {
-            goto fail;
-        }
-    } while (!pressure_ready);
-
-    /* Read the result of pressure measurement, and compensate the result with
-     * temperature and COEF.
-     *
-     * Note that dps310_read_pressure() reads temperature *and* pressure
-     * values for compensation, including oversampling rates.
-     *
-     * This implies:
-     *
-     * * temperature measurement must be done brefore dps310_read_pressure()
-     *   at least once.
-     * * the function is slow.
-     */
-    err = dps310_read_pressure(&dev, &pressure);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-    ESP_LOGI(TAG, "Pressure: %0.2f Pa", pressure);
-
     ESP_LOGI(TAG, "Starting the loop");
     while (1) {
+
+        /* Temperature command mode.
+         *
+         * The sensor measures temperature once, stores the raw value in a
+         * resister, and sets TMP_RDY bit. The sensor goes back to standby mode
+         * after measurement.
+         */
+        ESP_LOGI(TAG, "Setting manual temperature measurement mode");
+        err = dps310_set_mode(&dev, DPS310_MODE_COMMAND_TEMPERATURE);
+        if (err != ESP_OK)
+        {
+            goto fail;
+        }
+
+        /* wait for the result by polling TMP_RDY bit */
+        ESP_LOGI(TAG, "Waiting for the temperature value to be ready");
+        do
+        {
+            vTaskDelay(pdMS_TO_TICKS(10));
+            err = dps310_is_ready_for_temp(&dev, &temperature_ready);
+            if (err != ESP_OK)
+            {
+                goto fail;
+            }
+        } while (!temperature_ready);
+
+        /* Read the result of temperature measurement */
+        err = dps310_read_temp(&dev, &temperature);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+        ESP_LOGI(TAG, "Temperature: %0.2f °C", temperature);
+
+        /* Pressure command mode
+         *
+         * The sensor measures pressure once, stores the raw value in a resister,
+         * and sets PRS_RDY bit. The sensor goes back to standby mode after
+         * measurement.
+         */
+        ESP_LOGI(TAG, "Setting manual pressure measurement mode");
+        err = dps310_set_mode(&dev, DPS310_MODE_COMMAND_PRESSURE);
+        if (err != ESP_OK)
+        {
+            goto fail;
+        }
+
+        /* wait for the result by polling PRS_RDY bit */
+        ESP_LOGI(TAG, "Waiting for the pressure value to be ready");
+        do
+        {
+            vTaskDelay(pdMS_TO_TICKS(10));
+            err = dps310_is_ready_for_pressure(&dev, &pressure_ready);
+            if (err != ESP_OK)
+            {
+                goto fail;
+            }
+        } while (!pressure_ready);
+
+        /* Read the result of pressure measurement, and compensate the result with
+         * temperature and COEF.
+         *
+         * Note that dps310_read_pressure() reads temperature *and* pressure
+         * values for compensation, including oversampling rates.
+         *
+         * This implies:
+         *
+         * * temperature measurement must be done brefore dps310_read_pressure()
+         *   at least once.
+         * * the function is slow.
+         */
+        err = dps310_read_pressure(&dev, &pressure);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+        ESP_LOGI(TAG, "Pressure: %0.2f Pa", pressure);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
