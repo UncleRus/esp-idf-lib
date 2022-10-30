@@ -5,9 +5,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "mpu6050.h"
 #include <esp_err.h>
 #include <esp_log.h>
+#include <mpu6050.h>
 
 #ifdef CONFIG_EXAMPLE_MPU6050_ADDRESS_HIGH
 #define MPU6050_ADDR (MPU6050_ADDRESS_HIGH)
@@ -82,5 +82,7 @@ void mpu6050_test(void *pvParameters)
 void app_main()
 {
     // task
-    xTaskCreate(mpu6050_test, "mpu6050_device1", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    ESP_ERROR_CHECK(i2cdev_init());
+    xTaskCreate(mpu6050_test, "mpu6050_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);
+    return;
 }

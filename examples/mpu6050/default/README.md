@@ -21,40 +21,48 @@ resistors.
 ## Logs
 
 ```
-I (300) spi_flash: flash io: dio
-W (303) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
-I (318) cpu_start: Starting scheduler on PRO CPU.
+I (317) cpu_start: Starting scheduler on PRO CPU.
 I (0) cpu_start: Starting scheduler on APP CPU.
-I (0) mpu6050_test: sda 21, scl 22 clk freq 100000 addr 0x68
-W (10) mpu6050_test: [mpu6050_test, 41]: mpu6050 initilized.
-I (10) mpu6050_test: Testing connection...
-I (20) mpu6050_test: MPU6050 connection successful
-I (20) mpu6050_test: Reading internal sensor offsets...
-I (30) mpu6050_test: accel x offset: -1386
-I (30) mpu6050_test: accel y offset: 583
-I (40) mpu6050_test: accel z offset: 1280
-I (40) mpu6050_test: gyro x offset: 0
-I (50) mpu6050_test: gyro y offset: 0
-I (50) mpu6050_test: gyro z offset: 0
-I (60) mpu6050_test: enable sensor temp
-I (5060) mpu6050_test: Acceleration: x: <-6520> 	 y: <-14560> 	 z: <1992>
-I (5060) mpu6050_test:     Rotation: x: <-375> 	 y: <-622> 	 z: <97>
-I (5060) mpu6050_test: temperature 32
-I (10070) mpu6050_test: Acceleration: x: <-6004> 	 y: <-14896> 	 z: <2404>
-I (10070) mpu6050_test:     Rotation: x: <-173> 	 y: <-852> 	 z: <108>
-I (10070) mpu6050_test: temperature 32
-I (15070) mpu6050_test: Acceleration: x: <-5324> 	 y: <-15088> 	 z: <2860>
-I (15070) mpu6050_test:     Rotation: x: <-81> 	 y: <-573> 	 z: <-175>
-I (15070) mpu6050_test: temperature 32
-I (20070) mpu6050_test: Acceleration: x: <-5352> 	 y: <-14916> 	 z: <3540>
-I (20070) mpu6050_test:     Rotation: x: <-269> 	 y: <-362> 	 z: <-152>
-I (20070) mpu6050_test: temperature 32
-I (25080) mpu6050_test: Acceleration: x: <-5016> 	 y: <-14936> 	 z: <3808>
-I (25080) mpu6050_test:     Rotation: x: <-455> 	 y: <-1007> 	 z: <182>
-I (25080) mpu6050_test: temperature 32
-I (30090) mpu6050_test: Acceleration: x: <-4336> 	 y: <-14572> 	 z: <6236>
-I (30090) mpu6050_test:     Rotation: x: <50> 	 y: <-274> 	 z: <128>
-I (30090) mpu6050_test: temperature 32
-
+I (0) mpu6050_test: mpu6050 config: addr 0x68, sda 21, scl 22, clk, 100000 port 1
+I (4342) mpu6050_test: mpu6050 connection successfull.
+I (4342) mpu6050_test: **********************************************************************
+I (4342) mpu6050_test: Rotation:	x=-132	y=-1046	z=782
+I (4352) mpu6050_test: Acceleration:	x=7624	y=-4688	z=14480
+I (4352) mpu6050_test: **********************************************************************
+I (4362) mpu6050_test: temp 31
+I (5362) mpu6050_test: **********************************************************************
+I (5362) mpu6050_test: Rotation:	x=-725	y=201	z=85
+I (5362) mpu6050_test: Acceleration:	x=7652	y=-5252	z=14076
+I (5372) mpu6050_test: **********************************************************************
+I (5372) mpu6050_test: temp 31
+I (6382) mpu6050_test: **********************************************************************
+I (6382) mpu6050_test: Rotation:	x=-861	y=-868	z=392
+I (6382) mpu6050_test: Acceleration:	x=6616	y=-5840	z=13808
+I (6392) mpu6050_test: **********************************************************************
+I (6392) mpu6050_test: temp 31
+I (7402) mpu6050_test: **********************************************************************
+I (7402) mpu6050_test: Rotation:	x=-1207	y=1410	z=929
+I (7402) mpu6050_test: Acceleration:	x=5712	y=-6824	z=14108
+I (7412) mpu6050_test: **********************************************************************
+I (7422) mpu6050_test: temp 31
+I (8422) mpu6050_test: **********************************************************************
+I (8422) mpu6050_test: Rotation:	x=-876	y=-169	z=876
+I (8422) mpu6050_test: Acceleration:	x=3496	y=-11652	z=11276
+I (8432) mpu6050_test: **********************************************************************
+I (8442) mpu6050_test: temp 31
+I (9442) mpu6050_test: **********************************************************************
+I (9442) mpu6050_test: Rotation:	x=-774	y=-338	z=104
+I (9442) mpu6050_test: Acceleration:	x=3064	y=-12676	z=10192
+I (9452) mpu6050_test: **********************************************************************
+I (9462) mpu6050_test: temp 31
+I (10462) mpu6050_test: **********************************************************************
+I (10462) mpu6050_test: Rotation:	x=-319	y=-373	z=112
+I (10462) mpu6050_test: Acceleration:	x=2908	y=-13160	z=9800
+I (10472) mpu6050_test: **********************************************************************
+I (10482) mpu6050_test: temp 31
+I (11482) mpu6050_test: **********************************************************************
+I (11482) mpu6050_test: Rotation:	x=-143	y=-282	z=152
+I (11482) mpu6050_test: Acceleration:	x=2768	y=-13268	z=9296
+I (11492) mpu6050_test: **********************************************************************
 
 ```
