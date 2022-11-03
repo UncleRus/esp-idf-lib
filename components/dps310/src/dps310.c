@@ -27,6 +27,7 @@
 /* standard headers */
 #include <inttypes.h>
 #include <string.h>
+#include <assert.h>
 
 /* esp-idf headers */
 #include <freertos/FreeRTOS.h>
@@ -60,8 +61,12 @@ static const int32_t scale_factors[N_SCALE_FACTORS] = {
 
 esp_err_t dps310_quirk(dps310_t *dev)
 {
+    bool sensor_ready = false;
+    bool coef_ready = false;
+    bool temp_ready = false;
     esp_err_t err = ESP_FAIL;
     const int magic_command_len = 5;
+    float ignore = 0;
     const uint8_t magic_commands[5][2] = {
 
         /* reg address, value */
@@ -89,11 +94,59 @@ esp_err_t dps310_quirk(dps310_t *dev)
     {
         goto fail;
     }
+    vTaskDelay(pdMS_TO_TICKS(DPS310_STARTUP_DELAY_MS));
+
+    do
+    {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        err = dps310_is_ready_for_sensor(dev, &sensor_ready);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dps310_is_ready_for_sensor(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+
+        err = dps310_is_ready_for_coef(dev, &coef_ready);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dps310_is_ready_for_coef(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+
+    } while (!sensor_ready || !coef_ready);
+
     ESP_LOGD(TAG, "dps310_quirk(): reading COEF");
     err = dps310_get_coef(dev);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_get_coef(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "dps310_quirk(): setting mode to DPS310_MODE_COMMAND_TEMPERATURE");
+    err = dps310_set_mode(dev, DPS310_MODE_COMMAND_TEMPERATURE);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "dps310_set_mode(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "dps310_quirk(): waiting for TMP_RDY");
+    do
+    {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        err = dps310_is_ready_for_temp(dev, &temp_ready);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dps310_is_ready_for_temp(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    } while (!temp_ready);
+
+    ESP_LOGD(TAG, "dps310_quirk(): reading temperature");
+    err = dps310_read_temp(dev, &ignore);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
         goto fail;
     }
 
@@ -209,6 +262,13 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
         goto fail;
     }
 
+    err = dps310_quirk(dev);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_quirk(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
     ESP_LOGD(TAG, "Pressure measurement rate: %i measurements / sec", pow_int(2, config->pm_rate));
     err = dps310_set_rate_p(dev, config->pm_rate);
     if (err != ESP_OK)
@@ -301,13 +361,6 @@ esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config)
         goto fail;
     }
 
-    err = dps310_quirk(dev);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "dps310_quirk(): %s", esp_err_to_name(err));
-        goto fail;
-    }
-
     err = ESP_OK;
 
 fail:
@@ -363,30 +416,58 @@ fail:
 
 esp_err_t dps310_get_oversampling_p(dps310_t *dev, uint8_t *value)
 {
-    CHECK_ARG(dev && value);
+    esp_err_t err = ESP_FAIL;
 
-    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
+    CHECK_ARG(dev && value);
+    err = _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
+    if (err == ESP_OK)
+    {
+        /* XXX when new p_rate is available, always keep it in dev as a cache */
+        dev->p_rate = *value;
+    }
+    return err;
 }
 
 esp_err_t dps310_set_oversampling_p(dps310_t *dev, dps310_pm_oversampling_t value)
 {
-    CHECK_ARG(dev);
+    esp_err_t err = ESP_FAIL;
 
-    return _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
+    CHECK_ARG(dev);
+    err = _update_reg(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_PRC_MASK, value);
+    if (err == ESP_OK)
+    {
+        /* XXX when new p_rate is available, always keep it in dev as a cache */
+        dev->p_rate = value;
+    }
+    return err;
 }
 
 esp_err_t dps310_get_oversampling_t(dps310_t *dev, uint8_t *value)
 {
-    CHECK_ARG(dev && value);
+    esp_err_t err = ESP_FAIL;
 
-    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
+    CHECK_ARG(dev && value);
+    err = _read_reg_mask(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
+    if (err == ESP_OK)
+    {
+        /* XXX when new t_rate is available, always keep it in dev as a cache */
+        dev->t_rate = *value;
+    }
+    return err;
 }
 
 esp_err_t dps310_set_oversampling_t(dps310_t *dev, dps310_pm_oversampling_t value)
 {
-    CHECK_ARG(dev);
+    esp_err_t err = ESP_FAIL;
 
-    return _update_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
+    CHECK_ARG(dev);
+    err = _update_reg(&dev->i2c_dev, DPS310_REG_TMP_CFG, DPS310_REG_TMP_CFG_TMP_PRC_MASK, value);
+    if (err == ESP_OK)
+    {
+        /* XXX when new t_rate is available, always keep it in dev as a cache */
+        dev->t_rate = value;
+    }
+    return err;
 }
 
 esp_err_t dps310_get_tmp_ext(dps310_t *dev, uint8_t *value)
@@ -641,23 +722,31 @@ fail:
     return err;
 }
 
+/* calcurate and return kT, or kP. */
+static float raw_to_scaled(int32_t raw, uint8_t rate)
+{
+    int32_t k = 0;
+
+    assert(rate <= N_SCALE_FACTORS - 1);
+    k = scale_factors[rate];
+    ESP_LOGD(TAG, "scale_factor: %" PRIi32, k);
+
+    /* Traw_sc = Traw / kT */
+    assert(k != 0);
+    return (float)raw / (float)k;
+}
+
 static float compensate_temp(dps310_t *dev, uint32_t T_raw, uint8_t rate)
 {
 
     /* 4.9.2 How to Calculate Compensated Temperature Values */
-    float T_raw_scaled = 0;
     float result = 0;
-    int32_t kT = 0;
+    float T_raw_scaled = 0;
 
-    kT = scale_factors[rate];
-    ESP_LOGD(TAG, "kT: %" PRIi32, kT);
+    CHECK_ARG(dev);
+    T_raw_scaled = raw_to_scaled(T_raw, rate);
 
-    /* scale_factors is a const, no divided by zero check */
-    T_raw_scaled = (float)T_raw / (float)kT;
-
-    /* Traw_sc = Traw / kT
-     * Tcomp (°C) = c0 * 0.5 + c1 * Traw_sc
-     */
+    /* Tcomp (°C) = c0 * 0.5 + c1 * Traw_sc */
     result = ((float)dev->coef.c0 * 0.5) + ((float)dev->coef.c1 * T_raw_scaled);
     return result;
 }
@@ -668,12 +757,11 @@ static float compensate_pressure(dps310_t *dev, int32_t T_raw, int32_t T_rate, i
     /* 4.9.1 How to Calculate Compensated Pressure Values */
     float T_raw_scaled = 0;
     float P_raw_scaled = 0;
-    int32_t kT = scale_factors[T_rate];
-    int32_t kP = scale_factors[P_rate];
 
-    /* scale_factors is a const, no divided by zero check */
-    T_raw_scaled = (float)T_raw / (float)kT;
-    P_raw_scaled = (float)P_raw / (float)kP;
+    CHECK_ARG(dev);
+
+    T_raw_scaled = raw_to_scaled(T_raw, T_rate);
+    P_raw_scaled = raw_to_scaled(P_raw, P_rate);
 
     /* Pcomp(Pa) = c00
      *             + Praw_sc * (c10 + Praw_sc * (c20 + Praw_sc * c30))
@@ -694,6 +782,7 @@ esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure)
     uint8_t T_rate = 0;
     uint8_t P_rate = 0;
 
+    CHECK_ARG(dev && pressure);
     err = dps310_get_oversampling_t(dev, &T_rate);
     if (err != ESP_OK)
     {
@@ -731,6 +820,7 @@ esp_err_t dps310_read_temp(dps310_t *dev, float *temperature)
     int32_t T_raw = 0;
     uint8_t rate = 0;
 
+    CHECK_ARG(dev && temperature);
     err = dps310_get_oversampling_t(dev, &rate);
     if (err != ESP_OK)
     {
@@ -743,7 +833,10 @@ esp_err_t dps310_read_temp(dps310_t *dev, float *temperature)
         ESP_LOGE(TAG, "dps310_read_raw(): %s", esp_err_to_name(err));
         goto fail;
     }
-    *temperature = compensate_temp(dev, T_raw, rate);
+
+    /* XXX when latest t_raw is available, always keep it in dev as a cache */
+    dev->t_raw = T_raw;
+    *temperature = compensate_temp(dev, dev->t_raw, rate);
 fail:
     return err;
 }
@@ -752,6 +845,8 @@ esp_err_t dps310_is_ready_for(dps310_t *dev, uint8_t reg, uint8_t mask, bool *re
 {
     esp_err_t err = ESP_FAIL;
     uint8_t reg_value = 0;
+
+    CHECK_ARG(dev && ready);
 
     err = _read_reg_mask(&dev->i2c_dev, reg, mask, &reg_value);
     if (err != ESP_OK)
@@ -766,20 +861,139 @@ fail:
 
 esp_err_t dps310_is_ready_for_coef(dps310_t *dev, bool *ready)
 {
+    CHECK_ARG(dev && ready);
     return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_COEF_RDY_MASK, ready);
 }
 
 esp_err_t dps310_is_ready_for_sensor(dps310_t *dev, bool *ready)
 {
+    CHECK_ARG(dev && ready);
     return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_SENSOR_RDY_MASK, ready);
 }
 
 esp_err_t dps310_is_ready_for_temp(dps310_t *dev, bool *ready)
 {
+    CHECK_ARG(dev && ready);
     return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_TMP_RDY_MASK, ready);
 }
 
 esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready)
 {
+    CHECK_ARG(dev && ready);
     return dps310_is_ready_for(dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_PRS_RDY_MASK, ready);
+}
+
+static inline bool dps310_is_pressure_result(int32_t data)
+{
+    return (uint8_t)data & 0x01;
+}
+
+static inline bool dps310_is_temp_result(int32_t data)
+{
+    return !dps310_is_pressure_result(data);
+}
+
+static esp_err_t dps310_read_reg_sensor_raw(dps310_t *dev, uint8_t reg, int32_t *value)
+{
+    uint8_t reg_values[DPS310_REG_SENSOR_VALUE_LEN] = {0};
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev && value);
+    if (reg != DPS310_REG_TMP_B2 && reg != DPS310_REG_PRS_B2)
+    {
+        err = ESP_ERR_INVALID_ARG;
+        goto fail;
+    }
+    err = i2c_dev_read_reg(&dev->i2c_dev, reg, reg_values, DPS310_REG_SENSOR_VALUE_LEN);
+    *value = (uint32_t)reg_values[0] << 16 | (uint32_t)reg_values[1] << 8 | (uint32_t)reg_values[2];
+    ESP_LOGD(TAG, "reg_values: %" PRIi32, *value);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "i2c_dev_read_reg(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+fail:
+    return err;
+}
+
+esp_err_t dps310_is_fifo_empty(dps310_t *dev, bool *result)
+{
+    esp_err_t err = ESP_FAIL;
+    uint8_t value = 0;
+
+    CHECK_ARG(dev && result);
+    err = _read_reg_mask(&dev->i2c_dev, DPS310_REG_FIFO_STS, DPS310_REG_FIFO_STS_FIFO_EMPTY_MASK, &value);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "_read_reg_mask(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    *result = value == 1 ? true : false;
+
+fail:
+    return err;
+
+}
+
+esp_err_t dps310_read_fifo(dps310_t *dev, dps310_fifo_measurement_t *measurement)
+{
+    int32_t raw_value = 0;
+    esp_err_t err = ESP_OK;
+
+    CHECK_ARG(dev && measurement);
+
+    /* Read a measurement from FIFO. to compensate the value, additional
+     * parameters, such as t_rate, are necessary. Use cached parameters in the
+     * device descriptor so that the value can be returned by only one I2C
+     * reading. This means that the driver does not work in multi-master
+     * configuration. As long as cached parameters are in sync with the real
+     * values in registers, the returned value is always correct even if a
+     * parameter is modified during the background mode.
+     */
+    err = dps310_read_reg_sensor_raw(dev, DPS310_REG_FIFO, &raw_value);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_reg_sensor_raw(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    measurement->type = dps310_is_pressure_result(raw_value) ? DPS310_MEASUREMENT_PRESSURE : DPS310_MEASUREMENT_TEMPERATURE;
+    raw_value = two_complement_of(raw_value, 24);
+
+    switch (measurement->type)
+    {
+        case DPS310_MEASUREMENT_TEMPERATURE:
+            ESP_LOGD(TAG, "DPS310_MEASUREMENT_TEMPERATURE: raw_value: %" PRIi32, raw_value);
+            measurement->result = compensate_temp(dev, raw_value, dev->t_rate);
+
+            /* XXX when new t_raw is available, always keep it in dev as a
+             * cache */
+            dev->t_raw = raw_value;
+            break;
+            ;;
+        case DPS310_MEASUREMENT_PRESSURE:
+            ESP_LOGD(TAG, "DPS310_MEASUREMENT_PRESSURE: raw_value: %" PRIi32, raw_value);
+            measurement->result = compensate_pressure(dev, dev->t_raw, dev->t_rate, raw_value, dev->p_rate);
+            break;
+            ;;
+        default:
+
+            /* NOT REACHED */
+            abort();
+            ;;
+    }
+
+fail:
+    return err;
+}
+
+inline esp_err_t dps310_backgorund_start(dps310_t *dev, dps310_mode_t mode)
+{
+    CHECK_ARG(dev);
+    return dps310_set_mode(dev, mode);
+}
+
+inline esp_err_t dps310_backgorund_stop(dps310_t *dev)
+{
+    CHECK_ARG(dev);
+    return dps310_set_mode(dev, DPS310_MODE_STANDBY);
 }

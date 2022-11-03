@@ -31,8 +31,8 @@
  * The driver currently does not support:
  *
  * * SPI
- * * backgroung mode
  * * read measurements by interrupt
+ * * multi-master I2C configuration
  *
  */
 #if !defined(__DPS310_H__)
@@ -68,7 +68,7 @@ typedef enum {
     DPS310_MODE_COMMAND_TEMPERATURE = 0b010, //!<  Command mode, temperature measurement
     DPS310_MODE_BACKGROUND_PRESSURE = 0b101, //!<  Background mode, continous pressure measurement
     DPS310_MODE_BACKGROUND_TEMPERATURE = 0b110, //!<  Background mode, continous temperature measurement
-    DPS310_MODE_BACKGROUND_ALL = 0b110, //!<  Background mode, continous pressure and temperature measurement
+    DPS310_MODE_BACKGROUND_ALL = 0b111, //!<  Background mode, continous pressure and temperature measurement
 } dps310_mode_t;
 
 /**
@@ -206,6 +206,19 @@ typedef enum {
 } dps310_spi_mode_t;
 
 /**
+ * Type of measurement result in FIFO.
+ */
+typedef enum {
+    DPS310_MEASUREMENT_TEMPERATURE = 0,
+    DPS310_MEASUREMENT_PRESSURE,
+} dps310_fifo_measurement_type_t;
+
+typedef struct {
+    dps310_fifo_measurement_type_t type;
+    float result;
+} dps310_fifo_measurement_t;
+
+/**
  * Configuration parameters for DPS310.
  */
 typedef struct {
@@ -259,6 +272,7 @@ typedef struct {
     int32_t c21;
     int32_t c30;
 } dps310_coef_t;
+
 /**
  * Device descriptor.
  */
@@ -266,6 +280,9 @@ typedef struct {
     i2c_dev_t i2c_dev;          //!< I2C device descriptor
     uint8_t prod_id;            //!< Product ID
     uint8_t prod_rev;           //!< Product revision
+    uint8_t t_rate;             //!< latest P_rate
+    uint8_t p_rate;             //!< latest T_rate
+    int32_t t_raw;              //!< latest T_raw
     dps310_coef_t coef;         //!< coefficients
 } dps310_t;
 
@@ -316,6 +333,8 @@ typedef struct {
 #define DPS310_REG_MEAS_CFG_PRS_RDY_MASK    (1 << 4)
 #define DPS310_REG_MEAS_CFG_MEAS_CTRL_MASK  (0b111)
 #define DPS310_REG_COEF_SRCE_MASK           (1 << 7)
+#define DPS310_REG_FIFO_STS_FIFO_EMPTY_MASK (1)
+#define DPS310_REG_FIFO_STS_FIFO_FULL_MASK  (1 << 1)
 
 /* See 3.6 Timing Characteristics */
 #define DPS310_I2C_FREQ_MAX_HZ  (3400000)  // Max 3.4 MHz
@@ -342,6 +361,14 @@ typedef struct {
 
 /* temperature and pressure use three resisters for 24 bits values. */
 #define DPS310_REG_SENSOR_VALUE_LEN (3)
+
+/* 4.8 FIFO Operation */
+#define DPS310_REG_FIFO     DPS310_REG_PRS_B2
+
+/* XXX the datasheet says "when the FIFO is empty and all following reads will
+ * return 0x800000". this is not true. do not rely on the behavior.
+ */
+#define DPS310_FIFO_EMPTY   (0x800000)
 
 /* See 8.9 Soft Reset and FIFO flush (RESET) */
 #define DPS310_FIFO_FLUSH_VALUE (1 << 7)
@@ -793,6 +820,47 @@ esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_quirk(dps310_t *dev);
+
+/**
+ * @brief See if FIFO is empty.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] result The result. true if empty, false otherwise.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_is_fifo_empty(dps310_t *dev, bool *result);
+
+/**
+ * @brief Read measurement result from FIFO.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] measurement Measured value.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_read_fifo(dps310_t *dev, dps310_fifo_measurement_t *measurement);
+
+/**
+ * @brief Start background measurement.
+ *
+ * This function is a syntax-sugar of `dps310_set_mode()` just for readbility
+ * and for an emphasis on a fact that measurement starts immediately after
+ * this.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] mode The mode of background measurement.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_backgorund_start(dps310_t *dev, dps310_mode_t mode);
+
+/**
+ * @brief Stop background measurement.
+ *
+ * This function is a syntax-sugar of `dps310_set_mode()`.
+ *
+ * @param[in] dev The device descriptor.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_backgorund_stop(dps310_t *dev);
 
 #ifdef __cplusplus
 }
