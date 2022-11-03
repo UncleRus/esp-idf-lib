@@ -226,6 +226,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Real-time clocks
@@ -247,6 +248,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
+| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **ds18x20**              | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs             | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
 | **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **hts221**               | Driver for HTS221 temperature and humidity sensor.                               | ISC     | `esp32`, `esp32s2`, `esp32c3` | Yes

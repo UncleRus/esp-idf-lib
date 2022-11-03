@@ -1,0 +1,8 @@
+.. _dps310:
+
+dps310 - Driver for for DPS310, barometric pressure sensor
+==========================================================
+
+.. doxygengroup:: dps310
+   :members:
+
