@@ -44,6 +44,9 @@
 /* public headers */
 #include "dps310.h"
 
+#define DPS310_QUIRK_DELAY_MS       (10)
+#define DPS310_QUIRK_MAX_ATTEMPT    (5)
+
 static const char *TAG = "dps310";
 
 /* see 4.9.3 Compensation Scale Factors */
@@ -63,7 +66,6 @@ esp_err_t dps310_quirk(dps310_t *dev)
 {
     bool sensor_ready = false;
     bool coef_ready = false;
-    bool temp_ready = false;
     esp_err_t err = ESP_FAIL;
     const int magic_command_len = 5;
     float ignore = 0;
@@ -130,23 +132,11 @@ esp_err_t dps310_quirk(dps310_t *dev)
         goto fail;
     }
 
-    ESP_LOGD(TAG, "dps310_quirk(): waiting for TMP_RDY");
-    do
-    {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        err = dps310_is_ready_for_temp(dev, &temp_ready);
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "dps310_is_ready_for_temp(): %s", esp_err_to_name(err));
-            goto fail;
-        }
-    } while (!temp_ready);
-
-    ESP_LOGD(TAG, "dps310_quirk(): reading temperature");
-    err = dps310_read_temp(dev, &ignore);
+    ESP_LOGD(TAG, "dps310_quirk(): reading temperature just once");
+    err = dps310_read_temp_wait(dev, DPS310_QUIRK_DELAY_MS, DPS310_QUIRK_MAX_ATTEMPT, &ignore);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "dps310_read_temp_wait(): %s", esp_err_to_name(err));
         goto fail;
     }
 
@@ -837,6 +827,27 @@ esp_err_t dps310_read_temp(dps310_t *dev, float *temperature)
     /* XXX when latest t_raw is available, always keep it in dev as a cache */
     dev->t_raw = T_raw;
     *temperature = compensate_temp(dev, dev->t_raw, rate);
+fail:
+    return err;
+}
+
+esp_err_t dps310_read_temp_wait(dps310_t *dev, uint16_t delay_ms, uint8_t max_attempt, float *temperature)
+{
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev && temperature);
+    err = _wait_for_reg_bits(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_TMP_RDY_MASK, 1, max_attempt, delay_ms);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "_wait_for_reg_bits(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    err = dps310_read_temp(dev, temperature);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
+        goto fail;
+    }
 fail:
     return err;
 }

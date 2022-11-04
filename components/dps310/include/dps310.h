@@ -754,6 +754,17 @@ esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure);
 esp_err_t dps310_read_temp(dps310_t *dev, float *temperature);
 
 /**
+ * @brief Read compensated temperature value after waiting for TMP_RDY bit.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] delay_ms Time in microseconds to wait when the value is not ready.
+ * @param[in] max_attempt Number of attempt to read.
+ * @param[out] temperature Compensated temperature value.
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL. ESP_ERR_TIMEOUT when failed to read the measurement within max_attempt, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_read_temp_wait(dps310_t *dev, uint16_t delay_ms, uint8_t max_attempt, float *temperature);
+
+/**
  * @brief Test if a single bit in a resister is set.
  *
  * @param[in] dev The device descriptor.
