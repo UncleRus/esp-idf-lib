@@ -64,8 +64,6 @@ static const int32_t scale_factors[N_SCALE_FACTORS] = {
 
 esp_err_t dps310_quirk(dps310_t *dev)
 {
-    bool sensor_ready = false;
-    bool coef_ready = false;
     esp_err_t err = ESP_FAIL;
     const int magic_command_len = 5;
     float ignore = 0;
@@ -78,6 +76,7 @@ esp_err_t dps310_quirk(dps310_t *dev)
         { 0x0E, 0x00 },
         { 0x0F, 0x00 },
     };
+    dps310_mode_t original_mode = 0;
 
     CHECK_ARG(dev);
     ESP_LOGD(TAG, "dps310_quirk(): resetting resisters with magic numbers");
@@ -98,30 +97,34 @@ esp_err_t dps310_quirk(dps310_t *dev)
     }
     vTaskDelay(pdMS_TO_TICKS(DPS310_STARTUP_DELAY_MS));
 
-    do
+    /* sensor is ready? */
+    err = _wait_for_reg_bits(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_SENSOR_RDY_MASK, 1, DPS310_QUIRK_MAX_ATTEMPT, DPS310_QUIRK_DELAY_MS);
+    if (err != ESP_OK)
     {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        err = dps310_is_ready_for_sensor(dev, &sensor_ready);
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "dps310_is_ready_for_sensor(): %s", esp_err_to_name(err));
-            goto fail;
-        }
-
-        err = dps310_is_ready_for_coef(dev, &coef_ready);
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "dps310_is_ready_for_coef(): %s", esp_err_to_name(err));
-            goto fail;
-        }
-
-    } while (!sensor_ready || !coef_ready);
+        ESP_LOGE(TAG, "_wait_for_reg_bits(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    /* coef is ready? */
+    err = _wait_for_reg_bits(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_COEF_RDY_MASK, 1, DPS310_QUIRK_MAX_ATTEMPT, DPS310_QUIRK_DELAY_MS);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "_wait_for_reg_bits(): %s", esp_err_to_name(err));
+        goto fail;
+    }
 
     ESP_LOGD(TAG, "dps310_quirk(): reading COEF");
     err = dps310_get_coef(dev);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_get_coef(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "dps310_quirk(): keep the original operation mode");
+    err = dps310_get_mode(dev, &original_mode);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_mode(): %s", esp_err_to_name(err));
         goto fail;
     }
 
@@ -137,6 +140,13 @@ esp_err_t dps310_quirk(dps310_t *dev)
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_read_temp_wait(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    ESP_LOGD(TAG, "dps310_quirk(): restore the original mode");
+    err = dps310_set_mode(dev, original_mode);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "dps310_set_mode(): %s", esp_err_to_name(err));
         goto fail;
     }
 

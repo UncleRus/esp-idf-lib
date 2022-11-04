@@ -818,8 +818,9 @@ esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready);
  * values to magic resisters. However, the issue is not documented. The
  * latest datasheet does not mention the issue, nor an errata.
  *
- * After issuing magic commands, the function re-reads COEF so that the
- * subsequent temperature reads return compensated values.
+ * After issuing magic commands, the function re-reads COEF and temperature
+ * once so that the subsequent pressure reads return compensated values with
+ * internal cached parameters.
  *
  * See:
  * https://github.com/Infineon/DPS310-Pressure-Sensor#temperature-measurement-issue
