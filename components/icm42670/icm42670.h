@@ -421,10 +421,19 @@ esp_err_t icm42670_free_desc(icm42670_t *dev);
 esp_err_t icm42670_init(icm42670_t *dev);
 
 /**
+ * @brief Set device power mode
+ *
+ * @param dev Device descriptor
+ * @param enable_idle bool to enable idle mode
+ * @return `ESP_OK` on success
+ */
+esp_err_t icm42670_set_idle_pwr_mode(icm42670_t *dev, bool enable_idle);
+
+/**
  * @brief Set gyro power mode
  *
  * @param dev Device descriptor
- * @param pwr_mode struct of tyoe icm42670_gyro_pwr_mode_t
+ * @param pwr_mode struct of type icm42670_gyro_pwr_mode_t
  * @return `ESP_OK` on success
  */
 esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t pwr_mode);
@@ -433,7 +442,7 @@ esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t p
  * @brief Set accel power mode
  *
  * @param dev Device descriptor
- * @param pwr_mode struct of tyoe icm42670_accel_pwr_mode_t
+ * @param pwr_mode struct of type icm42670_accel_pwr_mode_t
  * @return `ESP_OK` on success
  */
 esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t pwr_mode);

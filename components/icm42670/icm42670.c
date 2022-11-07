@@ -336,6 +336,7 @@ esp_err_t icm42670_init_desc(icm42670_t *dev, uint8_t addr, i2c_port_t port, gpi
     dev->i2c_dev.addr = addr;
     dev->i2c_dev.cfg.sda_io_num = sda_gpio;
     dev->i2c_dev.cfg.scl_io_num = scl_gpio;
+    dev->i2c_dev.timeout_ticks = 0; // set to default
 #if HELPER_TARGET_IS_ESP32
     dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
@@ -353,18 +354,33 @@ esp_err_t icm42670_free_desc(icm42670_t *dev)
 esp_err_t icm42670_init(icm42670_t *dev)
 {
     CHECK_ARG(dev);
-
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     uint8_t reg;
-    
+
     // check who_am_i register
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_WHO_AM_I, &reg));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
     if (reg != 0x67)
     {
-        ESP_LOGE(TAG, "Error initializing icm42670, who_am_i register did not return 0x67");
+        ESP_LOGE(TAG, "Error initializing ICM42670, who_am_i register did not return 0x67");
         return ESP_ERR_INVALID_RESPONSE;
     }
+    ESP_LOGD(TAG, "Init: Chip ICM42670 detected");
+
+    //flush FIFO
+    CHECK(icm42670_flush_fifo(dev));
+    // perform signal path reset
+    CHECK(icm42670_reset(dev));
+    ESP_LOGD(TAG, "Init: Soft-Reset performed");
+
+    //wait 10ms
+    vTaskDelay(pdMS_TO_TICKS(10));
+
+    // set device in IDLE power state
+    CHECK(icm42670_set_idle_pwr_mode(dev, true));
+
+    //wait 10ms
+    vTaskDelay(pdMS_TO_TICKS(10));
 
     // check if internal clock is running
     bool mclk_rdy = false;
@@ -374,14 +390,22 @@ esp_err_t icm42670_init(icm42670_t *dev)
         ESP_LOGE(TAG, "Error initializing icm42670, Internal clock not running");
         return ESP_ERR_INVALID_RESPONSE;
     }
-    
+    ESP_LOGD(TAG, "Init: Internal clock running");
 
+    return ESP_OK;
+}
+
+esp_err_t icm42670_set_idle_pwr_mode(icm42670_t *dev, bool enable_idle)
+{
+    CHECK_ARG(dev);
+
+    CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_IDLE_BITS, ICM42670_IDLE_SHIFT, (uint8_t)enable_idle));
     return ESP_OK;
 }
 
 esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t pwr_mode)
 {
-    CHECK_ARG(dev && pwr_mode);
+    CHECK_ARG(dev);
 
     CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_GYRO_MODE_BITS, ICM42670_GYRO_MODE_SHIFT, pwr_mode));
     return ESP_OK;
@@ -389,7 +413,7 @@ esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t p
 
 esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t pwr_mode)
 {
-    CHECK_ARG(dev && pwr_mode);
+    CHECK_ARG(dev);
 
     CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_ACCEL_MODE_BITS, ICM42670_ACCEL_MODE_SHIFT, pwr_mode));
     return ESP_OK;
@@ -441,49 +465,49 @@ esp_err_t icm42670_flush_fifo(icm42670_t *dev)
 
 esp_err_t icm42670_set_gyro_fsr(icm42670_t *dev, icm42670_gyro_fsr_t range)
 {
-    CHECK_ARG(dev && range);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG0, ICM42670_GYRO_UI_FS_SEL_BITS, ICM42670_GYRO_UI_FS_SEL_SHIFT, range);
 }
 
 esp_err_t icm42670_set_gyro_odr(icm42670_t *dev, icm42670_gyro_odr_t odr)
 {
-    CHECK_ARG(dev && odr);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG0, ICM42670_GYRO_ODR_BITS, ICM42670_GYRO_ODR_SHIFT, odr);
 }
 
 esp_err_t icm42670_set_accel_fsr(icm42670_t *dev, icm42670_accel_fsr_t range)
 {
-    CHECK_ARG(dev && range);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG0, ICM42670_ACCEL_UI_FS_SEL_BITS, ICM42670_ACCEL_UI_FS_SEL_SHIFT, range);
 }
 
 esp_err_t icm42670_set_accel_odr(icm42670_t *dev, icm42670_accel_odr_t odr)
 {
-    CHECK_ARG(dev && odr);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG0, ICM42670_ACCEL_ODR_BITS, ICM42670_ACCEL_ODR_SHIFT, odr);
 }
 
 esp_err_t icm42670_set_temp_lpf(icm42670_t *dev, icm42670_temp_lfp_t lpf_bw)
 {
-    CHECK_ARG(dev && lpf_bw);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_TEMP_CONFIG0, ICM42670_TEMP_FILT_BW_BITS, ICM42670_TEMP_FILT_BW_SHIFT, lpf_bw);
 }
 
 esp_err_t icm42670_set_gyro_lpf(icm42670_t *dev, icm42670_gyro_lfp_t lpf_bw)
 {
-    CHECK_ARG(dev && lpf_bw);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_GYRO_CONFIG1, ICM42670_GYRO_UI_FILT_BW_BITS, ICM42670_GYRO_UI_FILT_BW_SHIFT, lpf_bw);
 }
 
 esp_err_t icm42670_set_accel_lpf(icm42670_t *dev, icm42670_accel_lfp_t lpf_bw)
 {
-    CHECK_ARG(dev && lpf_bw);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG1, ICM42670_ACCEL_UI_FILT_BW_BITS, ICM42670_ACCEL_UI_FILT_BW_SHIFT, lpf_bw);
 }
 
 esp_err_t icm42670_set_accel_avg(icm42670_t *dev, icm42670_accel_avg_t avg)
 {
-    CHECK_ARG(dev && avg);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_ACCEL_CONFIG1, ICM42670_ACCEL_UI_AVG_BITS, ICM42670_ACCEL_UI_AVG_SHIFT, avg);
 }
 
@@ -569,7 +593,7 @@ esp_err_t icm42670_config_wom(icm42670_t *dev, icm42670_wom_config_t config)
 
 esp_err_t icm42670_enable_wom(icm42670_t *dev, bool enable)
 {
-    CHECK_ARG(dev && enable);
+    CHECK_ARG(dev);
     return manipulate_register(dev, ICM42670_REG_WOM_CONFIG, ICM42670_WOM_EN_BITS, ICM42670_WOM_EN_SHIFT, enable);
 }
 
