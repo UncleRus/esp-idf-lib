@@ -1001,7 +1001,7 @@ esp_err_t dps310_read_fifo(dps310_t *dev, dps310_fifo_measurement_t *measurement
             break;
             ;;
         case DPS310_MEASUREMENT_EMPTY:
-            ESP_LOGD(TAG, "DPS310_MEASUREMENT_EMPTY: raw_value %X", raw_value);
+            ESP_LOGD(TAG, "DPS310_MEASUREMENT_EMPTY: raw_value %" PRIi32, raw_value);
             measurement->result = 0;
             break;
         default:
