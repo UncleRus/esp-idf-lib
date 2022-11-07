@@ -199,6 +199,17 @@ void dps310_task(void *pvParameters)
                 ESP_LOGI(TAG, "pressure: %0.2f Pa", measurement.result);
                 break;
                 ;;
+
+            /* we are sure there should be a measurement result in FIFO
+             * because dps310_is_fifo_empty() returned false. but when FIFO is
+             * empty, the result is DPS310_MEASUREMENT_EMPTY type.
+             */
+            case DPS310_MEASUREMENT_EMPTY:
+                ESP_LOGI(TAG, "FIFO is empty");
+                break;
+                ;;
+
+            /* should not happen */
             default:
                 ESP_LOGE(TAG, "Unknown dps310_fifo_measurement_type_t: %i", measurement.type);
                 goto fail;
@@ -207,13 +218,13 @@ void dps310_task(void *pvParameters)
     }
 
 fail:
-    ESP_LOGE(TAG, "Halting due to error");
 
     /* stop background measurement.
      *
      * ignore returned value here as it would probably fail depending on the
      * nature of the previous error, and there is nothing we can do.
      */
+    ESP_LOGI(TAG, "Stopping background measurement");
     (void)dps310_backgorund_stop(&dev);
 
     /* free the resources.
@@ -223,6 +234,7 @@ fail:
     (void)dps310_free_desc(&dev);
 
 init_fail:
+    ESP_LOGE(TAG, "Halting due to error");
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

@@ -979,6 +979,10 @@ esp_err_t dps310_read_fifo(dps310_t *dev, dps310_fifo_measurement_t *measurement
     }
     measurement->type = dps310_is_pressure_result(raw_value) ? DPS310_MEASUREMENT_PRESSURE : DPS310_MEASUREMENT_TEMPERATURE;
     raw_value = two_complement_of(raw_value, 24);
+    if (raw_value == DPS310_FIFO_EMPTY)
+    {
+        measurement->type = DPS310_MEASUREMENT_EMPTY;
+    }
 
     switch (measurement->type)
     {
@@ -996,6 +1000,10 @@ esp_err_t dps310_read_fifo(dps310_t *dev, dps310_fifo_measurement_t *measurement
             measurement->result = compensate_pressure(dev, dev->t_raw, dev->t_rate, raw_value, dev->p_rate);
             break;
             ;;
+        case DPS310_MEASUREMENT_EMPTY:
+            ESP_LOGD(TAG, "DPS310_MEASUREMENT_EMPTY: raw_value %X", raw_value);
+            measurement->result = 0;
+            break;
         default:
 
             /* NOT REACHED */

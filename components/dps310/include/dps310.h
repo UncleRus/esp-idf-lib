@@ -207,10 +207,14 @@ typedef enum {
 
 /**
  * Type of measurement result in FIFO.
+ *
+ * When the type is DPS310_MEASUREMENT_EMPTY, the result is always zero.
+ * Otherwise, the result is the compensated value of each type.
  */
 typedef enum {
-    DPS310_MEASUREMENT_TEMPERATURE = 0,
-    DPS310_MEASUREMENT_PRESSURE,
+    DPS310_MEASUREMENT_TEMPERATURE = 0, //!< Temperature
+    DPS310_MEASUREMENT_PRESSURE,        //!< Pressure
+    DPS310_MEASUREMENT_EMPTY,           //!< Empty, no measurement available
 } dps310_fifo_measurement_type_t;
 
 typedef struct {
@@ -363,12 +367,8 @@ typedef struct {
 #define DPS310_REG_SENSOR_VALUE_LEN (3)
 
 /* 4.8 FIFO Operation */
-#define DPS310_REG_FIFO     DPS310_REG_PRS_B2
-
-/* XXX the datasheet says "when the FIFO is empty and all following reads will
- * return 0x800000". this is not true. do not rely on the behavior.
- */
-#define DPS310_FIFO_EMPTY   (0x800000)
+#define DPS310_REG_FIFO     DPS310_REG_PRS_B2   //! Resister address of FIFO.
+#define DPS310_FIFO_EMPTY   (0xff800000)        //! the value of two's complement in the resisters when no measurement is in the FIFO.
 
 /* See 8.9 Soft Reset and FIFO flush (RESET) */
 #define DPS310_FIFO_FLUSH_VALUE (1 << 7)
