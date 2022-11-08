@@ -27,7 +27,8 @@ void dps310_task(void *pvParameters)
     bool sensor_ready = false;
     bool coef_ready = false;
     bool fifo_is_empty = true;
-    uint8_t mode = 0;
+    dps310_fifo_en_mode_t fifo_en_mode = 0;
+    dps310_mode_t mode = 0;
     esp_err_t err = ESP_FAIL;
     dps310_t dev;
     dps310_fifo_measurement_t measurement;
@@ -79,12 +80,12 @@ void dps310_task(void *pvParameters)
         goto fail;
     }
 
-    err = dps310_get_fifo_en(&dev, &mode);
+    err = dps310_get_fifo_en(&dev, &fifo_en_mode);
     if (err != ESP_OK)
     {
         goto fail;
     }
-    if (mode != DPS310_FIFO_ENABLE)
+    if (fifo_en_mode != DPS310_FIFO_ENABLE)
     {
         ESP_LOGE(TAG, "fifo_en is not enabled");
         goto fail;

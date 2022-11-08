@@ -453,7 +453,7 @@ esp_err_t dps310_set_rate_p(dps310_t *dev, dps310_pm_rate_t value);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_rate_t(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_rate_t(dps310_t *dev, dps310_tmp_rate_t *value);
 
 /**
  * @brief Set temperature measurement rate.
@@ -472,7 +472,7 @@ esp_err_t dps310_set_rate_t(dps310_t *dev, dps310_tmp_rate_t value);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_oversampling_p(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_oversampling_p(dps310_t *dev, dps310_pm_oversampling_t *value);
 
 /**
  * @brief Set pressure oversampling rate.
@@ -491,7 +491,7 @@ esp_err_t dps310_set_oversampling_p(dps310_t *dev, dps310_pm_oversampling_t valu
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_oversampling_t(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_oversampling_t(dps310_t *dev, dps310_tmp_oversampling_t *value);
 
 /**
  * @brief Set temperature oversampling rate.
@@ -500,7 +500,7 @@ esp_err_t dps310_get_oversampling_t(dps310_t *dev, uint8_t *value);
  * @param[in] value The value to set.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `config` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_set_oversampling_t(dps310_t *dev, dps310_pm_oversampling_t value);
+esp_err_t dps310_set_oversampling_t(dps310_t *dev, dps310_tmp_oversampling_t value);
 
 /**
  * @brief Get temperature measurement source.
@@ -509,7 +509,7 @@ esp_err_t dps310_set_oversampling_t(dps310_t *dev, dps310_pm_oversampling_t valu
  * @param[out] value the value in the resister.
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_tmp_ext(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_tmp_ext(dps310_t *dev, dps310_tmp_src_ext_t *value);
 
 /**
  * @brief Set temperature measurement source.
@@ -536,7 +536,7 @@ esp_err_t dps310_set_tmp_coef_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
  * @param[out] value the value in the resister.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_int_hl(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_int_hl(dps310_t *dev, dps310_int_hl_active_level_t *value);
 
 /**
  * @brief Set interupt active level.
@@ -554,7 +554,7 @@ esp_err_t dps310_set_int_hl(dps310_t *dev, dps310_int_hl_active_level_t value);
  * @param[out] value Current configuration of INT_FIFO.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_int_fifo(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t *value);
 
 /**
  * @brief Set the status of FIFO intrrupt.
@@ -572,7 +572,7 @@ esp_err_t dps310_set_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t value);
  * @param[out] value Current configuration of INT_TMP.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_int_tmp(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t *value);
 
 /**
  * @brief Set the status of temperature intrrupt.
@@ -590,7 +590,7 @@ esp_err_t dps310_set_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t value);
  * @param[out] value Current configuration of INT_PRS.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_int_prs(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_int_prs(dps310_t *dev, dps310_int_prs_mode_t *value);
 
 /**
  * @brief Set the status of pressure intrrupt.
@@ -608,7 +608,7 @@ esp_err_t dps310_set_int_prs(dps310_t *dev, dps310_int_prs_mode_t value);
  * @param[out] value Current configuration of T_SHIFT.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_t_shift(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_t_shift(dps310_t *dev, dps310_t_shift_mode_t *value);
 
 /**
  * @brief Set the status of temperature result bit-shift.
@@ -628,7 +628,7 @@ esp_err_t dps310_set_t_shift(dps310_t *dev, dps310_t_shift_mode_t value);
  * @param[out] value Current configuration of T_SHIFT.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_p_shift(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_p_shift(dps310_t *dev, dps310_p_shift_mode_t *value);
 
 /**
  * @brief Set the status of pressure result bit-shift.
@@ -648,7 +648,7 @@ esp_err_t dps310_set_p_shift(dps310_t *dev, dps310_p_shift_mode_t value);
  * @param[out] value Current configuration of FIFO_EN.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_fifo_en(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_fifo_en(dps310_t *dev, dps310_fifo_en_mode_t *value);
 
 /**
  * @brief Set the status of FIFO.
@@ -666,7 +666,7 @@ esp_err_t dps310_set_fifo_en(dps310_t *dev, dps310_fifo_en_mode_t value);
  * @param[out] value Current configuration of SPI_MODE.
  * @return `ESP_OK` on success, `ESP_ERR_INVALID_ARG` when `dev` and/or `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_spi_mode(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_spi_mode(dps310_t *dev, dps310_spi_mode_t *value);
 
 /**
  * @brief Set the mode of SPI.
@@ -692,7 +692,7 @@ esp_err_t dps310_get_coef(dps310_t *dev);
  * @param[in] dev The device descriptor.
  * @param[out] mode The operating mode.
  */
-esp_err_t dps310_get_mode(dps310_t *dev, uint8_t *mode);
+esp_err_t dps310_get_mode(dps310_t *dev, dps310_mode_t *mode);
 
 /**
  * @brief Set operating mode.
