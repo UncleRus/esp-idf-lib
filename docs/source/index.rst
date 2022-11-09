@@ -135,6 +135,7 @@ Pressure sensors
    groups/bmp180
    groups/bmp280
    groups/bme680
+   groups/dps310
    groups/ms5611
 
 Air quality/Gas sensors
@@ -158,6 +159,7 @@ ADC/DAC
    groups/pcf8591
    groups/mcp4725
    groups/mcp342x
+   groups/ads130e08
 
 Power/Current monitors
 ======================

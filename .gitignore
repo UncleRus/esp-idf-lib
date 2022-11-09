@@ -71,3 +71,7 @@ Gemfile.lock
 # macOS .DS_Store and .AppleDouble files
 .DS_Store
 .AppleDouble
+
+# bundled files by ruby bundler and configuration
+/.bundle/
+/vendor/
