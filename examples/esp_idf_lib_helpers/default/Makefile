@@ -1,5 +1,5 @@
 #V := 1
-PROJECT_NAME := example_example
+PROJECT_NAME := esp_idf_lib_helpers_example
 
 EXTRA_COMPONENT_DIRS := $(CURDIR)/../../../components
 

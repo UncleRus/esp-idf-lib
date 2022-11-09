@@ -1,16 +1,10 @@
-# Example application for `example` component
+# Example application for `esp_idf_lib_helpers` component
 
 ## What the example does
 
-The example does nothing but waits in a loop.
+The example source code includes `ets_sys.h` file without specifying the exact path for target platform.
+The running example "ESP32xx" or "ESP8266" depending on the target platform.
 
 ## Configuration
 
 No configuration is available.
-
-## Notes
-
-This is an example application of `example`. It is intended as an example
-application for new component.
-
-The code under `main` should conform the code style.

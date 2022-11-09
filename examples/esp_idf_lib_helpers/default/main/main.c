@@ -18,10 +18,8 @@
 #include <freertos/task.h>
 
 #include <esp_log.h>
-#include <example.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
-
-#include "my_local_header.h"
 
 static char *tag = "main";
 
@@ -29,9 +27,9 @@ void app_main()
 {
     ESP_LOGI(tag, "An example log");
 #if HELPER_TARGET_IS_ESP32
-    ESP_LOGI(tag, "the target is ESP32");
+    ESP_LOGI(tag, "ESP32xx");
 #else
-    ESP_LOGI(tag, "the target is not ESP32");
+    ESP_LOGI(tag, "ESP8266");
 #endif
     while (1)
     {
