@@ -21,7 +21,7 @@
  * @defgroup dps310 dps310
  * @{
  *
- * ESP-IDF driver for DPS310 barometric pressure sensor. Sponserd by @beriberikix.
+ * ESP-IDF driver for DPS310 barometric pressure sensor. Sponsored by @beriberikix.
  *
  * DPS310 supports I2C and SPI (3-wires and 4-wires) as digital interface. The
  * driver currently supports:
@@ -74,9 +74,9 @@ typedef enum {
     DPS310_MODE_STANDBY = 0b000,  //!< Standby mode
     DPS310_MODE_COMMAND_PRESSURE = 0b001, //!<  Command mode, pressure measurement
     DPS310_MODE_COMMAND_TEMPERATURE = 0b010, //!<  Command mode, temperature measurement
-    DPS310_MODE_BACKGROUND_PRESSURE = 0b101, //!<  Background mode, continous pressure measurement
-    DPS310_MODE_BACKGROUND_TEMPERATURE = 0b110, //!<  Background mode, continous temperature measurement
-    DPS310_MODE_BACKGROUND_ALL = 0b111, //!<  Background mode, continous pressure and temperature measurement
+    DPS310_MODE_BACKGROUND_PRESSURE = 0b101, //!<  Background mode, continuous pressure measurement
+    DPS310_MODE_BACKGROUND_TEMPERATURE = 0b110, //!<  Background mode, continuous temperature measurement
+    DPS310_MODE_BACKGROUND_ALL = 0b111, //!<  Background mode, continuous pressure and temperature measurement
 } dps310_mode_t;
 
 /**
@@ -157,24 +157,24 @@ typedef enum {
  * Mode of interupt when the FIFO is full.
  */
 typedef enum {
-    DPS310_INT_FIFO_DISABLE = 0, //!< Disable interupt when the FIFO is full
-    DPS310_INT_FIFO_ENABLE  = 1, //!< Enable interupt when the FIFO is full
+    DPS310_INT_FIFO_DISABLE = 0, //!< Disable interrupt when the FIFO is full
+    DPS310_INT_FIFO_ENABLE  = 1, //!< Enable interrupt when the FIFO is full
 } dps310_int_fifo_mode_t;
 
 /**
  * Mode of interupt when a temperature measurement is ready
  */
 typedef enum {
-    DPS310_INT_TMP_DISABLE  = 0, //!< Disable interupt when a temperature measurement is ready
-    DPS310_INT_TMP_ENABLE   = 1, //!< Enable interupt when a temperature measurement is ready
+    DPS310_INT_TMP_DISABLE  = 0, //!< Disable interrupt when a temperature measurement is ready
+    DPS310_INT_TMP_ENABLE   = 1, //!< Enable interrupt when a temperature measurement is ready
 } dps310_int_tmp_mode_t;
 
 /**
  * Mode of interupt when a pressure measurement is ready
  */
 typedef enum {
-    DPS310_INT_PRS_DISABLE  = 0, //!< Disable interupt when a pressure measurement is ready
-    DPS310_INT_PRS_ENABLE   = 1, //!< Enable interupt when a pressure measurement is ready
+    DPS310_INT_PRS_DISABLE  = 0, //!< Disable interrupt when a pressure measurement is ready
+    DPS310_INT_PRS_ENABLE   = 1, //!< Enable interrupt when a pressure measurement is ready
 } dps310_int_prs_mode_t;
 
 /**
@@ -297,7 +297,7 @@ typedef struct {
     int32_t t_raw;              //!< latest T_raw
     dps310_coef_t coef;         //!< coefficients
     float offset;               //!< offset in meter
-    float pressure_s;           //!< calicurated pressure at sea-level
+    float pressure_s;           //!< calculated pressure at sea-level
 } dps310_t;
 
 /**
@@ -414,7 +414,7 @@ esp_err_t dps310_free_desc(dps310_t *dev);
  *
  * The function does the followings:
  *
- * - read the DPS310_REG_ID, and identify the product ID. return ESP_FAIL if
+ * - read the DPS310_REG_ID, and identify the product ID. Return ESP_FAIL if
  *   the product ID does not match expected product ID.
  * - reset the chip
  * - perform a quirk
@@ -540,7 +540,7 @@ esp_err_t dps310_set_tmp_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
 esp_err_t dps310_set_tmp_coef_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
 
 /**
- * @brief Get interupt active level.
+ * @brief Get interrupt active level.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value the value in the resister.
@@ -549,7 +549,7 @@ esp_err_t dps310_set_tmp_coef_ext(dps310_t *dev, dps310_tmp_src_ext_t value);
 esp_err_t dps310_get_int_hl(dps310_t *dev, dps310_int_hl_active_level_t *value);
 
 /**
- * @brief Set interupt active level.
+ * @brief Set interrupt active level.
  *
  * @param[in] dev The device descriptor.
  * @param[in] value The value to set.
@@ -558,7 +558,7 @@ esp_err_t dps310_get_int_hl(dps310_t *dev, dps310_int_hl_active_level_t *value);
 esp_err_t dps310_set_int_hl(dps310_t *dev, dps310_int_hl_active_level_t value);
 
 /**
- * @brief Get the status of FIFO intrrupt.
+ * @brief Get the status of FIFO interrupt.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value Current configuration of INT_FIFO.
@@ -567,7 +567,7 @@ esp_err_t dps310_set_int_hl(dps310_t *dev, dps310_int_hl_active_level_t value);
 esp_err_t dps310_get_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t *value);
 
 /**
- * @brief Set the status of FIFO intrrupt.
+ * @brief Set the status of FIFO interrupt.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value The value to set.
@@ -576,7 +576,7 @@ esp_err_t dps310_get_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t *value);
 esp_err_t dps310_set_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t value);
 
 /**
- * @brief Get the status of temperature intrrupt.
+ * @brief Get the status of temperature interrupt.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value Current configuration of INT_TMP.
@@ -585,7 +585,7 @@ esp_err_t dps310_set_int_fifo(dps310_t *dev, dps310_int_fifo_mode_t value);
 esp_err_t dps310_get_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t *value);
 
 /**
- * @brief Set the status of temperature intrrupt.
+ * @brief Set the status of temperature interrupt.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value The value to set.
@@ -594,7 +594,7 @@ esp_err_t dps310_get_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t *value);
 esp_err_t dps310_set_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t value);
 
 /**
- * @brief Get the status of pressure intrrupt.
+ * @brief Get the status of pressure interrupt.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value Current configuration of INT_PRS.
@@ -603,7 +603,7 @@ esp_err_t dps310_set_int_tmp(dps310_t *dev, dps310_int_tmp_mode_t value);
 esp_err_t dps310_get_int_prs(dps310_t *dev, dps310_int_prs_mode_t *value);
 
 /**
- * @brief Set the status of pressure intrrupt.
+ * @brief Set the status of pressure interrupt.
  *
  * @param[in] dev The device descriptor.
  * @param[out] value The value to set.
@@ -837,7 +837,7 @@ esp_err_t dps310_is_ready_for_pressure(dps310_t *dev, bool *ready);
  *
  * The function is supposed to fix an issue in the sensor by writing magic
  * values to magic resisters. However, the issue is not documented. The
- * latest datasheet does not mention the issue, nor an errata.
+ * latest data sheet does not mention the issue, nor an errata.
  *
  * After issuing magic commands, the function re-reads COEF and temperature
  * once so that the subsequent pressure reads return compensated values with
@@ -901,11 +901,11 @@ esp_err_t dps310_backgorund_stop(dps310_t *dev);
  * Call this function before dps310_read_altitude() for higher accuracy.
  *
  * By default, the driver calculates altitude using average sea-level
- * pressure. This funciton updates internal offset of altitude by reading
+ * pressure. This function updates internal offset of altitude by reading
  * pressure from the sensor, and given altitude. There are public web services
  * that provide altitude at a specific location, such as Google Earth.
  *
- * The function attempts to keep oiginal oversampling rates during
+ * The function attempts to keep original oversampling rates during
  * calibration. When it fails to do so due to errors, the oversampling rates
  * might be different.
  *
@@ -933,7 +933,7 @@ esp_err_t dps310_calc_altitude(dps310_t *dev, float pressure, float *altitude);
  * Make sure that pressure measurement value is available.
  *
  * @param[in] dev The device descriptor.
- * @param[out] altitude The calicurated altitude.
+ * @param[out] altitude The calculated altitude.
  */
 esp_err_t dps310_read_altitude(dps310_t *dev, float *altitude);
 
