@@ -444,7 +444,7 @@ esp_err_t dps310_reset(dps310_t *dev);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` and/or
  * `value` is NULL, or other errors when I2C communication fails.
  */
-esp_err_t dps310_get_rate_p(dps310_t *dev, uint8_t *value);
+esp_err_t dps310_get_rate_p(dps310_t *dev, dps310_pm_rate_t *value);
 
 /**
  * @brief Set pressure measurement rate.
@@ -755,6 +755,17 @@ esp_err_t dps310_read_raw(dps310_t *dev, uint8_t reg, int32_t *value);
 esp_err_t dps310_read_pressure(dps310_t *dev, float *pressure);
 
 /**
+ * @brief Read compensated temperature value after waiting for PRES_RDY bit.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] delay_ms Time in microseconds to wait when the value is not ready.
+ * @param[in] max_attempt Number of attempt to read.
+ * @param[out] pressure Compensated pressure value in Pascal (not hPa).
+ * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL. ESP_ERR_TIMEOUT when failed to read the measurement within max_attempt, or other errors when I2C communication fails.
+ */
+esp_err_t dps310_read_pressure_wait(dps310_t *dev, uint16_t delay_ms, uint8_t max_attempt, float *pressure);
+
+/**
  * @brief Read compensated temperature value.
  *
  * @param[in] dev The device descriptor.
@@ -889,10 +900,14 @@ esp_err_t dps310_backgorund_stop(dps310_t *dev);
  *
  * Call this function before dps310_read_altitude() for higher accuracy.
  *
- * By default, the driver calicurates altitude using average sea-level
+ * By default, the driver calculates altitude using average sea-level
  * pressure. This funciton updates internal offset of altitude by reading
  * pressure from the sensor, and given altitude. There are public web services
  * that provide altitude at a specific location, such as Google Earth.
+ *
+ * The function attempts to keep oiginal oversampling rates during
+ * calibration. When it fails to do so due to errors, the oversampling rates
+ * might be different.
  *
  * @param[in] dev The device descriptor.
  * @param[in] altitude_real Real (known) altitude.
@@ -903,7 +918,8 @@ esp_err_t dps310_calibrate_altitude(dps310_t *dev, float altitude_real);
  * @brief Calculate altitude from pressure.
  *
  * Calculates altitude from pressure given. Call dps310_calibrate_altitude()
- * before this function for higher accuracy.
+ * before this function for higher accuracy. The function adds the offset to
+ * calculated altitude.
  *
  * @param[in] dev The device descriptor.
  * @param[in] pressure The pressure.
@@ -911,9 +927,8 @@ esp_err_t dps310_calibrate_altitude(dps310_t *dev, float altitude_real);
  */
 esp_err_t dps310_calc_altitude(dps310_t *dev, float pressure, float *altitude);
 
-
 /**
- * @brief Read pressure from the sensor, calicurates altitude.
+ * @brief Read pressure from the sensor, calculates altitude.
  *
  * Make sure that pressure measurement value is available.
  *
@@ -921,7 +936,6 @@ esp_err_t dps310_calc_altitude(dps310_t *dev, float pressure, float *altitude);
  * @param[out] altitude The calicurated altitude.
  */
 esp_err_t dps310_read_altitude(dps310_t *dev, float *altitude);
-
 
 #ifdef __cplusplus
 }

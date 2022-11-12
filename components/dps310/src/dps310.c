@@ -370,11 +370,11 @@ fail:
     return err;
 }
 
-esp_err_t dps310_get_rate_p(dps310_t *dev, uint8_t *value)
+esp_err_t dps310_get_rate_p(dps310_t *dev, dps310_pm_rate_t *value)
 {
     CHECK_ARG(dev && value);
 
-    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_RATE_MASK, value);
+    return _read_reg_mask(&dev->i2c_dev, DPS310_REG_PRS_CFG, DPS310_REG_PRS_CFG_PM_RATE_MASK, (uint8_t *)value);
 }
 
 esp_err_t dps310_set_rate_p(dps310_t *dev, dps310_pm_rate_t value)
@@ -817,6 +817,27 @@ fail:
     return err;
 }
 
+esp_err_t dps310_read_pressure_wait(dps310_t *dev, uint16_t delay_ms, uint8_t max_attempt, float *pressure)
+{
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev && pressure);
+    err = _wait_for_reg_bits(&dev->i2c_dev, DPS310_REG_MEAS_CFG, DPS310_REG_MEAS_CFG_PRS_RDY_MASK, 1, max_attempt, delay_ms);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "_wait_for_reg_bits(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    err = dps310_read_pressure(dev, pressure);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+fail:
+    return err;
+}
+
 esp_err_t dps310_read_temp(dps310_t *dev, float *temperature)
 {
     esp_err_t err = ESP_FAIL;
@@ -1043,53 +1064,71 @@ static inline float calc_altitude(float pressure, float pressure_s)
 esp_err_t dps310_calibrate_altitude(dps310_t *dev, float altitude_real)
 {
     esp_err_t err = ESP_FAIL;
-    bool ready = false;
-    int8_t attempt = 0;
     float pressure = 0;
+    float temperature = 0;
     float altitude_guess = 0;
+    dps310_pm_oversampling_t orig_oversmapling_p = 0;
+    dps310_tmp_oversampling_t orig_oversmapling_t = 0;
 
     CHECK_ARG(dev);
 
+    /* keep original oversampling values */
+    err = dps310_get_oversampling_p(dev, &orig_oversmapling_p);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_oversampling_p(): %s", esp_err_to_name(err));
+        goto get_oversampling_fail;
+    }
+    err = dps310_get_oversampling_t(dev, &orig_oversmapling_t);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_get_oversampling_t(): %s", esp_err_to_name(err));
+        goto get_oversampling_fail;
+    }
+
+    /* modify oversampling values for accuracy */
     err = dps310_set_oversampling_p(dev, DPS310_PM_PRC_64);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_set_oversampling_p(): %s", esp_err_to_name(err));
+        goto fail;
     }
     err = dps310_set_oversampling_t(dev, DPS310_TMP_PRC_64);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_set_oversampling_t(): %s", esp_err_to_name(err));
+        goto fail;
     }
+
+    /* read temperature once in command mode */
+    err = dps310_set_mode(dev, DPS310_MODE_COMMAND_TEMPERATURE);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_mode(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    err = dps310_read_temp_wait(dev, 100, 10, &temperature);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_temp(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    /* read pressure once in command mode */
     err = dps310_set_mode(dev, DPS310_MODE_COMMAND_PRESSURE);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_set_mode(): %s", esp_err_to_name(err));
         goto fail;
     }
-
-    do {
-        attempt++;
-        if (attempt > 10)
-        {
-            ESP_LOGE(TAG, "dps310_calibrate(): timeout");
-            err = ESP_FAIL;
-            goto fail;
-        }
-        vTaskDelay(pdMS_TO_TICKS(100));
-        err = dps310_is_ready_for_pressure(dev, &ready);
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "dps310_is_ready_for_pressure(): %s", esp_err_to_name(err));
-            goto fail;
-        }
-    } while (!ready);
-
-    err = dps310_read_pressure(dev, &pressure);
+    err = dps310_read_pressure_wait(dev, 100, 10, &pressure);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
         goto fail;
     }
+
+    /* calibrate offset */
     dev->pressure_s = dps310_calc_sea_level_pressure(pressure, altitude_real);
     altitude_guess = calc_altitude(pressure, dev->pressure_s);
     dev->offset = altitude_real - altitude_guess;
@@ -1101,6 +1140,15 @@ esp_err_t dps310_calibrate_altitude(dps310_t *dev, float altitude_real)
     ESP_LOGI(TAG, "\tReal altitude: %0.2f (m)", altitude_real);
     ESP_LOGI(TAG, "\tOffset: %0.2f (m)", dev->offset);
 fail:
+    if (dps310_set_oversampling_t(dev, orig_oversmapling_t) != ESP_OK)
+    {
+        ESP_LOGW(TAG, "Restoring temperature oversampling failed");
+    }
+    if (dps310_set_oversampling_p(dev, orig_oversmapling_p) != ESP_OK)
+    {
+        ESP_LOGW(TAG, "Restoring pressure oversampling failed");
+    }
+get_oversampling_fail:
     return err;
 }
 
@@ -1134,6 +1182,7 @@ esp_err_t dps310_calc_altitude(dps310_t *dev, float pressure, float *altitude)
         ESP_LOGE(TAG, "pressure_to_altitude(): %s", esp_err_to_name(err));
         goto fail;
     }
+    *altitude = *altitude + dev->offset;
 fail:
     return err;
 }
