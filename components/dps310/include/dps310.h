@@ -34,6 +34,11 @@
  * * read measurements by interrupt
  * * multi-master I2C configuration
  *
+ * Note that the unit of pressure in this driver is pascal (Pa), not
+ * hectopascals (hPa).
+ *
+ * Note that the unit of altitude in this driver is meter.
+ *
  */
 #if !defined(__DPS310_H__)
 #define __DPS310_H__
@@ -58,6 +63,9 @@ extern "C" {
 
 #define DPS310_PRODUCT_ID   0x01 //!< Product ID
 #define DPS310_REVISION_ID  0x00 //!< Revision ID
+
+#define DPS310_AVERAGE_SEA_LEVEL_PRESSURE_hPa   (1013.25) //!< Average sea-level pressure in hPa
+#define DPS310_AVERAGE_SEA_LEVEL_PRESSURE_Pa    (DPS310_AVERAGE_SEA_LEVEL_PRESSURE_hPa * 10) //!< Average sea-level pressure in Pa
 
 /**
  * Mode of DPS310 module operation. See 4.1 Operating Modes.
@@ -288,6 +296,8 @@ typedef struct {
     uint8_t p_rate;             //!< latest T_rate
     int32_t t_raw;              //!< latest T_raw
     dps310_coef_t coef;         //!< coefficients
+    float offset;               //!< offset in meter
+    float pressure_s;           //!< calicurated pressure at sea-level
 } dps310_t;
 
 /**
@@ -873,6 +883,45 @@ esp_err_t dps310_backgorund_start(dps310_t *dev, dps310_mode_t mode);
  * @return `ESP_OK` on success. `ESP_ERR_INVALID_ARG` when `dev` is NULL, or other errors when I2C communication fails.
  */
 esp_err_t dps310_backgorund_stop(dps310_t *dev);
+
+/**
+ * @brief Calibrate altitude offset from the altitude of the device.
+ *
+ * Call this function before dps310_read_altitude() for higher accuracy.
+ *
+ * By default, the driver calicurates altitude using average sea-level
+ * pressure. This funciton updates internal offset of altitude by reading
+ * pressure from the sensor, and given altitude. There are public web services
+ * that provide altitude at a specific location, such as Google Earth.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] altitude_real Real (known) altitude.
+ */
+esp_err_t dps310_calibrate_altitude(dps310_t *dev, float altitude_real);
+
+/**
+ * @brief Calculate altitude from pressure.
+ *
+ * Calculates altitude from pressure given. Call dps310_calibrate_altitude()
+ * before this function for higher accuracy.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[in] pressure The pressure.
+ * @param[out] altitude The calicurated altitude.
+ */
+esp_err_t dps310_calc_altitude(dps310_t *dev, float pressure, float *altitude);
+
+
+/**
+ * @brief Read pressure from the sensor, calicurates altitude.
+ *
+ * Make sure that pressure measurement value is available.
+ *
+ * @param[in] dev The device descriptor.
+ * @param[out] altitude The calicurated altitude.
+ */
+esp_err_t dps310_read_altitude(dps310_t *dev, float *altitude);
+
 
 #ifdef __cplusplus
 }

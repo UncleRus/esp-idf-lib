@@ -28,6 +28,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 /* esp-idf headers */
 #include <freertos/FreeRTOS.h>
@@ -189,6 +190,8 @@ esp_err_t dps310_init_desc(dps310_t *dev, uint8_t addr, i2c_port_t port, gpio_nu
         ESP_LOGE(TAG, "i2c_dev_create_mutex(): %s", esp_err_to_name(err));
         goto fail;
     }
+    dev->pressure_s = DPS310_AVERAGE_SEA_LEVEL_PRESSURE_Pa;
+    dev->offset = 0;
 
 fail:
     return err;
@@ -1025,4 +1028,136 @@ inline esp_err_t dps310_backgorund_stop(dps310_t *dev)
 {
     CHECK_ARG(dev);
     return dps310_set_mode(dev, DPS310_MODE_STANDBY);
+}
+
+static int32_t dps310_calc_sea_level_pressure(float pressure, float altitude)
+{
+    return (int32_t)(pressure / pow(1.0 - altitude / 44330, 5.255));
+}
+
+static inline float calc_altitude(float pressure, float pressure_s)
+{
+    return 44330 * (1.0 - pow(pressure / pressure_s, 0.1903));
+}
+
+esp_err_t dps310_calibrate_altitude(dps310_t *dev, float altitude_real)
+{
+    esp_err_t err = ESP_FAIL;
+    bool ready = false;
+    int8_t attempt = 0;
+    float pressure = 0;
+    float altitude_guess = 0;
+
+    CHECK_ARG(dev);
+
+    err = dps310_set_oversampling_p(dev, DPS310_PM_PRC_64);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_oversampling_p(): %s", esp_err_to_name(err));
+    }
+    err = dps310_set_oversampling_t(dev, DPS310_TMP_PRC_64);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_oversampling_t(): %s", esp_err_to_name(err));
+    }
+    err = dps310_set_mode(dev, DPS310_MODE_COMMAND_PRESSURE);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_set_mode(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+    do {
+        attempt++;
+        if (attempt > 10)
+        {
+            ESP_LOGE(TAG, "dps310_calibrate(): timeout");
+            err = ESP_FAIL;
+            goto fail;
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+        err = dps310_is_ready_for_pressure(dev, &ready);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "dps310_is_ready_for_pressure(): %s", esp_err_to_name(err));
+            goto fail;
+        }
+    } while (!ready);
+
+    err = dps310_read_pressure(dev, &pressure);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    dev->pressure_s = dps310_calc_sea_level_pressure(pressure, altitude_real);
+    altitude_guess = calc_altitude(pressure, dev->pressure_s);
+    dev->offset = altitude_real - altitude_guess;
+
+    ESP_LOGI(TAG, "Calibration result:");
+    ESP_LOGI(TAG, "\tPressure: %0.2f (Pa)", pressure);
+    ESP_LOGI(TAG, "\tCalculated Pressure at sea level: %0.2f (Pa)", dev->pressure_s);
+    ESP_LOGI(TAG, "\tCalculated altitude: %0.2f (m)", altitude_guess);
+    ESP_LOGI(TAG, "\tReal altitude: %0.2f (m)", altitude_real);
+    ESP_LOGI(TAG, "\tOffset: %0.2f (m)", dev->offset);
+fail:
+    return err;
+}
+
+
+static float pressure_to_altitude(float pressure, float pressure_s, float *altitude)
+{
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(altitude);
+    if (pressure_s == 0)
+    {
+        err = ESP_ERR_INVALID_ARG;
+        goto fail;
+    }
+    *altitude = 44330 * (1.0 - pow(pressure / pressure_s, 0.1903));
+    err = ESP_OK;
+
+fail:
+    return err;
+}
+
+esp_err_t dps310_calc_altitude(dps310_t *dev, float pressure, float *altitude)
+{
+    esp_err_t err = ESP_FAIL;
+
+    CHECK_ARG(dev && altitude);
+
+    err = pressure_to_altitude(pressure, dev->pressure_s, altitude);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "pressure_to_altitude(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+fail:
+    return err;
+}
+
+esp_err_t dps310_read_altitude(dps310_t *dev, float *altitude)
+{
+    esp_err_t err = ESP_FAIL;
+    float pressure = 0;
+
+    CHECK_ARG(dev && altitude);
+
+    err = dps310_read_pressure(dev, &pressure);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_read_pressure(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    err = dps310_calc_altitude(dev, pressure, altitude);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "dps310_calc_altitude(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+
+fail:
+    return err;
 }
