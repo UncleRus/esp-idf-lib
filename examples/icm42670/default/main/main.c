@@ -5,92 +5,70 @@
 #include "driver/gpio.h"
 #include <icm42670.h>
 
-//#include "esp_sleep.h"
-//#include "esp_log.h"
+#define PORT 0
+#if defined(CONFIG_EXAMPLE_I2C_ADDRESS_GND)
+#define I2C_ADDR ICM42670_I2C_ADDR_GND
+#endif
+#if defined(CONFIG_EXAMPLE_I2C_ADDRESS_VCC)
+#define I2C_ADDR ICM42670_I2C_ADDR_VCC
+#endif
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-#define I2C_MASTER_SDA 10
-#define I2C_MASTER_SCL 8
-
-#define INT_INPUT_PIN 0
+/* Find gpio definitions in sdkconfig */
 
 void icm42670_test(void *pvParameters)
 {
-    // config IO0 as input, pull-up enabled
-    const gpio_config_t io_conf = {
-        .intr_type = GPIO_INTR_DISABLE,
-        .mode = GPIO_MODE_INPUT,
-        .pin_bit_mask = BIT(INT_INPUT_PIN),
-        .pull_down_en = 0,
-        .pull_up_en = 1,
-    };
-    gpio_config(&io_conf);
-
-    icm42670_t dev = { 0 };
     // init device descriptor and device
-    ESP_ERROR_CHECK(icm42670_init_desc(&dev, ICM42670_I2C_ADDR_GND, 0, I2C_MASTER_SDA, I2C_MASTER_SCL)); // TODO add CONFIG_EXAMPLE_ prefix for pins
+    icm42670_t dev = { 0 };
+    ESP_ERROR_CHECK(icm42670_init_desc(&dev, I2C_ADDR, PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(icm42670_init(&dev));
 
-    // config a WoM interrupt on pin 2
-    const icm42670_int_config_t int_config = {
-        .mode = ICM42670_INT_MODE_LATCHED,
-        .drive = ICM42670_INT_DRIVE_PUSH_PULL,
-        .polarity = ICM42670_INT_POLARITY_ACTIVE_LOW,
-    };
-    const uint8_t int_pin = 2;
+    // enable accelerometer and gyro in low-noise (LN) mode
+    ESP_ERROR_CHECK(icm42670_set_gyro_pwr_mode(&dev, ICM42670_GYRO_ENABLE_LN_MODE));
+    ESP_ERROR_CHECK(icm42670_set_accel_pwr_mode(&dev, ICM42670_ACCEL_ENABLE_LN_MODE));
 
-    ESP_ERROR_CHECK(icm42670_config_int_pin(&dev, int_pin, int_config));
+    /* OPTIONAL */
+    // enable low-pass-filters on accelerometer and gyro
+    ESP_ERROR_CHECK(icm42670_set_accel_lpf(&dev, ICM42670_ACCEL_LFP_53HZ));
+    ESP_ERROR_CHECK(icm42670_set_gyro_lpf(&dev, ICM42670_GYRO_LFP_53HZ));
+    // set output data rate (ODR)
+    ESP_ERROR_CHECK(icm42670_set_accel_odr(&dev, ICM42670_ACCEL_ODR_200HZ));
+    ESP_ERROR_CHECK(icm42670_set_gyro_odr(&dev, ICM42670_GYRO_ODR_200HZ));
+    // set full scale range (FSR)
+    ESP_ERROR_CHECK(icm42670_set_accel_fsr(&dev, ICM42670_ACCEL_RANGE_16G));
+    ESP_ERROR_CHECK(icm42670_set_gyro_fsr(&dev, ICM42670_GYRO_RANGE_2000DPS));
+    
 
-    icm42670_int_source_t sources = {false};
-    sources.wom_z = true;
-    sources.wom_y = true;
-    sources.wom_z = true;
+    // read temperature sensor value once
+    float temperature;
+    ESP_ERROR_CHECK(icm42670_read_temperature(&dev, &temperature));
+    printf("Temperature reading: %f\n", temperature);
 
-    ESP_ERROR_CHECK(icm42670_set_int_sources(&dev, int_pin, sources));
 
-    const icm42670_wom_config_t wom_config = {
-        .trigger = ICM42670_WOM_INT_DUR_FIRST,
-        .logical_mode = ICM42670_WOM_INT_MODE_ALL_OR,
-        .reference = ICM42670_WOM_MODE_REF_LAST,
-        .wom_x_threshold = 30,
-        .wom_y_threshold = 30,
-        .wom_z_threshold = 30,
-    };
+    uint16_t raw_reading;
+    uint8_t data_register;
 
-    ESP_ERROR_CHECK(icm42670_config_wom(&dev, wom_config));
+    /* select which acceleration or gyro value should be read: */
+    //data_register = ICM42670_REG_ACCEL_DATA_X1;
+    //data_register = ICM42670_REG_ACCEL_DATA_Y1;
+    //data_register = ICM42670_REG_ACCEL_DATA_Z1;
+    data_register = ICM42670_REG_GYRO_DATA_X1;
+    //data_register = ICM42670_REG_GYRO_DATA_Y1;
+    //data_register = ICM42670_REG_GYRO_DATA_Z1;
 
-    // enable averaging on accel
-    ESP_ERROR_CHECK(icm42670_set_accel_avg(&dev, ICM42670_ACCEL_AVG_8X));
-    // disable gyro and enable accel in low-power mode
-    ESP_ERROR_CHECK(icm42670_set_gyro_pwr_mode(&dev, ICM42670_GYRO_DISABLE));
-    ESP_ERROR_CHECK(icm42670_set_accel_pwr_mode(&dev, ICM42670_ACCEL_ENABLE_LP_MODE));
 
-    ESP_ERROR_CHECK(icm42670_enable_wom(&dev, true));
-
+    // now poll selected accelerometer or gyro raw value directly from registers
     while(1)
     {
-        printf("GPIO level pin 0: %d\n", gpio_get_level(INT_INPUT_PIN));
+        ESP_ERROR_CHECK(icm42670_read_raw_data(&dev, data_register, &raw_reading));
+
+        printf("Raw accelerometer / gyro reading: %d\n", raw_reading);
+
         vTaskDelay(pdMS_TO_TICKS(100));
     }
-
-
-
-    /* TEMPERATURE EXAMPLE
-    float temperature;
-    esp_err_t res;
-    while (1)
-    {
-        vTaskDelay(pdMS_TO_TICKS(100));
-
-        if ((res = icm42670_read_temperature(&dev, &temperature)) != ESP_OK)
-            printf("Could not read temperature value: %d\n", res);
-        else
-            printf("Temperature: %f\n", temperature);
-    }
-    */
 }
 
 void app_main()

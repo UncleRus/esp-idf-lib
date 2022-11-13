@@ -33,6 +33,12 @@
  * Copyright (c) 2022 Jan Veeh (jan.veeh@motius.de)
  *
  * BSD Licensed as described in the file LICENSE
+ * 
+ * Open TODOs:
+ * - FIFO reading and handling
+ * - APEX functions like pedometer, tilt-detection, low-g detection, freefall detection, ...
+ * 
+ * 
  */
 
 #include <freertos/FreeRTOS.h>
@@ -408,6 +414,8 @@ esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t p
     CHECK_ARG(dev);
 
     CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_GYRO_MODE_BITS, ICM42670_GYRO_MODE_SHIFT, pwr_mode));
+    // no register writes should be performed within the next 200us
+    vTaskDelay(pdMS_TO_TICKS(0.3));
     return ESP_OK;
 }
 
@@ -415,7 +423,40 @@ esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t
 {
     CHECK_ARG(dev);
 
+    // certain odr and avg settings are not allowed in LP or LN mode
+    icm42670_accel_odr_t odr;
+    icm42670_accel_avg_t avg;
+    CHECK(icm42670_get_accel_odr(dev, &odr));
+    CHECK(icm42670_get_accel_avg(dev, &avg));
+
+    if((pwr_mode == ICM42670_ACCEL_ENABLE_LP_MODE) && 
+        ((odr == ICM42670_ACCEL_ODR_800HZ) || 
+        (odr == ICM42670_ACCEL_ODR_1_6KHZ) || 
+        ((odr == ICM42670_ACCEL_ODR_200HZ) && (avg == ICM42670_ACCEL_AVG_64X))))
+    {
+        ESP_LOGE(TAG, "Accel ODR and AVG settings invalid for Low-power mode");
+        return ESP_ERR_INVALID_ARG;
+    }
+
+
+    if((pwr_mode == ICM42670_ACCEL_ENABLE_LN_MODE) &&
+        ((odr == ICM42670_ACCEL_ODR_6_25HZ) ||
+        (odr == ICM42670_ACCEL_ODR_3_125HZ) ||
+        (odr == ICM42670_ACCEL_ODR_1_5625HZ)))
+    {
+        ESP_LOGE(TAG, "Accel ODR settings invalid for Low-noise mode");
+        return ESP_ERR_INVALID_ARG;
+    }
+
     CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_ACCEL_MODE_BITS, ICM42670_ACCEL_MODE_SHIFT, pwr_mode));
+    return ESP_OK;
+}
+
+esp_err_t icm42670_set_low_power_clock(icm42670_t *dev, icm42670_lp_clock_source_t clock_source)
+{
+    CHECK_ARG(dev);
+
+    CHECK(manipulate_register(dev, ICM42670_REG_PWR_MGMT0, ICM42670_ACCEL_LP_CLK_SEL_BITS, ICM42670_ACCEL_LP_CLK_SEL_SHIFT, clock_source));
     return ESP_OK;
 }
 
@@ -516,11 +557,16 @@ esp_err_t icm42670_config_int_pin(icm42670_t *dev, uint8_t int_pin, icm42670_int
     CHECK_ARG(dev && int_pin);
 
     uint8_t reg = config.mode << 2 | config.drive << 1 | config.polarity;
-    if(int_pin == 2){
+    if(int_pin == 2)
+    {
         return manipulate_register(dev, ICM42670_REG_INT_CONFIG, 0b00111000, ICM42670_INT2_POLARITY_SHIFT, reg);
-    }else if (int_pin == 1){
+    }
+    else if (int_pin == 1)
+    {
         return manipulate_register(dev, ICM42670_REG_INT_CONFIG, 0b00000111, ICM42670_INT1_POLARITY_SHIFT, reg);
-    }else{
+    }
+    else
+    {
         printf("Error, only INT pins 1 and 2 available\n");
         return ESP_ERR_INVALID_ARG;
     }
@@ -609,6 +655,32 @@ esp_err_t icm42670_get_mclk_rdy(icm42670_t *dev, bool *mclk_rdy)
         *mclk_rdy = true;
     else
         *mclk_rdy = false;
+    
+    return ESP_OK;
+}
+
+esp_err_t icm42670_get_accel_odr(icm42670_t *dev, icm42670_accel_odr_t *odr)
+{
+    CHECK_ARG(dev && odr);
+
+    uint8_t reg;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_ACCEL_CONFIG0 , &reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    *odr = (reg & ICM42670_ACCEL_ODR_BITS) >> ICM42670_ACCEL_ODR_SHIFT;
+    
+    return ESP_OK;
+}
+
+esp_err_t icm42670_get_accel_avg(icm42670_t *dev, icm42670_accel_avg_t *avg)
+{
+    CHECK_ARG(dev && avg);
+
+    uint8_t reg;
+    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
+    I2C_DEV_CHECK(&dev->i2c_dev, read_register(dev, ICM42670_REG_ACCEL_CONFIG1 , &reg));
+    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    *avg = (reg & ICM42670_ACCEL_UI_AVG_BITS) >> ICM42670_ACCEL_UI_AVG_SHIFT;
     
     return ESP_OK;
 }

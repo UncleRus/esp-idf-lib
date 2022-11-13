@@ -186,6 +186,13 @@ typedef enum
     ICM42670_ACCEL_ENABLE_LN_MODE = 0b11
 } icm42670_accel_pwr_mode_t;
 
+/* Accelerometer low power mode clock source */
+typedef enum
+{
+    ICM42670_LP_CLK_WUO = 0,
+    ICM42670_LP_CLK_RCO = 1
+} icm42670_lp_clock_source_t;
+
 /* Gyro FSR (full scale range) */
 typedef enum
 {
@@ -448,6 +455,15 @@ esp_err_t icm42670_set_gyro_pwr_mode(icm42670_t *dev, icm42670_gyro_pwr_mode_t p
 esp_err_t icm42670_set_accel_pwr_mode(icm42670_t *dev, icm42670_accel_pwr_mode_t pwr_mode);
 
 /**
+ * @brief Set clock source in LP mode
+ *
+ * @param dev Device descriptor
+ * @param clock_source struct of type icm42670_lp_clock_source_t
+ * @return `ESP_OK` on success
+ */
+esp_err_t icm42670_set_low_power_clock(icm42670_t *dev, icm42670_lp_clock_source_t clock_source);
+
+/**
  * @brief Read temperature from device
  *
  * @param dev Device descriptor
@@ -602,6 +618,24 @@ esp_err_t icm42670_enable_wom(icm42670_t *dev, bool enable);
  * @return `ESP_OK` on success
  */
 esp_err_t icm42670_get_mclk_rdy(icm42670_t *dev, bool *mclk_rdy);
+
+/**
+ * @brief Get the output data rate (ODR) of the accel
+ *
+ * @param dev Device descriptor
+ * @param odr pointer to icm42670_accel_odr_t
+ * @return `ESP_OK` on success
+ */
+esp_err_t icm42670_get_accel_odr(icm42670_t *dev, icm42670_accel_odr_t *odr);
+
+/**
+ * @brief Get the status of the accel averaging
+ *
+ * @param dev Device descriptor
+ * @param avg pointer to icm42670_accel_avg_t
+ * @return `ESP_OK` on success
+ */
+esp_err_t icm42670_get_accel_avg(icm42670_t *dev, icm42670_accel_avg_t *avg);
 
 #ifdef __cplusplus
 }
