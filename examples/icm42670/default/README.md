@@ -2,7 +2,7 @@
 
 ## What it does
 
-This example shows the basic configuration and initialization of the ICM52670 IMU and prints raw accelerometer and gyro values.
+This example shows the basic configuration and initialization of the ICM42670 IMU and prints raw accelerometer and gyro values.
 
 Optional configuration of output data rate (ODR), full scale range (FSR) and low pass filters (LPF) is shown.
 
