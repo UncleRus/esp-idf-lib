@@ -170,6 +170,12 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3   | `esp32`, `esp32c3`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
+### Inertial measurement unit (IMUs)
+
+| Component                | Description                                                                      | License | Supported on       | Thread safety
+|--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
+| **icm42670**               | Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board: https://github.com/esp-rs/esp-rust-board)                                         | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+
 ### Input device drivers
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
