@@ -16,7 +16,7 @@ components:
       - name: esp32s2
       - name: esp32c3
     licenses:
-      - name: BSD-3
+      - name: ICS
     copyrights:
       - author:
           name: Jan Veeh

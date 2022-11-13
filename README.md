@@ -174,7 +174,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
-| **icm42670**               | Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board: https://github.com/esp-rs/esp-rust-board)                                         | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **icm42670**               | Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board: https://github.com/esp-rs/esp-rust-board)                                         | ICS   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Input device drivers
 
