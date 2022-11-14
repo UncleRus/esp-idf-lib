@@ -165,6 +165,7 @@ esp_err_t _wait_for_reg_bits(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t 
         }
         vTaskDelay(pdMS_TO_TICKS(delay_ms));
     }
+    ESP_LOGE(TAG, "Timeout. delay_ms: %" PRIu16 "max_attempt: %" PRIu8, delay_ms, max_attempt);
     return ESP_ERR_TIMEOUT;
 }
 
