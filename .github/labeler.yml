@@ -136,6 +136,14 @@ labels:
           - "components/dht/**"
           - "components/dht/.eil.yml"
           - "examples/dht/**"
+  - label: "area:components:dps310"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/dps310/**"
+          - "components/dps310/.eil.yml"
+          - "examples/dps310/**"
   - label: "area:components:ds1302"
     sync: true
     matcher:
@@ -648,3 +656,11 @@ labels:
           - "components/wiegand/**"
           - "components/wiegand/.eil.yml"
           - "examples/wiegand/**"
+  - label: "area:components:ads130e08"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ads130e08/**"
+          - "components/ads130e08/.eil.yml"
+          - "examples/ads130e08/**"

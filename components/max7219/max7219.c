@@ -236,7 +236,7 @@ esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s)
 {
     CHECK_ARG(dev && s);
 
-    while (s && pos < dev->digits)
+    while (*s && pos < dev->digits)
     {
         uint8_t c = get_char(dev, *s);
         if (*(s + 1) == '.')
