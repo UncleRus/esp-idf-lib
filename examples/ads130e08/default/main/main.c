@@ -15,14 +15,21 @@ static const char *TAG_ADS130E08 = "ads130e08";
 ads130e08_t adc_dev;
 ads130e08_raw_data_t raw_data;
 
+SemaphoreHandle_t ads130e08_drdy_semaphore = NULL;
+
 void IRAM_ATTR gpio_isr_handler(void *arg)
 {
     /* data ready */
+    xSemaphoreGiveFromISR(ads130e08_drdy_semaphore, NULL);
+    portYIELD_FROM_ISR();
 }
 
 // Main task
 void ads130e08_test(void *pvParameters)
 {
+    // Initialize semaphore
+    ads130e08_drdy_semaphore = xSemaphoreCreateBinary();
+
     // Configure SPI bus
     spi_bus_config_t spi_cfg = {
         .mosi_io_num = CONFIG_EXAMPLE_MOSI_GPIO,
@@ -71,8 +78,8 @@ void ads130e08_test(void *pvParameters)
 
     for (;;)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        
+        xSemaphoreTake(ads130e08_drdy_semaphore, portMAX_DELAY);
+
         ESP_ERROR_CHECK(ads130e08_get_rdata(&adc_dev, &raw_data));
 
         ESP_LOGI(TAG_ADS130E08, "Fault status -> Positive %02x, Negative %02x", raw_data.fault_statp,
