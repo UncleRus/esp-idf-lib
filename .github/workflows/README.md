@@ -121,7 +121,7 @@ jobs:
     name: Labeler
     runs-on: ubuntu-latest
     steps:
-      - uses: fuxingloh/multi-labeler@v1
+      - uses: fuxingloh/multi-labeler@v2
         with:
           github-token: ${{secrets.LABELER_TOKEN}}
           config-path: .github/labeler.yml
@@ -137,7 +137,7 @@ jobs:
     name: Labeler
     runs-on: ubuntu-latest
     steps:
-      - uses: fuxingloh/multi-labeler@v1
+      - uses: fuxingloh/multi-labeler@v2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           config-path: .github/labeler.yml
