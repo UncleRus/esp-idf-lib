@@ -223,7 +223,7 @@ jobs:
           echo "The components to build:"
           components_to_build=`echo ${components_to_build} | tr "\n" " "`
           echo ${components_to_build}
-          echo "::set-output name=components_to_build::${components_to_build}"
+          echo "components_to_build=${components_to_build}" > ${GITHUB_OUTPUT}
 
   # XXX create multiple jobs for major versions
   #
@@ -444,7 +444,7 @@ jobs:
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
 
           # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
-          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> $GITHUB_OUTPUT
 
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
@@ -472,7 +472,7 @@ jobs:
         # cache esp-idf tools. each tagged branch has fixed versions of tools.
         # the versions do not change. the master is an exception as it is a
         # moving target. do NOT cache tools if the branch is master.
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache-tools
         with:
           path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
@@ -689,7 +689,7 @@ jobs:
           echo "IDF_TARGET=esp8266" >> ${GITHUB_ENV}
 
           # cache-idf-tools needs PROJECT_TOOLCHAIN_DIR
-          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> $GITHUB_OUTPUT
 
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
@@ -719,7 +719,7 @@ jobs:
       - name: Cache toolchain
         id: cache-idf-tools
         if: ${{ matrix.branch != 'master' }}
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
           key: ${{ runner.os }}-${{ matrix.branch }}-esp8266-cache-tools
@@ -867,7 +867,7 @@ jobs:
           echo "IDF_TARGET=esp8266" >> ${GITHUB_ENV}
 
           # cache-idf-tools needs PROJECT_DISTFILE_DIR
-          echo "::set-output name=PROJECT_DISTFILE_DIR::${DISTFILE_DIR}"
+          echo "PROJECT_DISTFILE_DIR=${DISTFILE_DIR}" >> ${GITHUB_OUTPUT}
 
           # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
           echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
@@ -906,7 +906,7 @@ jobs:
 
       - name: Cache toolchain
         id: cache-idf-tools
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.set_env.outputs.PROJECT_DISTFILE_DIR }}
           key: ${{ runner.os }}-${{ matrix.branch }}-esp8266-cache-tools
@@ -1053,7 +1053,7 @@ jobs:
           IDF_PATH="${__PROJECT_PATH}/idf"
 
           # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
-          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> $GITHUB_OUTPUT
 
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
@@ -1072,7 +1072,7 @@ jobs:
         # cache esp-idf tools. each tagged branch has fixed versions of tools.
         # the versions do not change. the master is an exception as it is a
         # moving target. do NOT cache tools if the branch is master.
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache-tools
         if: ${{ matrix.branch != 'master' }}
         with:
@@ -1194,7 +1194,7 @@ jobs:
           IDF_PATH="${__PROJECT_PATH}/idf"
 
           # cache-idf-tools needs __PROJECT_TOOLCHAIN_DIR
-          echo "::set-output name=PROJECT_TOOLCHAIN_DIR::${TOOLCHAIN_DIR}"
+          echo "PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> $GITHUB_OUTPUT
 
           echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
           echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
@@ -1213,7 +1213,7 @@ jobs:
         # cache esp-idf tools. each tagged branch has fixed versions of tools.
         # the versions do not change. the master is an exception as it is a
         # moving target. do NOT cache tools if the branch is master.
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache-tools
         if: ${{ matrix.branch != 'master' }}
         with:
