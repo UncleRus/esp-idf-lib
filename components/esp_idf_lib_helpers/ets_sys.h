@@ -14,6 +14,8 @@
 #include <esp32s2/rom/ets_sys.h>
 #elif CONFIG_IDF_TARGET_ESP32S3
 #include <esp32s3/rom/ets_sys.h>
+#elif CONFIG_IDF_TARGET_ESP8266
+#include <rom/ets_sys.h>
 #else
 #error "ets_sys: Unknown target"
 #endif
