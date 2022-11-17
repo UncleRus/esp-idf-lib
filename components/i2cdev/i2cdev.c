@@ -205,10 +205,18 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
             states[dev->port].installed = false;
         }
 #if HELPER_TARGET_IS_ESP32
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 0)
+        // See https://github.com/espressif/esp-idf/issues/10163
         if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
         if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
             return res;
+#else
+        if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
+            return res;
+        if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
+            return res;
+#endif
 #endif
 #if HELPER_TARGET_IS_ESP8266
         // Clock Stretch time, depending on CPU frequency
