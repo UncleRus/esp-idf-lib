@@ -1,5 +1,26 @@
 # Changelog
 
+## v.0.9.2
+
+### Features
+- (ds3231): Added ds3231_get_squarewave_freq by @dizcza in https://github.com/UncleRus/esp-idf-lib/pull/447
+- (ads130e08): Driver for ADS130E08 ADC by @weslleymfd in https://github.com/UncleRus/esp-idf-lib/pull/462
+- (dps310): DPS310 driver by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/463
+
+### Bugfixes
+- (pca9557): Fixed incorrect I2C address and register bug by @AxelLin in https://github.com/UncleRus/esp-idf-lib/pull/453
+- (max7219) Fix string bounds check by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/471
+- (ci) Updated esp-idf versions by @trombik
+- (ci) Updated actions/checkout to v3 by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/476
+- (esp_idf_lib_helpers): Fixed ets_sys.h error by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/479
+- (i2cdev): Fixed i2c param config and driver install order for esp32 target by @AxelLin in https://github.com/UncleRus/esp-idf-lib/pull/475
+
+## New Contributors
+* @AxelLin made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/453
+* @weslleymfd made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/462
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.2/
+
 ## v.0.9.1
 
 ### Features
