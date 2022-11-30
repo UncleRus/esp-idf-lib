@@ -359,6 +359,123 @@ jobs:
             done
           done
 
+  build_esp32_v5_x:
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - esp32
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+            bison \
+            ccache \
+            flex \
+            gcc \
+            git \
+            gperf \
+            libffi-dev \
+            libncurses-dev \
+            libssl-dev \
+            make \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          __PROJECT_PATH=`pwd`
+
+          # XXX actions/checkout does not allow to checkout a repository other
+          # than under __PROJECT_PATH
+          IDF_PATH="${__PROJECT_PATH}/idf"
+
+          echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=${{ matrix.target }}" >> ${GITHUB_ENV}
+
+          # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
+          echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v3
+        with:
+          repository: espressif/esp-idf
+          path: idf
+          submodules: recursive
+          ref: v5.0-rc1
+
+      - name: Run idf_tools.py install
+        run: |
+          ${IDF_PATH}/tools/idf_tools.py install
+
+      - name: Run idf_tools.py install-python-env
+        run: |
+          ${IDF_PATH}/tools/idf_tools.py install-python-env
+
+      - name: Build (idf.py)
+        run: |
+          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
+
+          echo "The component whose examples need to be built:"
+          echo "${components_to_build}"
+
+          # find out drivers that do not support the target
+          EXCLUDE_COMPONENTS=""
+          ALL_COMPONENTS=`ls -1 components`
+          for C in ${ALL_COMPONENTS}; do
+            echo "see if component ${C} supports the target ${IDF_TARGET}"
+            if [ ! -f "components/${C}/.eil.yml" ]; then
+              echo "metadata file for component ${C}, components/${C}/.eil.yml, does not exist"
+              exit 1
+            fi
+            if yq '.components[].targets[].name' "components/${C}/.eil.yml" | grep -q ${IDF_TARGET}; then
+              echo "component ${C} supports ${IDF_TARGET}"
+            else
+              echo "component ${C} does not support ${IDF_TARGET}. adding it to EXCLUDE_COMPONENTS"
+              EXCLUDE_COMPONENTS="${EXCLUDE_COMPONENTS} ${C}"
+            fi
+          done
+          echo "EXCLUDE_COMPONENTS=${EXCLUDE_COMPONENTS}"
+          export EXCLUDE_COMPONENTS
+
+          # remove components in EXCLUDE_COMPONENTS from components_to_build
+          for ec in ${EXCLUDE_COMPONENTS}; do
+            components_to_build=`echo ${components_to_build} | tr ' ' '\n' | grep -v ${ec} | tr '\n' ' '`
+          done
+
+          . ${IDF_PATH}/export.sh
+
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          echo "final components_to_build:"
+          echo "${components_to_build}"
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+              echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+              idf.py --ccache build
+            done
+          done
+
   build_esp32_v4_x:
     needs: pre_build
     if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
@@ -1294,6 +1411,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build_esp32_master
+      - build_esp32_v5_x
       - build_esp32_v4_x
       - build_esp8266
       - build_esp8266_v3_3_x
