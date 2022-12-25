@@ -2,8 +2,11 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_system.h>
-#include "driver/gpio.h"
+#include <esp_log.h>
+#include <driver/gpio.h>
 #include <icm42670.h>
+
+static const char *TAG = "icm42670";
 
 #define PORT 0
 #if defined(CONFIG_EXAMPLE_I2C_ADDRESS_GND)
@@ -23,7 +26,8 @@ void icm42670_test(void *pvParameters)
 {
     // init device descriptor and device
     icm42670_t dev = { 0 };
-    ESP_ERROR_CHECK(icm42670_init_desc(&dev, I2C_ADDR, PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
+    ESP_ERROR_CHECK(
+        icm42670_init_desc(&dev, I2C_ADDR, PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(icm42670_init(&dev));
 
     // enable accelerometer and gyro in low-noise (LN) mode
@@ -40,32 +44,29 @@ void icm42670_test(void *pvParameters)
     // set full scale range (FSR)
     ESP_ERROR_CHECK(icm42670_set_accel_fsr(&dev, ICM42670_ACCEL_RANGE_16G));
     ESP_ERROR_CHECK(icm42670_set_gyro_fsr(&dev, ICM42670_GYRO_RANGE_2000DPS));
-    
 
     // read temperature sensor value once
     float temperature;
     ESP_ERROR_CHECK(icm42670_read_temperature(&dev, &temperature));
-    printf("Temperature reading: %f\n", temperature);
+    ESP_LOGI(TAG, "Temperature reading: %f", temperature);
 
-
-    uint16_t raw_reading;
+    int16_t raw_reading;
     uint8_t data_register;
 
     /* select which acceleration or gyro value should be read: */
-    //data_register = ICM42670_REG_ACCEL_DATA_X1;
-    //data_register = ICM42670_REG_ACCEL_DATA_Y1;
-    //data_register = ICM42670_REG_ACCEL_DATA_Z1;
+    // data_register = ICM42670_REG_ACCEL_DATA_X1;
+    // data_register = ICM42670_REG_ACCEL_DATA_Y1;
+    // data_register = ICM42670_REG_ACCEL_DATA_Z1;
     data_register = ICM42670_REG_GYRO_DATA_X1;
-    //data_register = ICM42670_REG_GYRO_DATA_Y1;
-    //data_register = ICM42670_REG_GYRO_DATA_Z1;
-
+    // data_register = ICM42670_REG_GYRO_DATA_Y1;
+    // data_register = ICM42670_REG_GYRO_DATA_Z1;
 
     // now poll selected accelerometer or gyro raw value directly from registers
-    while(1)
+    while (1)
     {
         ESP_ERROR_CHECK(icm42670_read_raw_data(&dev, data_register, &raw_reading));
 
-        printf("Raw accelerometer / gyro reading: %d\n", raw_reading);
+        ESP_LOGI(TAG, "Raw accelerometer / gyro reading: %d", raw_reading);
 
         vTaskDelay(pdMS_TO_TICKS(100));
     }
@@ -77,4 +78,3 @@ void app_main()
 
     xTaskCreatePinnedToCore(icm42670_test, "icm42670_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
-

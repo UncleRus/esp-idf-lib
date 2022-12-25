@@ -25,7 +25,7 @@
  *
  * Copyright (c) 2022 Jan Veeh (jan.veeh@motius.de)
  *
- * BSD Licensed as described in the file LICENSE
+ * ISC Licensed as described in the file LICENSE
  */
 
 #ifndef __ICM42670_H__
@@ -38,155 +38,150 @@
 extern "C" {
 #endif
 
-#define ICM42670_I2C_ADDR_GND           0x68
-#define ICM42670_I2C_ADDR_VCC           0x69
+#define ICM42670_I2C_ADDR_GND 0x68
+#define ICM42670_I2C_ADDR_VCC 0x69
 
 // Registers USER BANK 0
-#define ICM42670_REG_MCLK_RDY           0x00
-#define ICM42670_REG_DEVICE_CONFIG      0x01
-#define ICM42670_REG_SIGNAL_PATH_RESET  0x02
-#define ICM42670_REG_DRIVE_CONFIG1      0x03
-#define ICM42670_REG_DRIVE_CONFIG2      0x04
-#define ICM42670_REG_DRIVE_CONFIG3      0x05
-#define ICM42670_REG_INT_CONFIG         0x06
-#define ICM42670_REG_TEMP_DATA1         0x09
-#define ICM42670_REG_TEMP_DATA0         0x0A
-#define ICM42670_REG_ACCEL_DATA_X1      0x0B
-#define ICM42670_REG_ACCEL_DATA_X0      0x0C
-#define ICM42670_REG_ACCEL_DATA_Y1      0x0D
-#define ICM42670_REG_ACCEL_DATA_Y0      0x0E
-#define ICM42670_REG_ACCEL_DATA_Z1      0x0F
-#define ICM42670_REG_ACCEL_DATA_Z0      0x10
-#define ICM42670_REG_GYRO_DATA_X1       0x11
-#define ICM42670_REG_GYRO_DATA_X0       0x12
-#define ICM42670_REG_GYRO_DATA_Y1       0x13
-#define ICM42670_REG_GYRO_DATA_Y0       0x14
-#define ICM42670_REG_GYRO_DATA_Z1       0x15
-#define ICM42670_REG_GYRO_DATA_Z0       0x16
-#define ICM42670_REG_TMST_FSYNCH        0x17
-#define ICM42670_REG_TMST_FSYNCL        0x18
-#define ICM42670_REG_APEX_DATA4         0x1D
-#define ICM42670_REG_APEX_DATA5         0x1E
-#define ICM42670_REG_PWR_MGMT0          0x1F
-#define ICM42670_REG_GYRO_CONFIG0       0x20
-#define ICM42670_REG_ACCEL_CONFIG0      0x21
-#define ICM42670_REG_TEMP_CONFIG0       0x22
-#define ICM42670_REG_GYRO_CONFIG1       0x23
-#define ICM42670_REG_ACCEL_CONFIG1      0x24
-#define ICM42670_REG_APEX_CONFIG0       0x25
-#define ICM42670_REG_APEX_CONFIG1       0x26
-#define ICM42670_REG_WOM_CONFIG         0x27
-#define ICM42670_REG_FIFO_CONFIG1       0x28
-#define ICM42670_REG_FIFO_CONFIG2       0x29
-#define ICM42670_REG_FIFO_CONFIG3       0x2A
-#define ICM42670_REG_INT_SOURCE0        0x2B
-#define ICM42670_REG_INT_SOURCE1        0x2C
-#define ICM42670_REG_INT_SOURCE3        0x2D
-#define ICM42670_REG_INT_SOURCE4        0x2E
-#define ICM42670_REG_FIFO_LOST_PKT0     0x2F
-#define ICM42670_REG_FIFO_LOST_PKT1     0x30
-#define ICM42670_REG_APEX_DATA0         0x31
-#define ICM42670_REG_APEX_DATA1         0x32
-#define ICM42670_REG_APEX_DATA2         0x33
-#define ICM42670_REG_APEX_DATA3         0x34
-#define ICM42670_REG_INTF_CONFIG0       0x35
-#define ICM42670_REG_INTF_CONFIG1       0x36
-#define ICM42670_REG_INT_STATUS_DRDY    0x39
-#define ICM42670_REG_INT_STATUS         0x3A
-#define ICM42670_REG_INT_STATUS2        0x3B
-#define ICM42670_REG_INT_STATUS3        0x3C
-#define ICM42670_REG_FIFO_COUNTH        0x3D
-#define ICM42670_REG_FIFO_COUNTL        0x3E
-#define ICM42670_REG_FIFO_DATA          0x3F
-#define ICM42670_REG_WHO_AM_I           0x75
-#define ICM42670_REG_BLK_SEL_W          0x79
-#define ICM42670_REG_MADDR_W            0x7A
-#define ICM42670_REG_M_W                0x7B
-#define ICM42670_REG_BLK_SEL_R          0x7C
-#define ICM42670_REG_MADDR_R            0x7D
-#define ICM42670_REG_M_R                0x7E
-
+#define ICM42670_REG_MCLK_RDY          0x00
+#define ICM42670_REG_DEVICE_CONFIG     0x01
+#define ICM42670_REG_SIGNAL_PATH_RESET 0x02
+#define ICM42670_REG_DRIVE_CONFIG1     0x03
+#define ICM42670_REG_DRIVE_CONFIG2     0x04
+#define ICM42670_REG_DRIVE_CONFIG3     0x05
+#define ICM42670_REG_INT_CONFIG        0x06
+#define ICM42670_REG_TEMP_DATA1        0x09
+#define ICM42670_REG_TEMP_DATA0        0x0A
+#define ICM42670_REG_ACCEL_DATA_X1     0x0B
+#define ICM42670_REG_ACCEL_DATA_X0     0x0C
+#define ICM42670_REG_ACCEL_DATA_Y1     0x0D
+#define ICM42670_REG_ACCEL_DATA_Y0     0x0E
+#define ICM42670_REG_ACCEL_DATA_Z1     0x0F
+#define ICM42670_REG_ACCEL_DATA_Z0     0x10
+#define ICM42670_REG_GYRO_DATA_X1      0x11
+#define ICM42670_REG_GYRO_DATA_X0      0x12
+#define ICM42670_REG_GYRO_DATA_Y1      0x13
+#define ICM42670_REG_GYRO_DATA_Y0      0x14
+#define ICM42670_REG_GYRO_DATA_Z1      0x15
+#define ICM42670_REG_GYRO_DATA_Z0      0x16
+#define ICM42670_REG_TMST_FSYNCH       0x17
+#define ICM42670_REG_TMST_FSYNCL       0x18
+#define ICM42670_REG_APEX_DATA4        0x1D
+#define ICM42670_REG_APEX_DATA5        0x1E
+#define ICM42670_REG_PWR_MGMT0         0x1F
+#define ICM42670_REG_GYRO_CONFIG0      0x20
+#define ICM42670_REG_ACCEL_CONFIG0     0x21
+#define ICM42670_REG_TEMP_CONFIG0      0x22
+#define ICM42670_REG_GYRO_CONFIG1      0x23
+#define ICM42670_REG_ACCEL_CONFIG1     0x24
+#define ICM42670_REG_APEX_CONFIG0      0x25
+#define ICM42670_REG_APEX_CONFIG1      0x26
+#define ICM42670_REG_WOM_CONFIG        0x27
+#define ICM42670_REG_FIFO_CONFIG1      0x28
+#define ICM42670_REG_FIFO_CONFIG2      0x29
+#define ICM42670_REG_FIFO_CONFIG3      0x2A
+#define ICM42670_REG_INT_SOURCE0       0x2B
+#define ICM42670_REG_INT_SOURCE1       0x2C
+#define ICM42670_REG_INT_SOURCE3       0x2D
+#define ICM42670_REG_INT_SOURCE4       0x2E
+#define ICM42670_REG_FIFO_LOST_PKT0    0x2F
+#define ICM42670_REG_FIFO_LOST_PKT1    0x30
+#define ICM42670_REG_APEX_DATA0        0x31
+#define ICM42670_REG_APEX_DATA1        0x32
+#define ICM42670_REG_APEX_DATA2        0x33
+#define ICM42670_REG_APEX_DATA3        0x34
+#define ICM42670_REG_INTF_CONFIG0      0x35
+#define ICM42670_REG_INTF_CONFIG1      0x36
+#define ICM42670_REG_INT_STATUS_DRDY   0x39
+#define ICM42670_REG_INT_STATUS        0x3A
+#define ICM42670_REG_INT_STATUS2       0x3B
+#define ICM42670_REG_INT_STATUS3       0x3C
+#define ICM42670_REG_FIFO_COUNTH       0x3D
+#define ICM42670_REG_FIFO_COUNTL       0x3E
+#define ICM42670_REG_FIFO_DATA         0x3F
+#define ICM42670_REG_WHO_AM_I          0x75
+#define ICM42670_REG_BLK_SEL_W         0x79
+#define ICM42670_REG_MADDR_W           0x7A
+#define ICM42670_REG_M_W               0x7B
+#define ICM42670_REG_BLK_SEL_R         0x7C
+#define ICM42670_REG_MADDR_R           0x7D
+#define ICM42670_REG_M_R               0x7E
 
 // MREG1 registers
-#define ICM42670_REG_TMST_CONFIG1       0x00
-#define ICM42670_REG_FIFO_CONFIG5       0x01
-#define ICM42670_REG_FIFO_CONFIG6       0x02
-#define ICM42670_REG_FSYNC_CONFIG       0x03
-#define ICM42670_REG_INT_CONFIG0        0x04
-#define ICM42670_REG_INT_CONFIG1        0x05
-#define ICM42670_REG_SENSOR_CONFIG3     0x06
-#define ICM42670_REG_ST_CONFIG          0x13
-#define ICM42670_REG_SELFTEST           0x14
-#define ICM42670_REG_INTF_CONFIG6       0x23
-#define ICM42670_REG_INTF_CONFIG10      0x25
-#define ICM42670_REG_INTF_CONFIG7       0x28
-#define ICM42670_REG_OTP_CONFIG         0x2B
-#define ICM42670_REG_INT_SOURCE6        0x2F
-#define ICM42670_REG_INT_SOURCE7        0x30
-#define ICM42670_REG_INT_SOURCE8        0x31
-#define ICM42670_REG_INT_SOURCE9        0x32
-#define ICM42670_REG_INT_SOURCE10       0x33
-#define ICM42670_REG_APEX_CONFIG2       0x44
-#define ICM42670_REG_APEX_CONFIG3       0x45
-#define ICM42670_REG_APEX_CONFIG4       0x46
-#define ICM42670_REG_APEX_CONFIG5       0x47
-#define ICM42670_REG_APEX_CONFIG9       0x48
-#define ICM42670_REG_APEX_CONFIG10      0x49
-#define ICM42670_REG_APEX_CONFIG11      0x4A
-#define ICM42670_REG_ACCEL_WOM_X_THR    0x4B
-#define ICM42670_REG_ACCEL_WOM_Y_THR    0x4C
-#define ICM42670_REG_ACCEL_WOM_Z_THR    0x4D
-#define ICM42670_REG_OFFSET_USER0       0x4E
-#define ICM42670_REG_OFFSET_USER1       0x4F
-#define ICM42670_REG_OFFSET_USER2       0x50
-#define ICM42670_REG_OFFSET_USER3       0x51
-#define ICM42670_REG_OFFSET_USER4       0x52
-#define ICM42670_REG_OFFSET_USER5       0x53
-#define ICM42670_REG_OFFSET_USER6       0x54
-#define ICM42670_REG_OFFSET_USER7       0x55
-#define ICM42670_REG_OFFSET_USER8       0x56
-#define ICM42670_REG_ST_STATUS1         0x63
-#define ICM42670_REG_ST_STATUS2         0x64
-#define ICM42670_REG_FDR_CONFIG         0x66
-#define ICM42670_REG_APEX_CONFIG12      0x67
+#define ICM42670_REG_TMST_CONFIG1    0x00
+#define ICM42670_REG_FIFO_CONFIG5    0x01
+#define ICM42670_REG_FIFO_CONFIG6    0x02
+#define ICM42670_REG_FSYNC_CONFIG    0x03
+#define ICM42670_REG_INT_CONFIG0     0x04
+#define ICM42670_REG_INT_CONFIG1     0x05
+#define ICM42670_REG_SENSOR_CONFIG3  0x06
+#define ICM42670_REG_ST_CONFIG       0x13
+#define ICM42670_REG_SELFTEST        0x14
+#define ICM42670_REG_INTF_CONFIG6    0x23
+#define ICM42670_REG_INTF_CONFIG10   0x25
+#define ICM42670_REG_INTF_CONFIG7    0x28
+#define ICM42670_REG_OTP_CONFIG      0x2B
+#define ICM42670_REG_INT_SOURCE6     0x2F
+#define ICM42670_REG_INT_SOURCE7     0x30
+#define ICM42670_REG_INT_SOURCE8     0x31
+#define ICM42670_REG_INT_SOURCE9     0x32
+#define ICM42670_REG_INT_SOURCE10    0x33
+#define ICM42670_REG_APEX_CONFIG2    0x44
+#define ICM42670_REG_APEX_CONFIG3    0x45
+#define ICM42670_REG_APEX_CONFIG4    0x46
+#define ICM42670_REG_APEX_CONFIG5    0x47
+#define ICM42670_REG_APEX_CONFIG9    0x48
+#define ICM42670_REG_APEX_CONFIG10   0x49
+#define ICM42670_REG_APEX_CONFIG11   0x4A
+#define ICM42670_REG_ACCEL_WOM_X_THR 0x4B
+#define ICM42670_REG_ACCEL_WOM_Y_THR 0x4C
+#define ICM42670_REG_ACCEL_WOM_Z_THR 0x4D
+#define ICM42670_REG_OFFSET_USER0    0x4E
+#define ICM42670_REG_OFFSET_USER1    0x4F
+#define ICM42670_REG_OFFSET_USER2    0x50
+#define ICM42670_REG_OFFSET_USER3    0x51
+#define ICM42670_REG_OFFSET_USER4    0x52
+#define ICM42670_REG_OFFSET_USER5    0x53
+#define ICM42670_REG_OFFSET_USER6    0x54
+#define ICM42670_REG_OFFSET_USER7    0x55
+#define ICM42670_REG_OFFSET_USER8    0x56
+#define ICM42670_REG_ST_STATUS1      0x63
+#define ICM42670_REG_ST_STATUS2      0x64
+#define ICM42670_REG_FDR_CONFIG      0x66
+#define ICM42670_REG_APEX_CONFIG12   0x67
 
 // MREG2 registers
-#define ICM42670_REG_OTP_CTRL7          0x06
+#define ICM42670_REG_OTP_CTRL7 0x06
 
 // MREG3 registers
-#define ICM42670_REG_XA_ST_DATA         0x00
-#define ICM42670_REG_YA_ST_DATA         0x01
-#define ICM42670_REG_ZA_ST_DATA         0x02
-#define ICM42670_REG_XG_ST_DATA         0x03
-#define ICM42670_REG_YG_ST_DATA         0x04
-#define ICM42670_REG_ZG_ST_DATA         0x05
+#define ICM42670_REG_XA_ST_DATA 0x00
+#define ICM42670_REG_YA_ST_DATA 0x01
+#define ICM42670_REG_ZA_ST_DATA 0x02
+#define ICM42670_REG_XG_ST_DATA 0x03
+#define ICM42670_REG_YG_ST_DATA 0x04
+#define ICM42670_REG_ZG_ST_DATA 0x05
 
 /* Gyro power mode */
-typedef enum
-{
+typedef enum {
     ICM42670_GYRO_DISABLE = 0b00,
     ICM42670_GYRO_STANDBY = 0b01,
     ICM42670_GYRO_ENABLE_LN_MODE = 0b11
 } icm42670_gyro_pwr_mode_t;
 
 /* Accelerometer power mode */
-typedef enum
-{
+typedef enum {
     ICM42670_ACCEL_DISABLE = 0b00,
     ICM42670_ACCEL_ENABLE_LP_MODE = 0b10,
     ICM42670_ACCEL_ENABLE_LN_MODE = 0b11
 } icm42670_accel_pwr_mode_t;
 
 /* Accelerometer low power mode clock source */
-typedef enum
-{
-    ICM42670_LP_CLK_WUO = 0,
-    ICM42670_LP_CLK_RCO = 1
+typedef enum { 
+    ICM42670_LP_CLK_WUO = 0, 
+    ICM42670_LP_CLK_RCO = 1 
 } icm42670_lp_clock_source_t;
 
 /* Gyro FSR (full scale range) */
-typedef enum
-{
+typedef enum {
     ICM42670_GYRO_RANGE_2000DPS = 0b00,
     ICM42670_GYRO_RANGE_1000DPS = 0b01,
     ICM42670_GYRO_RANGE_500DPS = 0b10,
@@ -194,8 +189,7 @@ typedef enum
 } icm42670_gyro_fsr_t;
 
 /* Gyro ODR (output data rate) */
-typedef enum
-{
+typedef enum {
     ICM42670_GYRO_ODR_12_5HZ = 0b1100,
     ICM42670_GYRO_ODR_25HZ = 0b1011,
     ICM42670_GYRO_ODR_50HZ = 0b1010,
@@ -207,8 +201,7 @@ typedef enum
 } icm42670_gyro_odr_t;
 
 /* Accelerometer FSR (full scale range) */
-typedef enum
-{
+typedef enum {
     ICM42670_ACCEL_RANGE_16G = 0b00,
     ICM42670_ACCEL_RANGE_8G = 0b01,
     ICM42670_ACCEL_RANGE_4G = 0b10,
@@ -216,8 +209,7 @@ typedef enum
 } icm42670_accel_fsr_t;
 
 /* Accelerometer ODR (output data rate) */
-typedef enum
-{
+typedef enum {
     ICM42670_ACCEL_ODR_1_5625HZ = 0b1111,
     ICM42670_ACCEL_ODR_3_125HZ = 0b1110,
     ICM42670_ACCEL_ODR_6_25HZ = 0b1101,
@@ -232,8 +224,7 @@ typedef enum
 } icm42670_accel_odr_t;
 
 /* Temperature LPF (low pass filter) */
-typedef enum
-{
+typedef enum {
     ICM42670_TEMP_LFP_BYPASSED = 0b000,
     ICM42670_TEMP_LFP_180HZ = 0b001,
     ICM42670_TEMP_LFP_72HZ = 0b010,
@@ -244,8 +235,7 @@ typedef enum
 } icm42670_temp_lfp_t;
 
 /* Gyro LPF (low pass filter) */
-typedef enum
-{
+typedef enum {
     ICM42670_GYRO_LFP_BYPASSED = 0b000,
     ICM42670_GYRO_LFP_180HZ = 0b001,
     ICM42670_GYRO_LFP_121HZ = 0b010,
@@ -257,8 +247,7 @@ typedef enum
 } icm42670_gyro_lfp_t;
 
 /* Accelerometer LPF (low pass filter) */
-typedef enum
-{
+typedef enum {
     ICM42670_ACCEL_LFP_BYPASSED = 0b000,
     ICM42670_ACCEL_LFP_180HZ = 0b001,
     ICM42670_ACCEL_LFP_121HZ = 0b010,
@@ -270,8 +259,7 @@ typedef enum
 } icm42670_accel_lfp_t;
 
 /* Accelerometer averaging (for low power mode) */
-typedef enum
-{
+typedef enum {
     ICM42670_ACCEL_AVG_2X = 0b000,
     ICM42670_ACCEL_AVG_4X = 0b001,
     ICM42670_ACCEL_AVG_8X = 0b010,
@@ -280,28 +268,20 @@ typedef enum
     ICM42670_ACCEL_AVG_64X = 0b101
 } icm42670_accel_avg_t;
 
-
-
-
-
-
 /* Interrupt pin signal mode */
-typedef enum
-{
+typedef enum {
     ICM42670_INT_MODE_PULSED = 0,
     ICM42670_INT_MODE_LATCHED = 1
 } icm42670_int_mode_t;
 
 /* Interrupt pin signal type */
-typedef enum
-{
+typedef enum {
     ICM42670_INT_DRIVE_OPEN_DRAIN = 0,
     ICM42670_INT_DRIVE_PUSH_PULL = 1
 } icm42670_int_drive_t;
 
 /* Interrupt pin signal polarity */
-typedef enum
-{
+typedef enum {
     ICM42670_INT_POLARITY_ACTIVE_LOW = 0,
     ICM42670_INT_POLARITY_ACTIVE_HIGH = 1
 } icm42670_int_polarity_t;
@@ -332,11 +312,8 @@ typedef struct
     bool wom_x;
 } icm42670_int_source_t;
 
-
-
 /* Wake on Motion interrupt assertion */
-typedef enum
-{
+typedef enum {
     ICM42670_WOM_INT_DUR_FIRST = 0b00,
     ICM42670_WOM_INT_DUR_SECOND = 0b01,
     ICM42670_WOM_INT_DUR_THIRD = 0b10,
@@ -344,15 +321,13 @@ typedef enum
 } icm42670_wom_int_dur_t;
 
 /* Wake on Motion interrupt logical trigger */
-typedef enum
-{
+typedef enum {
     ICM42670_WOM_INT_MODE_ALL_OR = 0,
     ICM42670_WOM_INT_MODE_ALL_AND = 1
 } icm42670_wom_int_mode_t;
 
 /* Wake on Motion reference sample */
-typedef enum
-{
+typedef enum {
     ICM42670_WOM_MODE_REF_INITIAL = 0,
     ICM42670_WOM_MODE_REF_LAST = 1
 } icm42670_wom_mode_t;
@@ -363,23 +338,17 @@ typedef struct
     icm42670_wom_int_dur_t trigger;
     icm42670_wom_int_mode_t logical_mode;
     icm42670_wom_mode_t reference;
-    uint8_t wom_x_threshold;        // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
-    uint8_t wom_y_threshold;        // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
-    uint8_t wom_z_threshold;        // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
+    uint8_t wom_x_threshold; // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
+    uint8_t wom_y_threshold; // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
+    uint8_t wom_z_threshold; // 8-bit value between 0 and 1g (Resolution 1g/256=~3.9 mg)
 } icm42670_wom_config_t;
 
 /* MREG 1-3 access */
-typedef enum
-{
+typedef enum {
     ICM42670_MREG1_RW = 0x00,
     ICM42670_MREG2_RW = 0x28,
     ICM42670_MREG3_RW = 0x50
 } icm42670_mreg_number_t;
-
-
-
-
-
 
 /**
  * Device descriptor
@@ -471,7 +440,7 @@ esp_err_t icm42670_read_temperature(icm42670_t *dev, float *temperature);
  * @param[out] data accel or gyro data
  * @return `ESP_OK` on success
  */
-esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, uint16_t *data);
+esp_err_t icm42670_read_raw_data(icm42670_t *dev, uint8_t data_register, int16_t *data);
 
 /**
  * @brief Performs a soft-reset
@@ -634,4 +603,4 @@ esp_err_t icm42670_get_accel_avg(icm42670_t *dev, icm42670_accel_avg_t *avg);
 
 /**@}*/
 
-#endif  // __ICM42670_H__
+#endif // __ICM42670_H__

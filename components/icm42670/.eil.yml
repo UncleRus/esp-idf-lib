@@ -1,10 +1,10 @@
 ---
 components:
   - name: icm42670
-    description: Driver for TDK ICM-42670-P IMU (found on ESP-RS board)
+    description: Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board, https://github.com/esp-rs/esp-rust-board)
     group: imu
     groups: []
-    code_owners: Jan Veeh
+    code_owners: janveeh
     depends:
       - i2cdev
       - log
@@ -19,5 +19,5 @@ components:
       - name: ICS
     copyrights:
       - author:
-          name: Jan Veeh
+          name: janveeh
         year: 2022

@@ -44,3 +44,6 @@
 
 - name: misc
   description: Other misc libraries
+
+- name: imu
+  description: Inertial measurement units

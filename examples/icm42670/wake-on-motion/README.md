@@ -2,9 +2,11 @@
 
 ## What it does
 
-This example configures the ICM42670 IMU to send an interrupt to the ESP if motion above a certain threshold (0.39g by default) along any direction is detected. The level of the interrupt pin is polled in a loop. The IMU is set to a low-power mode before.
+This example configures the ICM42670 IMU to send an interrupt signal via a defined pin to the ESP if motion above a certain threshold is detected. This threshold (0.39*g by default) as well as the axes along movements are detected (all three axes by default) are configurable. Whether a WoM event was triggered or not is continuously checked in the main loop.
 
-This Wake-on-Motion (WoM) feature can be used to wake the MCU from deep-sleep or perform any other operation if motion is detected.
+If the user moves the device, the "WoM event detected" state changes from false to true.
+
+This Wake-on-Motion (WoM) feature can be used to wake the MCU from deep-sleep or perform any other operation if motion is detected. The WoM detection is performed in a low-power mode of the IMU.
 
 ## Wiring
 
