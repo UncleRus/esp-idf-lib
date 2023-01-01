@@ -664,3 +664,11 @@ labels:
           - "components/ads130e08/**"
           - "components/ads130e08/.eil.yml"
           - "examples/ads130e08/**"
+  - label: "area:components:veml7700"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/veml7700/**"
+          - "components/veml7700/.eil.yml"
+          - "examples/veml7700/**"
