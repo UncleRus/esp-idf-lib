@@ -218,6 +218,13 @@ Input controls
    groups/encoder
    groups/ls7366r
 
+Inertial measurement units
+==========================
+.. toctree::
+   :maxdepth: 1
+
+   groups/icm42670
+
 Other
 =====
 .. toctree::

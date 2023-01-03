@@ -272,6 +272,14 @@ labels:
           - "components/i2cdev/**"
           - "components/i2cdev/.eil.yml"
           - "examples/i2cdev/**"
+  - label: "area:components:icm42670"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/icm42670/**"
+          - "components/icm42670/.eil.yml"
+          - "examples/icm42670/**"
   - label: "area:components:ina219"
     sync: true
     matcher:
