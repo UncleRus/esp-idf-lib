@@ -387,13 +387,13 @@ typedef struct {
 /**
  * @brief Initialize device descriptor
  *
- * @param dev[out] The device descriptor.
- * @param addr[in] DPS310's I2C address
- * @param port[in] I2C port number to use.
+ * @param[out] dev      The device descriptor.
+ * @param[in]  addr     DPS310's I2C address
+ * @param[in]  port     I2C port number to use.
  *                 See available I2C port at:
  *                 https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html#_CPPv410i2c_port_t
- * @param sda_gpio[in] GPIO pin for SDA
- * @param scl_gpio[in] GPIO pin for SCL
+ * @param[in]  sda_gpio GPIO pin for SDA
+ * @param[in]  scl_gpio GPIO pin for SCL
  * @return `ESP_OK` on success
  */
 esp_err_t dps310_init_desc(dps310_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
@@ -419,8 +419,8 @@ esp_err_t dps310_free_desc(dps310_t *dev);
  * - reset the chip
  * - perform a quirk
  *
- * @param dev[in] Device descriptor
- * @param config[in] Configuration
+ * @param[in] dev    Device descriptor
+ * @param[in] config Configuration
  * @return `ESP_OK` on success
  */
 esp_err_t dps310_init(dps310_t *dev, dps310_config_t *config);
