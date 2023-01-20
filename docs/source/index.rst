@@ -187,6 +187,7 @@ Light sensors
    groups/tsl2561
    groups/tsl4531
    groups/tsl2591
+   groups/veml7700
 
 GPIO expanders
 ==============
@@ -217,6 +218,13 @@ Input controls
    groups/button
    groups/encoder
    groups/ls7366r
+
+Inertial measurement units
+==========================
+.. toctree::
+   :maxdepth: 1
+
+   groups/icm42670
 
 Other
 =====

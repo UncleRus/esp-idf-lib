@@ -171,6 +171,12 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3   | `esp32`, `esp32c3`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
+### Inertial measurement units
+
+| Component                | Description                                                                      | License | Supported on       | Thread safety
+|--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
+| **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board, https://github.com/esp-rs/esp-rust-board) | ICS     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+
 ### Input device drivers
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
@@ -196,6 +202,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **tsl2561**              | Driver for light-to-digital converter TSL2561                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tsl2591**              | Driver for light-to-digital converter TSL2591                                    | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tsl4531**              | Driver for digital ambient light sensor TSL4531                                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **veml7700**             | Driver for VEML7700 ambient light sensor                                         | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Magnetic sensors
 
@@ -301,3 +308,5 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Timofei Korostelev](https://github.com/chudsaviet), developer of HT16K33 driver
 - [Jose Manuel Perez](https://github.com/jmpmscorp), developer of LC709203F driver
 - [Weslley Duarte](https://github.com/weslleymfd), developer of ADS130E08 driver
+- [Jan Veeh](https://github.com/janveeh), developer of ICM42670 driver
+- [Marc Luehr](https://github.com/Th3Link), developer of VEML7700 driver

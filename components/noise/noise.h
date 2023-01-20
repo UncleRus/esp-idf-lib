@@ -29,6 +29,10 @@
 ///@file noise.h
 /// Noise functions provided by the library.
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///@defgroup Noise Noise functions
 ///Perlin noise function definitions
 ///@{
@@ -88,5 +92,9 @@ void fill_raw_noise8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint16
 void fill_raw_noise16into8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint32_t x, int scale, uint32_t time);
 ///@}
 ///@}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NOISE_H__ */

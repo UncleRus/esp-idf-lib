@@ -302,9 +302,8 @@ esp_err_t ads130e08_get_device_config(ads130e08_t *dev, ads130e08_dev_config_t *
 /**
  * @brief Reads raw data in "Read data by command" mode
  *
- * @param dev        Device descriptor
- * @param raw_data_t Raw data
- * @param n_devices  Number of devices
+ * @param dev           Device descriptor
+ * @param[out] raw_data Raw data
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data);
@@ -312,9 +311,9 @@ esp_err_t ads130e08_get_rdata(ads130e08_t *dev, ads130e08_raw_data_t *raw_data);
 /**
  * @brief Converts raw adc value to voltage
  *
- * @param raw   Raw adc value
- * @param gain  Channel gain
- * @param volts Voltage value
+ * @param raw        Raw adc value
+ * @param gain       Channel gain
+ * @param[out] volts Voltage value
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_convert_raw_to_voltage(int16_t raw, uint8_t gain, float *volts);
@@ -331,8 +330,8 @@ esp_err_t ads130e08_set_fault_detect_control(ads130e08_t *dev, ads130e08_fault_t
 /**
  * @brief Get fault detect control
  *
- * @param dev        Pointer to device descriptor
- * @param fault_mode Fault mode
+ * @param dev             Pointer to device descriptor
+ * @param[out] fault_mode Fault mode
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_fault_detect_control(ads130e08_t *dev, ads130e08_fault_threshold_t *fault_mode);
@@ -351,9 +350,9 @@ esp_err_t ads130e08_set_channel_config(ads130e08_t *dev, ads130e08_channel_t cha
 /**
  * @brief Get channel configuration
  *
- * @param dev     Pointer to device descriptor
- * @param channel Channel
- * @param config  Channel configuration
+ * @param dev         Pointer to device descriptor
+ * @param channel     Channel
+ * @param[out]config  Channel configuration
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_channel_config(ads130e08_t *dev, ads130e08_channel_t channel,
@@ -372,9 +371,9 @@ esp_err_t ads130e08_set_gpio_pin_mode(ads130e08_t *dev, ads130e08_gpio_pin_t gpi
 /**
  * @brief Get GPIO pin mode
  *
- * @param dev       Pointer to device descriptor
- * @param gpio_pin  GPIO pin number
- * @param gpio_mode GPIO pin mode
+ * @param dev            Pointer to device descriptor
+ * @param gpio_pin       GPIO pin number
+ * @param[out] gpio_mode GPIO pin mode
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_gpio_pin_mode(ads130e08_t *dev, ads130e08_gpio_pin_t gpio_pin,
@@ -394,9 +393,9 @@ esp_err_t ads130e08_set_gpio_pin_level(ads130e08_t *dev, ads130e08_gpio_pin_t gp
 /**
  * @brief Get GPIO pin level
  *
- * @param dev        Pointer to device descriptor
- * @param gpio_pin   GPIO pin number
- * @param gpio_level GPIO pin level
+ * @param dev             Pointer to device descriptor
+ * @param gpio_pin        GPIO pin number
+ * @param[out] gpio_level GPIO pin level
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_gpio_pin_level(ads130e08_t *dev, ads130e08_gpio_pin_t gpio_pin,
@@ -406,8 +405,8 @@ esp_err_t ads130e08_get_gpio_pin_level(ads130e08_t *dev, ads130e08_gpio_pin_t gp
  * @brief Run automatical fault detection cycle
  *
  * @param dev Device descriptor
- * @param fault_statp
- * @param fault_statn
+ * @param [out] fault_statp See datasheet
+ * @param [out] fault_statn See datasheet
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_detect_fault_auto(ads130e08_t *dev, uint8_t *fault_statp, uint8_t *fault_statn);

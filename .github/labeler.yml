@@ -272,6 +272,14 @@ labels:
           - "components/i2cdev/**"
           - "components/i2cdev/.eil.yml"
           - "examples/i2cdev/**"
+  - label: "area:components:icm42670"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/icm42670/**"
+          - "components/icm42670/.eil.yml"
+          - "examples/icm42670/**"
   - label: "area:components:ina219"
     sync: true
     matcher:
@@ -656,3 +664,11 @@ labels:
           - "components/ads130e08/**"
           - "components/ads130e08/.eil.yml"
           - "examples/ads130e08/**"
+  - label: "area:components:veml7700"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/veml7700/**"
+          - "components/veml7700/.eil.yml"
+          - "examples/veml7700/**"

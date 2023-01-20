@@ -69,7 +69,6 @@ typedef struct
  * @brief Initialize device descriptor
  *
  * @param dev      Device descriptor
- * @param addr     Device I2C address
  * @param port     I2C port
  * @param sda_gpio SDA GPIO
  * @param scl_gpio SCL GPIO
