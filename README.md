@@ -102,7 +102,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **ads111x**              | Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC           | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
-| **ads130e08**            | Driver for ADS130E08 ADC                                                         | MIT     | `esp32`            | Yes
+| **ads130e08**            | Driver for ADS130E08 ADC                                                         | MIT     | `esp32`, `esp32s3` | Yes
 | **hx711**                | Driver for HX711 24-bit ADC for weigh scales                                     | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
 | **mcp342x**              | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **mcp4725**              | Driver for 12-bit DAC MCP4725                                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
