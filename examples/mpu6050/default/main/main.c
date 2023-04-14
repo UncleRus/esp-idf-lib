@@ -26,6 +26,7 @@ void mpu6050_test(void *pvParameters)
     esp_err_t ret = ESP_FAIL;
 
     mpu6050_dev_t mpu6050_conf = { 0 };
+    int16_t temp = 0;
 
     ESP_LOGI(TAG, "mpu6050 config: addr 0x%x, sda %d, scl %d, clk, %d port %d", MPU6050_ADDR, MPU6050_SDA_PIN,
         MPU6050_SCL_PIN, MPU6050_I2C_CLK_FREQZ, MPU6050_I2C_PORT);
@@ -37,13 +38,13 @@ void mpu6050_test(void *pvParameters)
         {
             ESP_LOGE(TAG, "Failed to init mpu6050, error %s", esp_err_to_name(ret));
         }
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 
     while (mpu6050_test_connection(&(mpu6050_conf)) != ESP_OK)
     {
         ESP_LOGE(TAG, "mpu6050 connection failed.");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
     ESP_LOGI(TAG, "mpu6050 connection successfull.");
@@ -52,6 +53,11 @@ void mpu6050_test(void *pvParameters)
     {
         mpu6050_rotation_t mpu6050_rot = { 0 };
         mpu6050_acceleration_t mpu6050_accel = { 0 };
+        mpu6050_get_temperature(&(mpu6050_conf), &temp);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(TAG, "failed to read temp error %s", esp_err_to_name(ret));
+        }
         ret = mpu6050_get_motion(&(mpu6050_conf), &(mpu6050_accel), &(mpu6050_rot));
         if (ret != ESP_OK)
         {
@@ -60,18 +66,12 @@ void mpu6050_test(void *pvParameters)
         else
         {
             ESP_LOGI(TAG, "**********************************************************************");
-            ESP_LOGI(TAG, "Rotation:\tx=%d\ty=%d\tz=%d", mpu6050_rot.x, mpu6050_rot.y, mpu6050_rot.z);
-            ESP_LOGI(TAG, "Acceleration:\tx=%d\ty=%d\tz=%d", mpu6050_accel.x, mpu6050_accel.y, mpu6050_accel.z);
-            ESP_LOGI(TAG, "**********************************************************************");
-            int16_t temp = 0;
-            ret = mpu6050_get_temperature(&(mpu6050_conf), &temp);
-            if (ret == ESP_OK)
-            {
-                ESP_LOGI(TAG, "temp %d", temp);
-            }
+            ESP_LOGI(TAG, "Rotation:     x=%d   y=%d   z=%d", mpu6050_rot.x, mpu6050_rot.y, mpu6050_rot.z);
+            ESP_LOGI(TAG, "Acceleration: x=%d   y=%d   z=%d", mpu6050_accel.x, mpu6050_accel.y, mpu6050_accel.z);
+            ESP_LOGI(TAG, "Temperature:    %d", temp);
         }
 
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
     // never reach here
