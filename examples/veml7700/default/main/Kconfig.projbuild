@@ -1,0 +1,31 @@
+menu "Example Configuration"
+
+    config EXAMPLE_SCL_GPIO_NUM
+        int "SCL GPIO Num"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32H2
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_SDA_GPIO_NUM
+        int "SDA GPIO Num"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32H2
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+
+    config EXAMPLE_SCL_PULLUP_ENABLE
+        bool "SCL pullup enable"
+        default n
+        help
+            Enable internal pullup resistor for SCL.
+
+    config EXAMPLE_SDA_PULLUP_ENABLE
+        bool "SDA pullup enable"
+        default n
+        help
+            Enable internal pullup resistor for SDA.
+
+endmenu

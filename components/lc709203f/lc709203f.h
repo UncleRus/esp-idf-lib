@@ -331,7 +331,7 @@ esp_err_t lc709203f_set_alarm_low_voltage(i2c_dev_t *dev, uint16_t voltage);
  * @brief Set APA (adjustment pack application)
  *
  * @param[in] dev Device descriptor
- * @param[in] value Value to set
+ * @param[in] apa Value to set
  * @return `ESP_OK` on success
  */
 esp_err_t lc709203f_set_apa(i2c_dev_t *dev, uint8_t apa);
@@ -340,7 +340,7 @@ esp_err_t lc709203f_set_apa(i2c_dev_t *dev, uint8_t apa);
  * @brief Set APA (adjustment pack thermistor)
  *
  * @param[in] dev Device descriptor
- * @param[in] value Value to set
+ * @param[in] apt Value to set
  * @return
  * @return
  *      `ESP_INVALID_ARG` null dev

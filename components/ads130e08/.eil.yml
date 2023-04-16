@@ -11,6 +11,7 @@ components:
     thread_safe: yes
     targets:
       - name: esp32
+      - name: esp32s3
     licenses:
       - name: MIT
     copyrights:

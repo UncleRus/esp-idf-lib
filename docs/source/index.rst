@@ -188,6 +188,7 @@ Light sensors
    groups/tsl2561
    groups/tsl4531
    groups/tsl2591
+   groups/veml7700
 
 GPIO expanders
 ==============
