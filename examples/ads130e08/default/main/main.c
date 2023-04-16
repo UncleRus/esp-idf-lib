@@ -9,7 +9,11 @@
 #include <esp_task_wdt.h>
 #include <ads130e08.h>
 
+#if CONFIG_IDF_TARGET_ESP32S3
+#define HOST SPI2_HOST
+#else
 #define HOST HSPI_HOST
+#endif
 
 static const char *TAG_ADS130E08 = "ads130e08";
 
