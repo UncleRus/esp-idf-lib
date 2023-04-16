@@ -8,11 +8,11 @@
 #define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
-static const char *TAG = "am2302-example";
+static const char *TAG = "am2320-example";
 
 void task(void *pvParameters)
 {
-    i2c_dev_t dev = { 0 };
+    i2c_dev_t dev = {0};
 
     ESP_ERROR_CHECK(am2320_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
