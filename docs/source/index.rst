@@ -126,7 +126,8 @@ Humidity & temperature sensors
    groups/hdc1000
    groups/max31855
    groups/sts21
-   
+   groups/am2320
+
 Pressure sensors
 ================
 .. toctree::
