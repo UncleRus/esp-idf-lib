@@ -4,6 +4,10 @@
 #include <esp_log.h>
 #include <inttypes.h>
 
+#ifndef APP_CPU_NUM
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 static const char *TAG = "am2302-example";
 
 void task(void *pvParameters)
