@@ -601,7 +601,7 @@ static esp_err_t i2c_write_word(i2c_dev_t *dev, uint8_t reg_addr, uint8_t data)
     return ESP_OK;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
+/**********************************************************/
 
 /* ------------------------------------------------------ */
 esp_err_t mpu6050_get_aux_vddio_level(mpu6050_dev_t *setting, uint8_t *level)

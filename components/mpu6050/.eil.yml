@@ -1,0 +1,22 @@
+---
+components:
+  - name: mpu6050
+    description: |
+      Driver for MPU6050 module
+    group: sensor
+    groups: []
+    code_owners:
+      - name: horsemann07
+    depends:
+      - name: log
+      - name: esp_idf_lib_helpers
+      - name: driver
+    thread_safe: no
+    targets:
+      - name: esp32
+      - name: esp32s2
+    licenses:
+      - name: MIT
+    copyrights:
+      - name: horsemann07
+        year: 2023
