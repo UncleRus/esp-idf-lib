@@ -44,7 +44,7 @@
 /* mpu6050 headers */
 #include "mpu6050.h"
 
-#define TAG (__FILENAME__)
+#define TAG ("mpu6050.c")
 
 // Internal Registers Definitions
 #define MPU6050_REGISTER_XG_OFFS_TC         (0)
