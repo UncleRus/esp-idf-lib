@@ -160,6 +160,7 @@ ADC/DAC
    groups/mcp4725
    groups/mcp342x
    groups/ads130e08
+   groups/sgm58031
 
 Power/Current monitors
 ======================

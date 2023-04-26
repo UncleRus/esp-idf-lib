@@ -544,6 +544,14 @@ labels:
           - "components/scd4x/**"
           - "components/scd4x/.eil.yml"
           - "examples/scd4x/**"
+- label: "area:components:sgm58031"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/sgm58031/**"
+          - "components/sgm58031/.eil.yml"
+          - "examples/sgm58031/**"
   - label: "area:components:sgp40"
     sync: true
     matcher:
