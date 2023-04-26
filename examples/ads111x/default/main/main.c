@@ -28,11 +28,11 @@ static void measure(size_t n)
 {
     // wait for conversion end
     bool busy;
-    do
-    {
-        ads111x_is_busy(&devices[n], &busy);
-    }
-    while (busy);
+    // do
+    // {
+    //     ads111x_is_busy(&devices[n], &busy);
+    // }
+    // while (busy);
 
     // Read result
     int16_t raw = 0;
