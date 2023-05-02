@@ -52,20 +52,26 @@ Mkfile.old
 dkms.conf
 *.swp
 
-build/
-sdkconfig.old
-sdkconfig
+**/build/
+**/sdkconfig.old
+**/sdkconfig
 /.cproject
 /.project
 /.settings/
 /.pydevproject
 /__garbage__/
-/.vscode/
+**/.vscode/
+**/.devcontainer
 /.idea/
 cmake-build-debug/
+
 /esp-idf-lib.code-workspace
 Gemfile.lock
 
 # macOS .DS_Store and .AppleDouble files
 .DS_Store
 .AppleDouble
+
+# bundled files by ruby bundler and configuration
+/.bundle/
+/vendor/

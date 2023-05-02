@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -73,7 +74,7 @@ void ds18x20_test(void *pvParameter)
                 // Float is used in printf(). You need non-default configuration in
                 // sdkconfig for ESP8266, which is enabled by default for this
                 // example. See sdkconfig.defaults.esp8266
-                ESP_LOGI(TAG, "Sensor %08x%08x (%s) reports %.3f°C (%.3f°F)",
+                ESP_LOGI(TAG, "Sensor %08" PRIx32 "%08" PRIx32 " (%s) reports %.3f°C (%.3f°F)",
                         (uint32_t)(addrs[j] >> 32), (uint32_t)addrs[j],
                         (addrs[j] & 0xff) == DS18B20_FAMILY_ID ? "DS18B20" : "DS18S20",
                         temp_c, temp_f);
@@ -91,4 +92,3 @@ void app_main()
 {
     xTaskCreate(ds18x20_test, "ds18x20_test", configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
 }
-

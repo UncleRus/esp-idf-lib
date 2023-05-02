@@ -1,0 +1,46 @@
+menu "Example configuration"
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+    
+    config EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT
+        int "I2C onboard pullup resistors GPIO output"
+        default -1
+        help
+            Boards like Adafruit Feather esp32s2/s3 have onboard pullup resistors for I2C, 
+            which can be enabled (or disabled) by setting output to HIGH (or LOW). 
+            Use this option if the board has such feature.
+
+            Set -1 to skip pin configuration.
+            Set GPIO number to configure a pin used as onboard pullup resistor output. 
+    
+    
+    choice 
+        prompt "I2C onboard pullup resistors GPIO output level" 
+        depends on EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT >= 0
+
+        config EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT_HIGH
+            bool "HIGH"
+        config EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT_LOW
+            bool "LOW"
+    endchoice
+
+    config EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT_LEVEL
+        int
+        default 1
+        default 1 if EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT_HIGH
+        default 0 if EXAMPLE_I2C_ONBOARD_PULLUP_GPIO_OUTPUT_LOW
+    
+endmenu

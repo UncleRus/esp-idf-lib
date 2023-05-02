@@ -274,6 +274,17 @@ esp_err_t ds3231_disable_squarewave(i2c_dev_t *dev);
 esp_err_t ds3231_set_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t freq);
 
 /**
+ * @brief Get the frequency of the squarewave output
+ *
+ * Does not enable squarewave output.
+ *
+ * @param dev Device descriptor
+ * @param freq Squarewave frequency to store the output
+ * @return ESP_OK to indicate success
+ */
+esp_err_t ds3231_get_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t* freq);
+
+/**
  * @brief Get the raw temperature value
  *
  * **Supported only by DS3231**

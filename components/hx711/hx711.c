@@ -167,7 +167,7 @@ esp_err_t hx711_read_average(hx711_t *dev, size_t times, int32_t *data)
         CHECK(hx711_read_data(dev, &v));
         *data += v;
     }
-    *data /= times;
+    *data /= (int32_t) times;
 
     return ESP_OK;
 }

@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -40,7 +41,7 @@ void task(void *pvParameters)
         default:
             printf("Unknown");
     }
-    printf("\nSerial number: 0x%08x%08x\n", (uint32_t)(serial >> 32), (uint32_t)serial);
+    printf("\nSerial number: 0x%08" PRIx32 "%08" PRIx32 "\n", (uint32_t)(serial >> 32), (uint32_t)serial);
 #endif
 
     float val;

@@ -4,7 +4,7 @@
 version: v1
 labels:
 
-  # thses labels are used to draft relases.
+  # these labels are used to draft releases.
   - label: "enhancement"
     matcher:
       branch: "^(feat|feature)-.*"
@@ -136,6 +136,14 @@ labels:
           - "components/dht/**"
           - "components/dht/.eil.yml"
           - "examples/dht/**"
+  - label: "area:components:dps310"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/dps310/**"
+          - "components/dps310/.eil.yml"
+          - "examples/dps310/**"
   - label: "area:components:ds1302"
     sync: true
     matcher:
@@ -264,6 +272,14 @@ labels:
           - "components/i2cdev/**"
           - "components/i2cdev/.eil.yml"
           - "examples/i2cdev/**"
+  - label: "area:components:icm42670"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/icm42670/**"
+          - "components/icm42670/.eil.yml"
+          - "examples/icm42670/**"
   - label: "area:components:ina219"
     sync: true
     matcher:
@@ -288,6 +304,14 @@ labels:
           - "components/ina3221/**"
           - "components/ina3221/.eil.yml"
           - "examples/ina3221/**"
+  - label: "area:components:lc709203f"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/lc709203f/**"
+          - "components/lc709203f/.eil.yml"
+          - "examples/lc709203f/**"
   - label: "area:components:led_strip"
     sync: true
     matcher:
@@ -632,3 +656,19 @@ labels:
           - "components/wiegand/**"
           - "components/wiegand/.eil.yml"
           - "examples/wiegand/**"
+  - label: "area:components:ads130e08"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/ads130e08/**"
+          - "components/ads130e08/.eil.yml"
+          - "examples/ads130e08/**"
+  - label: "area:components:veml7700"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/veml7700/**"
+          - "components/veml7700/.eil.yml"
+          - "examples/veml7700/**"

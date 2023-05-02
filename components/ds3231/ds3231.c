@@ -347,6 +347,24 @@ esp_err_t ds3231_set_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t freq)
     return ESP_OK;
 }
 
+
+esp_err_t ds3231_get_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t* freq)
+{
+    CHECK_ARG(dev);
+
+    uint8_t flag = 0;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, ds3231_get_flag(dev, DS3231_ADDR_CONTROL, 0xff, &flag));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    flag &= DS3231_SQWAVE_8192HZ;
+    *freq = (ds3231_sqwave_freq_t) flag;
+
+    return ESP_OK;
+}
+
+
 esp_err_t ds3231_get_raw_temp(i2c_dev_t *dev, int16_t *temp)
 {
     CHECK_ARG(dev && temp);

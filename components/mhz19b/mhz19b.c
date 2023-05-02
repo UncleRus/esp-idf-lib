@@ -42,8 +42,6 @@
 #include <esp_idf_lib_helpers.h>
 #include <esp_log.h>
 #include <esp_timer.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 
 #include "mhz19b.h"
 
@@ -114,7 +112,7 @@ bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up)
     {
         if (smart_warming_up)
         {
-            ESP_LOGI(TAG, "Using smart warming up detection ");
+            ESP_LOGD(TAG, "Using smart warming up detection");
 
             int16_t co2, last_co2;
             last_co2 = dev->last_value;

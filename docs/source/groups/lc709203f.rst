@@ -1,0 +1,7 @@
+.. _lc709203f:
+
+lc709203f - Driver for LC709203F battery fuel gauge
+===================================================
+
+.. doxygengroup:: lc709203f
+   :members:

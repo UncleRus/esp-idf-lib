@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <inttypes.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ds18x20.h>
@@ -30,10 +30,10 @@ void test(void *pvParameter)
     {
         res = ds18x20_measure_and_read(SENSOR_GPIO, SENSOR_ADDR, &temperature);
         if (res != ESP_OK)
-            ESP_LOGE(TAG, "Could not read from sensor %08x%08x: %d (%s)",
+            ESP_LOGE(TAG, "Could not read from sensor %08" PRIx32 "%08" PRIx32 ": %d (%s)",
                     (uint32_t)(SENSOR_ADDR >> 32), (uint32_t)SENSOR_ADDR, res, esp_err_to_name(res));
         else
-            ESP_LOGI(TAG, "Sensor %08x%08x: %.2f°C",
+            ESP_LOGI(TAG, "Sensor %08" PRIx32 "%08" PRIx32 ": %.2f°C",
                     (uint32_t)(SENSOR_ADDR >> 32), (uint32_t)SENSOR_ADDR, temperature);
 
         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -44,4 +44,3 @@ void app_main()
 {
     xTaskCreate(test, TAG, configMINIMAL_STACK_SIZE * 4, NULL, 5, NULL);
 }
-

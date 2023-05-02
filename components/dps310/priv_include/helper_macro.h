@@ -1,5 +1,5 @@
 /*
- * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
+ * Copyright (c) 2022 Tomoyuki Sakurai <y@trombik.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +14,19 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(__MY_LOCAL_HEADER__H__)
-#define __MY_LOCAL_HEADER__H__
+#if !defined(__DPS310_HELPER_MACRO_H__)
+#define __DPS310_HELPER_MACRO_H__
+
+#define BV(x) ((uint8_t)(1 << (x)))
+#define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
+#define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
+#define CHECK_LOGE(dev, x, msg, ...) do { \
+        esp_err_t __; \
+        if ((__ = x) != ESP_OK) { \
+            I2C_DEV_GIVE_MUTEX(&dev->i2c_dev); \
+            ESP_LOGE(TAG, msg, ## __VA_ARGS__); \
+            return __; \
+        } \
+    } while (0)
 
 #endif

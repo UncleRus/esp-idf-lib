@@ -35,9 +35,10 @@
  * MIT Licensed as described in the file LICENSE
  */
 
+#include "bmp280.h"
+#include <inttypes.h>
 #include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
-#include "bmp280.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
@@ -376,8 +377,8 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
 
     adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
     adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;
-    ESP_LOGD(TAG, "ADC temperature: %d", adc_temp);
-    ESP_LOGD(TAG, "ADC pressure: %d", adc_pressure);
+    ESP_LOGD(TAG, "ADC temperature: %" PRIi32, adc_temp);
+    ESP_LOGD(TAG, "ADC pressure: %" PRIi32, adc_pressure);
 
     int32_t fine_temp;
     *temperature = compensate_temperature(dev, adc_temp, &fine_temp);
@@ -386,7 +387,7 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
     if (humidity)
     {
         int32_t adc_humidity = data[6] << 8 | data[7];
-        ESP_LOGD(TAG, "ADC humidity: %d", adc_humidity);
+        ESP_LOGD(TAG, "ADC humidity: %" PRIi32, adc_humidity);
         *humidity = compensate_humidity(dev, adc_humidity, fine_temp);
     }
 

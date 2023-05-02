@@ -102,6 +102,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **ads111x**              | Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC           | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **ads130e08**            | Driver for ADS130E08 ADC                                                         | MIT     | `esp32`, `esp32s3` | Yes
 | **hx711**                | Driver for HX711 24-bit ADC for weigh scales                                     | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
 | **mcp342x**              | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **mcp4725**              | Driver for 12-bit DAC MCP4725                                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
@@ -170,6 +171,12 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3   | `esp32`, `esp32c3`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
+### Inertial measurement units
+
+| Component                | Description                                                                      | License | Supported on       | Thread safety
+|--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
+| **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board, https://github.com/esp-rs/esp-rust-board) | ICS     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+
 ### Input device drivers
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
@@ -195,12 +202,13 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **tsl2561**              | Driver for light-to-digital converter TSL2561                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tsl2591**              | Driver for light-to-digital converter TSL2591                                    | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tsl4531**              | Driver for digital ambient light sensor TSL4531                                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **veml7700**             | Driver for VEML7700 ambient light sensor                                         | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Magnetic sensors
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
-| **hmc5883l**             | Driver for 3-axis digital compass HMC5883L                                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **hmc5883l**             | Driver for 3-axis digital compass HMC5883L and HMC5983L                          | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **qmc5883l**             | Driver for QMC5883L 3-axis magnetic sensor                                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Other misc libraries
@@ -210,6 +218,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **example**              | An example component                                                             | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
+| **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **pca9685**              | Driver for 16-channel, 12-bit PWM PCA9685                                        | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
@@ -224,6 +233,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Real-time clocks
@@ -245,6 +255,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
+| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **ds18x20**              | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs             | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
 | **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **hts221**               | Driver for HTS221 temperature and humidity sensor.                               | ISC     | `esp32`, `esp32s2`, `esp32c3` | Yes
@@ -295,3 +306,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Josh Kallus](https://github.com/Jkallus), developer of LS7366R driver
 - [saasaa](https://github.com/saasaa), developer of HTS221 driver
 - [Timofei Korostelev](https://github.com/chudsaviet), developer of HT16K33 driver
+- [Jose Manuel Perez](https://github.com/jmpmscorp), developer of LC709203F driver
+- [Weslley Duarte](https://github.com/weslleymfd), developer of ADS130E08 driver
+- [Jan Veeh](https://github.com/janveeh), developer of ICM42670 driver
+- [Marc Luehr](https://github.com/Th3Link), developer of VEML7700 driver

@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -27,7 +28,7 @@ void task(void *pvParameters)
     ESP_ERROR_CHECK(hdc1000_get_manufacturer_id(&dev, &manuf_id));
     ESP_ERROR_CHECK(hdc1000_get_device_id(&dev, &dev_id));
 
-    ESP_LOGI(TAG, "HDC1000, Manufacturer ID: 0x%04x, device ID: 0x%04x, serial number: 0x%08x%08x",
+    ESP_LOGI(TAG, "HDC1000, Manufacturer ID: 0x%04x, device ID: 0x%04x, serial number: 0x%08" PRIx32 "%08" PRIx32,
             manuf_id, dev_id, serial[0], serial[1]);
 
     float temperature, humidity;
@@ -49,4 +50,3 @@ void app_main()
     ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreatePinnedToCore(task, TAG, configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
-

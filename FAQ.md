@@ -8,6 +8,7 @@
 * [How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
 * [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
 * [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+* [Porting I2C libs to I2Cdev](#porting-i2c-libs-to-i2cdev)
 
 <!-- vim-markdown-toc -->
 
@@ -137,3 +138,8 @@ With default configuration you can't. Since the drivers use mutexes, this will
 crash the system.  But you can disable use of any I2C mutexes (both port and
 device) in configuration: just enable CONFIG_I2CDEV_NOLOCK. Keep in mind that
 after enabling this option all i2c device drivers will become non-thread safe.
+
+
+## Porting I2C libs to I2Cdev
+
+See [porting.md](docs/porting.md).

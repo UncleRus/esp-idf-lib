@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -60,7 +61,7 @@ void lcd_test(void *pvParameters)
     {
         hd44780_gotoxy(&lcd, 2, 1);
 
-        snprintf(time, 7, "%u  ", get_time_sec());
+        snprintf(time, 7, "%" PRIu32 "  ", get_time_sec());
         time[sizeof(time) - 1] = 0;
 
         hd44780_puts(&lcd, time);
@@ -73,4 +74,3 @@ void app_main()
 {
     xTaskCreate(lcd_test, "lcd_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
-

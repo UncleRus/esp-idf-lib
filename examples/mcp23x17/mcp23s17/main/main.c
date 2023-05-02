@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -15,7 +16,7 @@ static void intr_handler(void *arg)
 {
     uint32_t v;
     mcp23x17_get_level(&dev, 0, &v);
-    ESP_LOGI(TAG, "Interrupt! PORTA0: %d\n", v);
+    ESP_LOGI(TAG, "Interrupt! PORTA0: %" PRIu32, v);
 }
 
 void test(void *pvParameters)
@@ -64,4 +65,3 @@ void app_main()
 {
     xTaskCreate(test, "test", configMINIMAL_STACK_SIZE * 6, NULL, 5, NULL);
 }
-

@@ -1,5 +1,31 @@
 # Metadata
 
+## Table of Contents
+
+<!-- vim-markdown-toc GFM -->
+
+* [Purpose](#purpose)
+* [Files](#files)
+    * [`.eil.yml`](#eilyml)
+    * [`persons.yml`](#personsyml)
+    * [`groups.yml`](#groupsyml)
+    * [`targets.yml`](#targetsyml)
+* [Resources](#resources)
+    * [Person](#person)
+    * [Target](#target)
+    * [License](#license)
+    * [Copyright](#copyright)
+    * [Group](#group)
+    * [Metadata](#metadata)
+    * [Component](#component)
+* [Usages of metadata in the project](#usages-of-metadata-in-the-project)
+    * [Validating metadata of components](#validating-metadata-of-components)
+    * [Generating `README.md`](#generating-readmemd)
+* [Known issues](#known-issues)
+    * [conditional `depends`](#conditional-depends)
+
+<!-- vim-markdown-toc -->
+
 This document describes metadata used in the project. The status of the
 document is beta.
 
@@ -194,19 +220,8 @@ in `CMakeLists.txt`.
 
 ## Usages of metadata in the project
 
-### `README.md`
-
-`README.md` is generated from the metadata and `README.md.erb`. To update
-`README.md`, run:
-
-```console
-bundle exec rake -C devtools readme
-```
-
-## Validating metadata of components
-
 The current implementation uses `ruby` and `rspec` ruby gem to validate
-metadata in all components.
+metadata in all components, and generate `README.md`.
 
 Requirements are:
 
@@ -218,6 +233,8 @@ After installing requirements, run:
 ```console
 bundle install
 ```
+
+### Validating metadata of components
 
 To validate metadata, run:
 
@@ -242,6 +259,15 @@ Under `spec` directory, there are:
 The ruby classes for the test validate minimum requirements only, such as the
 `.eil.yml` file exists, or a resource has a required primary key. Actual
 test should be performed in `*_spec.rb` files.
+
+### Generating `README.md`
+
+`README.md` is generated from the metadata and `README.md.erb`. To update
+`README.md`, run the following command at the repository root directory:
+
+```console
+bundle exec rake -C devtools readme > README.md
+```
 
 ## Known issues
 

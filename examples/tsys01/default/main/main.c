@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -22,7 +23,7 @@ void task(void *arg)
     ESP_ERROR_CHECK(tsys01_init_desc(&dev, ADDRESS, I2C_PORT, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(tsys01_init(&dev));
 
-    printf("Device serial number: 0x%06x\n", dev.serial);
+    printf("Device serial number: 0x%06" PRIx32 "\n", dev.serial);
 
     ESP_ERROR_CHECK(tsys01_reset(&dev));
 

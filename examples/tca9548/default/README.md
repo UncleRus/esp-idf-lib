@@ -1,16 +1,23 @@
-# Example application for `example` component
+# Example for `tca9548` driver
 
-## What the example does
+## What it does
 
-The example does nothing but waits in a loop.
+It shows temperature and pressure measured by two BMP180 connected to TCA9548.
 
-## Configuration
+## Wiring
 
-No configuration is available.
+- Connect `SCL` and `SDA` pins of TCA9548 to the following pins with appropriate pull-up
+resistors.
+
+| Name | Description | Defaults |
+|------|-------------|----------|
+| `CONFIG_EXAMPLE_I2C_MASTER_SCL` | GPIO number for `SCL` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
+| `CONFIG_EXAMPLE_I2C_MASTER_SDA` | GPIO number for `SDA` | "4" for `esp8266`, "5" for `esp32c3`, "18" for `esp32`, `esp32s2`, and `esp32s3` |
+
+- Connect `SCL` and `SDA` pins of first BMP180 to the `SC0` and `SD0` of TCA9548 
+- Connect `SCL` and `SDA` pins of second BMP180 to the `SC1` and `SD1` of TCA9548
 
 ## Notes
 
-This is an example application of `example`. It is intended as an example
-application for new component.
-
-The code under `main` should conform the code style.
+- Choose correct I2C address of TCA9548 in `menuconfig`. It's 0x70 by default.
+- `CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL` must be `y` on `esp8266`.
