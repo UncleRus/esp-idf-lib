@@ -52,7 +52,8 @@ static const char *TAG = "am2320";
 #define REG_VER      (0x0a)
 #define REG_DEV_ID_H (0x0b)
 
-#define DELAY_US 1600
+#define DELAY_T1_US (800 + 100) // minimum delay + extra
+#define DELAY_T2_US (1500 + 100)
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -83,33 +84,60 @@ static esp_err_t read_reg_modbus(i2c_dev_t *dev, uint8_t reg, uint8_t len, uint8
 {
     uint8_t req[] = { MODBUS_READ, reg, len };
     uint8_t resp[len + 4];
+    esp_err_t err = ESP_FAIL;
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, req, sizeof(req)));
-    ets_delay_us(DELAY_US);
-    I2C_DEV_CHECK(dev, i2c_dev_read(dev, NULL, 0, resp, sizeof(resp)));
-    I2C_DEV_GIVE_MUTEX(dev);
+
+    /* Wake up the sensor. See 8.2.4 I2C Communication Timing */
+    err = i2c_dev_probe(dev, I2C_DEV_READ);
+    if (err == ESP_FAIL)
+    {
+        /* the sensor does not send ACK for wakeup command, ignore the error
+         */
+        ESP_LOGD(TAG, "i2c_dev_probe(): %s", esp_err_to_name(err));
+    }
+    ets_delay_us(DELAY_T1_US);
+
+    err =  i2c_dev_write(dev, NULL, 0, req, sizeof(req));
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "i2c_dev_write(): %s", esp_err_to_name(err));
+        goto fail;
+    }
+    ets_delay_us(DELAY_T2_US);
+
+    err = i2c_dev_read(dev, NULL, 0, resp, sizeof(resp));
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "i2c_dev_read(): %s", esp_err_to_name(err));
+        goto fail;
+    }
 
     if (resp[0] != MODBUS_READ)
     {
         ESP_LOGE(TAG, "Invalid MODBUS reply (%d != 0x03)", resp[0]);
-        return ESP_ERR_INVALID_RESPONSE;
+        err = ESP_ERR_INVALID_RESPONSE;
+        goto fail;
     }
     if (resp[1] != len)
     {
         ESP_LOGE(TAG, "Invalid MODBUS reply length (%d != %d)", resp[1], len);
-        return ESP_ERR_INVALID_RESPONSE;
+        err = ESP_ERR_INVALID_RESPONSE;
+        goto fail;
     }
-    // CRC16 in little endian
+
+    /* CRC16 in little endian */
     if (crc16(resp, len + 2) != ((uint16_t)resp[len + 3] << 8) + resp[len + 2])
     {
         ESP_LOGE(TAG, "Invalid CRC in MODBUS reply");
-        return ESP_ERR_INVALID_CRC;
+        err = ESP_ERR_INVALID_CRC;
+        goto fail;
     }
-
     memcpy(buf, resp + 2, len);
 
-    return ESP_OK;
+fail:
+    I2C_DEV_GIVE_MUTEX(dev);
+    return err;
 }
 
 static float convert_temperature(uint16_t raw)

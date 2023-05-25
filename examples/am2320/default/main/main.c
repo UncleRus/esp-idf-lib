@@ -16,18 +16,6 @@ void task(void *pvParameters)
 
     ESP_ERROR_CHECK(am2320_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
-    uint32_t dev_id;
-    uint16_t model_id;
-    uint8_t ver;
-    ESP_ERROR_CHECK(am2320_get_device_id(&dev, &dev_id));
-    ESP_ERROR_CHECK(am2320_get_model(&dev, &model_id));
-    ESP_ERROR_CHECK(am2320_get_version(&dev, &ver));
-
-    ESP_LOGI(TAG, "Found sensor! Device info:");
-    ESP_LOGI(TAG, "Device ID: %" PRIX32, dev_id);
-    ESP_LOGI(TAG, "Model ID:  %" PRIX16, model_id);
-    ESP_LOGI(TAG, "Version:   %" PRIu8, ver);
-
     float temperature, humidity;
 
     while (1)
