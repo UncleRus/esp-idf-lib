@@ -30,7 +30,7 @@ menu "Example configuration"
     config EXAMPLE_INT_GPIO
         int "SPI INT GPIO Number"
         default 26 if IDF_TARGET_ESP32
-        default 8 if IDF_TARGET_ESP32S3
+        default 2 if IDF_TARGET_ESP32S3
         help
             GPIO number for SPI INT (Interrupt) line.
 endmenu
