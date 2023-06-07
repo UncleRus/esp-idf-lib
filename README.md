@@ -107,6 +107,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mcp342x**              | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **mcp4725**              | Driver for 12-bit DAC MCP4725                                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **pcf8591**              | Driver for 8-bit ADC and an 8-bit DAC PCF8591                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **sgm58031**             | Driver for SGM58031 16-bit I2C ADC                                               | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32s3`, `esp32c3` | Yes
 
 ### Air quality sensors
 
