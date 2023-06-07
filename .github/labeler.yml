@@ -680,3 +680,11 @@ labels:
           - "components/veml7700/**"
           - "components/veml7700/.eil.yml"
           - "examples/veml7700/**"
+  - label: "area:components:am2320"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/am2320/**"
+          - "components/am2320/.eil.yml"
+          - "examples/am2320/**"

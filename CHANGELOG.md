@@ -1,5 +1,30 @@
 # Changelog
 
+## v.0.9.3
+
+### Features
+- (icm42670): Driver for TDK ICM-42670-P 6-Axis IMU by @janveeh in https://github.com/UncleRus/esp-idf-lib/pull/485
+- (veml7700): Driver for ambient light sensor VEML7700 by @Th3Link in https://github.com/UncleRus/esp-idf-lib/pull/492
+- (am2320): Driver for temperature and humidity sensor AM2320 (I2C mode) by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/508
+
+### Bugfixes
+- (ci): Added esp-idf 5.x build to CI by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/483
+- (hx711): Fixed signed division of HX711 average read by @gaialucas in https://github.com/UncleRus/esp-idf-lib/pull/487
+- (esp_idf_lib_helpers): Added support for esp32c2 by @vaemc in https://github.com/UncleRus/esp-idf-lib/pull/488
+- (esp_idf_lib_helpers): Added support for esp32c6 by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/524
+- (noise): Added cpp guards by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/490
+- (doc): Fixed multiple documentation errors @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/493
+- (encoder): Fixed incorrect pin configuration by @klaasjanhorlings in https://github.com/UncleRus/esp-idf-lib/pull/526
+- (si7021): Fixed reversed bytes in command words by @stvnjns and @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/527 
+
+## New Contributors
+
+* @gaialucas made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/487
+* @vaemc made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/488
+* @janveeh made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/485
+* @Th3Link made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/492
+* @klaasjanhorlings made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/526
+
 ## v.0.9.2
 
 ### Features

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <inttypes.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -9,18 +8,16 @@
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <ls7366r.h>
-#include <esp_idf_lib_helpers.h>
-
 
 #define TEST_PIN CONFIG_EXAMPLE_PIN_NUM_TEST
 #define INTR_PIN CONFIG_EXAMPLE_PIN_NUM_INTR
 #define GPIO_OUTPUT_PIN_SEL (1ULL << TEST_PIN)
 #define GPIO_INPUT_PIN_SEL (1ULL << INTR_PIN)
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
-#define LS7366R_HOST SPI2_HOST
+#ifdef HSPI_HOST
+#define LS7366R_HOST HSPI_HOST
 #else
-#define LS7366R_HOST VSPI_HOST
+#define LS7366R_HOST SPI2_HOST
 #endif
 
 #define PIN_NUM_MISO CONFIG_EXAMPLE_PIN_NUM_MISO
