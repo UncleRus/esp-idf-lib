@@ -211,6 +211,7 @@ LED drivers
    groups/led_strip
    groups/led_strip_spi
    groups/ht16k33
+   groups/max7219
 
 Input controls
 ==============
@@ -234,7 +235,6 @@ Other
    :maxdepth: 1
 
    groups/hd44780
-   groups/max7219
    groups/pca9685
    groups/ultrasonic
    groups/tda74xx
