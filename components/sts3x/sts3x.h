@@ -37,7 +37,8 @@
  * Forked from <https://github.com/gschorcht/sht3x-esp-idf>
  *
  * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>\n
- * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>\n
+ * Copyright (c) 2023 Christian Skjerning <https://github.com/slimcdk>
  *
  * BSD Licensed as described in the file LICENSE
  */
