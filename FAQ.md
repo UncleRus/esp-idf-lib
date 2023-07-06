@@ -151,5 +151,5 @@ See [porting.md](docs/porting.md).
 1. Check if the sensor is connected correctly.
 2. Use an external 4k7 pullup resistor! With an internal pullup resistor, operation will be unstable, if at all.
 3. Shorten the wires that connect the sensor.
-4. Use 5V as power, not 3.3V. ESP chips are 5V tolerant.
+4. Use 5V for powering the sensor, not 3.3V. ESP chips are 5V tolerant.
 5. Use shielded wires where the shield is connected to the GND.
