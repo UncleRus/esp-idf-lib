@@ -87,6 +87,30 @@ static uint8_t dec2bcd(uint8_t val)
     return ((val / 10) << 4) + (val % 10);
 }
 
+#include <stdio.h>
+
+// Function to check if a year is a leap year
+int isLeapYear(int year) { return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0); }
+
+// Function to convert year, month, and day to days since January 1st
+int daysSinceJanuary1st(int year, int month, int day)
+{
+    int daysPerMonth[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    int days = day;
+
+    // Handle leap year
+    if (isLeapYear(year))
+        daysPerMonth[2] = 29;
+
+    // Add days from previous months
+    for (int i = 1; i < month; i++)
+    {
+        days += daysPerMonth[i];
+    }
+
+    return days;
+}
+
 esp_err_t ds3231_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
@@ -433,6 +457,7 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
     time->tm_mon  = bcd2dec(data[5] & DS3231_MONTH_MASK) - 1;
     time->tm_year = bcd2dec(data[6]) + 100;
     time->tm_isdst = 0;
+    time->tm_yday = daysSinceJanuary1st(time->tm_year, time->tm_mon, time->tm_mday);
 
     // apply a time zone (if you are not using localtime on the rtc or you want to check/apply DST)
     //applyTZ(time);
