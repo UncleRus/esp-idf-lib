@@ -320,7 +320,7 @@ esp_err_t mcp23x17_init_desc_spi(mcp23x17_t *dev, spi_host_device_t host, uint32
     return spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
 }
 
-esp_err_t mcp23x17_free_desc(mcp23x17_t *dev)
+esp_err_t mcp23x17_free_desc_spi(mcp23x17_t *dev)
 {
     CHECK_ARG(dev);
 

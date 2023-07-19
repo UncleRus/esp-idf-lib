@@ -126,7 +126,8 @@ Humidity & temperature sensors
    groups/hdc1000
    groups/max31855
    groups/sts21
-   
+   groups/am2320
+
 Pressure sensors
 ================
 .. toctree::
@@ -160,6 +161,7 @@ ADC/DAC
    groups/mcp4725
    groups/mcp342x
    groups/ads130e08
+   groups/sgm58031
 
 Power/Current monitors
 ======================
@@ -209,6 +211,7 @@ LED drivers
    groups/led_strip
    groups/led_strip_spi
    groups/ht16k33
+   groups/max7219
 
 Input controls
 ==============
@@ -233,7 +236,6 @@ Other
    :maxdepth: 1
 
    groups/hd44780
-   groups/max7219
    groups/pca9685
    groups/ultrasonic
    groups/tda74xx

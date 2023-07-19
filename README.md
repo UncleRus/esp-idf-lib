@@ -107,6 +107,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mcp342x**              | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428                       | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **mcp4725**              | Driver for 12-bit DAC MCP4725                                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **pcf8591**              | Driver for 8-bit ADC and an 8-bit DAC PCF8591                                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **sgm58031**             | Driver for SGM58031 16-bit I2C ADC                                               | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32s3`, `esp32c3` | Yes
 
 ### Air quality sensors
 
@@ -163,6 +164,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **am2320**               | Driver for AM2320 temperature and humidity sensor (I2C)                          | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
 | **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
@@ -251,6 +253,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **am2320**               | Driver for AM2320 temperature and humidity sensor (I2C)                          | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bh1900nux**            | Driver for BH1900NUX temperature sensor                                          | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
