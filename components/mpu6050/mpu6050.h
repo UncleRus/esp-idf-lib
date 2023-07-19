@@ -297,6 +297,11 @@ typedef struct {
  * @brief Initialize device descriptor.
  *
  * @param dev Device descriptor
+ * @param addr Device I2C address
+ * @param port I2C port
+ * @param sda_gpio SDA GPIO
+ * @param scl_gpio SCL GPIO
+ *
  * @return `ESP_OK` on success
  */
 esp_err_t mpu6050_init_desc(mpu6050_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
@@ -305,6 +310,7 @@ esp_err_t mpu6050_init_desc(mpu6050_dev_t *dev, uint8_t addr, i2c_port_t port, g
  * @brief Free device descriptor.
  *
  * @param dev Device descriptor
+ *
  * @return `ESP_OK` on success
  */
 esp_err_t mpu6050_free_desc(mpu6050_dev_t *dev);
@@ -406,18 +412,17 @@ esp_err_t mpu6050_get_external_frame_sync(mpu6050_dev_t *dev, mpu6050_ext_sync_t
 esp_err_t mpu6050_set_external_frame_sync(mpu6050_dev_t *dev, mpu6050_ext_sync_t sync);
 
 /**
- * @brief: Get digital low-pass filter configuration.
+ * @brief Get digital low-pass filter configuration.
  *
  * The DLPF_CFG parameter sets the digital low pass filter configuration.
- * It also determines the internal sampling rate used by the device as shown
- * in the table below.
+ * It also determines the internal sampling rate used by the device.
  *
  * Note: The accelerometer output rate is 1kHz. This means that for a Sample
  * Rate greater than 1kHz, the same accelerometer sample may be output to the
  * FIFO, DMP, and sensor registers more than once.
  *
  * @param dev Device descriptor
- * @param[out] mode: DLFP configuration.
+ * @param[out] mode DLFP configuration.
  *
  * @return `ESP_OK` on success
  */
@@ -607,7 +612,7 @@ esp_err_t mpu6050_get_freefall_detection_duration(mpu6050_dev_t *dev, uint8_t *d
  * @brief Set free-fall event duration threshold.
  *
  * @param dev Device descriptor
- * @param duration Free-fall duration threshold value, ms
+ * @param duration_ms Free-fall duration threshold value, ms
  *
  * @return `ESP_OK` on success
  */
@@ -792,7 +797,6 @@ esp_err_t mpu6050_set_gyro_fifo_enabled(mpu6050_dev_t *dev, mpu6050_axis_t axis,
  * written into the FIFO buffer.
  *
  * @param dev Device descriptor
- * @param axis Gyroscope axis
  * @param[out] enabled Gyroscope axis FIFO enabled value.
  *
  * @return `ESP_OK` on success
@@ -935,7 +939,7 @@ esp_err_t mpu6050_get_master_clock_speed(mpu6050_dev_t *dev, mpu6050_i2c_master_
  * @brief Set I2C master clock speed.
  *
  * @param dev Device descriptor
- * @param speed Current I2C master clock speed.
+ * @param clk_spd Current I2C master clock speed.
  *
  * @return `ESP_OK` on success
  */
@@ -1288,6 +1292,7 @@ esp_err_t mpu6050_get_lost_arbitration(mpu6050_dev_t *dev, bool *lost);
  * bit in the INT_ENABLE register (Register 56) is asserted.
  *
  * @param dev Device descriptor
+ * @param num Slave number (0-4).
  * @param[out] nack Slave NACK status.
  *
  * @return `ESP_OK` on success
@@ -1375,20 +1380,20 @@ esp_err_t mpu6050_get_interrupt_latch_clear(mpu6050_dev_t *dev, bool *clear);
 esp_err_t mpu6050_set_interrupt_latch_clear(mpu6050_dev_t *dev, bool clear);
 
 /**
- * @brief Get FSYNC interrupt logic level mode.
+ * @brief Get FSYNC interrupt logic level.
  *
  * @param dev Device descriptor
- * @param[out] mode Current FSYNC interrupt mode.
+ * @param[out] level Current FSYNC interrupt logic level.
  *
  * @return `ESP_OK` on success
  */
 esp_err_t mpu6050_get_fsync_interrupt_level(mpu6050_dev_t *dev, mpu6050_int_level_t *level);
 
 /**
- * @brief Set FSYNC interrupt logic level mode.
+ * @brief Set FSYNC interrupt logic level.
  *
  * @param dev Device descriptor
- * @param mode New FSYNC interrupt mode.
+ * @param level New FSYNC interrupt logic level.
  *
  * @return `ESP_OK` on success
  */
@@ -1650,7 +1655,7 @@ esp_err_t mpu6050_get_rotation(mpu6050_dev_t *dev, mpu6050_rotation_t *gyro);
  * @brief Get raw 3-axis gyroscope readings.
  *
  * @param dev Device descriptor
- * @param[out] raw_accel Raw rotation data.
+ * @param[out] raw_gyro Raw rotation data.
  *
  * @return `ESP_OK` on success
  */
@@ -1661,7 +1666,7 @@ esp_err_t mpu6050_get_raw_rotation(mpu6050_dev_t *dev, mpu6050_raw_rotation_t *r
  *
  * @param dev Device descriptor
  * @param axis Gyroscope axis
- * @param[out] accel Axis rotation measurement, °/s
+ * @param[out] gyro Axis rotation measurement, °/s
  *
  * @return `ESP_OK` on success
  */
@@ -1672,7 +1677,7 @@ esp_err_t mpu6050_get_rotation_axis(mpu6050_dev_t *dev, mpu6050_axis_t axis, flo
  *
  * @param dev Device descriptor
  * @param axis Gyroscope axis
- * @param[out] raw_accel Raw axis rotation measurement
+ * @param[out] raw_gyro Raw axis rotation measurement
  *
  * @return `ESP_OK` on success
  */
@@ -2005,7 +2010,7 @@ esp_err_t mpu6050_set_motion_detection_counter_decrement(mpu6050_dev_t *dev, uin
  * does not change unless the MPU-60X0 is power cycled.
  *
  * @param dev Device descriptor
- * @param[out] decrement FIFO enabled status.
+ * @param[out] enabled FIFO enabled status.
  *
  * @return `ESP_OK` on success
  */
