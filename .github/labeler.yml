@@ -688,3 +688,11 @@ labels:
           - "components/am2320/**"
           - "components/am2320/.eil.yml"
           - "examples/am2320/**"
+  - label: "area:components:sts3x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/sts3x/**"
+          - "components/sts3x/.eil.yml"
+          - "examples/sts3x/**"
