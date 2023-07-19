@@ -73,12 +73,12 @@ static const float gyro_res[] = {
 
 inline static float get_accel_value(mpu6050_dev_t *dev, int16_t raw)
 {
-    return (float)raw / accel_res[dev->ranges.accel];
+    return (float)raw * accel_res[dev->ranges.accel];
 }
 
 inline static float get_gyro_value(mpu6050_dev_t *dev, int16_t raw)
 {
-    return (float)raw / gyro_res[dev->ranges.gyro];
+    return (float)raw * gyro_res[dev->ranges.gyro];
 }
 
 inline static int16_t shuffle(uint16_t word)

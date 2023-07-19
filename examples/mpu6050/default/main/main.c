@@ -33,6 +33,9 @@ void mpu6050_test(void *pvParameters)
 
     ESP_ERROR_CHECK(mpu6050_init(&dev));
 
+    ESP_LOGI(TAG, "Accel range: %d", dev.ranges.accel);
+    ESP_LOGI(TAG, "Gyro range:  %d", dev.ranges.gyro);
+
     while (1)
     {
         float temp;
@@ -43,11 +46,11 @@ void mpu6050_test(void *pvParameters)
         ESP_ERROR_CHECK(mpu6050_get_motion(&dev, &accel, &rotation));
 
         ESP_LOGI(TAG, "**********************************************************************");
-        ESP_LOGI(TAG, "Acceleration: x=%.3f   y=%.3f   z=%.3f", accel.x, accel.y, accel.z);
-        ESP_LOGI(TAG, "Rotation:     x=%.3f   y=%.3f   z=%.3f", rotation.x, rotation.y, rotation.z);
+        ESP_LOGI(TAG, "Acceleration: x=%.4f   y=%.4f   z=%.4f", accel.x, accel.y, accel.z);
+        ESP_LOGI(TAG, "Rotation:     x=%.4f   y=%.4f   z=%.4f", rotation.x, rotation.y, rotation.z);
         ESP_LOGI(TAG, "Temperature:  %.1f", temp);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
