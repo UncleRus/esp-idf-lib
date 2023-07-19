@@ -4,7 +4,7 @@ components:
     description: Driver for Sensirion STS30/STS31/STS35 digital temperature sensor
     group: temperature
     groups:
-      - name: humidity
+      - name: temperature
     code_owners: UncleRus
     depends:
       - i2cdev
