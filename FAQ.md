@@ -9,6 +9,7 @@
 * [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
 * [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
 * [Porting I2C libs to I2Cdev](#porting-i2c-libs-to-i2cdev)
+* [My DHT sensor doesn't work well/doesn't work at all.](#my-dht-sensor-doesnt-work-welldoesnt-work-at-all)
 
 <!-- vim-markdown-toc -->
 
@@ -143,3 +144,12 @@ after enabling this option all i2c device drivers will become non-thread safe.
 ## Porting I2C libs to I2Cdev
 
 See [porting.md](docs/porting.md).
+
+
+## My DHT sensor doesn't work well/doesn't work at all!
+
+1. Check if the sensor is connected correctly.
+2. Use an external 4k7 pullup resistor! With an internal pullup resistor, operation will be unstable, if at all.
+3. Shorten the wires that connect the sensor.
+4. Use 5V for powering the sensor, not 3.3V. ESP chips are 5V tolerant.
+5. Use shielded wires where the shield is connected to the GND.
