@@ -178,7 +178,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
 | **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU (found on ESP-RS board, https://github.com/esp-rs/esp-rust-board) | ICS     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
-| **mpu6050**              | Driver for MPU6000/MPU6050 6-axis MotionTracking device                          | MIT     | `esp32`, `esp32s2` | Yes
+| **mpu6050**              | Driver for MPU6000/MPU6050 6-axis MotionTracking device                          | MIT     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
 ### Input device drivers
 
