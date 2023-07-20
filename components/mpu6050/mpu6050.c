@@ -48,6 +48,8 @@
 #include "mpu6050_regs.h"
 #include <math.h>
 #include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 // Max 1MHz for esp-idf, but device supports up to 1.7Mhz
 #define I2C_FREQ_HZ (1000000)
