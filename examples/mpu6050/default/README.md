@@ -2,11 +2,10 @@
 
 ## What it does
 
-
-MPU6050 is a Micro Electro-mechanical system (MEMS), it consists of three-axis accelerometer and three-axis gyroscope. It helps us to measure velocity, orientation, acceleration, displacement and other motion like features.
+This example initializes an MPU-6050 connected on the I2C bus and then displays the accelerometer and gyroscope data in gravity and degrees per second in an endless loop.
 
 **NOTE:**
-Example is tested on ESP-IDF 4.4 and ESP32 Wrover Module
+Example is tested on ESP-IDF v4.4, v5.1 and ESP32 Wrover Module
 
 ## Wiring
 
@@ -72,6 +71,4 @@ I (14451) mpu6050_test: Rotation:     x=-218   y=-264   z=-45
 I (14451) mpu6050_test: Acceleration: x=-15864   y=-264   z=188
 I (14461) mpu6050_test: Temperature:    33
 I (15461) mpu6050_test: **********************************************************************
-
-
 ```
