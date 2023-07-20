@@ -440,6 +440,13 @@ labels:
           - "components/mhz19b/**"
           - "components/mhz19b/.eil.yml"
           - "examples/mhz19b/**"
+  - label: "area:components:mpu6050"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/mpu6050/**"
+          - "examples/mpu6050/**"
   - label: "area:components:ms5611"
     sync: true
     matcher:

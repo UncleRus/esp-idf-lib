@@ -1,0 +1,24 @@
+---
+components:
+  - name: mpu6050
+    description: |
+      Driver for MPU6000/MPU6050 6-axis MotionTracking device
+    group: imu
+    groups: []
+    code_owners:
+      - name: horsemann07
+    depends:
+      - name: log
+      - name: esp_idf_lib_helpers
+      - name: i2cdev
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
+    licenses:
+      - name: MIT
+    copyrights:
+      - name: horsemann07
+        year: 2023

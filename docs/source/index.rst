@@ -229,6 +229,7 @@ Inertial measurement units
    :maxdepth: 1
 
    groups/icm42670
+   groups/mpu6050
 
 Other
 =====

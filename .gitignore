@@ -62,7 +62,7 @@ dkms.conf
 /__garbage__/
 **/.vscode/
 **/.devcontainer
-/.idea/
+.idea/
 cmake-build-debug/
 
 /esp-idf-lib.code-workspace
