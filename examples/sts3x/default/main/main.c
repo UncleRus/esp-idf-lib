@@ -127,5 +127,5 @@ void app_main()
     ESP_ERROR_CHECK(sts3x_init_desc(&dev, CONFIG_EXAMPLE_STS3X_ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
     ESP_ERROR_CHECK(sts3x_init(&dev));
 
-    xTaskCreatePinnedToCore(task, "sts31_dis_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(task, "sts31_test", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL, APP_CPU_NUM);
 }
