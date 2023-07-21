@@ -132,25 +132,18 @@ typedef enum
 } tsl2591_persistence_filter_t;
 
 /**
- * Device settings.
- */
-typedef struct 
-{
-    uint8_t enable_reg;
-    uint8_t control_reg;
-    uint8_t persistence_reg;
-} tsl2591_settings_t;
-
-/**
  * Device descriptor.
  */
 typedef struct
 {
     i2c_dev_t i2c_dev;
-    tsl2591_settings_t settings;
-
+    struct
+    {
+        uint8_t enable_reg;
+        uint8_t control_reg;
+        uint8_t persistence_reg;
+    } settings;
 } tsl2591_t;
-
 
 /**
  * @brief Initialize device descriptor
