@@ -1,7 +1,7 @@
 ---
 components:
   - name: max1704x
-    description: Driver for MAX1704X battery fuel gauge
+    description: Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge
     group: battery
     groups: []
     code_owners: shuki25
@@ -13,6 +13,8 @@ components:
     targets:
       - name: esp32
       - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
     licenses:
       - name: BSD-3
     copyrights:

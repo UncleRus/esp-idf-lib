@@ -119,6 +119,13 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **sgp40**                | Driver for SGP40 Indoor Air Quality Sensor for VOC Measurements                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 
+### Battery controllers
+
+| Component                | Description                                                                      | License | Supported on       | Thread safety
+|--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
+| **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **max1704x**             | Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge                | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+
 ### Common libraries
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
@@ -221,7 +228,6 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **example**              | An example component                                                             | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
-| **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **pca9685**              | Driver for 16-channel, 12-bit PWM PCA9685                                        | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
@@ -315,3 +321,4 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Weslley Duarte](https://github.com/weslleymfd), developer of ADS130E08 driver
 - [Jan Veeh](https://github.com/janveeh), developer of ICM42670 driver
 - [Marc Luehr](https://github.com/Th3Link), developer of VEML7700 driver
+- [Joshua Butler, MD, MHI](https://github.com/shuki25), developer of MAX1704x driver

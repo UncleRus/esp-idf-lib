@@ -231,6 +231,14 @@ Inertial measurement units
    groups/icm42670
    groups/mpu6050
 
+Battery controllers
+===================
+.. toctree::
+   :maxdepth: 1
+
+   groups/lc709203f
+   groups/max1704x
+
 Other
 =====
 .. toctree::
@@ -244,7 +252,6 @@ Other
    groups/tca9548
    groups/ds3502
    groups/wiegand
-   groups/lc709203f
    
 
 ===========

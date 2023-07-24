@@ -47,3 +47,6 @@
 
 - name: imu
   description: Inertial measurement units
+
+- name: battery
+  description: Battery controllers
