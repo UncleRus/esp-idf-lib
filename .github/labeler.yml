@@ -703,3 +703,11 @@ labels:
           - "components/sts3x/**"
           - "components/sts3x/.eil.yml"
           - "examples/sts3x/**"
+  - label: "area:components:max1704x"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/max1704x/**"
+          - "components/max1704x/.eil.yml"
+          - "examples/max1704x/**"

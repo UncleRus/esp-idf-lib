@@ -1,0 +1,11 @@
+menu "MAX1704X Battery Fuel Gauge"
+
+    choice MAX1704X_MODEL
+        prompt "Chip type"
+        config MAX1704X_MODEL_3_4
+            bool "MAX17043/MAX17044"
+        config MAX1704X_MODEL_8_9
+            bool "MAX17048/MAX17049"
+    endchoice
+    
+endmenu

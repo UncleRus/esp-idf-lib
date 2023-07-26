@@ -1,13 +1,13 @@
 ---
 components:
-  - name: lc709203f
-    description: |
-      Driver for LC709203F battery fuel gauge
+  - name: max1704x
+    description: Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge
     group: battery
     groups: []
-    code_owners: jmpmscorp
+    code_owners: shuki25
     depends:
       - name: i2cdev
+      - name: log
       - name: esp_idf_lib_helpers
     thread_safe: yes
     targets:
@@ -16,8 +16,8 @@ components:
       - name: esp32s2
       - name: esp32c3
     licenses:
-      - name: ISC
+      - name: BSD-3
     copyrights:
       - author:
-          name: jmpmscorp
+          name: shuki25
         year: 2022
