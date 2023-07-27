@@ -711,3 +711,11 @@ labels:
           - "components/max1704x/**"
           - "components/max1704x/.eil.yml"
           - "examples/max1704x/**"
+  - label: "area:components:calibration"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/calibration/**"
+          - "components/calibration/.eil.yml"
+          - "examples/calibration/**"
