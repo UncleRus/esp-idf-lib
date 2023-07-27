@@ -1,7 +1,7 @@
 ---
 components:
   - name: calibration
-    description: Multipoint calibration library
+    description: Multi-point calibration library
     group: misc
     groups: []
     code_owners:

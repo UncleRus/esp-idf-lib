@@ -1,7 +1,7 @@
 /**
  * @file calibration.c
  *
- * ESP-IDF library or multi-point calibration
+ * ESP-IDF Multi-point calibration library
  *
  * Copyright (c) 2023 Ruslan V. Uss <unclerus@gmail.com>
  *

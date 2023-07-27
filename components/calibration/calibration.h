@@ -30,7 +30,7 @@
  * @defgroup calibration calibration
  * @{
  *
- * ESP-IDF library for multi-point calibration
+ * ESP-IDF Multi-point calibration library
  *
  * Copyright (c) 2023 Ruslan V. Uss <unclerus@gmail.com>
  *

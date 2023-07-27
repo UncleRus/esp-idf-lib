@@ -225,7 +225,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|--------------
-| **calibration**          | Multipoint calibration library                                                   | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
+| **calibration**          | Multi-point calibration library                                                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **example**              | An example component                                                             | ISC     | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | Yes
 | **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3   | `esp32`, `esp8266`, `esp32s2`, `esp32c3` | No
