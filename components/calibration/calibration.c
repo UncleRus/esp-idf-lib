@@ -37,7 +37,6 @@
 #include "calibration.h"
 #include <esp_log.h>
 #include <string.h>
-#include <inttypes.h>
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -75,7 +74,7 @@ esp_err_t calibration_init(calibration_handle_t *handler, size_t count, calibrat
     handler->points = calloc(sizeof(calibration_point_t), handler->count);
     if (!handler->points)
     {
-        ESP_LOGE(TAG, "Could not allocate %" PRIu32 " bytes", (unsigned long)(sizeof(calibration_point_t) * handler->count));
+        ESP_LOGE(TAG, "Could not allocate memory for calibration points");
         return ESP_ERR_NO_MEM;
     }
 
@@ -105,7 +104,7 @@ esp_err_t calibration_add_point(calibration_handle_t *handler, float code, float
         if (handler->points[pos].code > code)
             break;
 
-    if (pos < handler->filled - 1)
+    if (pos < handler->filled)
         memmove(handler->points + pos + 1, handler->points + pos, sizeof(calibration_point_t) * (handler->filled - pos));
 
     handler->points[pos].code = code;

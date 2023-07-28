@@ -21,9 +21,9 @@
 static char *TAG = "calibration_example";
 
 static const calibration_point_t points[] = {
-    { .code = 15,  .value = 31 },
     { .code = 20,  .value = 40 },
     { .code = 10,  .value = 25 },
+    { .code = 15,  .value = 31 },
     { .code = 30,  .value = 55 },
     { .code = 100, .value = 250 },
     { .code = 50,  .value = 80 },
