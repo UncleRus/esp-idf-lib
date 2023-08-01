@@ -1,26 +1,21 @@
----
-components:
-  - name: ina3221
-    description: Driver for INA3221 shunt and bus voltage monitor
-    group: current
-    groups: []
-    code_owners: UncleRus
-    depends:
-      - name: i2cdev
-      - name: log
-      - name: esp_idf_lib_helpers
-    thread_safe: yes
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: ISC
-    copyrights:
-      - author:
-          name: UncleRus
-        year: 2019
-      - author:
-          name: Zaltora
-        year: 2016
+name: ina3221
+description: Driver for INA3221 shunt and bus voltage monitor
+groups:
+  - current
+code_owners: UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: Zaltora
+    year: 2016
+  - name: UncleRus
+    year: 2019

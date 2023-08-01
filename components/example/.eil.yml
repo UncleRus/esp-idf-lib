@@ -1,23 +1,19 @@
----
-components:
-  - name: example
-    description: An example component
-    group: misc
-    groups: []
-    code_owners: trombik
-    depends:
-      # FIXME conditional depends
-      - name: driver
-      - name: log
-    thread_safe: N/A
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: ISC
-    copyrights:
-      - author:
-          name: trombik
-        year: 2021
+name: example
+description: An example component
+groups:
+  - misc
+code_owners: trombik
+depends:
+  # FIXME conditional depends
+  - driver
+  - log
+thread_safe: n/a # yes, no, n/a
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: ISC
+copyrights:
+  - name: trombik
+    year: 2021

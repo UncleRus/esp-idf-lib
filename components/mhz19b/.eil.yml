@@ -1,26 +1,23 @@
----
-components:
-  - name: mhz19b
-    description: Driver for MH-Z19B NDIR CO₂ sensor
-    group: air-quality
-    groups:
-      - gas
-    code_owners: UncleRus
-    depends:
-      - log
-      - esp_idf_lib_helpers
-    thread_safe: no
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: BSD-3
-    copyrights:
-      - author:
-          name: Erriez
-        year: 2020
-      - author:
-          name: DavidD
-        year: 2021
+name: mhz19b
+description: Driver for MH-Z19B NDIR CO₂ sensor
+groups:
+  - air-quality
+  - gas
+code_owners:
+  - Erriez
+  - DavidD
+depends:
+  - log
+  - esp_idf_lib_helpers
+thread_safe: no
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: Erriez
+    year: 2020
+  - name: DavidD
+    year: 2021

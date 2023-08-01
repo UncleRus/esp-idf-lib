@@ -1,23 +1,19 @@
----
-components:
-  - name: tda74xx
-    description: Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors
-    group: misc
-    groups: []
-    code_owners: UncleRus
-    depends:
-      - i2cdev
-      - log
-      - esp_idf_lib_helpers
-    thread_safe: yes
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: MIT
-    copyrights:
-      - author:
-          name: UncleRus
-        year: 2018
+name: tda74xx
+description: Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors
+groups:
+  - misc
+code_owners: UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: UncleRus
+    year: 2018

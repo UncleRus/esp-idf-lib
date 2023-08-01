@@ -30,7 +30,7 @@
 /**
  * @file sts3x.c
  *
- * ESP-IDF driver for Sensirion STS3x digital temperature
+ * ESP-IDF driver for Sensirion STS3x digital temperature sensors
  *
  * Forked from SHT3x driver
  *
@@ -38,7 +38,7 @@
  * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>\n
  * Copyright (c) 2023 Christian Skjerning <https://github.com/slimcdk>
  *
- * BSD Licensed as described in the file LICENSE
+ * BSD-3 Licensed as described in the file LICENSE
  */
 
 #include <esp_log.h>
