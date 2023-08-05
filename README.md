@@ -1,7 +1,6 @@
 # ESP-IDF Components library
 
-[![Build Status](https://github.com/UncleRus/esp-idf-lib/workflows/Build%20examples/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions?query=workflow%3A%22Build+examples%22)
-[![Build the documentation](https://github.com/UncleRus/esp-idf-lib/workflows/Build%20the%20documentation/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions?query=workflow%3A%22Build+the+documentation%22)
+[![Main CI process](https://github.com/UncleRus/esp-idf-lib/actions/workflows/ci.yml/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions/workflows/ci.yml)
 [![Docs Status](https://readthedocs.org/projects/esp-idf-lib/badge/?version=latest&style=flat)](https://esp-idf-lib.readthedocs.io/en/latest/)
 
 Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf)
@@ -11,12 +10,12 @@ Part of them ported from [esp-open-rtos](https://github.com/SuperHouse/esp-open-
 
 ## Supported versions of frameworks and devices
 
-| Chip           | Framework          | Versions
-|----------------|--------------------|-----------------------
-| ESP32-xx       | ESP-IDF            | All officially supported versions (see [Support Period Policy](https://github.com/espressif/esp-idf/blob/master/SUPPORT_POLICY.md)) and `master`
-| ESP8266  *[1]* | ESP8266 RTOS SDK   | `master`, v3.4
+| Chip     | Framework        | Versions                                                                                                                                         |
+|----------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| ESP32-xx | ESP-IDF          | All officially supported versions (see [Support Period Policy](https://github.com/espressif/esp-idf/blob/master/SUPPORT_POLICY.md)) and `master` |
+| ESP8266  | ESP8266 RTOS SDK | `master`, v3.4                                                                                                                                   |
 
-See "Supported on" column for each of the components.
+*See "Supported on" column for each of the components.*
 
 ## How to use
 
