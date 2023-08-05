@@ -239,7 +239,7 @@ esp_err_t si7021_get_device_id(i2c_dev_t *dev, si7021_device_id_t *id);
  *  - SI7021
  *
  * @param dev       Device descriptor
- * @param[out] id   Device revision
+ * @param[out] rev  Device revision
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_device_revision(i2c_dev_t *dev, uint8_t *rev);

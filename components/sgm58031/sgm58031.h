@@ -198,18 +198,6 @@ esp_err_t sgm58031_start_conversion(i2c_dev_t *dev);
 esp_err_t sgm58031_get_value(i2c_dev_t *dev, int16_t *value);
 
 /**
- * @brief Read last conversion result
- *
- * @param[in] dev Device descriptor
- * @param[out] value Last conversion result
- * @return
- *  - `ESP_OK` on success
- *  - `ESP_INVALID_ARG` if dev or value are NULL
- *  - `ESP_FAIL` otherwise
- */
-esp_err_t sgm58031_get_value(i2c_dev_t *dev, int16_t *value);
-
-/**
  * @brief Read the programmable gain amplifier configuration
  *
  * Use ::sgm58031_gain_values[] for real voltage.
