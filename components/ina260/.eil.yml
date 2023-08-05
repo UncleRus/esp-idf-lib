@@ -1,5 +1,6 @@
 name: ina260
 description: Driver for INA260 precision digital current and power monitor
+version: 1.0.0
 groups:
   - current
 code_owners: UncleRus

@@ -1,5 +1,6 @@
 name: sts21
 description: Driver for STS21 temperature sensor
+version: 1.0.0
 groups:
   - temperature
 code_owners:

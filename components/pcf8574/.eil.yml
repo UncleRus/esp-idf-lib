@@ -1,5 +1,6 @@
 name: pcf8574
 description: Driver for PCF8574 remote 8-bit I/O expander for I2C-bus
+version: 1.0.0
 groups:
   - gpio
 code_owners: UncleRus

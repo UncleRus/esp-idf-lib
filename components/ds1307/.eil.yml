@@ -1,5 +1,6 @@
 name: ds1307
 description: Driver for DS1307 RTC module
+version: 1.0.1
 groups:
   - rtc
 code_owners:

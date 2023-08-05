@@ -1,5 +1,6 @@
 name: ht16k33
 description: HT16K33 LED controller driver
+version: 1.0.0
 groups:
   - led
 code_owners: chudsaviet

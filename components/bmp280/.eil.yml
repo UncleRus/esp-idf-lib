@@ -1,5 +1,6 @@
 name: bmp280
 description: Driver for BMP280/BME280 digital pressure sensor
+version: 1.0.0
 groups:
   - pressure
   - temperature

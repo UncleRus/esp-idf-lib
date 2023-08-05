@@ -1,6 +1,6 @@
 name: hd44780
-description: |
-  Driver for HD44780 compatible LCD text displays
+description: Driver for HD44780 compatible LCD text displays
+version: 1.2.0
 groups:
   - misc
 code_owners:

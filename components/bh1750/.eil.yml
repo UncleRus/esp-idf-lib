@@ -1,5 +1,6 @@
 name: bh1750
 description: Driver for BH1750 light sensor
+version: 1.1.0
 groups:
   - light
 code_owners:

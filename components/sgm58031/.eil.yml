@@ -1,5 +1,6 @@
 name: sgm58031
 description: Driver for SGM58031 16-bit I2C ADC
+version: 1.0.0
 groups:
   - adc-dac
 code_owners: jmpmscorp

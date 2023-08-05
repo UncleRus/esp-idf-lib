@@ -1,5 +1,6 @@
 name: wiegand
 description: Wiegand protocol receiver
+version: 1.1.0
 groups:
   - misc
 code_owners: UncleRus

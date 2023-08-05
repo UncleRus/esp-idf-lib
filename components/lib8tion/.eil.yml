@@ -1,5 +1,6 @@
 name: lib8tion
 description: Math functions specifically designed for LED programming
+version: 1.0.0
 groups:
   - common
 code_owners: UncleRus

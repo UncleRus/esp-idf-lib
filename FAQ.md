@@ -143,7 +143,7 @@ after enabling this option all i2c device drivers will become non-thread safe.
 
 ## Porting I2C libs to I2Cdev
 
-See [porting.md](docs/porting.md).
+See [Porting.md](Porting.md).
 
 
 ## My DHT sensor doesn't work well/doesn't work at all!

@@ -1,6 +1,6 @@
 name: esp_idf_lib_helpers
-description: |
-  Common support library for esp-idf-lib
+description: Common support library for esp-idf-lib
+version: 1.2.0
 groups:
   - common
 code_owners:

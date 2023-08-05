@@ -1,7 +1,6 @@
 name: si7021
-description: |
-  Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature
-  and humidity sensors
+description: Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors
+version: 1.0.1
 groups:
   - temperature
   - humidity

@@ -1,5 +1,6 @@
 name: max1704x
 description: Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge
+version: 0.9.0
 groups:
   - battery
 code_owners: shuki25

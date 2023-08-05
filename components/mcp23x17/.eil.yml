@@ -1,5 +1,6 @@
 name: mcp23x17
 description: Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17
+version: 1.1.2
 groups:
   - gpio
 code_owners: UncleRus

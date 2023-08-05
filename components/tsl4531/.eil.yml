@@ -1,5 +1,6 @@
 name: tsl4531
 description: Driver for digital ambient light sensor TSL4531
+version: 1.0.1
 groups:
   - light
 code_owners: UncleRus

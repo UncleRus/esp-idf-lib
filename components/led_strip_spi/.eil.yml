@@ -1,5 +1,6 @@
 name: led_strip_spi
 description: SPI-based driver for SK9822/APA102 LED strips
+version: 1.0.0
 groups:
   - led
 code_owners: trombik

@@ -1,5 +1,6 @@
 name: ds3502
 description: Driver for nonvolatile digital potentiometer DS3502
+version: 1.0.0
 groups:
   - misc
 code_owners:

@@ -1,5 +1,6 @@
 name: i2cdev
 description: ESP-IDF I2C master thread-safe utilities
+version: 1.5.0
 groups:
   - common
 code_owners:

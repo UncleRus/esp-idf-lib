@@ -1,5 +1,6 @@
 name: tsys01
 description: Driver for precision digital temperature sensor TSYS01
+version: 1.0.0
 groups:
   - temperature
 code_owners: UncleRus

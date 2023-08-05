@@ -1,5 +1,6 @@
 name: lc709203f
 description: Driver for LC709203F battery fuel gauge
+version: 1.0.0
 groups:
   - battery
 code_owners: jmpmscorp

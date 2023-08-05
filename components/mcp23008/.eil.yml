@@ -1,5 +1,6 @@
 name: mcp23008
 description: Driver for 8-bit I2C GPIO expander MCP23008
+version: 1.0.0
 groups:
   - gpio
 code_owners: UncleRus
