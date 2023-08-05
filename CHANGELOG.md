@@ -1,5 +1,30 @@
 # Changelog
 
+## v.0.9.4
+
+### Features
+- (sgm58031): Driver for SGM58031 16-bit I2C ADC by @jmpmscorp in https://github.com/UncleRus/esp-idf-lib/pull/511
+- (sts3x): Driver for Sensirion STS30/STS31/STS35 digital temperature sensor by @slimcdk in https://github.com/UncleRus/esp-idf-lib/pull/532
+- (mpu6050): Driver for MPU6000/MPU6050 6-axis MotionTracking device by @horsemann07 in https://github.com/UncleRus/esp-idf-lib/pull/455
+- (max1704x): Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge by @shuki25 in https://github.com/UncleRus/esp-idf-lib/pull/542
+- (calibration): Multi-point calibration library by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/545
+
+### Bugfixes
+- (veml7700): Fixed wrong resolution divider by @Throows in https://github.com/UncleRus/esp-idf-lib/pull/534
+- (docs): Fixed section in docs for max7219 by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/529
+- (mcp23x17): Fixed function name in mcp23x17.c to match the one in the header by @oisalb in https://github.com/UncleRus/esp-idf-lib/pull/536
+- (tsl2591): Added sensor init to default tsl2591 example by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/541
+- (ci): New devtool, simpler metadata, simpler CI by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/546
+- (docs): Fixed doxygen comments and docs, updated doxygen config by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/553
+
+## New Contributors
+* @slimcdk made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/532
+* @Throows made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/534
+* @oisalb made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/536
+* @horsemann07 made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/455
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.4/
+
 ## v.0.9.3
 
 ### Features
@@ -18,12 +43,13 @@
 - (si7021): Fixed reversed bytes in command words by @stvnjns and @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/527 
 
 ## New Contributors
-
 * @gaialucas made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/487
 * @vaemc made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/488
 * @janveeh made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/485
 * @Th3Link made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/492
 * @klaasjanhorlings made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/526
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.3/
 
 ## v.0.9.2
 
