@@ -1,27 +1,23 @@
----
-components:
-  - name: ds1302
-    description: |
-      Driver for DS1302 RTC module
-    group: rtc
-    groups: []
-    code_owners:
-      - name: UncleRus
-    depends:
-      - name: log
-      - name: esp_idf_lib_helpers
-      - name: freertos
-      - name: driver
-    thread_safe: no
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: BSD-3
-    copyrights:
-      - name: UncleRus
-        year: 2021
-      - name: PavelM
-        year: 2016
+name: ds1302
+description: Driver for DS1302 RTC module
+groups:
+  - rtc
+code_owners:
+  - UncleRus
+depends:
+  - log
+  - esp_idf_lib_helpers
+  - freertos
+  - driver
+thread_safe: no
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: PavelM
+    year: 2016
+  - name: UncleRus
+    year: 2021

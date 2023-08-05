@@ -1,8 +1,7 @@
 .. _calibration:
 
-calibration - Library for multi-point calibration
-=================================================
+calibration - Multi-point calibration library
+=============================================
 
 .. doxygengroup:: calibration
    :members:
-

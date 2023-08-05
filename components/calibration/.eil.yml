@@ -1,21 +1,18 @@
----
-components:
-  - name: calibration
-    description: Multi-point calibration library
-    group: misc
-    groups: []
-    code_owners:
-      - name: UncleRus
-    depends:
-      - name: log
-    thread_safe: N/A
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: BSD-3
-    copyrights:
-      - name: UncleRus
-        year: 2023
+name: calibration
+description: Multi-point calibration library
+groups:
+  - common
+code_owners:
+  - UncleRus
+depends:
+  - log
+thread_safe: n/a
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2023
