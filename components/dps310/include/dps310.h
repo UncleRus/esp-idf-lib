@@ -21,7 +21,7 @@
  * @defgroup dps310 dps310
  * @{
  *
- * ESP-IDF driver for DPS310 barometric pressure sensor. Sponsored by @beriberikix.
+ * ESP-IDF driver for DPS310 barometric pressure sensor. Sponsored by beriberikix.
  *
  * DPS310 supports I2C and SPI (3-wires and 4-wires) as digital interface. The
  * driver currently supports:

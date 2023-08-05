@@ -352,7 +352,7 @@ esp_err_t ads130e08_set_channel_config(ads130e08_t *dev, ads130e08_channel_t cha
  *
  * @param dev         Pointer to device descriptor
  * @param channel     Channel
- * @param[out]config  Channel configuration
+ * @param[out] config Channel configuration
  * @return `ESP_OK` on success
  */
 esp_err_t ads130e08_get_channel_config(ads130e08_t *dev, ads130e08_channel_t channel,
