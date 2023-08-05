@@ -1,29 +1,23 @@
----
-components:
-  - name: onewire
-    description: Bit-banging 1-Wire driver
-    group: common
-    groups: []
-    code_owners: UncleRus
-    depends:
-      # XXX conditional depends
-      - driver
-      - freertos
-      - log
-      - esp_idf_lib_helpers
-    thread_safe: no
-    targets:
-      - name: esp32
-      - name: esp8266
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      # XXX what `MIT *` means?
-      - name: MIT
-    copyrights:
-      - author:
-          name: UncleRus
-        year: 2016
-      - author:
-          name: zeroday
-        year: 2016
+name: onewire
+description: Bit-banging 1-Wire driver
+groups:
+  - common
+code_owners: UncleRus
+depends:
+  # XXX conditional depends
+  - driver
+  - freertos
+  - log
+  - esp_idf_lib_helpers
+thread_safe: no
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: zeroday
+    year: 2016
+  - name: UncleRus
+    year: 2016

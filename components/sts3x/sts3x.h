@@ -32,7 +32,7 @@
  * @defgroup sts3x sts3x
  * @{
  *
- * ESP-IDF driver for Sensirion STS3x digital temperature
+ * ESP-IDF driver for Sensirion STS3x digital temperature sensors
  *
  * Forked from <https://github.com/gschorcht/sht3x-esp-idf>
  *
@@ -40,7 +40,7 @@
  * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>\n
  * Copyright (c) 2023 Christian Skjerning <https://github.com/slimcdk>
  *
- * BSD Licensed as described in the file LICENSE
+ * BSD-3 Licensed as described in the file LICENSE
  */
 #ifndef __STS3X_H__
 #define __STS3X_H__

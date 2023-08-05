@@ -1,20 +1,16 @@
----
-components:
-  - name: ads130e08
-    description: Driver for ADS130E08 ADC
-    group: adc-dac
-    groups: []
-    code_owners: weslleymfd
-    depends:
-      - driver
-      - log
-    thread_safe: yes
-    targets:
-      - name: esp32
-      - name: esp32s3
-    licenses:
-      - name: MIT
-    copyrights:
-      - author:
-          name: weslleymfd
-        year: 2021
+name: ads130e08
+description: Driver for ADS130E08 ADC
+groups:
+  - adc-dac
+code_owners: weslleymfd
+depends:
+  - driver
+  - log
+thread_safe: yes
+targets:
+  - esp32
+  - esp32s3
+license: MIT
+copyrights:
+  - name: weslleymfd
+    year: 2021

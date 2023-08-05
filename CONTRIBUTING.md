@@ -456,10 +456,10 @@ for the supported keywords.
 Each component has a `.eil.yml` file in its component directory. The file is a
 metadata file of the component. If you change the file, you need to update the
 `README.md` in the project root directory. The `README.md` is generated from
-the metadata and a template, `README.md.erb`. Generate `README.md` by:
+the metadata and a template.
 
 ```console
-bundle exec rake -C devtools readme > README.md
+./devtools/devtool.py --repo=. render
 ```
 
 See also [`Metadata.md`](Metadata.md).
