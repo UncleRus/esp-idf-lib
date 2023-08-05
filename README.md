@@ -119,6 +119,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
+| **calibration**          | Multi-point calibration library                                                  | BSD-3   | esp32, esp8266, esp32s2, esp32c3 | n/a           |
 | **color**                | Common library for RGB and HSV colors                                            | MIT     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
 | **esp_idf_lib_helpers**  | Common support library for esp-idf-lib                                           | ISC     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
 | **framebuffer**          | RGB framebuffer component                                                        | MIT     | esp32, esp32s2, esp32c3 | n/a           |
@@ -321,7 +322,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - Pavel Merzlyakov: `ds1302` 
 - [Raghav Jha](https://github.com/horsemann07): `mpu6050` 
 - RichardA: `ds3231` 
-- [Ruslan V. Uss](https://github.com/UncleRus): `ads111x` `aht` `am2320` `bh1750` `bh1900nux` `bme680` `bmp180` `bmp280` `button` `ccs811` `dht` `ds1302` `ds1307` `ds18x20` `ds3231` `ds3502` `encoder` `framebuffer` `hd44780` `hdc1000` `hmc5883l` `hx711` `i2cdev` `ina219` `ina260` `ina3221` `led_strip` `led_strip_spi` `max31725` `max31855` `max31865` `max7219` `mcp23008` `mcp23x17` `mcp342x` `mcp4725` `mcp960x` `mcp9808` `mpu6050` `ms5611` `onewire` `pca9557` `pca9685` `pcf8563` `pcf8574` `pcf8575` `pcf8591` `qmc5883l` `rda5807m` `scd30` `scd4x` `sgp40` `sht3x` `sht4x` `si7021` `sts21` `sts3x` `tca9548` `tca95x5` `tda74xx` `tsl2561` `tsl4531` `tsys01` `ultrasonic` `wiegand` 
+- [Ruslan V. Uss](https://github.com/UncleRus): `ads111x` `aht` `am2320` `bh1750` `bh1900nux` `bme680` `bmp180` `bmp280` `button` `calibration` `ccs811` `dht` `ds1302` `ds1307` `ds18x20` `ds3231` `ds3502` `encoder` `framebuffer` `hd44780` `hdc1000` `hmc5883l` `hx711` `i2cdev` `ina219` `ina260` `ina3221` `led_strip` `led_strip_spi` `max31725` `max31855` `max31865` `max7219` `mcp23008` `mcp23x17` `mcp342x` `mcp4725` `mcp960x` `mcp9808` `mpu6050` `ms5611` `onewire` `pca9557` `pca9685` `pcf8563` `pcf8574` `pcf8575` `pcf8591` `qmc5883l` `rda5807m` `scd30` `scd4x` `sgp40` `sht3x` `sht4x` `si7021` `sts21` `sts3x` `tca9548` `tca95x5` `tda74xx` `tsl2561` `tsl4531` `tsys01` `ultrasonic` `wiegand` 
 - [Sensirion AG](https://github.com/Sensirion): `scd30` `scd4x` 
 - [sheinz](https://github.com/sheinz): `bmp280` 
 - [Thanh Pham](https://github.com/panoti): `pcf8591` 
