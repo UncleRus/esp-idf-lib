@@ -193,7 +193,7 @@ jobs:
             fi
 
             # ESP32-H2: 5.1
-            if [ "${{ matrix.target }}" = "esp32c6" ]; then
+            if [ "${{ matrix.target }}" = "esp32h2" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
                   -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
                   -a "${{ matrix.esp_idf_version }}" != "release-v4.4" \
@@ -333,11 +333,6 @@ jobs:
       - name: Build (make)
         if: ${{ matrix.build_method == 'make' }}
         run: |
-          components_to_build="${{ needs.pre_build.outputs.components_to_build }}"
-
-          echo "The component whose examples need to be built:"
-          echo "${components_to_build}"
-
           # make sure gcc is in $PATH
           echo ${PATH}
           ${__PROJECT_GCC_FILE} --version
