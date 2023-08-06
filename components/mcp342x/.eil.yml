@@ -1,5 +1,6 @@
 name: mcp342x
 description: Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428
+version: 1.0.0
 groups:
   - adc-dac
 code_owners: UncleRus

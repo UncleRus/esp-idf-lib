@@ -84,13 +84,13 @@ foo: trombik
 A `Person` represents a person. `Person` is used to describe a copyrights
 holder and a code owner. A `Person` must be defined in `persons.yml` file.
 
-| Name        | Type | Description | Required |
-|-------------|------|-------------|----------|
-| `name`      | `String` | A unique ID string of the person. Use GitHub account or GitHub project if the person has one | Yes |
-| `full_name` | `String` | Full name of the person or the project | No |
-| `gh_id`     | `String` | GitHub account name or project name | No |
-| `email`     | `String` | Email address of the person | No |
-| `url`       | `String` | Web site URL | No |
+| Name        | Type     | Description                                                                                  | Required |
+|-------------|----------|----------------------------------------------------------------------------------------------|----------|
+| `name`      | `String` | A unique ID string of the person. Use GitHub account or GitHub project if the person has one | Yes      |
+| `full_name` | `String` | Full name of the person or the project                                                       | No       |
+| `gh_id`     | `String` | GitHub account name or project name                                                          | No       |
+| `email`     | `String` | Email address of the person                                                                  | No       |
+| `url`       | `String` | Web site URL                                                                                 | No       |
 
 When any of `gh_id`, `email`, or `website` is not available, `person` must
 have a full name because it is used to identify the source of code.
@@ -119,9 +119,9 @@ full_name: Foo `bar` buz
 
 ### Target
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | Name of the build target in `esp-idf`, or `esp8266`. | Yes |
+| Name   | Type     | Description                                          | Required |
+|--------|----------|------------------------------------------------------|----------|
+| `name` | `String` | Name of the build target in `esp-idf`, or `esp8266`. | Yes      |
 
 An example:
 
@@ -131,9 +131,9 @@ name: esp32
 
 ### License
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | SPDX License Identifier (see [the list of licenses](https://spdx.org/licenses/)) | Yes |
+| Name   | Type     | Description                                                                      | Required |
+|--------|----------|----------------------------------------------------------------------------------|----------|
+| `name` | `String` | SPDX License Identifier (see [the list of licenses](https://spdx.org/licenses/)) | Yes      |
 
 An example:
 
@@ -143,11 +143,11 @@ name: BSD-3
 
 ### Copyright
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `author` | `Person` | Copyrights holder. See also `Person`. | No |
-| `name` | `String` | The value of `name` of `Person`. A shorthand for `author` | No |
-| `year` | `Integer` | Registration year of the copyrights | Yes |
+| Name     | Type      | Description                                               | Required |
+|----------|-----------|-----------------------------------------------------------|----------|
+| `author` | `Person`  | Copyrights holder. See also `Person`.                     | No       |
+| `name`   | `String`  | The value of `name` of `Person`. A shorthand for `author` | No       |
+| `year`   | `Integer` | Registration year of the copyrights                       | Yes      |
 
 `Copyright` must have only one of `author` and `name`, not both.
 
@@ -171,10 +171,10 @@ year: 2021
 A `Group` represents a group of `Component`s. A `Group` must be in
 `groups.yml`.
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | A unique ID of the group | Yes |
-| `description` | `String` | Description of the group | Yes |
+| Name          | Type     | Description              | Required |
+|---------------|----------|--------------------------|----------|
+| `name`        | `String` | A unique ID of the group | Yes      |
+| `description` | `String` | Description of the group | Yes      |
 
 `name` should be short, and memorable. Use `-` as a word separator. It must
 not include spaces (`[0-9a-zA-Z-]+` in regular expression).
@@ -202,30 +202,27 @@ components:
 
 ### Component
 
-| Name | Type | Description                                               | Required |
-|------|------|-----------------------------------------------------------|----------|
-| `name` | `String` | The name of the component. Must be unique.                | Yes |
-| `description` | `String` | A short description of the component.                     | Yes |
-| `group` | `Group` | The primary group name of the component.                  | Yes |
-| `groups` | A list of `Group` | A list of zero or more of `Group`                         | No |
-| `code_owners` | A list of `Person` | A list of one or more of `Person`                         | Yes |
-| `depends` | A list of `Component` | Zero or more of `component` that the component depends on | No |
-| `thread_safe` | `Strnig` | One of `yes`, `no`, and `N/A`                             | Yes |
-| `targets` | A list of `Target` | One or more of supported `target`                         | Yes |
-| `license` | `License` | License used in the component                            | Yes |
-| `copyrights` | A list of `Copyright` | One or more of copyright holder                           | Yes |
+| Name          | Type                  | Description                                               | Required |
+|---------------|-----------------------|-----------------------------------------------------------|----------|
+| `name`        | `String`              | The name of the component. Must be unique.                | Yes      |
+| `description` | `String`              | A short description of the component.                     | Yes      |
+| `version`     | `String`              | Component version.                                        | Yes      |
+| `groups`      | A list of `Group`     | A list of one or more of `Group`                          | No       |
+| `code_owners` | A list of `Person`    | A list of one or more of `Person`                         | Yes      |
+| `depends`     | A list of `Component` | Zero or more of `component` that the component depends on | No       |
+| `thread_safe` | `Strnig`              | One of `yes`, `no`, and `N/A`                             | Yes      |
+| `targets`     | A list of `Target`    | One or more of supported `target`                         | Yes      |
+| `license`     | `License`             | License used in the component                             | Yes      |
+| `copyrights`  | A list of `Copyright` | One or more of copyright holder                           | Yes      |
 
 FIXME `depends` must be a list because some drivers have conditional `REQUIRES`
 in `CMakeLists.txt`.
 
 ## Usages of metadata in the project
 
-The current implementation uses `ruby` and `rspec` ruby gem to validate
-metadata in all components, and generate `README.md`.
-
 Requirements are:
 
-* `python` >=3.11
+* `python` >=3.10
 
 After installing requirements, run:
 
@@ -238,17 +235,17 @@ pip install -r devtool/requirements.txt
 To validate metadata, run:
 
 ```console
-./devtools/devtool.py --repo=. check
+python ./devtools/devtool.py check
 ```
 
 
 ### Generating `README.md`
 
-`README.md` is generated from the metadata and `README.md.erb`. To update
+`README.md` is generated from the metadata and `devtools/devtools/template/README.md`. To update
 `README.md`, run the following command at the repository root directory:
 
 ```console
-bundle exec rake -C devtools readme > README.md
+python ./devtools/devtool.py render
 ```
 
 ## Known issues

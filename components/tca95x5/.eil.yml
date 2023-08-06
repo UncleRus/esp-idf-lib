@@ -1,5 +1,6 @@
 name: tca95x5
 description: Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus
+version: 1.0.0
 groups:
   - gpio
 code_owners: UncleRus

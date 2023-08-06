@@ -1,5 +1,6 @@
 name: pca9685
 description: Driver for 16-channel, 12-bit PWM PCA9685
+version: 1.0.0
 groups:
   - misc
 code_owners: UncleRus

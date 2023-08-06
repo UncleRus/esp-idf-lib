@@ -1,5 +1,6 @@
 name: mpu6050
 description: Driver for MPU6000/MPU6050 6-axis MotionTracking device
+version: 2.1.0
 groups:
   - imu
 code_owners:

@@ -1,5 +1,6 @@
 name: pcf8591
 description: Driver for 8-bit ADC and an 8-bit DAC PCF8591
+version: 1.0.0
 groups:
   - adc-dac
 code_owners: UncleRus

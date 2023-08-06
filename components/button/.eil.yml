@@ -1,5 +1,6 @@
 name: button
 description: HW timer-based driver for GPIO buttons
+version: 1.0.0
 groups:
   - input
 code_owners:

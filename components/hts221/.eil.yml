@@ -1,6 +1,6 @@
 name: hts221
-description: |
-  Driver for HTS221 temperature and humidity sensor.
+description: Driver for HTS221 temperature and humidity sensor
+version: 1.0.0
 groups:
   - temperature
   - humidity

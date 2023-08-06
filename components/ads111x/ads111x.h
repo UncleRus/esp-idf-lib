@@ -33,6 +33,8 @@
  *
  * ESP-IDF driver for ADS1113/ADS1114/ADS1115, ADS1013/ADS1014/ADS1015 I2C ADC
  *
+ * Version: 1.1.2
+ *
  * Ported from esp-open-rtos
  *
  * Copyright (c) 2016, 2018 Ruslan V. Uss <unclerus@gmail.com>

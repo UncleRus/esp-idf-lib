@@ -1,5 +1,6 @@
 name: max31725
 description: Driver for MAX31725/MAX31726 temperature sensors
+version: 1.0.0
 groups:
   - temperature
 code_owners: UncleRus

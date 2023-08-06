@@ -1,5 +1,6 @@
 name: mcp9808
-description: Driver for MCP9808 Digital Temperature Sensor
+description: Driver for MCP9808 digital temperature sensor
+version: 1.0.0
 groups:
   - temperature
 code_owners: UncleRus

@@ -1,5 +1,6 @@
 name: max7219
 description: Driver for 8-Digit LED display drivers, MAX7219/MAX7221
+version: 1.0.0
 groups:
   - led
 code_owners: UncleRus

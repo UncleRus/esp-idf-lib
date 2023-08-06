@@ -1,5 +1,6 @@
 name: ads130e08
 description: Driver for ADS130E08 ADC
+version: 1.0.0
 groups:
   - adc-dac
 code_owners: weslleymfd

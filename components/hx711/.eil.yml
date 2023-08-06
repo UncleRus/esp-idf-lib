@@ -1,6 +1,6 @@
 name: hx711
-description: |
-  Driver for HX711 24-bit ADC for weigh scales
+description: Driver for HX711 24-bit ADC for weigh scales
+version: 1.0.0
 groups:
   - adc-dac
 code_owners:

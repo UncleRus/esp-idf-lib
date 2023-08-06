@@ -1,5 +1,6 @@
 name: bh1900nux
 description: Driver for BH1900NUX temperature sensor
+version: 1.0.0
 groups:
   - temperature
 code_owners: UncleRus

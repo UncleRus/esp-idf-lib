@@ -41,7 +41,13 @@ class ThreadSafety(str, Enum):
 class Licenses(str, Enum):
     ISC = 'ISC'
     MIT = 'MIT'
-    BSD3 = 'BSD-3'
+    BSD3 = 'BSD-3-Clause'
+
+    @staticmethod
+    def from_value(raw: str) -> Licenses:
+        if raw == 'BSD-3':
+            return Licenses.BSD3
+        return Licenses(raw)
 
 
 class Group(pydantic.BaseModel):
@@ -70,6 +76,7 @@ class Copyright(pydantic.BaseModel):
 class Component(pydantic.BaseModel):
     name: str
     description: str
+    version: str
     groups: t.List[Group] = []
     code_owners: t.List[Person] = []
     depends: t.List[str] = []
@@ -107,13 +114,14 @@ class Component(pydantic.BaseModel):
 
         lc = str(raw['license'])
         try:
-            lc = Licenses(lc.upper())
+            lc = Licenses.from_value(lc.upper())
         except:
             raise InvalidLicenseError(ctx, lc)
 
         res = Component(
             name=ctx,
             description=raw['description'].strip().strip('.').replace('\n', ' '),
+            version=raw['version'].strip(),
             groups=m.get_groups(ctx, raw),
             code_owners=m.get_persons(ctx, raw['code_owners']),
             depends=[lib for lib in raw['depends']],

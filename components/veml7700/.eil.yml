@@ -1,5 +1,6 @@
 name: veml7700
 description: Driver for VEML7700 ambient light sensor
+version: 1.0.0
 groups:
   - light
 code_owners: Th3Link

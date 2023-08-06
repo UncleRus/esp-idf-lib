@@ -1,5 +1,6 @@
 name: sht4x
 description: Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor
+version: 1.0.0
 groups:
   - temperature
   - humidity

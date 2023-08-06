@@ -1,5 +1,6 @@
 name: ds3231
 description: Driver for DS1337 RTC and DS3231 high precision RTC module
+version: 1.1.0
 groups:
   - rtc
 code_owners:

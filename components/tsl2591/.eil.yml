@@ -1,5 +1,6 @@
 name: tsl2591
 description: Driver for light-to-digital converter TSL2591
+version: 1.0.0
 groups:
   - light
 code_owners: UncleRus

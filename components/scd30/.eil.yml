@@ -1,5 +1,6 @@
 name: scd30
 description: Driver for SCD30 CO₂ sensor
+version: 1.0.5
 groups:
   - gas
   - air-quality

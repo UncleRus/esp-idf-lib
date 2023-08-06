@@ -1,5 +1,6 @@
 name: sht3x
 description: Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor
+version: 1.0.1
 groups:
   - temperature
   - humidity

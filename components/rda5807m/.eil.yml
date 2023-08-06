@@ -1,5 +1,6 @@
 name: rda5807m
 description: Driver for single-chip broadcast FM radio tuner RDA5807M
+version: 1.0.0
 groups:
   - misc
 code_owners: UncleRus
