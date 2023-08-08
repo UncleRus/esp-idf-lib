@@ -211,13 +211,17 @@ esp_err_t ds18s20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *t
 
 esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
 {
-    if ((uint8_t)addr == DS18B20_FAMILY_ID) {
-        return ds18b20_read_temperature(pin, addr, temperature);
-    }
-    else
+    uint8_t family = (uint8_t)addr;
+    switch (family)
     {
-        return ds18s20_read_temperature(pin, addr, temperature);
+        case DS18B20_FAMILY_ID:
+            return ds18b20_read_temperature(pin, addr, temperature);
+        case DS18S20_FAMILY_ID:
+            return ds18s20_read_temperature(pin, addr, temperature);
+        default:
+            ESP_LOGE(TAG, "Unknown sensor family %02x. Please use an explicit read/measure function (prefixed with \"ds18b\" or \"ds18s\")", family);
     }
+    return ESP_ERR_NOT_SUPPORTED;
 }
 
 esp_err_t ds18b20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
@@ -289,4 +293,3 @@ esp_err_t ds18x20_read_temp_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, siz
     }
     return res;
 }
-
