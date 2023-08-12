@@ -359,6 +359,8 @@ esp_err_t mcp23x17_set_int_out_mode(mcp23x17_t *dev, mcp23x17_int_out_mode_t mod
     if (mode == MCP23X17_OPEN_DRAIN)
         return write_reg_bit_8(dev, REG_IOCON, true, BIT_IOCON_ODR);
 
+    // The INTPOL bit is only functional if the ODR bit is cleared.
+    write_reg_bit_8(dev, REG_IOCON, false, BIT_IOCON_ODR);
     return write_reg_bit_8(dev, REG_IOCON, mode == MCP23X17_ACTIVE_HIGH, BIT_IOCON_INTPOL);
 }
 
