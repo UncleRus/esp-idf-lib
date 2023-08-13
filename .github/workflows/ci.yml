@@ -100,6 +100,16 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - prepare
+    if: >-
+      ${{ needs.prepare.outputs._ci_build_esp32 != '' 
+       || needs.prepare.outputs._ci_build_esp32c2 != ''
+       || needs.prepare.outputs._ci_build_esp32c3 != ''
+       || needs.prepare.outputs._ci_build_esp32c6 != ''
+       || needs.prepare.outputs._ci_build_esp32h2 != ''
+       || needs.prepare.outputs._ci_build_esp32h4 != ''
+       || needs.prepare.outputs._ci_build_esp32s2 != ''
+       || needs.prepare.outputs._ci_build_esp32s3 != ''
+       || needs.prepare.outputs._ci_build_esp8266 != '' }}
     strategy:
       # run other jobs even when one job failed
       fail-fast: false
@@ -133,7 +143,7 @@ jobs:
           sudo apt-get -y install ccache
 
       - id: build_esp32
-        name: esp-idf build
+        name: Build
         uses: espressif/esp-idf-ci-action@v1
         with:
           esp_idf_version: ${{ matrix.esp_idf_version }}
@@ -203,7 +213,8 @@ jobs:
             fi
 
             if [ -z "${examples}" ]; then
-              echo "Nothing to build: no component supports ${{ matrix.target }} or ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
+              echo "Nothing to build: no component supports ${{ matrix.target }} or " \
+                   "ESP-IDF ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
               exit 0
             fi
 
@@ -221,6 +232,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - prepare
+    if: ${{ needs.prepare.outputs._ci_build_esp8266 != '' }}
     strategy:
       fail-fast: false
       matrix:
