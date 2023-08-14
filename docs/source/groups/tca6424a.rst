@@ -1,0 +1,8 @@
+.. _tca6424a:
+
+tca6424a - Driver for TCA6424A low-voltage 24-bit I2C I/O expander
+==================================================================
+
+.. doxygengroup:: tca6424a
+   :members:
+

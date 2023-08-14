@@ -204,7 +204,8 @@ GPIO expanders
    groups/mcp23008
    groups/mcp23x17
    groups/pca9557
-   
+   groups/tca6424a
+
 LED drivers
 ===========
 .. toctree::
