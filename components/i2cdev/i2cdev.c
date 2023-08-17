@@ -179,8 +179,9 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
         && a->sda_io_num == b->sda_io_num
 #if HELPER_TARGET_IS_ESP32
         && a->master.clk_speed == b->master.clk_speed
-#elif HELPER_TARGET_IS_ESP8266
-        && a->clk_stretch_tick == b->clk_stretch_tick
+// FIXME: temporary workaround for #501
+//#elif HELPER_TARGET_IS_ESP8266
+//        && a->clk_stretch_tick == b->clk_stretch_tick
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
         && a->sda_pullup_en == b->sda_pullup_en;
