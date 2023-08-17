@@ -180,7 +180,9 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
 #if HELPER_TARGET_IS_ESP32
         && a->master.clk_speed == b->master.clk_speed
 #elif HELPER_TARGET_IS_ESP8266
-        && a->clk_stretch_tick == b->clk_stretch_tick
+        && ((a->clk_stretch_tick && a->clk_stretch_tick == b->clk_stretch_tick) 
+            || (!a->clk_stretch_tick && b->clk_stretch_tick == I2CDEV_MAX_STRETCH_TIME)
+        ) // see line 232
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
         && a->sda_pullup_en == b->sda_pullup_en;
