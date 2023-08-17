@@ -186,7 +186,7 @@ class Devtool:
             for c_name in changed_components:
                 if c_name in all_components:
                     components_to_build.add(c_name)
-                components_to_build.union(self._find_dependants(c_name, all_components).keys())
+                components_to_build = components_to_build.union(self._find_dependants(c_name, all_components).keys())
 
         print('_ci_meta=%d' % res.meta)
         print('_ci_readme=%d' % res.readme)
