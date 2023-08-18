@@ -254,7 +254,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **ds1302**               | Driver for DS1302 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **ds1307**               | Driver for DS1307 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **ds3231**               | Driver for DS1337 RTC and DS3231 high precision RTC module                       | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **pcf8563**              | Driver for PCF8563 real-time clock/calendar                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **pcf8563**              | Driver for PCF8563 (BM8563) real-time clock/calendar                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
 ### Temperature sensors
