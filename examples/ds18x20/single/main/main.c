@@ -9,7 +9,7 @@ static const gpio_num_t SENSOR_GPIO = CONFIG_EXAMPLE_ONEWIRE_GPIO;
 
 // Use address of your own sensor here!
 // You can find out the address of your sensor by running ds18x20_multi example
-static const ds18x20_addr_t SENSOR_ADDR = CONFIG_EXAMPLE_DS18X20_ADDR;
+static const onewire_addr_t SENSOR_ADDR = CONFIG_EXAMPLE_DS18X20_ADDR;
 
 static const char *TAG = "ds18x20_test";
 
