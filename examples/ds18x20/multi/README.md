@@ -1,9 +1,5 @@
 # Example for `ds18x20` driver
 
-## Datasheet
-
-* [DS18S20 High-Precision 1-Wire Digital Thermometer](https://datasheets.maximintegrated.com/en/ds/DS18S20.pdf)
-
 ## What it does
 
 The example configures one or `CONFIG_EXAMPLE_DS18X20_MAX_SENSORS` of
@@ -24,6 +20,6 @@ recommended instead!
 
 Connect `DQ` pin to `CONFIG_EXAMPLE_ONEWIRE_GPIO`.
 
-| Name | Description | Defaults |
-|------|-------------|----------|
-| `CONFIG_EXAMPLE_ONEWIRE_GPIO` | GPIO Number of 1-Wire bus, or `DQ` | "4" for `esp8266`, "18" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
+| Name | Description | Defaults                                                                          |
+|------|-------------|-----------------------------------------------------------------------------------|
+| `CONFIG_EXAMPLE_ONEWIRE_GPIO` | GPIO Number of 1-Wire bus, or `DQ` | "4" for `esp8266`, "18" for `esp32c3`, "17" for `esp32`, `esp32s2`, and `esp32s3` |

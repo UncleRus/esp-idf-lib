@@ -13,9 +13,25 @@ static const uint32_t LOOP_DELAY_MS = 500;
 
 static const char *TAG = "ds18x20_test";
 
+static const char *sensor_type(uint8_t family_id)
+{
+    switch (family_id)
+    {
+        case DS18X20_FAMILY_DS18S20:
+            return "DS18S20";
+        case DS18X20_FAMILY_DS1822:
+            return "DS1822";
+        case DS18X20_FAMILY_DS18B20:
+            return "DS18B20";
+        case DS18X20_FAMILY_MAX31850:
+            return "MAX31850";
+    }
+    return "Unknown";
+}
+
 void ds18x20_test(void *pvParameter)
 {
-    ds18x20_addr_t addrs[MAX_SENSORS];
+    onewire_addr_t addrs[MAX_SENSORS];
     float temps[MAX_SENSORS];
     size_t sensor_count = 0;
 
@@ -76,7 +92,7 @@ void ds18x20_test(void *pvParameter)
                 // example. See sdkconfig.defaults.esp8266
                 ESP_LOGI(TAG, "Sensor %08" PRIx32 "%08" PRIx32 " (%s) reports %.3f°C (%.3f°F)",
                         (uint32_t)(addrs[j] >> 32), (uint32_t)addrs[j],
-                        (addrs[j] & 0xff) == DS18B20_FAMILY_ID ? "DS18B20" : "DS18S20",
+                        sensor_type(addrs[j]),
                         temp_c, temp_f);
             }
 

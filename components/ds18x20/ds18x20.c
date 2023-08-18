@@ -76,7 +76,7 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 static const char *TAG = "ds18x20";
 
-esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait)
+esp_err_t ds18x20_measure(gpio_num_t pin, onewire_addr_t addr, bool wait)
 {
     if (!onewire_reset(pin))
         return ESP_ERR_INVALID_RESPONSE;
@@ -102,7 +102,7 @@ esp_err_t ds18x20_measure(gpio_num_t pin, ds18x20_addr_t addr, bool wait)
     return ESP_OK;
 }
 
-esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *buffer)
+esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, onewire_addr_t addr, uint8_t *buffer)
 {
     CHECK_ARG(buffer);
 
@@ -133,7 +133,7 @@ esp_err_t ds18x20_read_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *
     return ESP_OK;
 }
 
-esp_err_t ds18x20_write_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t *buffer)
+esp_err_t ds18x20_write_scratchpad(gpio_num_t pin, onewire_addr_t addr, uint8_t *buffer)
 {
     CHECK_ARG(buffer);
 
@@ -152,7 +152,7 @@ esp_err_t ds18x20_write_scratchpad(gpio_num_t pin, ds18x20_addr_t addr, uint8_t 
     return ESP_OK;
 }
 
-esp_err_t ds18x20_copy_scratchpad(gpio_num_t pin, ds18x20_addr_t addr)
+esp_err_t ds18x20_copy_scratchpad(gpio_num_t pin, onewire_addr_t addr)
 {
     if (!onewire_reset(pin))
         return ESP_ERR_INVALID_RESPONSE;
@@ -176,55 +176,70 @@ esp_err_t ds18x20_copy_scratchpad(gpio_num_t pin, ds18x20_addr_t addr)
     return ESP_OK;
 }
 
-esp_err_t ds18b20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t ds18s20_read_temperature(gpio_num_t pin, onewire_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);
 
     uint8_t scratchpad[8];
-    int16_t temp;
-
     CHECK(ds18x20_read_scratchpad(pin, addr, scratchpad));
 
-    temp = scratchpad[1] << 8 | scratchpad[0];
-
-    *temperature = ((float)temp * 625.0) / 10000;
+    int16_t temp = (((scratchpad[1] << 8) | (scratchpad[0] & 0xfe)) << 3) | ((0x10 - scratchpad[6]) & 0x0f);
+    *temperature = (float)temp * 0.0625f - 0.250f;
 
     return ESP_OK;
 }
 
-esp_err_t ds18s20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t ds18b20_read_temperature(gpio_num_t pin, onewire_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);
 
     uint8_t scratchpad[8];
-    int16_t temp;
-
     CHECK(ds18x20_read_scratchpad(pin, addr, scratchpad));
 
-    temp = scratchpad[1] << 8 | scratchpad[0];
-
-    temp = ((temp & 0xfffe) << 3) + (16 - scratchpad[6]) - 4;
-    *temperature = ((float)temp * 625.0) / 10000 - 0.25;
+    uint16_t temp = scratchpad[1] << 8 | scratchpad[0];
+    int sign = 1;
+    if (temp > 2047)
+    {
+        temp = ~temp + 1;
+        sign = -1;
+    }
+    *temperature = (float)temp * (float)sign * 0.0625f;
 
     return ESP_OK;
 }
 
-esp_err_t ds18x20_read_temperature(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t max31850_read_temperature(gpio_num_t pin, onewire_addr_t addr, float *temperature)
+{
+    CHECK_ARG(temperature);
+
+    uint8_t scratchpad[8];
+    CHECK(ds18x20_read_scratchpad(pin, addr, scratchpad));
+
+    int16_t temp = scratchpad[1] << 8 | (scratchpad[0] & 0xfc);
+    *temperature = (float)temp * 0.0625f;
+
+    return ESP_OK;
+}
+
+esp_err_t ds18x20_read_temperature(gpio_num_t pin, onewire_addr_t addr, float *temperature)
 {
     uint8_t family = (uint8_t)addr;
     switch (family)
     {
-        case DS18B20_FAMILY_ID:
-            return ds18b20_read_temperature(pin, addr, temperature);
-        case DS18S20_FAMILY_ID:
+        case DS18X20_FAMILY_DS18S20:
+        case DS18X20_FAMILY_DS1822:
             return ds18s20_read_temperature(pin, addr, temperature);
+        case DS18X20_FAMILY_DS18B20:
+            return ds18b20_read_temperature(pin, addr, temperature);
+        case DS18X20_FAMILY_MAX31850:
+            return max31850_read_temperature(pin, addr, temperature);
         default:
-            ESP_LOGE(TAG, "Unknown sensor family %02x. Please use an explicit read/measure function (prefixed with \"ds18b\" or \"ds18s\")", family);
+            ESP_LOGE(TAG, "Unknown sensor family %02x. Please use an explicit read/measure function", family);
     }
     return ESP_ERR_NOT_SUPPORTED;
 }
 
-esp_err_t ds18b20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t ds18b20_measure_and_read(gpio_num_t pin, onewire_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);
 
@@ -232,7 +247,7 @@ esp_err_t ds18b20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *t
     return ds18b20_read_temperature(pin, addr, temperature);
 }
 
-esp_err_t ds18s20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t ds18s20_measure_and_read(gpio_num_t pin, onewire_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);
 
@@ -240,7 +255,15 @@ esp_err_t ds18s20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *t
     return ds18s20_read_temperature(pin, addr, temperature);
 }
 
-esp_err_t ds18x20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *temperature)
+esp_err_t max31850_measure_and_read(gpio_num_t pin, onewire_addr_t addr, float *temperature)
+{
+    CHECK_ARG(temperature);
+
+    CHECK(ds18x20_measure(pin, addr, true));
+    return max31850_read_temperature(pin, addr, temperature);
+}
+
+esp_err_t ds18x20_measure_and_read(gpio_num_t pin, onewire_addr_t addr, float *temperature)
 {
     CHECK_ARG(temperature);
 
@@ -248,7 +271,7 @@ esp_err_t ds18x20_measure_and_read(gpio_num_t pin, ds18x20_addr_t addr, float *t
     return ds18x20_read_temperature(pin, addr, temperature);
 }
 
-esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, float *result_list)
+esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, onewire_addr_t *addr_list, size_t addr_count, float *result_list)
 {
     CHECK_ARG(result_list && addr_count);
 
@@ -257,7 +280,7 @@ esp_err_t ds18x20_measure_and_read_multi(gpio_num_t pin, ds18x20_addr_t *addr_li
     return ds18x20_read_temp_multi(pin, addr_list, addr_count, result_list);
 }
 
-esp_err_t ds18x20_scan_devices(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, size_t *found)
+esp_err_t ds18x20_scan_devices(gpio_num_t pin, onewire_addr_t *addr_list, size_t addr_count, size_t *found)
 {
     CHECK_ARG(addr_list && addr_count);
 
@@ -269,7 +292,10 @@ esp_err_t ds18x20_scan_devices(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t
     while ((addr = onewire_search_next(&search, pin)) != ONEWIRE_NONE)
     {
         uint8_t family_id = (uint8_t)addr;
-        if (family_id == DS18B20_FAMILY_ID || family_id == DS18S20_FAMILY_ID)
+        if (family_id == DS18X20_FAMILY_DS18S20
+            || family_id == DS18X20_FAMILY_DS1822
+            || family_id == DS18X20_FAMILY_DS18B20
+            || family_id == DS18X20_FAMILY_MAX31850)
         {
             if (*found < addr_count)
                 addr_list[*found] = addr;
@@ -280,7 +306,7 @@ esp_err_t ds18x20_scan_devices(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t
     return ESP_OK;
 }
 
-esp_err_t ds18x20_read_temp_multi(gpio_num_t pin, ds18x20_addr_t *addr_list, size_t addr_count, float *result_list)
+esp_err_t ds18x20_read_temp_multi(gpio_num_t pin, onewire_addr_t *addr_list, size_t addr_count, float *result_list)
 {
     CHECK_ARG(result_list);
 
