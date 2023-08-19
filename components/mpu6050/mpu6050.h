@@ -1746,7 +1746,6 @@ esp_err_t mpu6050_get_motion(mpu6050_dev_t *dev, mpu6050_acceleration_t *data_ac
  * information regarding the characteristics of Slave 4, please refer to
  * Registers 49 to 53.
  *
- * @example
  * Suppose that Slave 0 is enabled with 4 bytes to be read (I2C_SLV0_EN = 1 and
  * I2C_SLV0_LEN = 4) while Slave 1 is enabled with 2 bytes to be read so that
  * I2C_SLV1_EN = 1 and I2C_SLV1_LEN = 2. In such a situation, EXT_SENS_DATA _00
