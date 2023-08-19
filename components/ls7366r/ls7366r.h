@@ -248,9 +248,11 @@ esp_err_t ls7366r_clear_counter(ls7366r_t *dev);
  * @return `ESP_OK` on success
  */
 esp_err_t ls7366r_counter_enable(ls7366r_t *dev, bool enable);
-	
+
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __LS7366R_H__ */

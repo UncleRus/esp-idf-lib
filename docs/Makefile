@@ -22,7 +22,10 @@ help:
 	@echo "  man        to make manual pages"
 	@echo "  all        to make all of the above"
 
-xml/index.xml:
+$(BUILDDIR):
+	mkdir $(BUILDDIR)
+
+xml/index.xml: $(BUILDDIR)
 	doxygen doxygen.conf
 	sed -i 's/LIB8STATIC_ALWAYS_INLINE/inline static/g' xml/*.xml
 	sed -i 's/LIB8STATIC/inline static/g' xml/*.xml

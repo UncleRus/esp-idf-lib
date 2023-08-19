@@ -89,11 +89,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install python3-sphinx python3-sphinx-rtd-theme python3-breathe doxygen
 
-      # FIXME: extract doxygen and sphinx errors and warnings, not just run make!
+      # FIXME: extract sphinx errors and warnings, not just run make!
       - id: build
         name: Build docs
         run: |
-          make -C docs dirhtml
+          cd docs
+          make dirhtml
+          if [ -s doxygen.log ]; then
+            echo "========================================================="
+            echo "Found errors:"
+            echo "========================================================="
+            cat doxygen.log
+            exit 1
+          fi
 
   build_esp32xx:
     name: Build for ESP32xx
