@@ -43,6 +43,7 @@
 #include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
 #include <string.h>
+#include <ets_sys.h>
 #include "sfa3x.h"
 
 #define I2C_FREQ_HZ 100000 // 100kHz
@@ -52,8 +53,8 @@ static const char *TAG = "sfa3x";
 #define CMD_START_CONTINUOUS_MEASUREMENT (0x0006)
 #define CMD_STOP_CONTINUOUS_MEASUREMENT  (0x0104)
 #define CMD_READ_MEASUREMENT             (0x0327)
-#define CMD_GET_DEVICE_MARKING           (0xD0D6)
-#define CMD_DEVCIE_RESET                 (0xD304)
+#define CMD_GET_DEVICE_MARKING           (0xD060)
+#define CMD_DEVICE_RESET                 (0xD304)
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
@@ -132,7 +133,7 @@ static esp_err_t execute_cmd(i2c_dev_t *dev, uint16_t cmd, uint32_t timeout_ms,
     I2C_DEV_CHECK(dev, send_cmd(dev, cmd, out_data, out_words));
     if (timeout_ms)
     {
-        if (timeout_ms > 10)
+        if (timeout_ms >= portTICK_PERIOD_MS)
             vTaskDelay(pdMS_TO_TICKS(timeout_ms));
         else
             ets_delay_us(timeout_ms * 1000);
@@ -170,7 +171,7 @@ esp_err_t sfa3x_free_desc(i2c_dev_t *dev)
 
 esp_err_t sfa3x_reset(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_DEVCIE_RESET, 100, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_DEVICE_RESET, 100, NULL, 0, NULL, 0);
 }
 
 esp_err_t sfa3x_start_continuous_measurement(i2c_dev_t *dev)

@@ -24,8 +24,6 @@ void task(void *pvParameters)
     i2c_dev_t dev = { 0 };
 
     ESP_ERROR_CHECK(sfa3x_init_desc(&dev, 0, SDA_GPIO, SCL_GPIO));
-    ESP_ERROR_CHECK(sfa3x_reset(&dev));
-    ESP_LOGI(TAG, "Sensor reset");
 
     char marking[32];
     ESP_ERROR_CHECK(sfa3x_get_device_marknig(&dev, marking));

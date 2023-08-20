@@ -172,6 +172,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **hts221**               | Driver for HTS221 temperature and humidity sensor                                | ISC     | esp32, esp32s2, esp32c3 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
@@ -281,6 +282,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mcp960x**              | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **mcp9808**              | Driver for MCP9808 digital temperature sensor                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |

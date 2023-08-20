@@ -4,6 +4,8 @@ version: 1.0.0
 groups:
   - air-quality
   - gas
+  - temperature
+  - humidity
 code_owners:
   - UncleRus
 depends:
