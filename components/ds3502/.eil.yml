@@ -1,0 +1,20 @@
+name: ds3502
+description: Driver for nonvolatile digital potentiometer DS3502
+version: 1.0.0
+groups:
+  - misc
+code_owners:
+  - UncleRus
+depends:
+  - i2cdev
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2021

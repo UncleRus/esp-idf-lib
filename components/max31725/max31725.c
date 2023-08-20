@@ -108,7 +108,7 @@ static esp_err_t write_temp(i2c_dev_t *dev, uint8_t reg, float temp, max31725_da
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t max31725_init_desc(i2c_dev_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t max31725_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     if (addr < MAX31725_I2C_ADDR_BASE || addr > MAX31725_I2C_ADDR_MAX)

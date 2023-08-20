@@ -37,11 +37,12 @@
  * BSD Licensed as described in the file LICENSE
  */
 
-#include <esp_idf_lib_helpers.h>
 #include "pca9685.h"
-
+#include <esp_idf_lib_helpers.h>
+#include <inttypes.h>
 #include <esp_system.h>
 #include <esp_log.h>
+#include <ets_sys.h>
 
 #define I2C_FREQ_HZ 1000000 // 1 Mhz
 
@@ -277,7 +278,7 @@ esp_err_t pca9685_set_prescaler(i2c_dev_t *dev, uint8_t prescaler)
 {
     CHECK_ARG(dev);
     CHECK_ARG_LOGE(prescaler >= MIN_PRESCALER,
-            "Invalid prescaler value: (%d), must be >= 3", prescaler);
+            "Invalid prescaler value: (%" PRIu8 "), must be >= 3", prescaler);
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, dev_sleep(dev, true));
@@ -306,7 +307,7 @@ esp_err_t pca9685_set_pwm_frequency(i2c_dev_t *dev, uint16_t freq)
 {
     uint32_t prescaler = round_div(INTERNAL_FREQ, (uint32_t)PCA9685_MAX_PWM_VALUE * freq) - 1;
     CHECK_ARG_LOGE(prescaler >= MIN_PRESCALER && prescaler <= MAX_PRESCALER,
-            "Invalid prescaler value (%d), must be in (%d..%d)", prescaler,
+            "Invalid prescaler value (%" PRIu32 "), must be in (%d..%d)", prescaler,
             MIN_PRESCALER, MAX_PRESCALER);
     return pca9685_set_prescaler(dev, prescaler);
 }

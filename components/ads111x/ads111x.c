@@ -187,7 +187,13 @@ esp_err_t ads111x_free_desc(i2c_dev_t *dev)
 
 esp_err_t ads111x_is_busy(i2c_dev_t *dev, bool *busy)
 {
-    READ_CONFIG(OS_OFFSET, OS_MASK, busy);
+    CHECK_ARG(dev && busy);
+
+    uint16_t r;
+    CHECK(read_conf_bits(dev, OS_OFFSET, OS_MASK, &r));
+    *busy = !r;
+
+    return ESP_OK;
 }
 
 esp_err_t ads111x_start_conversion(i2c_dev_t *dev)

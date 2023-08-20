@@ -41,6 +41,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 #include "scd4x.h"
 
@@ -303,7 +304,7 @@ esp_err_t scd4x_get_data_ready_status(i2c_dev_t *dev, bool *data_ready)
 
     uint16_t status;
     CHECK(execute_cmd(dev, CMD_GET_DATA_READY_STATUS, 1, NULL, 0, &status, 1));
-    *data_ready = status != 0;
+    *data_ready = (status & 0x7ff) != 0;
 
     return ESP_OK;
 }

@@ -29,7 +29,7 @@ void app_main(void)
     while (!mhz19b_detect(&dev))
     {
         ESP_LOGI(TAG, "MHZ-19B not detected, waiting...");
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 
     mhz19b_get_version(&dev, version, 5);
@@ -48,13 +48,13 @@ void app_main(void)
     while (mhz19b_is_warming_up(&dev))
     {
         ESP_LOGI(TAG, "MHZ-19B is warming up");
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 
     while (1) {
         mhz19b_read_CO2(&dev, &co2);
         ESP_LOGI(TAG, "CO2: %d", co2);
-        vTaskDelay(5000 / portTICK_RATE_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }
 

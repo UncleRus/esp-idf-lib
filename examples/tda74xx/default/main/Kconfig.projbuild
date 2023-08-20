@@ -1,0 +1,63 @@
+menu "Example configuration"
+
+    config EXAMPLE_USING_MIDDLE_RANGE_CONTROL
+        bool "Use middle-range control"
+        default true
+        help
+            Use middle-range control in the example. TDA7439DS supports
+            middle-range control, TDA7440 does not. Select this if the chip
+            supports middle-range control.
+
+    config EXAMPLE_INPUT_CHANNEL
+        int "Input channel to use, from 0 to 3"
+        default 0
+        help
+            Input gain in dB at 2dB step.
+
+    config EXAMPLE_INPUT_GAIN
+        int "Input gain, from 0 to 30"
+        default 28
+        help
+            Input gain in dB at 2dB step.
+
+    config EXAMPLE_VOLUME
+        int "The volume control in dB, from -48 to 0"
+        default 0
+        help
+            The volume control in dB at 1dB step.
+
+    config EXAMPLE_BASS
+        int "Bass control in dB, from -14 to 14"
+        default 0
+        help
+            Bass control in dB at 2dB step.
+
+    config EXAMPLE_MIDDLE
+        int "Middle-range control in dB, from -14 to 14"
+        default 0
+        help
+            Middle-range control in dB at 2dB step.
+        depends on EXAMPLE_USING_MIDDLE_RANGE_CONTROL
+
+    config EXAMPLE_TREBLE
+        int "Treble control in dB, from -14 to 14"
+        default 0
+        help
+            Treble control in dB at 2dB step.
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

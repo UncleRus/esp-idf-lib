@@ -39,6 +39,7 @@
  * BSD Licensed as described in the file LICENSE
  */
 #include <string.h>
+#include <inttypes.h>
 #include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
 #include <freertos/FreeRTOS.h>
@@ -114,12 +115,12 @@ typedef struct
 
 static esp_err_t read_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    ESP_LOGD(TAG, "Read %d byte from i2c slave starting at reg addr %02x.", len, reg);
+    ESP_LOGD(TAG, "Read %" PRIu32 " bytes from i2c slave starting at reg addr %02x.", len, reg);
 
     esp_err_t res = i2c_dev_read_reg(&dev->i2c_dev, reg, data, len);
     if (res != ESP_OK)
     {
-        ESP_LOGE(TAG, "Error %d on read %d byte from I2C slave reg addr %02x.", res, len, reg);
+        ESP_LOGE(TAG, "Error %d on read %" PRIu32 " bytes from I2C slave reg addr %02x.", res, len, reg);
         return res;
     }
 
@@ -128,12 +129,12 @@ static esp_err_t read_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, 
 
 static esp_err_t write_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    ESP_LOGD(TAG, "Write %d bytes to i2c slave starting at reg addr %02x", len, reg);
+    ESP_LOGD(TAG, "Write %" PRIu32 " bytes to i2c slave starting at reg addr %02x", len, reg);
 
     esp_err_t res = i2c_dev_write_reg(&dev->i2c_dev, reg, data, len);
     if (res != ESP_OK)
     {
-        ESP_LOGE(TAG, "Error %d on write %d byte to i2c slave register %02x.", res, len, reg);
+        ESP_LOGE(TAG, "Error %d on write %" PRIu32 " bytes to i2c slave register %02x.", res, len, reg);
         return res;
     }
 
@@ -477,11 +478,15 @@ esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev,
 {
     CHECK_ARG(dev);
 
-    uint16_t temp = (temperature + 25) * 512;   // -25 °C maps to 0
-    uint16_t hum = humidity * 512;
+    uint16_t hum_conv = humidity * 512.0f + 0.5f;
+    uint16_t temp_conv = (temperature + 25.0f) * 512.0f + 0.5f;
+    
 
     // fill environmental data
-    uint8_t data[4] = { temp >> 8, temp & 0xff, hum >> 8, hum & 0xff };
+    uint8_t data[4] = {
+        (uint8_t)((hum_conv >> 8) & 0xFF), (uint8_t)(hum_conv & 0xFF),
+        (uint8_t)((temp_conv >> 8) & 0xFF), (uint8_t)(temp_conv & 0xFF)
+    };
 
     // send environmental data to the sensor
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);

@@ -1,0 +1,37 @@
+menu "Example configuration"
+
+    config EXAMPLE_ADDRESS
+        hex "Chip address"
+        default 0x20
+
+    config EXAMPLE_MOSI_GPIO
+        int "MOSI GPIO number"
+        default 13
+        help
+            MOSI pin GPIO number
+        	
+    config EXAMPLE_MISO_GPIO
+        int "MISO GPIO number"
+        default 12
+        help
+            MISO pin GPIO number
+
+    config EXAMPLE_SCLK_GPIO
+        int "SCLK GPIO number"
+        default 14
+        help
+            SCLK pin GPIO number
+
+    config EXAMPLE_CS_GPIO
+        int "CS GPIO number"
+        default 15
+        help
+            CS pin GPIO number
+
+    config EXAMPLE_INTA_GPIO
+        int "INTA GPIO number"
+        default 19
+        help
+            GPIO number connected to INTA pin
+
+endmenu

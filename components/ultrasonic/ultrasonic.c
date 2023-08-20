@@ -41,6 +41,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_timer.h>
+#include <ets_sys.h>
 
 #define TRIGGER_LOW_DELAY 4
 #define TRIGGER_HIGH_DELAY 10

@@ -1,0 +1,26 @@
+menu "Example configuration"
+    config EXAMPLE_I2C_ADDR
+        hex "I2C address of mcp342x"
+        default 0x68
+        help
+            mcp342x devices have two address pins (`Adr0` and `Adr1`). The I2C
+            address starts from `0x68`, which is the default, and ends at `0x6f`.
+            See "5.3.2 DEVICE ADDRESS BITS (A2, A1, A0) AND ADDRESS SELECTION PINS
+            (MCP3423 AND MCP3424 )" in the datasheet.
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

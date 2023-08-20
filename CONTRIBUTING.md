@@ -16,8 +16,10 @@
     * [Creating a feature branch in your fork and develop](#creating-a-feature-branch-in-your-fork-and-develop)
     * [C Code style](#c-code-style)
     * [`markdown` Code style](#markdown-code-style)
+    * [`git` branch name convention](#git-branch-name-convention)
     * [Typical issues you will face in developments](#typical-issues-you-will-face-in-developments)
     * [Writing a commit message](#writing-a-commit-message)
+    * [Updating README.md](#updating-readmemd)
     * [Creating a Pull Request](#creating-a-pull-request)
 * [Licenses](#licenses)
     * [Acceptable licenses](#acceptable-licenses)
@@ -78,6 +80,27 @@ creating a Pull Request unless the bug is subtle, typos, or easy to reproduce
 and fix. Make sure to read [Development Life Cycle](#development-life-cycle)
 as a Pull Request must meet the same standards documented in the section.
 
+A GitHub Actions workflow,
+[pr-labeler-action](https://github.com/TimonVS/pr-labeler-action), is used to
+label PRs by branch name. Your fix branch should have prefixes defined in
+[.github/pr-labeler.yml](.github/pr-labeler.yml). Create a branch with one of
+the prefixes. If you are fixing a bug, your branch name should be `bugfix-`.
+The rest of branch name should be short, and descriptive. If the fix has
+related issues, the branch name should include them.
+
+See also [`git` branch name convention](#git-branch-name-convention).
+
+```console
+git checkout -b bugfix-issue-1
+```
+
+Change the branch name before creating a PR if your branch name does not
+follow the convention.
+
+```console
+git branch --move bugfix-issue-1
+```
+
 ### Writing documentation
 
 Even if you are not an author of the code in the repository, you can write
@@ -95,6 +118,14 @@ Not all contributors are native English speakers. If you are, please let us
 know ambiguity in the documentation, wrong usages of terms, and mistakes in
 English grammar. For this case, please create a Pull Request (creating an
 issue is optional).
+
+Create a branch that documents features, or fixes existing documentations.
+
+```console
+git checkout -b doc-foo
+```
+
+See also [`git` branch name convention](#git-branch-name-convention).
 
 ### Suggesting enhancements
 
@@ -153,11 +184,14 @@ Create a feature branch in your fork from the `master` branch.
 git checkout master
 ```
 
-Check out the feature branch.
+Check out the feature branch. The feature branch name should start with
+`feat-` or `feature-`.
 
 ```console
-git checkout -b my-feature
+git checkout -b feat-implement-foo
 ````
+
+See also [`git` branch name convention](#git-branch-name-convention).
 
 Write your code. Test the code in your physical test environment.  Commit your
 changes and push them to your remote fork on GitHub.
@@ -169,7 +203,7 @@ changes and push them to your remote fork on GitHub.
 ```console
 git add path/to/files
 git commit -v
-git push --set-upstream origin my-feature
+git push --set-upstream origin feat-implement-foo
 ````
 
 See also [Writing a commit message](#writing-a-commit-message).
@@ -199,7 +233,7 @@ commits. This is especially useful when you are actively developing and the
 commit history has many trial-and-error commits.
 
 ```console
-git checkout my-feature
+git checkout feat-implement-foo
 git rebase -i master
 git push -f
 ```
@@ -229,6 +263,9 @@ except some cases, notably brace wrapping. Here is a brief list of the styles.
 * Use suffix `_cb_t` for function `typedef`, e.g.`my_function_cb_t`
 * Use suffix `_s` for `struct`, e.g. `my_struct_s`
 * Wrap numbers in macro definition with parenthesis, e.g. `#define N_FOO (1)`
+* Use `#include <foo.h> for headers that are not part of the component, such
+  as `string.h`, `esp_log,h`, and `i2cdev.h`. Use `#include "foo.h" when the
+  header is private, i.e. the header is the part of the component.
 
 The style should be followed for all new code. In general, code can be
 considered "new code" when it makes up about 50% or more of the file(s)
@@ -287,6 +324,29 @@ output is shown below.
 ```console
 examples/led_strip_spi/README.md:30: MD040 Fenced code blocks should have a language specified
 ```
+
+### `git` branch name convention
+
+We use the following convention for git branch name. Use one of branch name
+prefixes when creating a branch.
+
+| Branch name prefix | Description |
+|--------------------|-------------|
+| `feat-`, and `feature-` | A feature branch that implements feature(s), or add enhancement(s) to existing code |
+| `fix-`, and `bugfix-` | A bug fix branch that fixes bug(s). The rest of the branch name should include issue number, such as `fix-issue-1` |
+| `ci-` | A branch that implements enhancement(s), or fixes issue(s) in CI |
+| `chore-` | A branch that does not affect code or its behavior, such as updating `.gitignore` |
+| `doc-`, and `documentation-` | Adding or updating documentation only, such as documenting undocumented features, or fixing existing documentation(s) |
+
+A GitHub Actions workflow automatically labels PRs depending on the branch
+name prefixes so that the PR is automatically included in release notes.
+
+The rest of the branch name should be short, and descriptive. If your branch
+fixes, implements, or relates to, an Issue, include the Issue number. Say, if
+your branch fixes a bug reported Issue ${N}, the branch name should be
+`fix-issue-${N}` so that reviewer immediately understand there is a related
+Issue with your branch. Replace `${N}` with the Issue number, such as
+`fix-issue-123` when the Issue number is 123.
 
 ### Typical issues you will face in developments
 
@@ -391,23 +451,101 @@ keywords, the referenced Issue or Pull Request will be closed. See [Linking a
 pull request to an issue using a keyword](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
 for the supported keywords.
 
+### Updating README.md
+
+Each component has a `.eil.yml` file in its component directory. The file is a
+metadata file of the component. If you change the file, you need to update the
+`README.md` in the project root directory. The `README.md` is generated from
+the metadata and a template.
+
+```console
+./devtools/devtool.py --repo=. render
+```
+
+See also [`Metadata.md`](Metadata.md).
+
 ### Creating a Pull Request
 
-When your code is ready to be merged, and all the tests have passed in the CI,
-create a Pull Request. Before creating a Pull Request, make sure:
+To test your code, you need to create a Pull Request. It is not practical to
+test code manually because you have to perform many tests. For instance, the
+number of tests is all targets (`esp32`, `esp8266`, `esp32s2`, etc) * build
+methods (`make` and `idf.py`) * supported `esp-idf` versions. Let the CI do it
+for you.
+
+Before creating a Pull Request, make sure:
 
 1. You compiled the code and the build succeeded
-2. You pushed the changes to your remote fork and the CI passed
-3. Functions, macros, data types are documented in the code
-4. An example application is provided under [`examples`](examples)
-5. You compiled the example code and the example application ran on a
+1. Functions, macros, data types are documented in the code
+1. An example application is provided under [`examples`](examples). In the
+   directory, create a directory `${COMPONENT_NAME}/default`. For instance, a
+   component `foo` must have `examples/foo/default`. Create an example
+   application in that directory.
+1. Update [.github/labeler.yml](.github/labeler.yml). The component should
+   have a label for it.
+1. You compiled the example code and the example application ran on a
    physical device as expected and documented
-6. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
+1. All files are licensed under one of [Acceptable Licenses](#acceptable-licenses)
    by including the license at the top of file
-7. One of your commits in the feature branch, or the PR itself, mentions Issue
+1. One of your commits in the feature branch, or the PR itself, mentions Issue
    number so that the Issue will be automatically closed when the PR is merged
 
-From this point, you should avoid to `git rebase` your feature branch.
+When a PR is created, GitHub Actions workflows will:
+
+* label the PR with various labels, such as type of the PR (bug fix, or
+  feature)
+* perform necessary tests depending on the changes (build the examples in a
+  matrix if the source code is modified, build the documentation if files
+  under `docs` are modified)
+
+After the CI processes complete, you will see "All checks have passed" or some
+failures in the PR. To merge the PR, all checks must pass. Log is available
+from the link, `Details`, in the failed test.
+
+If the PR does not pass the CI, update the branch with a fix. At this point,
+`git rebase` may be used. For instance, if a commit has a typo and one of the
+test fails because of syntax error, commit a fix of the syntax error and do
+`git rebase` to merge the fix into the original commit that has introduced the
+syntax error.
+
+```console
+git add path/to/file
+git commmit -v
+git rebase -i master
+```
+
+`-i`, or `--interactive`, flag will launch a text editor where the history of
+the branch can be edited with commands. The buffer of the editor will look
+like:
+
+```text
+pick f7f3f6d bugfix: fix issue foo
+pick 310154e bugfix: fix a syntax error in f7f3f6d
+```
+
+The second commit, `310154e`, should be part of the previous, `f7f3f6d`. To
+rewrite the commit history, replace `pick` with `fixup`.
+
+```text
+pick f7f3f6d bugfix: fix issue foo
+fixup 310154e bugfix: fix a syntax error in f7f3f6d
+```
+
+When you save and exit the editor, `git` rewrites the commit history as if
+`310154e` was never committed. The commit `310154e` is now part of `f7f3f6d`.
+If you don't save or modify the buffer, `git` will not rewrite the commit
+history.
+
+`git rebase` can be used to tidy up the commits. To `rebase` or not to
+`rebase` depends on the nature of commits. A single commit per PR is preferred,
+but is not mandatory.
+
+See also
+[7.6 Git Tools - Rewriting History](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History).
+
+When all the tests pass, ask the code owner to review the PR. The code owner
+can be found in `.eli.yml` file in the component directory.  From this point,
+you should avoid to `git rebase` your feature branch. Otherwise, the reviewer
+would have to review the PR from scratch.
 
 Developers who has write access to the repository will leave comments, ask
 rewrites, and merge the PR.
@@ -421,9 +559,12 @@ anyone and for any purpose.
 
 We accept permissive licenses such as:
 
-* ISC License
-* MIT License
-* BSD License
+* [ISC](https://spdx.org/licenses/ISC.html) License
+* [MIT](https://spdx.org/licenses/MIT.html) License
+* [BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html) License
+
+A list of licenses are available at
+[SPDX License List](https://spdx.org/licenses/).
 
 ### Acceptable license for new code
 
@@ -434,6 +575,8 @@ The following is a preferred wording of the license.
 
 ```c
 /*
+ * SPDX-License-Identifier: ISC
+ *
  * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
  *
  * Permission to use, copy, modify, and distribute this software for any
@@ -449,6 +592,12 @@ The following is a preferred wording of the license.
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
  ```
+
+Add `SPDX-License-Identifier: $YOUR_LICENSE` to your license header.
+`$YOUR_LICENSE` is a SPDX License Identifier.
+
+* [ISC](https://spdx.org/licenses/ISC.html)
+* [BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html)
 
 ### Unacceptable licenses
 

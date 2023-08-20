@@ -45,8 +45,6 @@
 
 static const char *TAG = "max7219";
 
-#define CLOCK_SPEED_HZ (10000000) // 10 MHz
-
 #define ALL_CHIPS 0xff
 #define ALL_DIGITS 8
 
@@ -116,13 +114,13 @@ inline static uint8_t get_char(max7219_t *dev, char c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin)
+esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
 {
     CHECK_ARG(dev);
 
     memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
     dev->spi_cfg.spics_io_num = cs_pin;
-    dev->spi_cfg.clock_speed_hz = CLOCK_SPEED_HZ;
+    dev->spi_cfg.clock_speed_hz = clock_speed_hz;
     dev->spi_cfg.mode = 0;
     dev->spi_cfg.queue_size = 1;
     dev->spi_cfg.flags = SPI_DEVICE_NO_DUMMY;
@@ -238,7 +236,7 @@ esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s)
 {
     CHECK_ARG(dev && s);
 
-    while (s && pos < dev->digits)
+    while (*s && pos < dev->digits)
     {
         uint8_t c = get_char(dev, *s);
         if (*(s + 1) == '.')

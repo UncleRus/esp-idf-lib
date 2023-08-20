@@ -1,0 +1,20 @@
+name: sgp40
+description: Driver for SGP40 Indoor Air Quality Sensor for VOC Measurements
+version: 1.0.0
+groups:
+  - air-quality
+code_owners: UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2020

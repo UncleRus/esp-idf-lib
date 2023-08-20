@@ -35,9 +35,10 @@
  * MIT Licensed as described in the file LICENSE
  */
 #include "bmp180.h"
-
+#include <inttypes.h>
 #include <esp_err.h>
 #include <esp_log.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
@@ -219,7 +220,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
     if (temperature)
         *temperature = T / 10.0;
 
-    ESP_LOGD(TAG, "T:= %d.%d", T / 10, abs(T % 10));
+    ESP_LOGD(TAG, "T:= %" PRIi32 ".%d", T / 10, abs(T % 10));
 
     if (pressure)
     {
@@ -253,7 +254,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
 
         *pressure = P;
 
-        ESP_LOGD(TAG, "P:= %d", P);
+        ESP_LOGD(TAG, "P:= %" PRIi32, P);
     }
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);

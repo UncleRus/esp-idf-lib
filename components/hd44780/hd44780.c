@@ -39,7 +39,7 @@
 #include <string.h>
 #include <esp_system.h>
 #include <esp_idf_lib_helpers.h>
-#include <esp_log.h> // to include ets_sys.h
+#include <ets_sys.h>
 #include "hd44780.h"
 
 #define MS 1000

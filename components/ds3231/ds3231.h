@@ -274,6 +274,17 @@ esp_err_t ds3231_disable_squarewave(i2c_dev_t *dev);
 esp_err_t ds3231_set_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t freq);
 
 /**
+ * @brief Get the frequency of the squarewave output
+ *
+ * Does not enable squarewave output.
+ *
+ * @param dev Device descriptor
+ * @param freq Squarewave frequency to store the output
+ * @return ESP_OK to indicate success
+ */
+esp_err_t ds3231_get_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t* freq);
+
+/**
  * @brief Get the raw temperature value
  *
  * **Supported only by DS3231**
@@ -305,6 +316,36 @@ esp_err_t ds3231_get_temp_integer(i2c_dev_t *dev, int8_t *temp);
  * @return ESP_OK to indicate success
  */
 esp_err_t ds3231_get_temp_float(i2c_dev_t *dev, float *temp);
+
+
+/**
+ * @brief Set the aging offset register to a new value.
+ *
+ * Positive aging values add capacitance to the array,
+ * slowing the oscillator frequency. Negative values remove
+ * capacitance from the array, increasing the oscillator
+ * frequency.
+ *
+ * **Supported only by DS3231**
+ *
+ * @param dev Device descriptor
+ * @param age Aging offset (in range [-128, 127]) to be set
+ * @return ESP_OK to indicate success
+ */
+esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age);
+
+
+/**
+ * @brief Get the aging offset register.
+ *
+ * **Supported only by DS3231**
+ *
+ * @param dev Device descriptor
+ * @param[out] age Aging offset in range [-128, 127]
+ * @return ESP_OK to indicate success
+ */
+esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age);
+
 
 #ifdef	__cplusplus
 }

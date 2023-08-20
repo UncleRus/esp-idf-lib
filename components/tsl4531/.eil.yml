@@ -1,0 +1,22 @@
+name: tsl4531
+description: Driver for digital ambient light sensor TSL4531
+version: 1.0.1
+groups:
+  - light
+code_owners: UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: bschwind
+    year: 2017
+  - name: UncleRus
+    year: 2019

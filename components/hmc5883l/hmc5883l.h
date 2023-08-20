@@ -30,7 +30,7 @@
  * @defgroup hmc5883l hmc5883l
  * @{
  *
- * ESP-IDF Driver for 3-axis digital compass HMC5883L
+ * ESP-IDF Driver for 3-axis digital compass HMC5883L and HMC5983L
  *
  * Ported from esp-open-rtos
  *
@@ -85,7 +85,8 @@ typedef enum
     HMC5883L_DATA_RATE_07_50,     //!< 7.5 Hz
     HMC5883L_DATA_RATE_15_00,     //!< 15 Hz, default
     HMC5883L_DATA_RATE_30_00,     //!< 30 Hz
-    HMC5883L_DATA_RATE_75_00      //!< 75 Hz
+    HMC5883L_DATA_RATE_75_00,     //!< 75 Hz
+    HMC5883L_DATA_RATE_220_00     //!< 220 Hz, HMC5983 only
 } hmc5883l_data_rate_t;
 
 /**

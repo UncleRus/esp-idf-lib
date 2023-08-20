@@ -1,0 +1,40 @@
+menu "Example configuration"
+    choice EXAMPLE_I2C_DEVICE_ADDRESS
+        bool "SGM58031 I2C address"
+        default SGM58031_0x48_ADDR
+        help
+            Select SMG58031 I2C address
+        
+        config SGM58031_0x48_ADDR
+            bool "0x49 (ADDR <-> GND)"
+        config SGM58031_0x49_ADDR
+            bool "0x49 (ADDR <-> VDD)"
+        config SGM58031_0x4A_ADDR
+            bool "0x4A (ADDR <-> SDA)"
+        config SGM58031_0x48_ADDR
+            bool "0x4B (ADDR <-> SCL)"
+    endchoice
+
+    config EXAMPLE_I2C_DEVICE_ADDRESS
+        hex 
+        default 0x48 if SGM58031_0x48_ADDR
+        default 0x49 if SGM58031_0x49_ADDR
+        default 0x4A if SGM58031_0x4A_ADDR
+        default 0x4B if SGM58031_0x4B_ADDR
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

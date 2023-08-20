@@ -29,12 +29,16 @@
 ///@file noise.h
 /// Noise functions provided by the library.
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///@defgroup Noise Noise functions
-///Simplex noise function definitions
+///Perlin noise function definitions
 ///@{
 /// @name scaled 16 bit noise functions
 ///@{
-/// 16 bit, fixed point implementation of perlin's Simplex Noise.  Coordinates are
+/// 16 bit, fixed point implementation of Perlin's Noise.  Coordinates are
 /// 16.16 fixed point values, 32 bit integers with integral coordinates in the high 16
 /// bits and fractional in the low 16 bits, and the function takes 1d, 2d, and 3d coordinate
 /// values.  These functions are scaled to return 0-65535
@@ -88,5 +92,9 @@ void fill_raw_noise8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint16
 void fill_raw_noise16into8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint32_t x, int scale, uint32_t time);
 ///@}
 ///@}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NOISE_H__ */

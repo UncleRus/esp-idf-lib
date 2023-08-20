@@ -1,0 +1,17 @@
+name: ads130e08
+description: Driver for ADS130E08 ADC
+version: 1.0.0
+groups:
+  - adc-dac
+code_owners: weslleymfd
+depends:
+  - driver
+  - log
+thread_safe: yes
+targets:
+  - esp32
+  - esp32s3
+license: MIT
+copyrights:
+  - name: weslleymfd
+    year: 2021

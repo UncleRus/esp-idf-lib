@@ -40,7 +40,7 @@
  */
 #include <freertos/FreeRTOS.h>
 #include <string.h>
-#include <esp_log.h> // to include ets_sys.h
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 #include "ds1302.h"
 

@@ -1,0 +1,18 @@
+name: noise
+description: Noise generation functions
+version: 1.0.0
+groups:
+  - common
+code_owners: UncleRus
+depends:
+  - lib8tion
+thread_safe: n/a
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: FastLED
+    year: 2013

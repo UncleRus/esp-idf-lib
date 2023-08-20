@@ -203,7 +203,7 @@ static esp_err_t get_raw_data_nolock(sht3x_t *dev, sht3x_raw_data_t raw_data)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t sht3x_init_desc(sht3x_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t sht3x_init_desc(sht3x_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
 
@@ -234,13 +234,7 @@ esp_err_t sht3x_init(sht3x_t *dev)
     dev->meas_started = false;
     dev->meas_first = false;
 
-    // send reset command
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, send_cmd_nolock(dev, SHT3X_RESET_CMD));
-    vTaskDelay(pdMS_TO_TICKS(10));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
-
-    return ESP_OK;
+    return send_cmd(dev, SHT3X_CLEAR_STATUS_CMD);
 }
 
 esp_err_t sht3x_set_heater(sht3x_t *dev, bool enable)

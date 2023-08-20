@@ -47,6 +47,7 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <ets_sys.h>
 
 #define I2C_FREQ_HZ 400000 // 400 kHz
 

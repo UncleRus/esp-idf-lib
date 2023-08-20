@@ -1,0 +1,72 @@
+menu "Example configuration"
+
+    choice EXAMPLE_SCALE
+        prompt "Select temperature scale standard"
+        default EXAMPLE_SCALE_ITS90
+        config EXAMPLE_SCALE_ITS90
+            bool "ITS-90"
+        config EXAMPLE_SCALE_DIN43760
+            bool "DIN43760"
+        config EXAMPLE_SCALE_US
+            bool "US INDUSTRIAL"
+    endchoice
+
+    config EXAMPLE_RTD_NOMINAL
+        int "RTD nominal, Ohms"
+        default 100
+        help
+        	RTD nominal resistance at 0 deg. C, Ohms (PT100 - 100 Ohms, PT1000 - 1000 Ohms)
+
+    config EXAMPLE_RTD_REF
+        int "Reference resistor value, Ohms"
+        default 430
+
+    choice EXAMPLE_CONN
+        prompt "Select RTD connection type"
+        default EXAMPLE_CONN_2WIRE
+        config EXAMPLE_CONN_2WIRE
+            bool "2 wires"
+        config EXAMPLE_CONN_3WIRE
+            bool "3 wires"
+        config EXAMPLE_CONN_4WIRE
+            bool "4 wires"
+    endchoice
+
+    choice EXAMPLE_FILTER
+        prompt "Select notch frequency for the noise rejection filter"
+        default EXAMPLE_FILTER_50
+        config EXAMPLE_FILTER_50
+            bool "50 Hz"
+        config EXAMPLE_FILTER_60
+            bool "60 Hz"
+    endchoice
+
+    config EXAMPLE_MOSI_GPIO
+        int "SPI MOSI GPIO Number"
+        default 4 if IDF_TARGET_ESP32C3
+        default 23 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI MOSI (Master Output / Slave Input) line.
+
+    config EXAMPLE_MISO_GPIO
+        int "SPI MISO GPIO Number"
+        default 5 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI MISO (Master Input / Slave Output) line.
+
+    config EXAMPLE_SCLK_GPIO
+        int "SPI SCLK GPIO Number"
+        default 6 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI SCLK (Clock) line.
+
+    config EXAMPLE_CS_GPIO
+        int "SPI CS GPIO Number"
+        default 7 if IDF_TARGET_ESP32C3
+        default 5 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI CS (Chip Select) line.
+
+endmenu

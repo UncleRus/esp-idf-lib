@@ -1,0 +1,21 @@
+name: hmc5883l
+description: Driver for 3-axis digital compass HMC5883L and HMC5983L
+version: 1.0.0
+groups:
+  - magnetic
+code_owners:
+  - UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2016

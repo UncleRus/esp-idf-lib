@@ -42,8 +42,6 @@
 #include <esp_idf_lib_helpers.h>
 #include <esp_log.h>
 #include <esp_timer.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 
 #include "mhz19b.h"
 
@@ -62,7 +60,7 @@ esp_err_t mhz19b_init(mhz19b_dev_t *dev, uart_port_t uart_port, gpio_num_t tx_gp
         .parity    = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 3, 0)
         .source_clk = UART_SCLK_APB,
 #endif
     };
@@ -114,7 +112,7 @@ bool mhz19b_is_warming_up(mhz19b_dev_t *dev, bool smart_warming_up)
     {
         if (smart_warming_up)
         {
-            ESP_LOGI(TAG, "Using smart warming up detection ");
+            ESP_LOGD(TAG, "Using smart warming up detection");
 
             int16_t co2, last_co2;
             last_co2 = dev->last_value;
@@ -261,7 +259,7 @@ esp_err_t mhz19b_send_command(mhz19b_dev_t *dev, uint8_t cmd, uint8_t b3, uint8_
     // Read response from serial buffer
     int len = uart_read_bytes(dev->uart_port, dev->buf,
                               MHZ19B_SERIAL_RX_BYTES,
-                              MHZ19B_SERIAL_RX_TIMEOUT_MS / portTICK_RATE_MS);
+                              MHZ19B_SERIAL_RX_TIMEOUT_MS / portTICK_PERIOD_MS);
     if (len < 9)
         return ESP_ERR_TIMEOUT;
 

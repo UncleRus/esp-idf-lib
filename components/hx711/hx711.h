@@ -50,8 +50,7 @@ extern "C" {
 /**
  * Gain/channel
  */
-typedef enum
-{
+typedef enum {
     HX711_GAIN_A_128 = 0, //!< Channel A, gain factor 128
     HX711_GAIN_B_32,      //!< Channel B, gain factor 32
     HX711_GAIN_A_64       //!< Channel A, gain factor 64
@@ -82,7 +81,6 @@ esp_err_t hx711_init(hx711_t *dev);
  *
  * @param dev Device descriptor
  * @param down Set device power down if true, power up otherwise
- *
  * @return `ESP_OK` on success
  */
 esp_err_t hx711_power_down(hx711_t *dev, bool down);
@@ -100,7 +98,7 @@ esp_err_t hx711_set_gain(hx711_t *dev, hx711_gain_t gain);
  * @brief Check if device ready to send data
  *
  * @param dev Device descriptor
- * @param ready true if data ready
+ * @param[out] ready true if data ready
  * @return `ESP_OK` on success
  */
 esp_err_t hx711_is_ready(hx711_t *dev, bool *ready);
@@ -121,10 +119,20 @@ esp_err_t hx711_wait(hx711_t *dev, size_t timeout_ms);
  * otherwise communication errors may occur
  *
  * @param dev Device descriptor
- * @param data Raw ADC data
+ * @param[out] data Raw ADC data
  * @return `ESP_OK` on success
  */
 esp_err_t hx711_read_data(hx711_t *dev, int32_t *data);
+
+/**
+ * @brief Read average data
+ *
+ * @param dev Device descriptor
+ * @param times Count of samples to read
+ * @param[out] data Average ADC data
+ * @return `ESP_OK` on success
+ */
+esp_err_t hx711_read_average(hx711_t *dev, size_t times, int32_t *data);
 
 #ifdef __cplusplus
 }

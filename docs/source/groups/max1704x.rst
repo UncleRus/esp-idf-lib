@@ -1,0 +1,7 @@
+.. _max1704x:
+
+max1704x - Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge
+============================================================================
+
+.. doxygengroup:: max1704x
+   :members:

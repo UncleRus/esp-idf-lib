@@ -126,7 +126,7 @@ esp_err_t lm75_set_os_threshold(i2c_dev_t *dev, const float value)
      *  7 LSB of the LSByte are equal to zero and should be ignored.
      */
     if (value < 0) {
-        reg_value = ((uint16_t)(abs(value) * 2) ^ 0xff) + 1;
+        reg_value = ((uint16_t)(abs((int16_t)value) * 2) ^ 0xff) + 1;
     } else {
         reg_value = value * 2;
     }

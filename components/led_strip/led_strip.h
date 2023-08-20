@@ -26,7 +26,7 @@
  * @defgroup led_strip led_strip
  * @{
  *
- * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106 LED strips
+ * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106/SM16703 LED strips
  *
  * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -44,7 +44,7 @@
 extern "C" {
 #endif
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 3, 0)
 #define LED_STRIP_BRIGHTNESS 1
 #endif
 
@@ -55,7 +55,10 @@ typedef enum
 {
     LED_STRIP_WS2812 = 0,
     LED_STRIP_SK6812,
-    LED_STRIP_APA106
+    LED_STRIP_APA106,
+    LED_STRIP_SM16703,
+
+    LED_STRIP_TYPE_MAX
 } led_strip_type_t;
 
 /**
@@ -67,7 +70,7 @@ typedef struct
     bool is_rgbw;          ///< true for RGBW strips
 #ifdef LED_STRIP_BRIGHTNESS
     uint8_t brightness;    ///< Brightness 0..255, call ::led_strip_flush() after change.
-                           ///< Supported only for ESP-IDF version >= 4.4
+                           ///< Supported only for ESP-IDF version >= 4.3
 #endif
     size_t length;         ///< Number of LEDs in strip
     gpio_num_t gpio;       ///< Data GPIO pin

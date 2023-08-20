@@ -1,0 +1,8 @@
+.. _mpu6050:
+
+mpu6050 - Driver for MPU6000/MPU6050 6-axis MotionTracking device
+=================================================================
+
+.. doxygengroup:: mpu6050
+   :members:
+

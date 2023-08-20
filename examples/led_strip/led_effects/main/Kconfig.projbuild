@@ -1,0 +1,33 @@
+menu "Example configuration"
+    config EXAMPLE_LED_GPIO
+        int "GPIO number for LEDs"
+        default 5
+        help
+            GPIO number for LEDs.
+
+    config EXAMPLE_LED_MATRIX_WIDTH
+        int "the width of the matrix"
+        default 16
+        help
+            The width of LED matrix
+
+    config EXAMPLE_LED_MATRIX_HEIGHT
+        int "the height of LED matrix"
+        default 16
+        help
+            The height of LED matrix.
+
+    config EXAMPLE_LED_BRIGHTNESS
+        int "brightness of LEDs"
+        default 20
+        help
+            The brightness value of LEDs, between 0 and 255.
+
+    config EXAMPLE_FPS
+        int "the number of Frame Per Second"
+        default 60
+
+    config EXAMPLE_SWITCH_PERIOD_MS
+        int "the delay between effects in millisecond"
+        default 5000
+endmenu

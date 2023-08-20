@@ -1,0 +1,91 @@
+---
+name: Report an issue in esp-idf-lib code
+description: >
+  This is for issues with our library code only. If you have a question, use
+  Discussions.
+body:
+  - type: textarea
+    id: issue_description
+    validations:
+      required: true
+    attributes:
+      label: The issue
+      description: >
+        Describe the issue you are experiencing. Describe what you did, and
+        what happened.
+
+  - type: dropdown
+    id: sdk_name
+    validations:
+      required: true
+    attributes:
+      label: Which SDK are you using?
+      options:
+        - esp-idf
+        - ESP8266 RTOS SDK
+
+  - type: input
+    id: sdk_version
+    validations:
+      required: true
+    attributes:
+      label: Which version of SDK are you using?
+      description: >
+        Describe SDK version. A version can be one of `master` (the latest),
+        git commit hash, or git tag. Examples are `master`, `b66cc63`, and
+        `v3.4`.
+
+  - type: checkboxes
+    id: targets
+    validations:
+      required: true
+    attributes:
+      label: Which build target have you used?
+      description: Choose one or more of targets.
+      options:
+        - label: esp32
+        - label: esp32s2
+        - label: esp32s3
+        - label: esp32c2
+        - label: esp8266
+        - label: other
+
+  - type: input
+    id: component_name
+    validations:
+      required: true
+    attributes:
+      label: Component causing the issue
+      description: >
+        The name of the component. For example, `dht` or `led_strip`.
+
+  - type: markdown
+    attributes:
+      value: |
+        # Details
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Anything in the logs that might be useful for us?
+      render: console
+      description: >
+        For example, error message, or stack traces. Paste raw log output
+        here. The log will be formatted into `console` codeblock.
+
+  - type: textarea
+    id: extra_info
+    attributes:
+      label: Additional information or context
+      description: >
+        If you have any additional information and/or context for us, use the
+        field below.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      description: Please confirm and check the box below.
+      options:
+        - label: This report is not a question nor a request for drivers.
+          required: true

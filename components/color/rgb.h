@@ -196,9 +196,9 @@ static inline rgb_t rgb_fade(rgb_t a, uint8_t fade_factor)
 static inline rgb_t rgb_invert(rgb_t a)
 {
     rgb_t res = {
-        .r = ~a.r,
-        .g = ~a.g,
-        .b = ~a.b,
+        .r = (uint8_t) ~a.r,
+        .g = (uint8_t) ~a.g,
+        .b = (uint8_t) ~a.b,
     };
     return res;
 }

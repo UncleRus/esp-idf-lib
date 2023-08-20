@@ -8,6 +8,8 @@
 * [How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
 * [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
 * [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+* [Porting I2C libs to I2Cdev](#porting-i2c-libs-to-i2cdev)
+* [My DHT sensor doesn't work well/doesn't work at all.](#my-dht-sensor-doesnt-work-welldoesnt-work-at-all)
 
 <!-- vim-markdown-toc -->
 
@@ -23,11 +25,12 @@ Common causes of I2C issues are:
 
 When any of I2C-based drivers does not work, follow the steps below.
 
-Build an _I2C scanner_ device. The device is not necessarily an ESP device.
-There are many examples for various platforms. Search by keyword `i2c scanner`.
+Build an [_I2C scanner_ device](examples/i2c_scanner). The device is not
+necessarily an ESP device. There are many examples for various platforms.
+Search by keyword `i2c scanner`.
 
 Connect the I2C module to the I2C scanner device. Make sure appropriate
-pull-up registers are connected to `SCL` and `SDA` lines.
+pull-up resistors are connected to `SCL` and `SDA` lines.
 
 Scan devices on the I2C bus. If the scanner does not find the I2C device, then
 your wiring might have issues. If the scanner finds the I2C device, make sure
@@ -136,3 +139,17 @@ With default configuration you can't. Since the drivers use mutexes, this will
 crash the system.  But you can disable use of any I2C mutexes (both port and
 device) in configuration: just enable CONFIG_I2CDEV_NOLOCK. Keep in mind that
 after enabling this option all i2c device drivers will become non-thread safe.
+
+
+## Porting I2C libs to I2Cdev
+
+See [Porting.md](Porting.md).
+
+
+## My DHT sensor doesn't work well/doesn't work at all!
+
+1. Check if the sensor is connected correctly.
+2. Use an external 4k7 pullup resistor! With an internal pullup resistor, operation will be unstable, if at all.
+3. Shorten the wires that connect the sensor.
+4. Use 5V for powering the sensor, not 3.3V. ESP chips are 5V tolerant.
+5. Use shielded wires where the shield is connected to the GND.

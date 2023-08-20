@@ -271,7 +271,7 @@ static esp_err_t read_reg_bit_16(mcp23x17_t *dev, uint8_t reg, bool *val, uint8_
 
 #ifdef CONFIG_MCP23X17_IFACE_I2C
 
-esp_err_t mcp23x17_init_desc(mcp23x17_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
+esp_err_t mcp23x17_init_desc(mcp23x17_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
 {
     CHECK_ARG(dev);
     if (addr < MCP23X17_ADDR_BASE || addr > MCP23X17_ADDR_BASE + 7)
@@ -320,7 +320,7 @@ esp_err_t mcp23x17_init_desc_spi(mcp23x17_t *dev, spi_host_device_t host, uint32
     return spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
 }
 
-esp_err_t mcp23x17_free_desc(mcp23x17_t *dev)
+esp_err_t mcp23x17_free_desc_spi(mcp23x17_t *dev)
 {
     CHECK_ARG(dev);
 
@@ -359,6 +359,8 @@ esp_err_t mcp23x17_set_int_out_mode(mcp23x17_t *dev, mcp23x17_int_out_mode_t mod
     if (mode == MCP23X17_OPEN_DRAIN)
         return write_reg_bit_8(dev, REG_IOCON, true, BIT_IOCON_ODR);
 
+    // The INTPOL bit is only functional if the ODR bit is cleared.
+    write_reg_bit_8(dev, REG_IOCON, false, BIT_IOCON_ODR);
     return write_reg_bit_8(dev, REG_IOCON, mode == MCP23X17_ACTIVE_HIGH, BIT_IOCON_INTPOL);
 }
 

@@ -3,7 +3,7 @@ menu "I2C"
 config I2CDEV_TIMEOUT
     int "I2C transaction timeout, milliseconds"
     default 1000
-    range 100 5000
+    range 10 5000
     
 config I2CDEV_NOLOCK
 	bool "Disable the use of mutexes"

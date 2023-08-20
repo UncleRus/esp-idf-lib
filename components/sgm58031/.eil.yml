@@ -1,0 +1,21 @@
+name: sgm58031
+description: Driver for SGM58031 16-bit I2C ADC
+version: 1.0.0
+groups:
+  - adc-dac
+code_owners: jmpmscorp
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32s3
+  - esp32c3
+license: ISC
+copyrights:
+  - name: jmpmscorp
+    year: 2023

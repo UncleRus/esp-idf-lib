@@ -46,15 +46,21 @@ extern "C" {
 #endif
 
 #if HELPER_TARGET_IS_ESP8266
+
 #define I2CDEV_MAX_STRETCH_TIME 0xffffffff
+
 #else
+
 #include <soc/i2c_reg.h>
-#ifdef I2C_TIME_OUT_REG_V
+#if defined(I2C_TIME_OUT_VALUE_V)
+#define I2CDEV_MAX_STRETCH_TIME I2C_TIME_OUT_VALUE_V
+#elif defined(I2C_TIME_OUT_REG_V)
 #define I2CDEV_MAX_STRETCH_TIME I2C_TIME_OUT_REG_V
 #else
 #define I2CDEV_MAX_STRETCH_TIME 0x00ffffff
 #endif
-#endif
+
+#endif /* HELPER_TARGET_IS_ESP8266 */
 
 /**
  * I2C device descriptor
@@ -69,6 +75,14 @@ typedef struct
                                   ticks for ESP-IDF, CPU ticks for ESP8266.
                                   When this value is 0, I2CDEV_MAX_STRETCH_TIME will be used */
 } i2c_dev_t;
+
+/**
+ * I2C transaction type
+ */
+typedef enum {
+    I2C_DEV_WRITE = 0, /**< Write operation */
+    I2C_DEV_READ       /**< Read operation */
+} i2c_dev_type_t;
 
 /**
  * @brief Init library
@@ -128,6 +142,17 @@ esp_err_t i2c_dev_take_mutex(i2c_dev_t *dev);
  * @return ESP_OK on success
  */
 esp_err_t i2c_dev_give_mutex(i2c_dev_t *dev);
+
+/**
+ * @brief Check the availability of the device
+ *
+ * Issue an operation of \p operation_type to the I2C device then stops.
+ *
+ * @param dev Device descriptor
+ * @param operation_type Operation type
+ * @return ESP_OK if device is available
+ */
+esp_err_t i2c_dev_probe(const i2c_dev_t *dev, i2c_dev_type_t operation_type);
 
 /**
  * @brief Read from slave device

@@ -1,0 +1,21 @@
+menu "Example configuration"
+
+    config EXAMPLE_PD_SCK_GPIO
+        int "PD/SCK GPIO number"
+        default 4 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number connected to PD/SCK pin
+
+    config EXAMPLE_DOUT_GPIO
+        int "DOUT GPIO number"
+        default 5 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number connected to DOUT pin
+
+    config EXAMPLE_AVG_TIMES
+        int "Samples to average"
+        default 5
+        	
+endmenu

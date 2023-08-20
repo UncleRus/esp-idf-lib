@@ -43,6 +43,19 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
+#if CONFIG_IDF_TARGET_ESP32
+#include <esp32/rom/ets_sys.h>
+#elif CONFIG_IDF_TARGET_ESP32S2
+#include <esp32s2/rom/ets_sys.h>
+#elif CONFIG_IDF_TARGET_ESP32S3
+#include <esp32s3/rom/ets_sys.h>
+#elif CONFIG_IDF_TARGET_ESP32C3
+#include <esp32c3/rom/ets_sys.h>
+#elif CONFIG_IDF_TARGET_ESP32H2
+#include <esp32h2/rom/ets_sys.h>
+#elif CONFIG_IDF_TARGET_ESP32C2
+#include <esp32c2/rom/ets_sys.h>
+#endif
 #include <esp_idf_lib_helpers.h>
 #include "scd30.h"
 
@@ -225,25 +238,26 @@ esp_err_t scd30_read_measurement(i2c_dev_t *dev, float *co2, float *temperature,
 {
     CHECK_ARG(co2 || temperature || humidity);
 
-    uint32_t tmp;
+    union {
+        uint32_t u32;
+        float f;
+    } tmp;
     uint16_t buf[6];
     CHECK(execute_cmd(dev, CMD_READ_MEASUREMENT, 3, NULL, 0, buf, 6));
     if (co2)
     {
-        tmp = ((uint32_t)buf[0] << 16) | buf[1];
-        *co2 = *(float *)&tmp;
-        tmp = 0;
+        tmp.u32 = ((uint32_t)buf[0] << 16) | buf[1];
+        *co2 = tmp.f;
     }
     if (temperature)
     {
-        tmp = ((uint32_t)buf[2] << 16) | buf[3];
-        *temperature = *(float *)&tmp;
-        tmp = 0;
+        tmp.u32 = ((uint32_t)buf[2] << 16) | buf[3];
+        *temperature = tmp.f;
     }
     if (humidity)
     {
-        tmp = ((uint32_t)buf[4] << 16) | buf[5];
-        *humidity = *(float *)&tmp;
+        tmp.u32 = ((uint32_t)buf[4] << 16) | buf[5];
+        *humidity = tmp.f;
     }
     return ESP_OK;
 }

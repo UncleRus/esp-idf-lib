@@ -30,7 +30,7 @@
  * @defgroup si7021 si7021
  * @{
  *
- * ESP-IDF driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and
+ * ESP-IDF driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and
  * compatible temperature and humidity sensors
  *
  * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
@@ -228,6 +228,21 @@ esp_err_t si7021_get_serial(i2c_dev_t *dev, uint64_t *serial, bool sht2x_mode);
  * @return `ESP_OK` on success
  */
 esp_err_t si7021_get_device_id(i2c_dev_t *dev, si7021_device_id_t *id);
+
+/**
+ * @brief Get device revision
+ *
+ * This function is supported by:
+ *
+ *  - SI7013
+ *  - SI7020
+ *  - SI7021
+ *
+ * @param dev       Device descriptor
+ * @param[out] rev  Device revision
+ * @return `ESP_OK` on success
+ */
+esp_err_t si7021_get_device_revision(i2c_dev_t *dev, uint8_t *rev);
 
 #ifdef __cplusplus
 }

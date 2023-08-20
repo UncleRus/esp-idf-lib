@@ -1,0 +1,24 @@
+name: onewire
+description: Bit-banging 1-Wire driver
+version: 1.0.0
+groups:
+  - common
+code_owners: UncleRus
+depends:
+  # XXX conditional depends
+  - driver
+  - freertos
+  - log
+  - esp_idf_lib_helpers
+thread_safe: no
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: zeroday
+    year: 2016
+  - name: UncleRus
+    year: 2016

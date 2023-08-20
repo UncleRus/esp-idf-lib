@@ -52,6 +52,7 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 #include "onewire.h"
 
