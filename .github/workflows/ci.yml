@@ -116,8 +116,7 @@ jobs:
        || needs.prepare.outputs._ci_build_esp32h2 != ''
        || needs.prepare.outputs._ci_build_esp32h4 != ''
        || needs.prepare.outputs._ci_build_esp32s2 != ''
-       || needs.prepare.outputs._ci_build_esp32s3 != ''
-       || needs.prepare.outputs._ci_build_esp8266 != '' }}
+       || needs.prepare.outputs._ci_build_esp32s3 != '' }}
     strategy:
       # run other jobs even when one job failed
       fail-fast: false
@@ -225,6 +224,11 @@ jobs:
                    "ESP-IDF ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
               exit 0
             fi
+
+            echo "========================================================="
+            echo "Examples to build for components:"
+            echo "========================================================="
+            echo "${examples}"
 
             for component in ${examples}; do
               for dir in ${component}/*; do
