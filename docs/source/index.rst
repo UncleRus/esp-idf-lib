@@ -233,6 +233,7 @@ Inertial measurement units
 
    groups/icm42670
    groups/mpu6050
+   groups/l3gx
 
 Battery controllers
 ===================
