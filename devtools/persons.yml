@@ -152,3 +152,8 @@
 - name: slimcdk
   full_name: Christian Skjerning
   gh_id: slimcdk
+
+- name: qb4-dev
+  full_name: Jakub Turek
+  gh_id: QB4-dev
+
