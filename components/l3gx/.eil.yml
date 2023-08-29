@@ -11,11 +11,12 @@ depends:
   - esp_idf_lib_helpers
 thread_safe: yes
 targets:
-  - name: esp32
-  - name: esp8266
-  - name: esp32s2
-  - name: esp32c3
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
 license: BSD-3
 copyrights:
   - name: qb4-dev
     year: 2023
+
