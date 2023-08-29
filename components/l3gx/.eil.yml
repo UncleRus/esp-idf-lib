@@ -1,0 +1,23 @@
+---
+components:
+  - name: l3gx
+    description: Driver for L3Gx 3-axis gyroscope sensors
+    group: imu
+    groups: []
+    code_owners: Qb4-dev
+    depends:
+      - i2cdev
+      - log
+      - esp_idf_lib_helpers
+    thread_safe: yes
+    targets:
+      - name: esp32
+      - name: esp8266
+      - name: esp32s2
+      - name: esp32c3
+    licenses:
+      - name: BSD-3
+    copyrights:
+      - author:
+          name: Qb4-dev
+        year: 2023
