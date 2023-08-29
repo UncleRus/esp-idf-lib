@@ -183,6 +183,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
 | **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU                                            | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **l3gx**                 | Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **mpu6050**              | Driver for MPU6000/MPU6050 6-axis MotionTracking device                          | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
@@ -313,6 +314,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Grupo de Pesquisa em Cultura Digital](http://gepid.upf.br/): `mpu6050` 
 - GrzegorzH: `ds18x20` 
 - [Gunar Schorcht](https://github.com/gschorcht): `bme680` `ccs811` `sht3x` `sts3x` 
+- [Jakub Turek](https://github.com/QB4-dev): `l3gx` 
 - [Jan Veeh](https://github.com/janveeh): `icm42670` 
 - [Jeff Rowberg](https://www.i2cdevlib.com/): `mpu6050` 
 - [Jose Manuel Perez](https://github.com/jmpmscorp): `lc709203f` `sgm58031` 
