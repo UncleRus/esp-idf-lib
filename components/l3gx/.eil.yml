@@ -4,7 +4,7 @@ version: 1.0.0
 groups:
   - imu
 code_owners: 
-  - qb4-dev
+  - QB4-dev
 depends:
   - i2cdev
   - log
@@ -17,5 +17,5 @@ targets:
   - name: esp32c3
 license: BSD-3
 copyrights:
-  - name: qb4-dev
+  - name: QB4-dev
     year: 2023
