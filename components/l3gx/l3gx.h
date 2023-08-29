@@ -58,36 +58,37 @@ extern "C" {
 /**
  * Sensor type
  */
-typedef enum
-{
-	L3GX_TYPE_L3G4200D,
-	L3GX_TYPE_L3GD20,
-	L3GX_TYPE_UNKNOWN
-} l3gx_sensor_type_t;
+typedef enum { L3GX_TYPE_L3G4200D, L3GX_TYPE_L3GD20, L3GX_TYPE_UNKNOWN } l3gx_sensor_type_t;
 
+/**
+ * Scales
+ */
 typedef enum {
-	L3GX_SCALE_250 = 0b00,  // full scale to 250 dps
-	L3GX_SCALE_500 = 0b01,  // full scale to 500 dps
-	L3GX_SCALE_2000 = 0b10  // full scale to 2000 dps
+    L3GX_SCALE_250 = 0b00, // full scale to 250 dps
+    L3GX_SCALE_500 = 0b01, // full scale to 500 dps
+    L3GX_SCALE_2000 = 0b10 // full scale to 2000 dps
 } l3gx_scale_t;
 
+/**
+ * Data rates and bandwith
+ */
 typedef enum {
-	L3GX_DRBW_100_125 = 0, // 100 Hz ODR, 12.5 Hz bandwidth
-	L3GX_DRBW_100_25a,
-	L3GX_DRBW_100_25b,
-	L3GX_DRBW_100_25c,
-	L3GX_DRBW_200_125,
-	L3GX_DRBW_200_25,
-	L3GX_DRBW_200_50,
-	L3GX_DRBW_200_70,
-	L3GX_DRBW_400_20,
-	L3GX_DRBW_400_25,
-	L3GX_DRBW_400_50,
-	L3GX_DRBW_400_110,
-	L3GX_DRBW_800_30,
-	L3GX_DRBW_800_35,
-	L3GX_DRBW_800_50,
-	L3GX_DRBW_800_110  // 800 Hz ODR, 110 Hz bandwidth
+    L3GX_DRBW_100_125 = 0, // 100 Hz ODR, 12.5 Hz bandwidth
+    L3GX_DRBW_100_25a,
+    L3GX_DRBW_100_25b,
+    L3GX_DRBW_100_25c,
+    L3GX_DRBW_200_125,
+    L3GX_DRBW_200_25,
+    L3GX_DRBW_200_50,
+    L3GX_DRBW_200_70,
+    L3GX_DRBW_400_20,
+    L3GX_DRBW_400_25,
+    L3GX_DRBW_400_50,
+    L3GX_DRBW_400_110,
+    L3GX_DRBW_800_30,
+    L3GX_DRBW_800_35,
+    L3GX_DRBW_800_50,
+    L3GX_DRBW_800_110 // 800 Hz ODR, 110 Hz bandwidth
 } l3gx_drbw_t;
 
 /**
@@ -95,9 +96,9 @@ typedef enum {
  */
 typedef struct
 {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 } l3gx_raw_data_t;
 
 /**
@@ -105,19 +106,20 @@ typedef struct
  */
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+    float x;
+    float y;
+    float z;
 } l3gx_data_t;
 
 /**
  * Device descriptor
  */
-typedef struct {
-	i2c_dev_t i2c_dev;
-	l3gx_sensor_type_t sensor_type;
-	l3gx_scale_t scale;
-	l3gx_drbw_t datarate_bandwith;
+typedef struct
+{
+    i2c_dev_t i2c_dev;
+    l3gx_sensor_type_t sensor_type;
+    l3gx_scale_t scale;
+    l3gx_drbw_t datarate_bandwith;
 } l3gx_t;
 
 /**
@@ -131,6 +133,7 @@ typedef struct {
  * @return `ESP_OK` on success
  */
 esp_err_t l3gx_init_desc(l3gx_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
 /**
  * @brief Free device descriptor
  *
