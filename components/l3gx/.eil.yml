@@ -1,5 +1,6 @@
 name: l3gx
 description: Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors
+version: 1.0.0
 groups:
   - imu
 code_owners: 
