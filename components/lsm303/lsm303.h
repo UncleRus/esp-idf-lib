@@ -52,61 +52,79 @@ extern "C" {
  * Default I2C address
  */
 
-#define LSM303_ADDR_ACC    0x19
-#define LSM303_ADDR_MAG    0x1E
+#define LSM303_ADDR_ACC 0x19
+#define LSM303_ADDR_MAG 0x1E
 
+/**
+ * Accelerometer modes
+ */
 typedef enum {
-	LSM303_ACC_MODE_NORMAL,          // Normal measurement mode; 10-bit
-	LSM303_ACC_MODE_HIGH_RESOLUTION, // High resolution mode; 12-bit
-	LSM303_ACC_MODE_LOW_POWER,       // Low power mode; 8-bit
+    LSM303_ACC_MODE_NORMAL,          //!< Normal measurement mode; 10-bit
+    LSM303_ACC_MODE_HIGH_RESOLUTION, //!< High resolution mode; 12-bit
+    LSM303_ACC_MODE_LOW_POWER,       //!< Low power mode; 8-bit
 } lsm303_acc_mode_t;
 
+/**
+ * Accelerometer data rates
+ */
 typedef enum {
-	LSM303_ODR30_POWER_DOWN = 0b0000,   // Power-down mode
-	LSM303_ODR30_1_HZ       = 0b0001,   // Normal / low-power mode (1 Hz)
-	LSM303_ODR30_10_HZ      = 0b0010,
-	LSM303_ODR30_25_HZ      = 0b0011,
-	LSM303_ODR30_50_HZ      = 0b0100,
-	LSM303_ODR30_100_HZ     = 0b0101,
-	LSM303_ODR30_200_HZ     = 0b0110,
-	LSM303_ODR30_400_HZ     = 0b0111,
-	LSM303_ODR30_1620_HZ    = 0b1000,
-	LSM303_ODR30_5376_HZ    = 0b1001   // Normal (1.344 kHz) / low-power mode (5.376 KHz)
+    LSM303_ODR30_POWER_DOWN = 0b0000, //!< Power-down mode
+    LSM303_ODR30_1_HZ = 0b0001,       //!< Normal / low-power mode (1 Hz)
+    LSM303_ODR30_10_HZ = 0b0010,
+    LSM303_ODR30_25_HZ = 0b0011,
+    LSM303_ODR30_50_HZ = 0b0100,
+    LSM303_ODR30_100_HZ = 0b0101,
+    LSM303_ODR30_200_HZ = 0b0110,
+    LSM303_ODR30_400_HZ = 0b0111,
+    LSM303_ODR30_1620_HZ = 0b1000,
+    LSM303_ODR30_5376_HZ = 0b1001     //!< Normal (1.344 kHz) / low-power mode (5.376 KHz)
 } lsm303_acc_rate_t;
 
+/**
+ * Accelerometer scales
+ */
 typedef enum {
-	LSM303_ACC_SCALE_2G = 0b00,  // 1 mg/LSB, +- 2G
-	LSM303_ACC_SCALE_4G = 0b01,  // 2 mg/LSB, +- 4G
-	LSM303_ACC_SCALE_8G = 0b10,  // 4 mg/LSB, +- 8G
-	LSM303_ACC_SCALE_16G = 0b11  // 12 mg/LSB, +- 16G
+    LSM303_ACC_SCALE_2G = 0b00, //!< 1 mg/LSB, +- 2G
+    LSM303_ACC_SCALE_4G = 0b01, //!< 2 mg/LSB, +- 4G
+    LSM303_ACC_SCALE_8G = 0b10, //!< 4 mg/LSB, +- 8G
+    LSM303_ACC_SCALE_16G = 0b11 //!< 12 mg/LSB, +- 16G
 } lsm303_acc_scale_t;
 
+/**
+ * Magnetometer modes
+ */
 typedef enum {
-    LSM303_MAG_MODE_CONT   = 0x00, // Continuous-conversion mode
-    LSM303_MAG_MODE_SINGLE = 0x01, // Single-conversion mode
-    LSM303_MAG_MODE_SLEEP1 = 0x02, // Sleep-mode. Device is placed in sleep-mode
-    LSM303_MAG_MODE_SLEEP2 = 0x03  // Sleep-mode. Device is placed in sleep-mode
+    LSM303_MAG_MODE_CONT = 0x00,   //!< Continuous-conversion mode
+    LSM303_MAG_MODE_SINGLE = 0x01, //!< Single-conversion mode
+    LSM303_MAG_MODE_SLEEP1 = 0x02, //!< Sleep-mode. Device is placed in sleep-mode
+    LSM303_MAG_MODE_SLEEP2 = 0x03  //!< Sleep-mode. Device is placed in sleep-mode
 } lsm303_mag_mode_t;
 
+/**
+ * Magnetometer rates
+ */
 typedef enum {
-	LSM303_MAGRATE_0_7, // 0.75 Hz
-	LSM303_MAGRATE_1_5, // 1.5 Hz
-	LSM303_MAGRATE_3_0, // 3.0 Hz
-	LSM303_MAGRATE_7_5, // 7.5 Hz
-	LSM303_MAGRATE_15,  // 15 Hz
-	LSM303_MAGRATE_30,  // 30 Hz
-	LSM303_MAGRATE_75,  // 75 Hz
-	LSM303_MAGRATE_220  // 220 Hz
+    LSM303_MAG_RATE_0_7, //!< 0.75 Hz
+    LSM303_MAG_RATE_1_5, //!< 1.5 Hz
+    LSM303_MAG_RATE_3_0, //!< 3.0 Hz
+    LSM303_MAG_RATE_7_5, //!< 7.5 Hz
+    LSM303_MAG_RATE_15,  //!< 15 Hz
+    LSM303_MAG_RATE_30,  //!< 30 Hz
+    LSM303_MAG_RATE_75,  //!< 75 Hz
+    LSM303_MAG_RATE_220  //!< 220 Hz
 } lsm303_mag_rate_t;
 
+/**
+ * Magnetometer gains
+ */
 typedef enum {
-	LSM303_MAGGAIN_1_3, // +/- 1.3
-	LSM303_MAGGAIN_1_9, // +/- 1.9
-	LSM303_MAGGAIN_2_5, // +/- 2.5
-	LSM303_MAGGAIN_4_0, // +/- 4.0
-	LSM303_MAGGAIN_4_7, // +/- 4.7
-	LSM303_MAGGAIN_5_6, // +/- 5.6
-	LSM303_MAGGAIN_8_1  // +/- 8.1
+    LSM303_MAG_GAIN_1_3, //!< +/- 1.3
+    LSM303_MAG_GAIN_1_9, //!< +/- 1.9
+    LSM303_MAG_GAIN_2_5, //!< +/- 2.5
+    LSM303_MAG_GAIN_4_0, //!< +/- 4.0
+    LSM303_MAG_GAIN_4_7, //!< +/- 4.7
+    LSM303_MAG_GAIN_5_6, //!< +/- 5.6
+    LSM303_MAG_GAIN_8_1  //!< +/- 8.1
 } lsm303_mag_gain_t;
 
 /**
@@ -114,9 +132,9 @@ typedef enum {
  */
 typedef struct
 {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 } lsm303_acc_raw_data_t;
 
 /**
@@ -124,9 +142,9 @@ typedef struct
  */
 typedef struct
 {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 } lsm303_mag_raw_data_t;
 
 /**
@@ -134,9 +152,9 @@ typedef struct
  */
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+    float x;
+    float y;
+    float z;
 } lsm303_acc_data_t;
 
 /**
@@ -144,25 +162,26 @@ typedef struct
  */
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+    float x;
+    float y;
+    float z;
 } lsm303_mag_data_t;
 
 /**
  * Device descriptor
  */
-typedef struct {
-	i2c_dev_t i2c_dev_acc;
-	i2c_dev_t i2c_dev_mag;
+typedef struct
+{
+    i2c_dev_t i2c_dev_acc;
+    i2c_dev_t i2c_dev_mag;
 
-	lsm303_acc_mode_t acc_mode;
-	lsm303_acc_rate_t acc_rate;
-	lsm303_acc_scale_t acc_scale;
+    lsm303_acc_mode_t acc_mode;
+    lsm303_acc_rate_t acc_rate;
+    lsm303_acc_scale_t acc_scale;
 
-	lsm303_mag_mode_t mag_mode;
-	lsm303_mag_rate_t mag_rate;
-	lsm303_mag_gain_t mag_gain;
+    lsm303_mag_mode_t mag_mode;
+    lsm303_mag_rate_t mag_rate;
+    lsm303_mag_gain_t mag_gain;
 } lsm303_t;
 
 /**
@@ -214,5 +233,3 @@ esp_err_t lsm303_mag_get_temp(lsm303_t *dev, float *temp);
 /**@}*/
 
 #endif /* __LSM303_H__ */
-
-
