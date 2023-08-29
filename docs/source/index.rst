@@ -34,15 +34,7 @@ or
    cd ~/my/work/path
    git clone git@gitlab.com:UncleRus/esp-idf-lib.git
 
-Add path to components in your project makefile, e.g:
-
-.. code-block:: make
-   
-   PROJECT_NAME := my-esp-project
-   EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
-   include $(IDF_PATH)/make/project.mk
-   
-or in CMakeLists.txt:
+Add path to components in your project CMakeLists.txt:
 
 .. code-block:: cmake
 
@@ -182,7 +174,8 @@ Magnetic sensors
 
    groups/hmc5883l
    groups/qmc5883l
-   
+   groups/lsm303
+
 Light sensors
 =============
 .. toctree::
@@ -234,6 +227,7 @@ Inertial measurement units
    groups/icm42670
    groups/mpu6050
    groups/l3gx
+   groups/lsm303
 
 Battery controllers
 ===================

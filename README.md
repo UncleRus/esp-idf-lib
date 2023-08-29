@@ -223,6 +223,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
 | **hmc5883l**             | Driver for 3-axis digital compass HMC5883L and HMC5983L                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **qmc5883l**             | Driver for QMC5883L 3-axis magnetic sensor                                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
