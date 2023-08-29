@@ -313,7 +313,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - Gabriel Boni Vicari: `mpu6050` 
 - [Grupo de Pesquisa em Cultura Digital](http://gepid.upf.br/): `mpu6050` 
 - GrzegorzH: `ds18x20` 
-- [Gunar Schorcht](https://github.com/gschorcht): `bme680` `ccs811` `sht3x` `sts3x`
+- [Gunar Schorcht](https://github.com/gschorcht): `bme680` `ccs811` `sht3x` `sts3x` 
 - [Jakub Turek](https://github.com/QB4-dev): `l3gx` 
 - [Jan Veeh](https://github.com/janveeh): `icm42670` 
 - [Jeff Rowberg](https://www.i2cdevlib.com/): `mpu6050` 
