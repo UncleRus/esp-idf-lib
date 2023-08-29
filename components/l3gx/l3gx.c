@@ -27,10 +27,8 @@
 
 /**
  * @file l3gx.c
- * @defgroup l3gx l3gx
- * @{
  *
- * ESP-IDF Driver for L3GD20 3-axis gyroscope sensor
+ * ESP-IDF Driver for L3Gx 3-axis gyroscope sensor
  *
  * Copyright (c) 2023 Jakub Turek <qb4.dev@gmail.com>
  *
