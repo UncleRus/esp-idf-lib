@@ -92,7 +92,7 @@
 /* accelerometer STATUS_REG_A */
 #define LSM303_ACC_STATUS_ZYXOR 0x80
 #define LSM303_ACC_STATUS_ZOR   0x40
-#define LSM303_STATUS_YOR       0x20
+#define LSM303_ACC_STATUS_YOR   0x20
 #define LSM303_ACC_STATUS_XOR   0x10
 #define LSM303_ACC_STATUS_ZYXDA 0x08
 #define LSM303_ACC_STATUS_ZDA   0x04
@@ -182,7 +182,7 @@ esp_err_t lsm303_init_desc(lsm303_t *dev, uint8_t acc_addr, uint8_t mag_addr, i2
 #endif
 
     dev->acc_mode = LSM303_ACC_MODE_NORMAL;
-    dev->acc_rate = LSM303_ODR30_10_HZ;
+    dev->acc_rate = LSM303_ODR_10_HZ;
     dev->acc_scale = LSM303_ACC_SCALE_2G;
 
     dev->mag_mode = LSM303_MAG_MODE_CONT;
