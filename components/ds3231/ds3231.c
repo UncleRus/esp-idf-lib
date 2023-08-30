@@ -98,7 +98,7 @@ static inline int days_since_january_1st(int year, int month, int day)
     const int *ptr = days_per_month; 
 
     // Handle leap year
-    if ((year % 4 == 0 and year % 100 != 0) || (year % 400 == 0))
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
         ptr = days_per_month_leap_year;
 
     // Add days from previous months
