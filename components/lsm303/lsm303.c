@@ -92,7 +92,7 @@
 /* accelerometer STATUS_REG_A */
 #define LSM303_ACC_STATUS_ZYXOR 0x80
 #define LSM303_ACC_STATUS_ZOR   0x40
-#define LSM303_STATUS_YOR       0x20
+#define LSM303_ACC_STATUS_YOR   0x20
 #define LSM303_ACC_STATUS_XOR   0x10
 #define LSM303_ACC_STATUS_ZYXDA 0x08
 #define LSM303_ACC_STATUS_ZDA   0x04
@@ -182,7 +182,7 @@ esp_err_t lsm303_init_desc(lsm303_t *dev, uint8_t acc_addr, uint8_t mag_addr, i2
 #endif
 
     dev->acc_mode = LSM303_ACC_MODE_NORMAL;
-    dev->acc_rate = LSM303_ODR30_10_HZ;
+    dev->acc_rate = LSM303_ODR_10_HZ;
     dev->acc_scale = LSM303_ACC_SCALE_2G;
 
     dev->mag_mode = LSM303_MAG_MODE_CONT;
@@ -348,7 +348,7 @@ esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_
 {
     CHECK_ARG(dev && raw && data);
 
-    static const float lsb[][4] = {
+    const float lsb[][4] = {
         [LSM303_ACC_MODE_NORMAL] = {
             [LSM303_ACC_SCALE_2G] = 0.0039,
             [LSM303_ACC_SCALE_4G] = 0.00782,
@@ -368,7 +368,7 @@ esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_
             [LSM303_ACC_SCALE_16G] = 0.18758
         },
     };
-    static const int shift[] = {
+    const int shift[] = {
         [LSM303_ACC_MODE_NORMAL] = 6,          // 10-bit
         [LSM303_ACC_MODE_HIGH_RESOLUTION] = 4, // 12-bit
         [LSM303_ACC_MODE_LOW_POWER] = 8        // 8-bit
@@ -447,7 +447,7 @@ esp_err_t lsm303_mag_raw_to_uT(lsm303_t *dev, lsm303_mag_raw_data_t *raw, lsm303
     /* gain for XY axis is different from Z axis */
     enum { GAIN_XY = 0, GAIN_Z = 1 };
     /*  { xy , z} */
-    static const float gauss_lsb[][2] = {
+    const float gauss_lsb[][2] = {
         [LSM303_MAG_GAIN_1_3] = { 1100, 980 },
         [LSM303_MAG_GAIN_1_9] = { 855, 760 },
         [LSM303_MAG_GAIN_2_5] = { 670, 600 },

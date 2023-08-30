@@ -68,16 +68,16 @@ typedef enum {
  * Accelerometer data rates
  */
 typedef enum {
-    LSM303_ODR30_POWER_DOWN = 0b0000, //!< Power-down mode
-    LSM303_ODR30_1_HZ = 0b0001,       //!< Normal / low-power mode (1 Hz)
-    LSM303_ODR30_10_HZ = 0b0010,
-    LSM303_ODR30_25_HZ = 0b0011,
-    LSM303_ODR30_50_HZ = 0b0100,
-    LSM303_ODR30_100_HZ = 0b0101,
-    LSM303_ODR30_200_HZ = 0b0110,
-    LSM303_ODR30_400_HZ = 0b0111,
-    LSM303_ODR30_1620_HZ = 0b1000,
-    LSM303_ODR30_5376_HZ = 0b1001     //!< Normal (1.344 kHz) / low-power mode (5.376 KHz)
+    LSM303_ODR_POWER_DOWN = 0b0000, //!< Power-down mode
+    LSM303_ODR_1_HZ = 0b0001,       //!< Normal / low-power mode (1 Hz)
+    LSM303_ODR_10_HZ = 0b0010,      //!< Normal / low-power mode (10 Hz)
+    LSM303_ODR_25_HZ = 0b0011,      //!< Normal / low-power mode (25 Hz)
+    LSM303_ODR_50_HZ = 0b0100,      //!< Normal / low-power mode (50 Hz)
+    LSM303_ODR_100_HZ = 0b0101,     //!< Normal / low-power mode (100 Hz)
+    LSM303_ODR_200_HZ = 0b0110,     //!< Normal / low-power mode (200 Hz)
+    LSM303_ODR_400_HZ = 0b0111,     //!< Normal / low-power mode (400 Hz)
+    LSM303_ODR_1620_HZ = 0b1000,    //!< Low-power mode (1.620 kHz)
+    LSM303_ODR_5376_HZ = 0b1001     //!< Normal (1.344 kHz) / low-power mode (5.376 KHz)
 } lsm303_acc_rate_t;
 
 /**
@@ -104,14 +104,14 @@ typedef enum {
  * Magnetometer rates
  */
 typedef enum {
-    LSM303_MAG_RATE_0_7, //!< 0.75 Hz
-    LSM303_MAG_RATE_1_5, //!< 1.5 Hz
-    LSM303_MAG_RATE_3_0, //!< 3.0 Hz
-    LSM303_MAG_RATE_7_5, //!< 7.5 Hz
-    LSM303_MAG_RATE_15,  //!< 15 Hz
-    LSM303_MAG_RATE_30,  //!< 30 Hz
-    LSM303_MAG_RATE_75,  //!< 75 Hz
-    LSM303_MAG_RATE_220  //!< 220 Hz
+    LSM303_MAG_RATE_0_75, //!< 0.75 Hz
+    LSM303_MAG_RATE_1_5,  //!< 1.5 Hz
+    LSM303_MAG_RATE_3_0,  //!< 3.0 Hz
+    LSM303_MAG_RATE_7_5,  //!< 7.5 Hz
+    LSM303_MAG_RATE_15,   //!< 15 Hz
+    LSM303_MAG_RATE_30,   //!< 30 Hz
+    LSM303_MAG_RATE_75,   //!< 75 Hz
+    LSM303_MAG_RATE_220   //!< 220 Hz
 } lsm303_mag_rate_t;
 
 /**

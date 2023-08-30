@@ -22,7 +22,7 @@ void lsm303_test(void *pvParameters)
     ESP_ERROR_CHECK(lsm303_init(&lsm303));
 
     /* OPTIONAL */
-    ESP_ERROR_CHECK(lsm303_acc_set_config(&lsm303, LSM303_ACC_MODE_NORMAL, LSM303_ODR30_100_HZ, LSM303_ACC_SCALE_2G));
+    ESP_ERROR_CHECK(lsm303_acc_set_config(&lsm303, LSM303_ACC_MODE_NORMAL, LSM303_ODR_100_HZ, LSM303_ACC_SCALE_2G));
     ESP_ERROR_CHECK(lsm303_mag_set_config(&lsm303, LSM303_MAG_MODE_CONT, LSM303_MAG_RATE_15, LSM303_MAG_GAIN_1_3));
 
     while (1)
