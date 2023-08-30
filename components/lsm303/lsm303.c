@@ -348,7 +348,7 @@ esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_
 {
     CHECK_ARG(dev && raw && data);
 
-    const float lsb[][4] = {
+    static const float lsb[][4] = {
         [LSM303_ACC_MODE_NORMAL] = {
             [LSM303_ACC_SCALE_2G] = 0.0039,
             [LSM303_ACC_SCALE_4G] = 0.00782,
@@ -368,7 +368,7 @@ esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_
             [LSM303_ACC_SCALE_16G] = 0.18758
         },
     };
-    const int shift[] = {
+    static const int shift[] = {
         [LSM303_ACC_MODE_NORMAL] = 6,          // 10-bit
         [LSM303_ACC_MODE_HIGH_RESOLUTION] = 4, // 12-bit
         [LSM303_ACC_MODE_LOW_POWER] = 8        // 8-bit
@@ -447,7 +447,7 @@ esp_err_t lsm303_mag_raw_to_uT(lsm303_t *dev, lsm303_mag_raw_data_t *raw, lsm303
     /* gain for XY axis is different from Z axis */
     enum { GAIN_XY = 0, GAIN_Z = 1 };
     /*  { xy , z} */
-    const float gauss_lsb[][2] = {
+    static const float gauss_lsb[][2] = {
         [LSM303_MAG_GAIN_1_3] = { 1100, 980 },
         [LSM303_MAG_GAIN_1_9] = { 855, 760 },
         [LSM303_MAG_GAIN_2_5] = { 670, 600 },
