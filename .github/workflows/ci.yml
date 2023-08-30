@@ -233,7 +233,7 @@ jobs:
             for component in ${examples}; do
               for dir in ${component}/*; do
                 cd ${dir}
-                idf.py --ccache build
+                idf.py --ccache build; res=$?; [ $res -ne 0 ] && exit $res
                 rm -rf build
                 cd ../..
               done
