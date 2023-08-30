@@ -137,20 +137,20 @@
 
 static const char *TAG = "lsm303";
 
-#define CHECK(x)                                                                                                                                                                                       \
-    do                                                                                                                                                                                                 \
-    {                                                                                                                                                                                                  \
-        esp_err_t __;                                                                                                                                                                                  \
-        if ((__ = x) != ESP_OK)                                                                                                                                                                        \
-            return __;                                                                                                                                                                                 \
-    }                                                                                                                                                                                                  \
+#define CHECK(x)                           \
+    do                                     \
+    {                                      \
+        esp_err_t __;                      \
+        if ((__ = x) != ESP_OK)            \
+            return __;                     \
+    }                                      \
     while (0)
-#define CHECK_ARG(VAL)                                                                                                                                                                                 \
-    do                                                                                                                                                                                                 \
-    {                                                                                                                                                                                                  \
-        if (!(VAL))                                                                                                                                                                                    \
-            return ESP_ERR_INVALID_ARG;                                                                                                                                                                \
-    }                                                                                                                                                                                                  \
+#define CHECK_ARG(VAL)                     \
+    do                                     \
+    {                                      \
+        if (!(VAL))                        \
+            return ESP_ERR_INVALID_ARG;    \
+    }                                      \
     while (0)
 
 inline static esp_err_t read_acc_reg_nolock(lsm303_t *dev, uint8_t reg, uint8_t *val)
@@ -346,10 +346,27 @@ esp_err_t lsm303_acc_get_raw_data(lsm303_t *dev, lsm303_acc_raw_data_t *raw)
 
 esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_acc_data_t *data)
 {
+    CHECK_ARG(dev && raw && data);
+
     static const float lsb[][4] = {
-        [LSM303_ACC_MODE_NORMAL] = { [LSM303_ACC_SCALE_2G] = 0.0039, [LSM303_ACC_SCALE_4G] = 0.00782, [LSM303_ACC_SCALE_8G] = 0.01563, [LSM303_ACC_SCALE_16G] = 0.0469 },
-        [LSM303_ACC_MODE_HIGH_RESOLUTION] = { [LSM303_ACC_SCALE_2G] = 0.00098, [LSM303_ACC_SCALE_4G] = 0.00195, [LSM303_ACC_SCALE_8G] = 0.0039, [LSM303_ACC_SCALE_16G] = 0.01172 },
-        [LSM303_ACC_MODE_LOW_POWER] = { [LSM303_ACC_SCALE_2G] = 0.01563, [LSM303_ACC_SCALE_4G] = 0.03126, [LSM303_ACC_SCALE_8G] = 0.06252, [LSM303_ACC_SCALE_16G] = 0.18758 },
+        [LSM303_ACC_MODE_NORMAL] = {
+            [LSM303_ACC_SCALE_2G] = 0.0039,
+            [LSM303_ACC_SCALE_4G] = 0.00782,
+            [LSM303_ACC_SCALE_8G] = 0.01563,
+            [LSM303_ACC_SCALE_16G] = 0.0469
+        },
+        [LSM303_ACC_MODE_HIGH_RESOLUTION] = {
+            [LSM303_ACC_SCALE_2G] = 0.00098,
+            [LSM303_ACC_SCALE_4G] = 0.00195,
+            [LSM303_ACC_SCALE_8G] = 0.0039,
+            [LSM303_ACC_SCALE_16G] = 0.01172
+        },
+        [LSM303_ACC_MODE_LOW_POWER] = {
+            [LSM303_ACC_SCALE_2G] = 0.01563,
+            [LSM303_ACC_SCALE_4G] = 0.03126,
+            [LSM303_ACC_SCALE_8G] = 0.06252,
+            [LSM303_ACC_SCALE_16G] = 0.18758
+        },
     };
     static const int shift[] = {
         [LSM303_ACC_MODE_NORMAL] = 6,          // 10-bit
@@ -426,6 +443,7 @@ esp_err_t lsm303_mag_get_raw_data(lsm303_t *dev, lsm303_mag_raw_data_t *raw)
 
 esp_err_t lsm303_mag_raw_to_uT(lsm303_t *dev, lsm303_mag_raw_data_t *raw, lsm303_mag_data_t *data)
 {
+    CHECK_ARG(dev && raw && data);
     /* gain for XY axis is different from Z axis */
     enum { GAIN_XY = 0, GAIN_Z = 1 };
     /*  { xy , z} */

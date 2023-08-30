@@ -196,6 +196,7 @@ typedef struct
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_init_desc(lsm303_t *dev, uint8_t acc_addr, uint8_t mag_addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
 /**
  * @brief Free device descriptor
  *
@@ -227,9 +228,9 @@ esp_err_t lsm303_acc_set_config(lsm303_t *dev, lsm303_acc_mode_t mode, lsm303_ac
  * @brief Get accelerometer configuration
  *
  * @param dev Device descriptor
- * @param mode Power mode
- * @param rate Output data rate
- * @param scale Full scale selection
+ * @param[out] mode Power mode
+ * @param[out] rate Output data rate
+ * @param[out] scale Full scale selection
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_acc_get_config(lsm303_t *dev, lsm303_acc_mode_t *mode, lsm303_acc_rate_t *rate, lsm303_acc_scale_t *scale);
@@ -238,7 +239,7 @@ esp_err_t lsm303_acc_get_config(lsm303_t *dev, lsm303_acc_mode_t *mode, lsm303_a
  * @brief Get accelerometer data state
  *
  * @param dev Device descriptor
- * @param ready Accelerometer data ready to read if true
+ * @param[out] ready Accelerometer data ready to read if true
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_acc_data_ready(lsm303_t *dev, bool *ready);
@@ -247,7 +248,7 @@ esp_err_t lsm303_acc_data_ready(lsm303_t *dev, bool *ready);
  * @brief Get raw accelerometer data
  *
  * @param dev Device descriptor
- * @param raw Accelerometer data
+ * @param[out] raw Accelerometer data
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_acc_get_raw_data(lsm303_t *dev, lsm303_acc_raw_data_t *raw);
@@ -257,7 +258,7 @@ esp_err_t lsm303_acc_get_raw_data(lsm303_t *dev, lsm303_acc_raw_data_t *raw);
  *
  * @param dev Device descriptor
  * @param raw Raw accelerometer data
- * @param data accelerometer data in g
+ * @param[out] data accelerometer data in g
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_acc_data_t *data);
@@ -266,7 +267,7 @@ esp_err_t lsm303_acc_raw_to_g(lsm303_t *dev, lsm303_acc_raw_data_t *raw, lsm303_
  * @brief Read accelerometer data in g
  *
  * @param dev Device descriptor
- * @param data accelerometer data in g
+ * @param[out] data accelerometer data in g
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_acc_get_data(lsm303_t *dev, lsm303_acc_data_t *data);
@@ -286,9 +287,9 @@ esp_err_t lsm303_mag_set_config(lsm303_t *dev, lsm303_mag_mode_t mode, lsm303_ma
  * @brief Get magnetometer configuration
  *
  * @param dev Device descriptor
- * @param mode Power mode
- * @param rate Output data rate
- * @param gain Gain configuration
+ * @param[out] mode Power mode
+ * @param[out] rate Output data rate
+ * @param[out] gain Gain configuration
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_mag_get_config(lsm303_t *dev, lsm303_mag_mode_t *mode, lsm303_mag_rate_t *rate, lsm303_mag_gain_t *gain);
@@ -297,7 +298,7 @@ esp_err_t lsm303_mag_get_config(lsm303_t *dev, lsm303_mag_mode_t *mode, lsm303_m
  * @brief Get magnetometer data state
  *
  * @param dev Device descriptor
- * @param ready Magnetometer data ready to read if true
+ * @param[out] ready Magnetometer data ready to read if true
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_mag_data_ready(lsm303_t *dev, bool *ready);
@@ -306,7 +307,7 @@ esp_err_t lsm303_mag_data_ready(lsm303_t *dev, bool *ready);
  * @brief Get raw magnetometer data
  *
  * @param dev Device descriptor
- * @param raw Magnetometer data
+ * @param[out] raw Magnetometer data
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_mag_get_raw_data(lsm303_t *dev, lsm303_mag_raw_data_t *raw);
@@ -316,7 +317,7 @@ esp_err_t lsm303_mag_get_raw_data(lsm303_t *dev, lsm303_mag_raw_data_t *raw);
  *
  * @param dev Device descriptor
  * @param raw Raw magnetometer data
- * @param data magnetometer data in uT
+ * @param[out] data magnetometer data in uT
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_mag_raw_to_uT(lsm303_t *dev, lsm303_mag_raw_data_t *raw, lsm303_mag_data_t *data);
@@ -325,7 +326,7 @@ esp_err_t lsm303_mag_raw_to_uT(lsm303_t *dev, lsm303_mag_raw_data_t *raw, lsm303
  * @brief Read magnetometer data in uT
  *
  * @param dev Device descriptor
- * @param data magnetometer data in uT
+ * @param[out] data magnetometer data in uT
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_mag_get_data(lsm303_t *dev, lsm303_mag_data_t *data);
@@ -334,10 +335,11 @@ esp_err_t lsm303_mag_get_data(lsm303_t *dev, lsm303_mag_data_t *data);
  * @brief Read chip temperature
  *
  * @param dev Device descriptor
- * @param temp Chip temperature
+ * @param[out] temp Chip temperature
  * @return `ESP_OK` on success
  */
 esp_err_t lsm303_mag_get_temp(lsm303_t *dev, float *temp);
+
 #ifdef __cplusplus
 }
 #endif
