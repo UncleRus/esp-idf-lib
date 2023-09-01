@@ -102,10 +102,9 @@ static inline int days_since_january_1st(int year, int month, int day)
         ptr = days_per_month_leap_year;
 
     // Add days from previous months
-    for (int i = 1; i < month; i++)
+    for (int i = 0; i < month; i++)
     {
-        days += *ptr;
-        ptr++;
+        days += ptr[i];
     }
 
     return days;
