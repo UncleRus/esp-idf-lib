@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (C) 2021 Tomoyuki Sakurai <y@rombik.org>
+ * Copyright (c) 2021 Tomoyuki Sakurai <y@rombik.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@
 #define __LED_STRIP_SPI_ESP32__H__
 
 #include <esp_idf_lib_helpers.h>
+#include <esp_idf_version.h>
 #include <driver/spi_master.h>
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
@@ -40,8 +41,13 @@
 #define LED_STRIP_SPI_DEFAULT_HOST_DEVICE  SPI2_HOST ///< Default is `SPI2_HOST` (`HSPI_HOST` if `esp-idf` version is v3.x).
 #endif
 
-#define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (13) ///< GPIO pin number of `LED_STRIP_SPI_DEFAULT_HOST_DEVICE`'s MOSI (13)
-#define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (14) ///< GPIO pin number of `LED_STRIP_SPI_DEFAULT_HOST_DEVICE`'s SCLK (14)
+#if defined(CONFIG_IDF_TARGET_ESP32C3)
+#define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (7)
+#define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (6)
+#else
+#define LED_STRIP_SPI_DEFAULT_MOSI_IO_NUM   (13) ///< GPIO pin number of `LED_STRIP_SPI_DEFAULT_HOST_DEVICE`'s MOSI (default is 13 for ESP32, 7 for ESP32C3)
+#define LED_STRIP_SPI_DEFAULT_SCLK_IO_NUM   (14) ///< GPIO pin number of `LED_STRIP_SPI_DEFAULT_HOST_DEVICE`'s SCLK (default is 14 for ESP32, 6 for ESP32C3)
+#endif
 
 /**
  * LED strip descriptor for ESP32-family.
@@ -61,6 +67,16 @@ typedef struct
     spi_transaction_t transaction;      ///< SPI transaction used internally by the driver.
 } led_strip_spi_esp32_t;
 
+/**
+ * Default DMA channel to use. Default is `SPI_DMA_CH_AUTO` for ESP-IDF v4.3
+ * and newer, 1 for older versions.
+ */
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 3, 0)
+#define LED_STRIP_SPI_DEFAULT_DMA_CHAN  (1)
+#else
+#define LED_STRIP_SPI_DEFAULT_DMA_CHAN  SPI_DMA_CH_AUTO
+#endif
 /**
  * Macro to initialize ::led_strip_spi_esp32_t
  *
@@ -85,7 +101,7 @@ typedef struct
     .clock_speed_hz = 1000000,                        \
     .queue_size = 1,                                  \
     .device_handle = NULL,                            \
-    .dma_chan = 1,                                    \
+    .dma_chan = LED_STRIP_SPI_DEFAULT_DMA_CHAN,       \
 }
 
 /** @} */

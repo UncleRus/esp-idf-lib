@@ -1,3 +1,34 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 zeroday nodemcu.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * -------------------------------------------------------------------------------
+ * Portions copyright (C) 2000 Dallas Semiconductor Corporation, under the
+ * following additional terms:
+ *
+ * Except as contained in this notice, the name of Dallas Semiconductor
+ * shall not be used except as stated in the Dallas Semiconductor
+ * Branding Policy.
+ */
+
 /**
  * @file onewire.c
  *
@@ -21,6 +52,7 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 #include "onewire.h"
 
@@ -391,7 +423,7 @@ onewire_addr_t onewire_search_next(onewire_search_t *search, gpio_num_t pin)
 
 #ifdef CONFIG_ONEWIRE_CRC8_TABLE
 // This table comes from Dallas sample code where it is freely reusable,
-// though Copyright (C) 2000 Dallas Semiconductor Corporation
+// though Copyright (c) 2000 Dallas Semiconductor Corporation
 static const uint8_t dscrc_table[] = {
     0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31, 65,
     157, 195, 33, 127, 252, 162, 64, 30, 95, 1, 227, 189, 62, 96, 130, 220,

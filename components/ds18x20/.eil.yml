@@ -1,0 +1,26 @@
+name: ds18x20
+description: Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs
+version: 1.2.0
+groups:
+  - temperature
+code_owners:
+  - UncleRus
+depends:
+  - log
+  - esp_idf_lib_helpers
+  - onewire
+  - freertos
+thread_safe: no
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: GrzegorzH
+    year: 2016
+  - name: AlexS
+    year: 2016
+  - name: UncleRus
+    year: 2018

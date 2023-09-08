@@ -1,0 +1,35 @@
+menu "MPU6050 Example Configuration"
+
+    choice EXAMPLE_I2C_ADDRESS
+        prompt "Select I2C address"
+        default EXAMPLE_I2C_ADDRESS_LOW
+        help
+            Select I2C address
+
+        config EXAMPLE_I2C_ADDRESS_LOW
+            bool "MPU6050_I2C_ADDRESS_LOW"
+            help
+                Choose this when ADDR pin is connected to ground
+        config EXAMPLE_I2C_ADDRESS_HIGH
+            bool "MPU6050_I2C_ADDRESS_HIGH"
+            help
+                Choose this when ADDR pin is connected to VCC
+    endchoice
+
+    config EXAMPLE_SCL_GPIO
+        int "MPU6050 SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_SDA_GPIO
+        int "MPU6050 SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+     
+endmenu

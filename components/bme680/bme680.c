@@ -1,14 +1,43 @@
+/*
+ * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
  * ESP-IDF driver for BME680 digital environmental sensor
  *
  * Forked from <https://github.com/gschorcht/bme680-esp-idf>
  *
- * Copyright (C) 2017 Gunar Schorcht <https://github.com/gschorcht>\n
- * Copyright (C) 2019 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>\n
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
 #include <string.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -301,7 +330,7 @@ static esp_err_t bme680_get_raw_data(bme680_t *dev, bme680_raw_data_t *raw_data)
      * BME680_REG_MEAS_STATUS_1, BME680_REG_MEAS_STATUS_2
      * These data are not documented and it is not really clear when they are filled
      */
-    ESP_LOGD(TAG, "Raw data: %d %d %d %d %d", raw_data->temperature, raw_data->pressure,
+    ESP_LOGD(TAG, "Raw data: %" PRIu32 " %" PRIu32 " %d %d %d", raw_data->temperature, raw_data->pressure,
             raw_data->humidity, raw_data->gas_resistance, raw_data->gas_range);
 
     return ESP_OK;
@@ -330,7 +359,7 @@ static int16_t bme680_convert_temperature(bme680_t *dev, uint32_t raw_temperatur
 
 /**
  * @brief       Calculate pressure from raw pressure value
- * @copyright   Copyright (C) 2017 - 2018 Bosch Sensortec GmbH
+ * @copyright   Copyright (c) 2017 - 2018 Bosch Sensortec GmbH
  *
  * The algorithm was extracted from the original Bosch Sensortec BME680 driver
  * published as open source. Divisions and multiplications by potences of 2
@@ -380,7 +409,7 @@ static uint32_t bme680_convert_pressure(bme680_t *dev, uint32_t raw_pressure)
 
 /**
  * @brief       Calculate humidty from raw humidity data
- * @copyright   Copyright (C) 2017 - 2018 Bosch Sensortec GmbH
+ * @copyright   Copyright (c) 2017 - 2018 Bosch Sensortec GmbH
  *
  * The algorithm was extracted from the original Bosch Sensortec BME680 driver
  * published as open source. Divisions and multiplications by potences of 2
@@ -758,7 +787,7 @@ esp_err_t bme680_get_results_fixed(bme680_t *dev, bme680_values_fixed_t *results
             ESP_LOGW(TAG, "Heater is not stable");
     }
 
-    ESP_LOGD(TAG, "Fixed point sensor values - %d/100 deg.C, %d/1000 %%, %d Pa, %d Ohm",
+    ESP_LOGD(TAG, "Fixed point sensor values - %d/100 deg.C, %" PRIu32 "/1000 %%, %" PRIu32 " Pa, %" PRIu32 " Ohm",
             results->temperature, results->humidity, results->pressure, results->gas_resistance);
 
     return ESP_OK;
@@ -979,4 +1008,3 @@ esp_err_t bme680_set_ambient_temperature(bme680_t *dev, int16_t ambient)
 
     return ESP_OK;
 }
-

@@ -1,0 +1,33 @@
+menu "Example configuration"
+    choice EXAMPLE_I2C_ADDRESS
+        prompt "Select I2C address"
+        default EXAMPLE_DS3502_ADDR_0
+        help
+            Select I2C address
+
+        config EXAMPLE_DS3502_ADDR_0
+            bool "DS3502_ADDR_0 (0x28)"
+        config EXAMPLE_DS3502_ADDR_1
+            bool "DS3502_ADDR_0 (0x29)"
+        config EXAMPLE_DS3502_ADDR_2
+            bool "DS3502_ADDR_0 (0x2a)"
+        config EXAMPLE_DS3502_ADDR_3
+            bool "DS3502_ADDR_0 (0x2b)"
+    endchoice
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

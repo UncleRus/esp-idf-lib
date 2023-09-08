@@ -1,0 +1,19 @@
+name: lc709203f
+description: Driver for LC709203F battery fuel gauge
+version: 1.0.0
+groups:
+  - battery
+code_owners: jmpmscorp
+depends:
+  - i2cdev
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: ISC
+copyrights:
+  - name: jmpmscorp
+    year: 2022

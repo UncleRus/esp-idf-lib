@@ -1,0 +1,50 @@
+- name: adc-dac
+  description: ADC/DAC libraries
+
+- name: common
+  description: Common libraries
+
+- name: rtc
+  description: Real-time clocks
+
+- name: humidity
+  description: Humidity sensors
+
+- name: temperature
+  description: Temperature sensors
+
+- name: pressure
+  description: Pressure sensors
+
+- name: air-quality
+  description: Air quality sensors
+
+- name: gas
+  description: Gas sensors
+
+- name: current
+  description: Current and power sensors
+
+- name: magnetic
+  description: Magnetic sensors
+
+- name: light
+  description: Light sensors
+
+- name: gpio
+  description: GPIO expanders
+
+- name: led
+  description: LED drivers
+
+- name: input
+  description: Input device drivers
+
+- name: misc
+  description: Other misc libraries
+
+- name: imu
+  description: Inertial measurement units
+
+- name: battery
+  description: Battery controllers

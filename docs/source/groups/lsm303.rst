@@ -1,0 +1,7 @@
+.. _lsm303:
+
+lsm303 - Driver for LSM303 3-axis accelerometer and magnetometer sensor
+=======================================================================
+
+.. doxygengroup:: lsm303
+   :members:

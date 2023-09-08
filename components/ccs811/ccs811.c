@@ -1,3 +1,31 @@
+/*
+ * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
  * @file ccs811.c
  *
@@ -6,11 +34,12 @@
  * Ported from esp-open-rtos
  *
  * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>\n
- * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>\n
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>\n
  *
  * BSD Licensed as described in the file LICENSE
  */
 #include <string.h>
+#include <inttypes.h>
 #include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
 #include <freertos/FreeRTOS.h>
@@ -86,12 +115,12 @@ typedef struct
 
 static esp_err_t read_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    ESP_LOGD(TAG, "Read %d byte from i2c slave starting at reg addr %02x.", len, reg);
+    ESP_LOGD(TAG, "Read %" PRIu32 " bytes from i2c slave starting at reg addr %02x.", len, reg);
 
     esp_err_t res = i2c_dev_read_reg(&dev->i2c_dev, reg, data, len);
     if (res != ESP_OK)
     {
-        ESP_LOGE(TAG, "Error %d on read %d byte from I2C slave reg addr %02x.", res, len, reg);
+        ESP_LOGE(TAG, "Error %d on read %" PRIu32 " bytes from I2C slave reg addr %02x.", res, len, reg);
         return res;
     }
 
@@ -100,12 +129,12 @@ static esp_err_t read_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, 
 
 static esp_err_t write_reg_nolock(ccs811_dev_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    ESP_LOGD(TAG, "Write %d bytes to i2c slave starting at reg addr %02x", len, reg);
+    ESP_LOGD(TAG, "Write %" PRIu32 " bytes to i2c slave starting at reg addr %02x", len, reg);
 
     esp_err_t res = i2c_dev_write_reg(&dev->i2c_dev, reg, data, len);
     if (res != ESP_OK)
     {
-        ESP_LOGE(TAG, "Error %d on write %d byte to i2c slave register %02x.", res, len, reg);
+        ESP_LOGE(TAG, "Error %d on write %" PRIu32 " bytes to i2c slave register %02x.", res, len, reg);
         return res;
     }
 
@@ -449,11 +478,15 @@ esp_err_t ccs811_set_environmental_data(ccs811_dev_t *dev,
 {
     CHECK_ARG(dev);
 
-    uint16_t temp = (temperature + 25) * 512;   // -25 °C maps to 0
-    uint16_t hum = humidity * 512;
+    uint16_t hum_conv = humidity * 512.0f + 0.5f;
+    uint16_t temp_conv = (temperature + 25.0f) * 512.0f + 0.5f;
+    
 
     // fill environmental data
-    uint8_t data[4] = { temp >> 8, temp & 0xff, hum >> 8, hum & 0xff };
+    uint8_t data[4] = {
+        (uint8_t)((hum_conv >> 8) & 0xFF), (uint8_t)(hum_conv & 0xFF),
+        (uint8_t)((temp_conv >> 8) & 0xFF), (uint8_t)(temp_conv & 0xFF)
+    };
 
     // send environmental data to the sensor
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);

@@ -1,0 +1,20 @@
+name: tca9548
+description: Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch
+version: 1.0.0
+groups:
+  - misc
+code_owners: UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2020

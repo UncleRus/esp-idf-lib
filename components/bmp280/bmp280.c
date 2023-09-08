@@ -1,3 +1,27 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 sheinz <https://github.com/sheinz>
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file bmp280.c
  *
@@ -5,15 +29,16 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2016 sheinz <https://github.com/sheinz>\n
- * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2016 sheinz <https://github.com/sheinz>\n
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
 
+#include "bmp280.h"
+#include <inttypes.h>
 #include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
-#include "bmp280.h"
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
 
@@ -352,8 +377,8 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
 
     adc_pressure = data[0] << 12 | data[1] << 4 | data[2] >> 4;
     adc_temp = data[3] << 12 | data[4] << 4 | data[5] >> 4;
-    ESP_LOGD(TAG, "ADC temperature: %d", adc_temp);
-    ESP_LOGD(TAG, "ADC pressure: %d", adc_pressure);
+    ESP_LOGD(TAG, "ADC temperature: %" PRIi32, adc_temp);
+    ESP_LOGD(TAG, "ADC pressure: %" PRIi32, adc_pressure);
 
     int32_t fine_temp;
     *temperature = compensate_temperature(dev, adc_temp, &fine_temp);
@@ -362,7 +387,7 @@ esp_err_t bmp280_read_fixed(bmp280_t *dev, int32_t *temperature, uint32_t *press
     if (humidity)
     {
         int32_t adc_humidity = data[6] << 8 | data[7];
-        ESP_LOGD(TAG, "ADC humidity: %d", adc_humidity);
+        ESP_LOGD(TAG, "ADC humidity: %" PRIi32, adc_humidity);
         *humidity = compensate_humidity(dev, adc_humidity, fine_temp);
     }
 

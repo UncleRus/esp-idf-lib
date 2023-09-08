@@ -34,15 +34,7 @@ or
    cd ~/my/work/path
    git clone git@gitlab.com:UncleRus/esp-idf-lib.git
 
-Add path to components in your project makefile, e.g:
-
-.. code-block:: make
-   
-   PROJECT_NAME := my-esp-project
-   EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
-   include $(IDF_PATH)/make/project.mk
-   
-or in CMakeLists.txt:
+Add path to components in your project CMakeLists.txt:
 
 .. code-block:: cmake
 
@@ -74,7 +66,7 @@ Add path to components in your project makefile, e.g:
    
    PROJECT_NAME := my-esp-project
    EXTRA_COMPONENT_DIRS := $(HOME)/my/work/path/esp-idf-lib/components
-   EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip
+   EXCLUDE_COMPONENTS := max7219 mcp23x17 led_strip max31865 ls7366r max31855
    include $(IDF_PATH)/make/project.mk
 
 ====================
@@ -91,7 +83,8 @@ Common libraries
    groups/lib8tion
    groups/color
    groups/noise
-   groups/led_effect
+   groups/framebuffer
+   groups/calibration
 
 Real-time clocks
 ================
@@ -119,7 +112,16 @@ Humidity & temperature sensors
    groups/mcp9808
    groups/mcp960x
    groups/tsys01
-   
+   groups/aht
+   groups/hts221
+   groups/max31865
+   groups/bh1900nux
+   groups/hdc1000
+   groups/max31855
+   groups/sts21
+   groups/sts3x
+   groups/am2320
+
 Pressure sensors
 ================
 .. toctree::
@@ -128,6 +130,7 @@ Pressure sensors
    groups/bmp180
    groups/bmp280
    groups/bme680
+   groups/dps310
    groups/ms5611
 
 Air quality/Gas sensors
@@ -137,6 +140,10 @@ Air quality/Gas sensors
 
    groups/sgp40
    groups/ccs811
+   groups/mhz19b
+   groups/scd4x
+   groups/scd30
+   groups/sfa3x
 
 ADC/DAC
 =======
@@ -148,6 +155,8 @@ ADC/DAC
    groups/pcf8591
    groups/mcp4725
    groups/mcp342x
+   groups/ads130e08
+   groups/sgm58031
 
 Power/Current monitors
 ======================
@@ -165,7 +174,8 @@ Magnetic sensors
 
    groups/hmc5883l
    groups/qmc5883l
-   
+   groups/lsm303
+
 Light sensors
 =============
 .. toctree::
@@ -175,6 +185,7 @@ Light sensors
    groups/tsl2561
    groups/tsl4531
    groups/tsl2591
+   groups/veml7700
 
 GPIO expanders
 ==============
@@ -186,39 +197,60 @@ GPIO expanders
    groups/tca95x5
    groups/mcp23008
    groups/mcp23x17
-   
-Addressable LEDs
-================
+   groups/pca9557
+   groups/tca6424a
+
+LED drivers
+===========
 .. toctree::
    :maxdepth: 1
 
    groups/led_strip
    groups/led_strip_spi
+   groups/ht16k33
+   groups/max7219
 
-
-Displays
-========
+Input controls
+==============
 .. toctree::
    :maxdepth: 1
 
-   groups/hd44780
-   groups/ssd1306
+   groups/button
+   groups/encoder
+   groups/ls7366r
+
+Inertial measurement units
+==========================
+.. toctree::
+   :maxdepth: 1
+
+   groups/icm42670
+   groups/mpu6050
+   groups/l3gx
+   groups/lsm303
+
+Battery controllers
+===================
+.. toctree::
+   :maxdepth: 1
+
+   groups/lc709203f
+   groups/max1704x
 
 Other
 =====
 .. toctree::
    :maxdepth: 1
 
-   groups/max7219
+   groups/hd44780
    groups/pca9685
    groups/ultrasonic
-   groups/encoder
    groups/tda74xx
    groups/rda5807m
    groups/tca9548
    groups/ds3502
    groups/wiegand
-   
+
 
 ===========
 Information

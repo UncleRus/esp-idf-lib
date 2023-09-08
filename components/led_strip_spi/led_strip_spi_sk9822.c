@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (C) 2021 Tomoyuki Sakurai <y@rombik.org>
+ * Copyright (c) 2021 Tomoyuki Sakurai <y@rombik.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,19 @@
 #include "led_strip_spi.h"
 #include "led_strip_spi_sk9822.h"
 
-esp_err_t led_strip_spi_set_pixel_sk9822(led_strip_spi_t *strip, size_t num, rgb_t color)
+esp_err_t led_strip_spi_set_pixel_sk9822(led_strip_spi_t *strip, size_t num, rgb_t color, uint8_t brightness)
 {
     int index = (num + 1) * 4;
-    ((uint8_t *)strip->buf)[index    ] = LED_STRIP_SPI_FRAME_SK9822_LED_MSB3 + 1; // XXX FIXME brightness control
+    uint8_t cooked_brightness = 0;
+    /* Don't divided the range equal instead, the bottom 10 % is actually 0 brightness 
+       then every 3 percent after that increase the brightness level by 1 */
+    if (brightness >= 100) {
+        cooked_brightness = 31;
+    } else if (brightness > 7){
+        cooked_brightness = (brightness - 7) / 3;
+    }
+    ((uint8_t *)strip->buf)[index    ] = LED_STRIP_SPI_FRAME_SK9822_LED_MSB3 | 
+                                         (cooked_brightness & ((1 << LED_STRIP_SPI_FRAME_SK9822_LED_BRIGHTNESS_BITS) - 1));
     ((uint8_t *)strip->buf)[index + 1] = color.b;
     ((uint8_t *)strip->buf)[index + 2] = color.g;
     ((uint8_t *)strip->buf)[index + 3] = color.r;

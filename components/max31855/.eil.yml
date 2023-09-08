@@ -1,0 +1,18 @@
+name: max31855
+description: Driver for MAX31855 cold-junction compensated thermocouple-to-digital converter
+version: 1.0.0
+groups:
+  - temperature
+code_owners: UncleRus
+depends:
+  - driver
+  - log
+thread_safe: yes
+targets:
+  - esp32
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2022

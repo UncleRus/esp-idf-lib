@@ -1,0 +1,46 @@
+menu "Example configuration"
+    choice EXAMPLE_STS3X_DEMO
+        prompt "Demo mode"
+        default EXAMPLE_STS3X_DEMO_HL
+        help
+            Choose how to masure values from the sensor. See the main.c for
+            details.
+
+        config EXAMPLE_STS3X_DEMO_HL
+            bool "High level"
+            help
+                In this example it uses the high level function
+                sts3x_measure() to perform one measurement in each cycle.
+
+        config EXAMPLE_STS3X_DEMO_LL
+            bool "Low level"
+            help
+                In this example it starts the measurement, waits for the
+                results and fetches the results using separate functions
+
+    endchoice
+
+    config EXAMPLE_STS3X_ADDR
+        hex "I2C address of STS3x"
+        default 0x44
+        help
+            I2C address of STS3x, either 0x44 or 0x45. When ADDR pin is
+            grounded, choose 0x44. When ADDR pin is pulled up to VDD, choose
+            0x45.
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

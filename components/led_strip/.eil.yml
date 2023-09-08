@@ -1,0 +1,20 @@
+name: led_strip
+description: RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips
+version: 1.2.0
+groups:
+  - led
+code_owners: UncleRus
+depends:
+  - driver
+  - log
+  - color
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: UncleRus
+    year: 2020

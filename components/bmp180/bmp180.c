@@ -1,3 +1,27 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Frank Bargstedt
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file bmp180.c
  *
@@ -5,15 +29,16 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2015 Frank Bargstedt\n
- * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2015 Frank Bargstedt\n
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
 #include "bmp180.h"
-
+#include <inttypes.h>
 #include <esp_err.h>
 #include <esp_log.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 
 #define I2C_FREQ_HZ 1000000 // Max 1MHz for esp-idf
@@ -195,7 +220,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
     if (temperature)
         *temperature = T / 10.0;
 
-    ESP_LOGD(TAG, "T:= %d.%d", T / 10, abs(T % 10));
+    ESP_LOGD(TAG, "T:= %" PRIi32 ".%d", T / 10, abs(T % 10));
 
     if (pressure)
     {
@@ -229,7 +254,7 @@ esp_err_t bmp180_measure(bmp180_dev_t *dev, float *temperature, uint32_t *pressu
 
         *pressure = P;
 
-        ESP_LOGD(TAG, "P:= %d", P);
+        ESP_LOGD(TAG, "P:= %" PRIi32, P);
     }
 
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);

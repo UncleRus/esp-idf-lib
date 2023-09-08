@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *               2021 Tomoyuki Sakurai <y@rombik.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -69,6 +69,11 @@ extern "C" {
 #endif
 
 /**
+ * Maximum brightness value for a pixel.
+ */
+#define LED_STRIP_SPI_MAX_BRIGHTNESS (100)
+
+/**
  * @brief Setup the driver
  *
  * This method must be called before any other led_strip_spi methods
@@ -113,6 +118,20 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip);
 esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int num, const rgb_t color);
 
 /**
+ * @brief Set color of single LED in strip.
+ *
+ * This function does not actually change colors of the LEDs.
+ * Call ::led_strip_spi_flush() to send buffer to the LEDs.
+ *
+ * @param strip Descriptor of LED strip
+ * @param num LED number, [0:strip.length - 1].
+ * @param color RGB color
+ * @param brightness Brightness of the LED, [0:100].
+ * @return `ESP_OK` on success
+ */
+esp_err_t led_strip_spi_set_pixel_brightness(led_strip_spi_t *strip, const int num, const rgb_t color, const uint8_t brightness);
+
+/**
  * @brief Set colors of multiple LEDs
  *
  * This function does not actually change colors of the LEDs.
@@ -125,6 +144,21 @@ esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int num, const r
  * @return `ESP_OK` on success
  */
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data);
+
+/**
+ * @brief Set colors of multiple LEDs
+ *
+ * This function does not actually change colors of the LEDs.
+ * Call ::led_strip_spi_flush() to send buffer to the LEDs.
+ *
+ * @param strip Descriptor of LED strip
+ * @param start First LED index, 0-based
+ * @param len Number of LEDs
+ * @param data Pointer to RGB data
+ * @param brightness Brightness of the LED, [0:100].
+ * @return `ESP_OK` on success
+ */
+esp_err_t led_strip_spi_set_pixels_brightness(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data, const uint8_t brightness);
 
 /**
  * @brief Set multiple LEDs to the one color.
@@ -140,6 +174,20 @@ esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_
  */
 esp_err_t led_strip_spi_fill(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color);
 
+/**
+ * @brief Set multiple LEDs to the one color.
+ *
+ * This function does not actually change colors of the LEDs.
+ * Call ::led_strip_spi_flush() to send buffer to the LEDs.
+ *
+ * @param strip Descriptor of LED strip
+ * @param start First LED index, 0-based
+ * @param len Number of LEDs
+ * @param color RGB color
+ * @param brightness Brightness of the LEDs, [0:100].
+ * @return `ESP_OK` on success
+ */
+esp_err_t led_strip_spi_fill_brightness(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color, const uint8_t brightness);
 #ifdef __cplusplus
 }
 #endif

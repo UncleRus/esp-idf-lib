@@ -1,0 +1,45 @@
+---
+name: Report an issue in esp-idf-lib repository
+description: >
+  This is for issues relating to the repository. If your issue is not directly
+  related to library code, such as policies, CI, or the project itself, report
+  from here.
+body:
+  - type: textarea
+    id: issue_description
+    validations:
+      required: true
+    attributes:
+      label: The issue
+      description: >
+        Describe the issue you are experiencing.
+
+  - type: markdown
+    attributes:
+      value: |
+        # Details
+
+  - type: textarea
+    id: context
+    attributes:
+      label: The context
+      description: >
+        Describe the context of the issue, or the background.
+
+  - type: textarea
+    id: possible_solution
+    attributes:
+      label: Possible solution
+      description: >
+        Describe possible solutions, if any, here.
+
+  - type: checkboxes
+    id: confirmation
+    validations:
+      required: true
+    attributes:
+      label: Confirmation
+      description: Please confirm and check the box below.
+      options:
+        - label: This report is not a bug report in code, a question, nor a request for drivers.
+          required: true

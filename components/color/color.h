@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 FastLED
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file color.h
  * @defgroup color color
@@ -251,12 +274,12 @@ static inline void rgb_fill_gradient4_rgb(rgb_t *target, size_t num, rgb_t c1, r
  * be spread evenly across the 0..255 range, and the intermedate values
  * will be HSV-interpolated between adjacent explicit entries.
  */
-hsv_t color_from_palette_hsv(hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
+hsv_t color_from_palette_hsv(const hsv_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
 
 /**
  * Same for RGB palette
  */
-rgb_t color_from_palette_rgb(rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
+rgb_t color_from_palette_rgb(const rgb_t *palette, uint8_t pal_size, uint8_t index, uint8_t brightness, bool blend);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Filter functions

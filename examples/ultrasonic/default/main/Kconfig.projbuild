@@ -1,0 +1,23 @@
+menu "Example configuration"
+
+    config EXAMPLE_TRIGGER_GPIO
+        int "Trigger GPIO number"
+        default 4 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 17 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for TRIGGER pin of ultrasonic module
+
+    config EXAMPLE_ECHO_GPIO
+        int "Echo GPIO number"
+        default 5 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 16 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for ECHO pin of ultrasonic module
+    
+    config EXAMPLE_MAX_DISTANCE
+    	int "Maximal distance, cm"
+    	default 500
+    	help
+    	    Maximum measurable distance. If the distance is greater than this parameter, there will be a timeout
+    	    
+endmenu

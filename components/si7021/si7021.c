@@ -1,10 +1,37 @@
+/*
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
  * @file si7021.c
  *
- * ESP-IDF driver for Si7013/Si7020/Si7021/HTU21D/SHT2x and
+ * ESP-IDF driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and
  * compatible temperature and humidity sensors
  *
- * Copyright (C) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
@@ -18,7 +45,7 @@
 
 static const char *TAG = "si7021";
 
-#define DELAY_MS 50  // fixed delay
+#define DELAY_MS 100  // fixed delay (100 ms for SHT20)
 
 #define CMD_MEAS_RH_HOLD     0xe5 // not used, can't stretch clock
 #define CMD_MEAS_RH_NOHOLD   0xf5
@@ -30,9 +57,9 @@ static const char *TAG = "si7021";
 #define CMD_READ_USER_REG    0xe7
 #define CMD_WRITE_HEATER_REG 0x51
 #define CMD_READ_HEATER_REG  0x11
-#define CMD_READ_ID_1        0xfa0f
-#define CMD_READ_ID_2        0xfcc9
-#define CMD_READ_FW_REV_1    0x84b8
+#define CMD_READ_ID_1        0x0ffa
+#define CMD_READ_ID_2        0xc9fc
+#define CMD_READ_FW_REV_1    0xb884
 
 #define BIT_USER_REG_RES0 0
 #define BIT_USER_REG_HTRE 2
@@ -69,7 +96,7 @@ static esp_err_t measure(i2c_dev_t *dev, uint8_t cmd, uint16_t *raw)
     I2C_DEV_CHECK(dev, i2c_dev_write(dev, NULL, 0, &cmd, 1));
 
     // wait
-    vTaskDelay(DELAY_MS / portTICK_RATE_MS);
+    vTaskDelay(DELAY_MS / portTICK_PERIOD_MS);
 
     // read data
     uint8_t buf[3];
@@ -286,6 +313,19 @@ esp_err_t si7021_get_device_id(i2c_dev_t *dev, si7021_device_id_t *id)
         default:
             *id = SI_MODEL_UNKNOWN;
     }
+
+    return ESP_OK;
+}
+
+esp_err_t si7021_get_device_revision(i2c_dev_t *dev, uint8_t *rev)
+{
+    CHECK_ARG(dev && rev);
+
+    uint16_t cmd = CMD_READ_FW_REV_1;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read(dev, &cmd, 2, rev, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }

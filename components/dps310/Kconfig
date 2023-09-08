@@ -1,0 +1,10 @@
+menu "DPS310 driver"
+    choice DPS310_PROTOCOL
+        prompt "Choose protocol for digital interface"
+        default DPS310_PROTOCOL_USING_I2C
+        help
+            The protocol to use for digital interface
+        config DPS310_PROTOCOL_USING_I2C
+            bool "I2C"
+    endchoice
+endmenu

@@ -1,0 +1,17 @@
+name: lib8tion
+description: Math functions specifically designed for LED programming
+version: 1.0.0
+groups:
+  - common
+code_owners: UncleRus
+depends: []
+thread_safe: N/A
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: FastLED
+    year: 2013

@@ -1,0 +1,26 @@
+name: sfa3x
+description: Driver for SFA30 formaldehyde detection module (I2C)
+version: 1.0.0
+groups:
+  - air-quality
+  - gas
+  - temperature
+  - humidity
+code_owners:
+  - UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: Sensirion
+    year: 2021
+  - name: UncleRus
+    year: 2021

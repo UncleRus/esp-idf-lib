@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 FastLED
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #ifndef __NOISE_H__
 #define __NOISE_H__
 
@@ -6,12 +29,16 @@
 ///@file noise.h
 /// Noise functions provided by the library.
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///@defgroup Noise Noise functions
-///Simplex noise function definitions
+///Perlin noise function definitions
 ///@{
 /// @name scaled 16 bit noise functions
 ///@{
-/// 16 bit, fixed point implementation of perlin's Simplex Noise.  Coordinates are
+/// 16 bit, fixed point implementation of Perlin's Noise.  Coordinates are
 /// 16.16 fixed point values, 32 bit integers with integral coordinates in the high 16
 /// bits and fractional in the low 16 bits, and the function takes 1d, 2d, and 3d coordinate
 /// values.  These functions are scaled to return 0-65535
@@ -65,5 +92,9 @@ void fill_raw_noise8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint16
 void fill_raw_noise16into8(uint8_t *pData, uint8_t num_points, uint8_t octaves, uint32_t x, int scale, uint32_t time);
 ///@}
 ///@}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NOISE_H__ */

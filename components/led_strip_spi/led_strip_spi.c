@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *               2021 Tomoyuki Sakurai <y@rombik.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,7 +54,7 @@ static SemaphoreHandle_t mutex;
 
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define MUTEX_TIMEOUT   (CONFIG_LED_STRIP_SPI_MUTEX_TIMEOUT_MS / portTICK_RATE_MS)
+#define MUTEX_TIMEOUT   (CONFIG_LED_STRIP_SPI_MUTEX_TIMEOUT_MS / portTICK_PERIOD_MS)
 
 esp_err_t led_strip_spi_install()
 {
@@ -78,11 +78,17 @@ static esp_err_t led_strip_spi_init_esp32(led_strip_spi_t *strip)
 
     esp_err_t err = ESP_FAIL;
     spi_bus_config_t bus_config = {
-        .miso_io_num = -1,
         .mosi_io_num = strip->mosi_io_num,
         .sclk_io_num = strip->sclk_io_num,
+        .miso_io_num = -1,
         .quadhd_io_num = -1,
         .quadwp_io_num = -1,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+        .data4_io_num = -1,
+        .data5_io_num = -1,
+        .data6_io_num = -1,
+#endif
+        .flags = SPICOMMON_BUSFLAG_MASTER,
         .max_transfer_sz = strip->max_transfer_sz,
     };
     spi_device_interface_config_t device_interface_config = {
@@ -280,7 +286,7 @@ static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
 
     for (int i = 0; i < mosi_buffer_block_size; i++) {
         trans.bits.mosi = ESP8266_SPI_MAX_DATA_LENGTH * 8; // bits, not bytes
-        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * i / sizeof(uint32_t);
+        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * i;
         err = spi_trans(HSPI_HOST, &trans);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
@@ -289,7 +295,7 @@ static esp_err_t led_strip_spi_flush_esp8266(led_strip_spi_t *strip)
     }
     if (mosi_buffer_block_size_mod > 0) {
         trans.bits.mosi = mosi_buffer_block_size_mod * 8; // bits, not bytes
-        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * mosi_buffer_block_size / sizeof(uint32_t);
+        trans.mosi = strip->buf + ESP8266_SPI_MAX_DATA_LENGTH * mosi_buffer_block_size;
         err = spi_trans(HSPI_HOST, &trans);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "spi_trans(): %s", esp_err_to_name(err));
@@ -317,18 +323,33 @@ esp_err_t led_strip_spi_flush(led_strip_spi_t*strip)
 
 esp_err_t led_strip_spi_set_pixel(led_strip_spi_t *strip, const int index, const rgb_t color)
 {
-#if CONFIG_LED_STRIP_SPI_USING_SK9822
-    return led_strip_spi_set_pixel_sk9822(strip, index, color);
-#endif
-    return ESP_ERR_NOT_SUPPORTED;
+    return led_strip_spi_set_pixel_brightness(strip, index, color, LED_STRIP_SPI_MAX_BRIGHTNESS);
 }
 
 esp_err_t led_strip_spi_set_pixels(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data)
 {
+    return led_strip_spi_set_pixels_brightness(strip, start, len, data, LED_STRIP_SPI_MAX_BRIGHTNESS);
+}
+
+esp_err_t led_strip_spi_fill(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color)
+{
+    return led_strip_spi_fill_brightness(strip, start, len, color, LED_STRIP_SPI_MAX_BRIGHTNESS);
+}
+
+esp_err_t led_strip_spi_set_pixel_brightness(led_strip_spi_t *strip, const int index, const rgb_t color, const uint8_t brightness)
+{
+#if CONFIG_LED_STRIP_SPI_USING_SK9822
+    return led_strip_spi_set_pixel_sk9822(strip, index, color, brightness);
+#endif
+    return ESP_ERR_NOT_SUPPORTED;
+}
+
+esp_err_t led_strip_spi_set_pixels_brightness(led_strip_spi_t*strip, const int start, size_t len, const rgb_t data, const uint8_t brightness)
+{
     esp_err_t err = ESP_FAIL;
 
     for (int i = 0; i < len; i++) {
-        err = led_strip_spi_set_pixel(strip, start + i, data);
+        err = led_strip_spi_set_pixel_brightness(strip, start + i, data, brightness);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "led_strip_spi_set_pixel(): %s", esp_err_to_name(err));
             goto fail;
@@ -338,12 +359,12 @@ fail:
     return err;
 }
 
-esp_err_t led_strip_spi_fill(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color)
+esp_err_t led_strip_spi_fill_brightness(led_strip_spi_t*strip, size_t start, size_t len, rgb_t color, const uint8_t brightness)
 {
     CHECK_ARG(strip && len && start + len <= strip->length);
 
     for (size_t i = start; i < len; i++) {
-        CHECK(led_strip_spi_set_pixel(strip, i, color));
+        CHECK(led_strip_spi_set_pixel_brightness(strip, i, color, brightness));
     }
     return ESP_OK;
 }

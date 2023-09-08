@@ -14,6 +14,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * @file lm75.c
+ *
+ * ESP-IDF driver for LM75, a digital temperature sensor and thermal watchdog.
+ *
+ * The driver depends on i2cdev library in `esp-idf-lib`.
+ *
+ * The driver was written using LM75B.
+ */
 #include <esp_log.h>
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>
@@ -117,7 +126,7 @@ esp_err_t lm75_set_os_threshold(i2c_dev_t *dev, const float value)
      *  7 LSB of the LSByte are equal to zero and should be ignored.
      */
     if (value < 0) {
-        reg_value = ((uint16_t)(abs(value) * 2) ^ 0xff) + 1;
+        reg_value = ((uint16_t)(abs((int16_t)value) * 2) ^ 0xff) + 1;
     } else {
         reg_value = value * 2;
     }

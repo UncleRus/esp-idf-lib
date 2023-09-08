@@ -1,0 +1,32 @@
+menu "Example configuration"
+    config EXAMPLE_I2C_ADDR
+        hex "I2C address of the device"
+        default 0x18
+        help
+            I2C address of the device.
+
+            PCA9557 has three address pins (`A0`, `A1` and `A2`). The address
+            starts from `0x18` (all address pins are grounded), which is the
+            default. See "8.3.2.1 Device Address" in the datasheet.
+
+            PCA9537 has a fixed I2C address (`0x49`).
+
+            TCA9534 has three address pins (`A0`, `A1` and `A2`). The address
+            starts from `0x20` (all address pins are grounded)
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

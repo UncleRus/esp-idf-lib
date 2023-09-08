@@ -1,0 +1,11 @@
+menu "Example configuration"
+
+config LED_STRIP_LEN
+    int "Number of LED pixel"
+    default 8
+config LED_STRIP_GPIO
+    int "GPIO pin number connected to DI"
+    default 5
+    help
+        Choose GPIO number connected to DI (DIN on some products).
+endmenu

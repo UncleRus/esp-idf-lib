@@ -1,13 +1,37 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file i2cdev.c
  *
  * ESP-IDF I2C master thread-safe functions for communication with I2C slave
  *
- * Copyright (C) 2018 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
 #include <string.h>
+#include <inttypes.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
@@ -156,7 +180,9 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
 #if HELPER_TARGET_IS_ESP32
         && a->master.clk_speed == b->master.clk_speed
 #elif HELPER_TARGET_IS_ESP8266
-        && a->clk_stretch_tick == b->clk_stretch_tick
+        && ((a->clk_stretch_tick && a->clk_stretch_tick == b->clk_stretch_tick) 
+            || (!a->clk_stretch_tick && b->clk_stretch_tick == I2CDEV_MAX_STRETCH_TIME)
+        ) // see line 232
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
         && a->sda_pullup_en == b->sda_pullup_en;
@@ -167,7 +193,7 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
     if (dev->port >= I2C_NUM_MAX) return ESP_ERR_INVALID_ARG;
 
     esp_err_t res;
-    if (!cfg_equal(&dev->cfg, &states[dev->port].config))
+    if (!cfg_equal(&dev->cfg, &states[dev->port].config) || !states[dev->port].installed)
     {
         ESP_LOGD(TAG, "Reconfiguring I2C driver on port %d", dev->port);
         i2c_config_t temp;
@@ -176,12 +202,23 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
 
         // Driver reinstallation
         if (states[dev->port].installed)
+        {
             i2c_driver_delete(dev->port);
+            states[dev->port].installed = false;
+        }
 #if HELPER_TARGET_IS_ESP32
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 0)
+        // See https://github.com/espressif/esp-idf/issues/10163
+        if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
+            return res;
+        if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
+            return res;
+#else
         if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
             return res;
         if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
+#endif
 #endif
 #if HELPER_TARGET_IS_ESP8266
         // Clock Stretch time, depending on CPU frequency
@@ -204,10 +241,34 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
     uint32_t ticks = dev->timeout_ticks ? dev->timeout_ticks : I2CDEV_MAX_STRETCH_TIME;
     if ((ticks != t) && (res = i2c_set_timeout(dev->port, ticks)) != ESP_OK)
         return res;
-    ESP_LOGD(TAG, "Timeout: ticks = %d (%d usec) on port %d", dev->timeout_ticks, dev->timeout_ticks / 80, dev->port);
+    ESP_LOGD(TAG, "Timeout: ticks = %" PRIu32 " (%" PRIu32 " usec) on port %d", dev->timeout_ticks, dev->timeout_ticks / 80, dev->port);
 #endif
 
     return ESP_OK;
+}
+
+esp_err_t i2c_dev_probe(const i2c_dev_t *dev, i2c_dev_type_t operation_type)
+{
+    if (!dev) return ESP_ERR_INVALID_ARG;
+
+    SEMAPHORE_TAKE(dev->port);
+
+    esp_err_t res = i2c_setup_port(dev);
+    if (res == ESP_OK)
+    {
+        i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+        i2c_master_start(cmd);
+        i2c_master_write_byte(cmd, dev->addr << 1 | (operation_type == I2C_DEV_READ ? 1 : 0), true);
+        i2c_master_stop(cmd);
+
+        res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
+
+        i2c_cmd_link_delete(cmd);
+    }
+
+    SEMAPHORE_GIVE(dev->port);
+
+    return res;
 }
 
 esp_err_t i2c_dev_read(const i2c_dev_t *dev, const void *out_data, size_t out_size, void *in_data, size_t in_size)
@@ -233,7 +294,7 @@ esp_err_t i2c_dev_read(const i2c_dev_t *dev, const void *out_data, size_t out_si
 
         res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
         if (res != ESP_OK)
-            ESP_LOGE(TAG, "Could not read from device [0x%02x at %d]: %d", dev->addr, dev->port, res);
+            ESP_LOGE(TAG, "Could not read from device [0x%02x at %d]: %d (%s)", dev->addr, dev->port, res, esp_err_to_name(res));
 
         i2c_cmd_link_delete(cmd);
     }
@@ -260,7 +321,7 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_re
         i2c_master_stop(cmd);
         res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
         if (res != ESP_OK)
-            ESP_LOGE(TAG, "Could not write to device [0x%02x at %d]: %d", dev->addr, dev->port, res);
+            ESP_LOGE(TAG, "Could not write to device [0x%02x at %d]: %d (%s)", dev->addr, dev->port, res, esp_err_to_name(res));
         i2c_cmd_link_delete(cmd);
     }
 
@@ -268,14 +329,12 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_re
     return res;
 }
 
-esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
-        void *in_data, size_t in_size)
+esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg, void *in_data, size_t in_size)
 {
     return i2c_dev_read(dev, &reg, 1, in_data, in_size);
 }
 
-esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
-        const void *out_data, size_t out_size)
+esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg, const void *out_data, size_t out_size)
 {
     return i2c_dev_write(dev, &reg, 1, out_data, out_size);
 }

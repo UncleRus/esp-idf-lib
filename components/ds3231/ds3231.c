@@ -1,3 +1,28 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Richard A Burton <richardaburton@gmail.com>
+ * Copyright (c) 2016 Bhuvanchandra DV <bhuvanchandra.dv@gmail.com>
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file ds3231.c
  *
@@ -5,12 +30,13 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2015 Richard A Burton <richardaburton@gmail.com>\n
- * Copyright (C) 2016 Bhuvanchandra DV <bhuvanchandra.dv@gmail.com>\n
- * Copyright (C) 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2015 Richard A Burton <richardaburton@gmail.com>\n
+ * Copyright (c) 2016 Bhuvanchandra DV <bhuvanchandra.dv@gmail.com>\n
+ * Copyright (c) 2018 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
+#include <stdio.h>
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>
 #include "ds3231.h"
@@ -52,6 +78,9 @@ enum {
     DS3231_REPLACE
 };
 
+static const int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static const int days_per_month_leap_year[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
 static uint8_t bcd2dec(uint8_t val)
 {
     return (val >> 4) * 10 + (val & 0x0f);
@@ -60,6 +89,25 @@ static uint8_t bcd2dec(uint8_t val)
 static uint8_t dec2bcd(uint8_t val)
 {
     return ((val / 10) << 4) + (val % 10);
+}
+
+// Function to convert year, month, and day to days since January 1st
+static inline int days_since_january_1st(int year, int month, int day)
+{
+    int days = day - 1;
+    const int *ptr = days_per_month; 
+
+    // Handle leap year
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+        ptr = days_per_month_leap_year;
+
+    // Add days from previous months
+    for (int i = 0; i < month; i++)
+    {
+        days += ptr[i];
+    }
+
+    return days;
 }
 
 esp_err_t ds3231_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -322,6 +370,24 @@ esp_err_t ds3231_set_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t freq)
     return ESP_OK;
 }
 
+
+esp_err_t ds3231_get_squarewave_freq(i2c_dev_t *dev, ds3231_sqwave_freq_t* freq)
+{
+    CHECK_ARG(dev);
+
+    uint8_t flag = 0;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, ds3231_get_flag(dev, DS3231_ADDR_CONTROL, 0xff, &flag));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    flag &= DS3231_SQWAVE_8192HZ;
+    *freq = (ds3231_sqwave_freq_t) flag;
+
+    return ESP_OK;
+}
+
+
 esp_err_t ds3231_get_raw_temp(i2c_dev_t *dev, int16_t *temp)
 {
     CHECK_ARG(dev && temp);
@@ -390,9 +456,48 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
     time->tm_mon  = bcd2dec(data[5] & DS3231_MONTH_MASK) - 1;
     time->tm_year = bcd2dec(data[6]) + 100;
     time->tm_isdst = 0;
+    time->tm_yday = days_since_january_1st(time->tm_year, time->tm_mon, time->tm_mday);
 
     // apply a time zone (if you are not using localtime on the rtc or you want to check/apply DST)
     //applyTZ(time);
+
+    return ESP_OK;
+}
+
+
+esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age)
+{
+    CHECK_ARG(dev);
+
+    uint8_t age_u8 = (uint8_t) age;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, DS3231_ADDR_AGING, &age_u8, sizeof(uint8_t)));
+
+    /**
+     * To see the effects of the aging register on the 32kHz output
+     * frequency immediately, a manual conversion should be started
+     * after each aging register change.
+     */
+    I2C_DEV_CHECK(dev, ds3231_set_flag(dev, DS3231_ADDR_CONTROL, DS3231_CTRL_TEMPCONV, DS3231_SET));
+
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+}
+
+
+esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age)
+{
+    CHECK_ARG(dev && age);
+
+    uint8_t age_u8;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, DS3231_ADDR_AGING, &age_u8, sizeof(uint8_t)));
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    *age = (int8_t) age_u8;
 
     return ESP_OK;
 }

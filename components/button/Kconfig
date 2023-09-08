@@ -1,0 +1,28 @@
+menu "Button"
+
+	config BUTTON_MAX
+		int "Maximum number of buttons"
+		range 1 10
+		default 5
+	
+	config BUTTON_POLL_TIMEOUT
+		int "Poll timeout, ms"
+		range 1 1000
+		default 10
+
+	config BUTTON_LONG_PRESS_TIMEOUT
+		int "Timeout of long press, ms"
+		range 100 10000
+		default 1000
+
+	config BUTTON_AUTOREPEAT_TIMEOUT
+		int "Timeout before autorepeat, ms"
+		range 100 10000
+		default 500
+
+	config BUTTON_AUTOREPEAT_INTERVAL
+		int "Autorepeat interval, ms"
+		range 100 10000
+		default 250
+		
+endmenu

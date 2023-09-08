@@ -1,13 +1,19 @@
 # FAQ
 
-- [How to debug I2C-based drivers?](#how-to-debug-i2c-based-drivers)
-- [Why are semaphores used in i2cdev routines?](#why-are-semaphores-mutexes-used-in-ic2dev-routines)
-- [How can I connect multiple I2C devices?](#how-can-i-connect-multiple-i2c-devices)
-- [How can I change frequency of I2C clock?](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
-- [How to use internal pull-up resistors?](#how-to-use-internal-pull-up-resistors)
-- [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+<!-- vim-markdown-toc GFM -->
 
-### How to debug I2C-based drivers?
+* [How to debug I2C-based drivers?](#how-to-debug-i2c-based-drivers)
+* [Why are semaphores (mutexes) used in i2cdev routines?](#why-are-semaphores-mutexes-used-in-i2cdev-routines)
+* [How can I connect multiple I2C devices?](#how-can-i-connect-multiple-i2c-devices)
+* [How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.](#how-can-i-change-frequency-of-i2c-clock-at-default-frequency-my-device-is-unstable-or-not-working-at-all)
+* [How to use internal pull-up resistors](#how-to-use-internal-pull-up-resistors)
+* [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
+* [Porting I2C libs to I2Cdev](#porting-i2c-libs-to-i2cdev)
+* [My DHT sensor doesn't work well/doesn't work at all.](#my-dht-sensor-doesnt-work-welldoesnt-work-at-all)
+
+<!-- vim-markdown-toc -->
+
+## How to debug I2C-based drivers?
 
 Common causes of I2C issues are:
 
@@ -19,11 +25,12 @@ Common causes of I2C issues are:
 
 When any of I2C-based drivers does not work, follow the steps below.
 
-Build an _I2C scanner_ device. The device is not necessarily an ESP device.
-There are many examples for various platforms. Search by keyword `i2c scanner`.
+Build an [_I2C scanner_ device](examples/i2c_scanner). The device is not
+necessarily an ESP device. There are many examples for various platforms.
+Search by keyword `i2c scanner`.
 
 Connect the I2C module to the I2C scanner device. Make sure appropriate
-pull-up registers are connected to `SCL` and `SDA` lines.
+pull-up resistors are connected to `SCL` and `SDA` lines.
 
 Scan devices on the I2C bus. If the scanner does not find the I2C device, then
 your wiring might have issues. If the scanner finds the I2C device, make sure
@@ -37,7 +44,7 @@ can decode I2C signals and display I2C transactions in human-readable way.
 If the driver does not work after these steps, please [let us
 know](https://github.com/UncleRus/esp-idf-lib/issues).
 
-### Why are semaphores (mutexes) used in i2cdev routines?
+## Why are semaphores (mutexes) used in i2cdev routines?
 
 i2cdev uses two types of mutexes: port and transactional.
 
@@ -75,15 +82,15 @@ xTaskCreate(task2, "task2", ....);
 These mutexes are used when single device operation requires several I2C
 transactions in a row.
 
-### How can I connect multiple I2C devices?
+## How can I connect multiple I2C devices?
 
 With i2cdev, you can use almost any way to connect I2C devices.
 
 For example, in the case of using SSD1306 and two MCP3428s, I would recommend
 connecting them like this:
 
-- 2 GPIO outputs on ESP32 for dedicated screen connection via I2C bus 0
-- 2 GPIO outputs to the second I2C bus, to which 2 MCP3428 are connected with
+* 2 GPIO outputs on ESP32 for dedicated screen connection via I2C bus 0
+* 2 GPIO outputs to the second I2C bus, to which 2 MCP3428 are connected with
   different addresses.
 
 If you need to connect more than one sensor with the same addresses and there
@@ -92,7 +99,7 @@ outputs instead of using the I2C multiplexer. i2cdev will take care of
 reconfiguring I2C driver to the according outputs when you exchange data
 with these devices.
 
-### How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.
+## How can I change frequency of I2C clock? At default frequency my device is unstable or not working at all.
 
 You can change the frequency after initializing the device handler, like this:
 
@@ -112,7 +119,7 @@ ESP_ERROR_CHECK(ads111x_set_data_rate(&dev, ADS111X_DATA_RATE_32)); // 32 sample
 ...
 ```
 
-### How to use internal pull-up resistors
+## How to use internal pull-up resistors
 
 Just enable them in `i2c_dev_t` config. For example:
 
@@ -126,60 +133,23 @@ ESP_ERROR_CHECK(ads111x_init_desc(&dev, addr, I2C_PORT, SDA_GPIO, SCL_GPIO));
 ...
 ```
 
-### Can I use I2C device drivers from interrupts?
+## Can I use I2C device drivers from interrupts?
 
-No, you can't. Since the drivers use mutexes, this will crash the system.
-Instead, you can do something like this:
+With default configuration you can't. Since the drivers use mutexes, this will
+crash the system.  But you can disable use of any I2C mutexes (both port and
+device) in configuration: just enable CONFIG_I2CDEV_NOLOCK. Keep in mind that
+after enabling this option all i2c device drivers will become non-thread safe.
 
-```C
-...
 
-static i2c_dev_t pcf8574;
-static TaskHandle_t read_task;
+## Porting I2C libs to I2Cdev
 
-static void IRAM_ATTR isr_handler(void *arg)
-{
-    vTaskNotifyGiveFromISR(read_task, NULL);
-}
+See [Porting.md](Porting.md).
 
-static void read_port_task(void *arg)
-{
-    uint8_t val;
-    while (1)
-    {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        if (pcf8574_port_read(&pcf8574, &val) != ESP_OK)
-            continue;
-        // Do something with val
-    }
-}
 
-...
+## My DHT sensor doesn't work well/doesn't work at all!
 
-void app_main()
-{
-	...
-	
-    pcf8574_init_desc(&pcf8574, 0, ADDR, I2C_SDA_GPIO, I2C_SCL_GPIO);
-    if (xTaskCreate(read_port, TAG, TASK_STACK, NULL, TASK_PRIORITY, &read_task) != pdPASS)
-    {
-    	...
-    }
-
-	// setup GPIO
-    gpio_config_t io_conf;
-    io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-    io_conf.intr_type = GPIO_INTR_NEGEDGE;
-    io_conf.pin_bit_mask = BIT(INTR_GPIO);
-    gpio_config(&io_conf);
-
-	// Setup ISR
-    CHECK(gpio_install_isr_service(0));
-    CHECK(gpio_isr_handler_add(CONFIG_KEYBOARD_INTR_GPIO, isr_handler, NULL));
-}
-
-...
-```
-
+1. Check if the sensor is connected correctly.
+2. Use an external 4k7 pullup resistor! With an internal pullup resistor, operation will be unstable, if at all.
+3. Shorten the wires that connect the sensor.
+4. Use 5V for powering the sensor, not 3.3V. ESP chips are 5V tolerant.
+5. Use shielded wires where the shield is connected to the GND.

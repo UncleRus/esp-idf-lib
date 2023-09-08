@@ -1,0 +1,7 @@
+.. _ls7366r:
+
+ls7366r - Driver for LSI LS7366R quadrature counter
+===================================================
+
+.. doxygengroup:: ls7366r
+   :members:

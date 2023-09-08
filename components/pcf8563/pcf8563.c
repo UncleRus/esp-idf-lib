@@ -1,9 +1,36 @@
+/*
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
  * @file pcf8563.c
  *
- * ESP-IDF driver for PCF8563 real-time clock/calendar
+ * ESP-IDF driver for PCF8563 (BM8563) real-time clock/calendar
  *
- * Copyright (C) 2020 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
@@ -43,6 +70,12 @@
 
 #define MASK_TIMER_CTRL_TD 0x03
 #define MASK_ALARM 0x7f
+
+#define MASK_MIN  0x7f
+#define MASK_HOUR 0x3f
+#define MASK_MDAY 0x3f
+#define MASK_WDAY 0x07
+#define MASK_MON  0x1f
 
 #define BV(x) ((uint8_t)(1 << (x)))
 
@@ -137,8 +170,8 @@ esp_err_t pcf8563_set_time(i2c_dev_t *dev, struct tm *time)
         dec2bcd(time->tm_sec),
         dec2bcd(time->tm_min),
         dec2bcd(time->tm_hour),
-        dec2bcd(time->tm_wday),
         dec2bcd(time->tm_mday),
+        dec2bcd(time->tm_wday),
         dec2bcd(time->tm_mon + 1) | (ovf ? BV(BIT_YEAR_CENTURY) : 0),
         dec2bcd(time->tm_year - (ovf ? 200 : 100))
     };
@@ -161,12 +194,12 @@ esp_err_t pcf8563_get_time(i2c_dev_t *dev, struct tm *time, bool *valid)
     I2C_DEV_GIVE_MUTEX(dev);
 
     *valid = data[0] & BV(BIT_VL) ? false : true;
-    time->tm_sec = bcd2dec(data[0] & ~BV(BIT_VL));
-    time->tm_min = bcd2dec(data[1]);
-    time->tm_hour = bcd2dec(data[2]);
-    time->tm_wday = bcd2dec(data[3]);
-    time->tm_mday = bcd2dec(data[4]);
-    time->tm_mon = bcd2dec(data[5] & ~BV(BIT_YEAR_CENTURY)) - 1;
+    time->tm_sec  = bcd2dec(data[0] & ~BV(BIT_VL));
+    time->tm_min  = bcd2dec(data[1] & MASK_MIN);
+    time->tm_hour = bcd2dec(data[2] & MASK_HOUR);
+    time->tm_mday = bcd2dec(data[3] & MASK_MDAY);
+    time->tm_wday = bcd2dec(data[4] & MASK_WDAY);
+    time->tm_mon  = bcd2dec(data[5] & MASK_MON) - 1;
     time->tm_year = bcd2dec(data[6]) + (data[5] & BV(BIT_YEAR_CENTURY) ? 200 : 100);
 
     return ESP_OK;

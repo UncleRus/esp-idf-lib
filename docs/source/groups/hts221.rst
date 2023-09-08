@@ -1,0 +1,8 @@
+.. _hts221:
+
+hts221 - Driver for HTS221 temperature and humidity sensor
+==================================================================
+
+.. doxygengroup:: hts221
+   :members:
+

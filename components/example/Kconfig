@@ -1,0 +1,17 @@
+menu "Example"
+    choice EXAMPLE_CHOOSE
+        prompt "Choose one"
+        default EXAMPLE_USING_FOO
+        help
+            An example to choose one from choices
+        config EXAMPLE_USING_FOO
+            bool "FOO"
+        config EXAMPLE_USING_BAR
+            bool "BAR"
+    endchoice
+    config EXAMPLE_NUMBER
+        int "Number example"
+        default 1
+        help
+            An example to choose number
+endmenu

@@ -1,0 +1,21 @@
+name: wiegand
+description: Wiegand protocol receiver
+version: 1.1.0
+groups:
+  - misc
+code_owners: UncleRus
+depends:
+  # XXX conditional depends
+  - driver
+  - log
+  - esp_idf_lib_helpers
+thread_safe: no
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2021

@@ -1,9 +1,32 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file led_strip.c
  *
- * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106 LED strips
+ * RMT-based ESP-IDF driver for WS2812B/SK6812/APA106/SM16703 LED strips
  *
- * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *
  * MIT Licensed as described in the file LICENSE
  */
@@ -11,6 +34,7 @@
 #include <esp_log.h>
 #include <esp_attr.h>
 #include <stdlib.h>
+#include <ets_sys.h>
 #include <esp_idf_lib_helpers.h>
 
 #if HELPER_TARGET_IS_ESP8266
@@ -41,32 +65,10 @@ static const char *TAG = "led_strip";
 
 #define LED_STRIP_RMT_CLK_DIV 2
 
-#define WS2812_T0H_NS   350
-#define WS2812_T0L_NS   1000
-#define WS2812_T1H_NS   1000
-#define WS2812_T1L_NS   350
-
-#define SK6812_T0H_NS   300
-#define SK6812_T0L_NS   900
-#define SK6812_T1H_NS   600
-#define SK6812_T1L_NS   600
-
-#define APA106_T0H_NS   350
-#define APA106_T0L_NS   1360
-#define APA106_T1H_NS   1360
-#define APA106_T1L_NS   350
-
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 #define COLOR_SIZE(strip) (3 + ((strip)->is_rgbw != 0))
-
-static rmt_item32_t ws2812_bit0 = { 0 };
-static rmt_item32_t ws2812_bit1 = { 0 };
-static rmt_item32_t sk6812_bit0 = { 0 };
-static rmt_item32_t sk6812_bit1 = { 0 };
-static rmt_item32_t apa106_bit0 = { 0 };
-static rmt_item32_t apa106_bit1 = { 0 };
 
 static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
                                    size_t wanted_num, size_t *translated_size, size_t *item_num,
@@ -82,15 +84,15 @@ static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t s
     size_t num = 0;
     uint8_t *psrc = (uint8_t *)src;
     rmt_item32_t *pdest = dest;
-#ifdef LED_STIRP_BRIGNTNESS
+#ifdef LED_STRIP_BRIGHTNESS
     led_strip_t *strip;
     esp_err_t r = rmt_translator_get_context(item_num, (void **)&strip);
     uint8_t brightness = r == ESP_OK ? strip->brightness : 255;
 #endif
     while (size < src_size && num < wanted_num)
     {
-#ifdef LED_STIRP_BRIGNTNESS
-        uint8_t b = scale8_video(*psrc, brightness);
+#ifdef LED_STRIP_BRIGHTNESS
+        uint8_t b = brightness != 255 ? scale8_video(*psrc, brightness) : *psrc;
 #else
         uint8_t b = *psrc;
 #endif
@@ -108,61 +110,78 @@ static void IRAM_ATTR _rmt_adapter(const void *src, rmt_item32_t *dest, size_t s
     *item_num = num;
 }
 
+typedef struct {
+    rmt_item32_t bit0, bit1;
+} led_rmt_t;
+
+static led_rmt_t rmt_items[LED_STRIP_TYPE_MAX] = { 0 };
+
 static void IRAM_ATTR ws2812_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
         size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
-    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &ws2812_bit0, &ws2812_bit1);
+    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_WS2812].bit0, &rmt_items[LED_STRIP_WS2812].bit1);
 }
 
 static void IRAM_ATTR sk6812_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
         size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
-    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &sk6812_bit0, &sk6812_bit1);
+    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_SK6812].bit0, &rmt_items[LED_STRIP_SK6812].bit1);
 }
 
 static void IRAM_ATTR apa106_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
         size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
-    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &apa106_bit0, &apa106_bit1);
+    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_APA106].bit0, &rmt_items[LED_STRIP_APA106].bit1);
 }
+
+static void IRAM_ATTR sm16703_rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size,
+                                         size_t wanted_num, size_t *translated_size, size_t *item_num)
+{
+    _rmt_adapter(src, dest, src_size, wanted_num, translated_size, item_num, &rmt_items[LED_STRIP_SM16703].bit0, &rmt_items[LED_STRIP_SM16703].bit1);
+}
+
+typedef enum {
+    ORDER_GRB,
+    ORDER_RGB,
+} color_order_t;
+
+typedef struct {
+    uint32_t t0h, t0l, t1h, t1l;
+    color_order_t order;
+    sample_to_rmt_t adapter;
+} led_params_t;
+
+static const led_params_t led_params[] = {
+    [LED_STRIP_WS2812]  = { .t0h = 400, .t0l = 1000, .t1h = 1000, .t1l = 400, .order = ORDER_GRB, .adapter = ws2812_rmt_adapter },
+    [LED_STRIP_SK6812]  = { .t0h = 300, .t0l = 900,  .t1h = 600,  .t1l = 600, .order = ORDER_GRB, .adapter = sk6812_rmt_adapter },
+    [LED_STRIP_APA106]  = { .t0h = 350, .t0l = 1360, .t1h = 1360, .t1l = 350, .order = ORDER_RGB, .adapter = apa106_rmt_adapter },
+    [LED_STRIP_SM16703] = { .t0h = 300, .t0l = 900,  .t1h = 1360, .t1l = 350, .order = ORDER_RGB, .adapter = sm16703_rmt_adapter },
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void led_strip_install()
 {
-    float ratio = (float)(APB_CLK_FREQ / LED_STRIP_RMT_CLK_DIV) / 1e09;
+    float ratio = (float)APB_CLK_FREQ / LED_STRIP_RMT_CLK_DIV / 1e09f;
 
-    ws2812_bit0.duration0 = ratio * WS2812_T0H_NS;
-    ws2812_bit0.level0 = 1;
-    ws2812_bit0.duration1 = ratio * WS2812_T0L_NS;
-    ws2812_bit0.level1 = 0;
-    ws2812_bit1.duration0 = ratio * WS2812_T1H_NS;
-    ws2812_bit1.level0 = 1;
-    ws2812_bit1.duration1 = ratio * WS2812_T1L_NS;
-    ws2812_bit1.level1 = 0;
-
-    sk6812_bit0.duration0 = ratio * SK6812_T0H_NS;
-    sk6812_bit0.level0 = 1;
-    sk6812_bit0.duration1 = ratio * SK6812_T0L_NS;
-    sk6812_bit0.level1 = 0;
-    sk6812_bit1.duration0 = ratio * SK6812_T1H_NS;
-    sk6812_bit1.level0 = 1;
-    sk6812_bit1.duration1 = ratio * SK6812_T1L_NS;
-    sk6812_bit1.level1 = 0;
-
-    apa106_bit0.duration0 = ratio * APA106_T0H_NS;
-    apa106_bit0.level0 = 1;
-    apa106_bit0.duration1 = ratio * APA106_T0L_NS;
-    apa106_bit0.level1 = 0;
-    apa106_bit1.duration0 = ratio * APA106_T1H_NS;
-    apa106_bit1.level0 = 1;
-    apa106_bit1.duration1 = ratio * APA106_T1L_NS;
-    apa106_bit1.level1 = 0;
+    for (size_t i = 0; i < LED_STRIP_TYPE_MAX; i++)
+    {
+        // 0 bit
+        rmt_items[i].bit0.duration0 = (uint32_t)(ratio * led_params[i].t0h);
+        rmt_items[i].bit0.level0 = 1;
+        rmt_items[i].bit0.duration1 = (uint32_t)(ratio * led_params[i].t0l);
+        rmt_items[i].bit0.level1 = 0;
+        // 1 bit
+        rmt_items[i].bit1.duration0 = (uint32_t)(ratio * led_params[i].t1h);
+        rmt_items[i].bit1.level0 = 1;
+        rmt_items[i].bit1.duration1 = (uint32_t)(ratio * led_params[i].t1l);
+        rmt_items[i].bit1.level1 = 0;
+    }
 }
 
 esp_err_t led_strip_init(led_strip_t *strip)
 {
-    CHECK_ARG(strip && strip->length > 0);
+    CHECK_ARG(strip && strip->length > 0 && strip->type < LED_STRIP_TYPE_MAX);
 
     strip->buf = calloc(strip->length, COLOR_SIZE(strip));
     if (!strip->buf)
@@ -177,25 +196,9 @@ esp_err_t led_strip_init(led_strip_t *strip)
     CHECK(rmt_config(&config));
     CHECK(rmt_driver_install(config.channel, 0, 0));
 
-    sample_to_rmt_t f = NULL;
-    switch (strip->type)
-    {
-        case LED_STRIP_WS2812:
-            f = ws2812_rmt_adapter;
-            break;
-        case LED_STRIP_SK6812:
-            f = sk6812_rmt_adapter;
-            break;
-        case LED_STRIP_APA106:
-            f = apa106_rmt_adapter;
-            break;
-        default:
-            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-            return ESP_ERR_NOT_SUPPORTED;
-    }
-    CHECK(rmt_translator_init(config.channel, f));
-#ifdef LED_STIRP_BRIGNTNESS
-    // No support for translator context prior to ESP-IDF 4.4
+    CHECK(rmt_translator_init(config.channel, led_params[strip->type].adapter));
+#ifdef LED_STRIP_BRIGHTNESS
+    // No support for translator context prior to ESP-IDF 4.3
     CHECK(rmt_translator_set_context(config.channel, strip));
 #endif
 
@@ -217,7 +220,7 @@ esp_err_t led_strip_flush(led_strip_t *strip)
     CHECK_ARG(strip && strip->buf);
 
     CHECK(rmt_wait_tx_done(strip->channel, pdMS_TO_TICKS(CONFIG_LED_STRIP_FLUSH_TIMEOUT)));
-    ets_delay_us(50);
+    ets_delay_us(CONFIG_LED_STRIP_PAUSE_LENGTH);
     return rmt_write_sample(strip->channel, strip->buf,
                             strip->length * COLOR_SIZE(strip), false);
 }
@@ -239,28 +242,22 @@ esp_err_t led_strip_set_pixel(led_strip_t *strip, size_t num, rgb_t color)
 {
     CHECK_ARG(strip && strip->buf && num <= strip->length);
     size_t idx = num * COLOR_SIZE(strip);
-    switch (strip->type)
+    switch (led_params[strip->type].order)
     {
-        case LED_STRIP_WS2812:
-        case LED_STRIP_SK6812:
-            // GRB
+        case ORDER_GRB:
             strip->buf[idx] = color.g;
             strip->buf[idx + 1] = color.r;
             strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
                 strip->buf[idx + 3] = rgb_luma(color);
             break;
-        case LED_STRIP_APA106:
-            // RGB
+        case ORDER_RGB:
             strip->buf[idx] = color.r;
             strip->buf[idx + 1] = color.g;
             strip->buf[idx + 2] = color.b;
             if (strip->is_rgbw)
                 strip->buf[idx + 3] = rgb_luma(color);
             break;
-        default:
-            ESP_LOGE(TAG, "Unknown strip type %d", strip->type);
-            return ESP_ERR_NOT_SUPPORTED;
     }
     return ESP_OK;
 }

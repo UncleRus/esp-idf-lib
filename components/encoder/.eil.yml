@@ -1,0 +1,21 @@
+name: encoder
+description: HW timer-based driver for incremental rotary encoders
+version: 1.0.0
+groups:
+  - input
+code_owners:
+  - UncleRus
+depends:
+  - driver
+  - freertos
+  - log
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2019

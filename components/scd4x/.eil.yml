@@ -1,0 +1,23 @@
+name: scd4x
+description: Driver for SCD40/SCD41 miniature CO₂ sensor
+version: 1.0.0
+groups:
+  - gas
+  - air-quality
+code_owners: UncleRus
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2021
+  - name: Sensirion
+    year: 2021

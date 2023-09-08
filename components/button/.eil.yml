@@ -1,0 +1,19 @@
+name: button
+description: HW timer-based driver for GPIO buttons
+version: 1.0.0
+groups:
+  - input
+code_owners:
+  - UncleRus
+depends:
+  - driver
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: UncleRus
+    year: 2021

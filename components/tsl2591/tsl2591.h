@@ -1,3 +1,26 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2020 Julian Doerner <https://github.com/juliandoerner>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  * @file tsl2591.h
  * @defgroup tsl2591 tsl2591
@@ -5,7 +28,7 @@
  *
  * ESP-IDF driver for TSL2591 light-to-digital. 
  *
- * Copyright (C) 2020 Julian Doerner <https://github.com/juliandoerner>
+ * Copyright (c) 2020 Julian Doerner <https://github.com/juliandoerner>
  *
  * MIT Licensed as described in the file LICENSE
  */
@@ -109,25 +132,18 @@ typedef enum
 } tsl2591_persistence_filter_t;
 
 /**
- * Device settings.
- */
-typedef struct 
-{
-    uint8_t enable_reg;
-    uint8_t control_reg;
-    uint8_t persistence_reg;
-} tsl2591_settings_t;
-
-/**
  * Device descriptor.
  */
 typedef struct
 {
     i2c_dev_t i2c_dev;
-    tsl2591_settings_t settings;
-
+    struct
+    {
+        uint8_t enable_reg;
+        uint8_t control_reg;
+        uint8_t persistence_reg;
+    } settings;
 } tsl2591_t;
-
 
 /**
  * @brief Initialize device descriptor

@@ -1,3 +1,31 @@
+/*
+ * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
  * @file sht3x.h
  * @defgroup sht3x sht3x
@@ -8,7 +36,7 @@
  * Forked from <https://github.com/gschorcht/sht3x-esp-idf>
  *
  * Copyright (c) 2017 Gunar Schorcht <https://github.com/gschorcht>\n
- * Copyright (C) 2019 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
@@ -78,7 +106,7 @@ typedef struct
  * @param scl_gpio  SCL GPIO
  * @return          `ESP_OK` on success
  */
-esp_err_t sht3x_init_desc(sht3x_t *dev, i2c_port_t port, uint8_t addr, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+esp_err_t sht3x_init_desc(sht3x_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
 /**
  * @brief Free device descriptor
@@ -118,9 +146,9 @@ esp_err_t sht3x_set_heater(sht3x_t *dev, bool enable);
  * This function is the easiest way to use the sensor. It is most suitable
  * for users that don't want to have the control on sensor details.
  *
- * Please note: The function delays the calling task up to 30 ms to wait for
- * the  the measurement results. This might lead to problems when the function
- * is called from a software timer callback function.
+ * @note The function delays the calling task up to 30 ms to wait for
+ *       the measurement results. This might lead to problems when function
+ *       is called from a software timer callback function.
  *
  * @param dev         Device descriptor
  * @param temperature Temperature in degree Celsius
@@ -138,8 +166,8 @@ esp_err_t sht3x_measure(sht3x_t *dev, float *temperature, float *humidity);
  * duration in RTOS ticks directly to wait with function `vTaskDelay()` until
  * the measurement results can be fetched.
  *
- * Please note: The duration only depends on repeatability level. Therefore,
- * it can be considered as constant for a repeatability.
+ * @note The duration only depends on repeatability level. Therefore,
+ *       it can be considered as constant for a repeatability.
  *
  * @param repeat    Repeatability, see type ::sht3x_repeat_t
  * @return          Measurement duration given in RTOS ticks
@@ -163,9 +191,9 @@ uint8_t sht3x_get_measurement_duration(sht3x_repeat_t repeat);
  * automatically performs all subsequent measurements. The rate of periodic
  * measurements can be 10, 4, 2, 1 or 0.5 measurements per second (mps).
  *
- * Please note: Due to inaccuracies in timing of the sensor, the user task
- * should fetch the results at a lower rate. The rate of the periodic
- * measurements is defined by the parameter *mode*.
+ * @note Due to inaccuracies in timing of the sensor, the user task
+ *       should fetch the results at a lower rate. The rate of the periodic
+ *       measurements is defined by the parameter \p mode.
  *
  * @param dev       Device descriptor
  * @param mode      Measurement mode, see type ::sht3x_mode_t
@@ -219,7 +247,7 @@ esp_err_t sht3x_compute_values(sht3x_raw_data_t raw_data, float *temperature, fl
 /**
  * @brief Get measurement results in form of sensor values
  *
- * The function combines function ::sht3x_read_raw_data() and function
+ * The function combines function ::sht3x_get_raw_data() and function
  * ::sht3x_compute_values() to get the measurement results.
  *
  * In case that there are no results that can be read, the function fails.

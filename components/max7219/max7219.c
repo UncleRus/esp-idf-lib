@@ -1,3 +1,30 @@
+/*
+ * Copyright (c) 2019 Ruslan V. Uss <unclerus@gmail.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
  * @file max7219.c
  *
@@ -6,7 +33,7 @@
  *
  * Ported from esp-open-rtos
  *
- * Copyright (C) 2017, 2018 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2017 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
@@ -17,8 +44,6 @@
 #include "max7219_priv.h"
 
 static const char *TAG = "max7219";
-
-#define CLOCK_SPEED_HZ (10000000) // 10 MHz
 
 #define ALL_CHIPS 0xff
 #define ALL_DIGITS 8
@@ -89,13 +114,13 @@ inline static uint8_t get_char(max7219_t *dev, char c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, gpio_num_t cs_pin)
+esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
 {
     CHECK_ARG(dev);
 
     memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
     dev->spi_cfg.spics_io_num = cs_pin;
-    dev->spi_cfg.clock_speed_hz = CLOCK_SPEED_HZ;
+    dev->spi_cfg.clock_speed_hz = clock_speed_hz;
     dev->spi_cfg.mode = 0;
     dev->spi_cfg.queue_size = 1;
     dev->spi_cfg.flags = SPI_DEVICE_NO_DUMMY;
@@ -211,7 +236,7 @@ esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s)
 {
     CHECK_ARG(dev && s);
 
-    while (s && pos < dev->digits)
+    while (*s && pos < dev->digits)
     {
         uint8_t c = get_char(dev, *s);
         if (*(s + 1) == '.')

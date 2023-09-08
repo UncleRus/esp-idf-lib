@@ -1,0 +1,33 @@
+menu "Example configuration"
+    choice EXAMPLE_CHIP_TYPE
+        prompt "Select chip type"
+        default EXAMPLE_CHIP_TYPE_SI70xx
+        help
+            Select chip type.
+
+        config EXAMPLE_CHIP_TYPE_SI70xx
+            bool "SI70xx"
+            help
+                Choose this when the chip is one of SI70xx family.
+        config EXAMPLE_CHIP_TYPE_SHT2x_HTU21D
+            bool "SHT2x or HTU21D"
+            help
+                Choose this when the chip is either SHT2x or HTU21D.
+    endchoice
+
+    config EXAMPLE_I2C_MASTER_SCL
+        int "SCL GPIO Number"
+        default 5 if IDF_TARGET_ESP8266
+        default 6 if IDF_TARGET_ESP32C3
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master clock line.
+
+    config EXAMPLE_I2C_MASTER_SDA
+        int "SDA GPIO Number"
+        default 4 if IDF_TARGET_ESP8266
+        default 5 if IDF_TARGET_ESP32C3
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        help
+            GPIO number for I2C Master data line.
+endmenu

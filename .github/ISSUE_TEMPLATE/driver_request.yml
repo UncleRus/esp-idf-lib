@@ -1,0 +1,70 @@
+---
+name: Request a new driver for a device
+description: >
+  If you want a new driver for a device, ask us. Driver requests are handled
+  on a best-efforts basis.
+labels:
+  - enhancement
+body:
+  - type: input
+    id: product_name
+    validations:
+      required: true
+    attributes:
+      label: Device name
+      description: >
+        Please provide the name of the device.
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Device description
+      description: >
+        Describe the device. What does it do? How do you control the device?
+        SPI?  I2C? How useful is the device for what?
+
+  - type: input
+    id: product_url
+    validations:
+      required: true
+    attributes:
+      label: Device product page URL
+      description: >
+        Please provide the URL of the product page.
+
+  - type: input
+    id: datasheet_url
+    validations:
+      required: true
+    attributes:
+      label: Datasheet URL
+      description: >
+        Please provide the URL of the datasheet.
+
+  - type: checkboxes
+    id: sources
+    attributes:
+      label: >
+        Can the device be purchased at any of the followings?
+      description: Check any of the followings if it can.
+      options:
+        - label: AliExpress
+        - label: Amazon
+        - label: ebay
+        - label: Digi-Key
+        - label: Mouser
+
+  - type: textarea
+    id: sources_url
+    attributes:
+      label: URLs to purchase the device
+      description: Provide URLs at which you can buy the device if any.
+
+  - type: textarea
+    id: other_implementations
+    attributes:
+      label: Other implementations
+      description: >
+        Do you know any other driver implementation? Such as a driver for
+        `arduino,` other arch, or framework? Please provide URLs if you do.

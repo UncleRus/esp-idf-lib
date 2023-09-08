@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (C) 2020 Ruslan V. Uss <https://github.com/UncleRus>
+ * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *               2021 Tomoyuki Sakurai <y@rombik.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -62,6 +62,8 @@ extern "C" {
 
 #define LED_STRIP_SPI_FRAME_SK9822_LED_MSB3    (0xE0)   ///< A magic number of [31:29] in LED frames. The bits must be 1 (APA102, SK9822)
 
+#define LED_STRIP_SPI_FRAME_SK9822_LED_BRIGHTNESS_BITS (5) ///< Number of bits used to describe the brightness of the LED
+
 #define LED_STRIP_SPI_BUFFER_SIZE(N_PIXEL) (\
         LED_STRIP_SPI_FRAME_SK9822_START_SIZE + \
         LED_STRIP_SPI_FRAME_SK9822_LEDS_SIZE(N_PIXEL)  + \
@@ -80,9 +82,10 @@ esp_err_t led_strip_spi_sk9822_buf_init(led_strip_spi_t *strip);
  * @param[in] strip LED strip descriptor.
  * @param[in] num Index of the LED pixel (zero-based).
  * @param[in] color The color to set.
+ * @param[in] brightness The brightness to set, [0:100].
  * @return `ESP_OK` on success.
  */
-esp_err_t led_strip_spi_set_pixel_sk9822(led_strip_spi_t *strip, size_t num, rgb_t color);
+esp_err_t led_strip_spi_set_pixel_sk9822(led_strip_spi_t *strip, size_t num, rgb_t color, uint8_t brightness);
 
 #ifdef __cplusplus
 }
