@@ -89,17 +89,34 @@ jobs:
           sudo apt-get update
           sudo apt-get install python3-sphinx python3-sphinx-rtd-theme python3-breathe doxygen
 
-      # FIXME: extract doxygen and sphinx errors and warnings, not just run make!
+      # FIXME: extract sphinx errors and warnings, not just run make!
       - id: build
         name: Build docs
         run: |
-          make -C docs dirhtml
+          cd docs
+          make dirhtml
+          if [ -s doxygen.log ]; then
+            echo "========================================================="
+            echo "Found errors:"
+            echo "========================================================="
+            cat doxygen.log
+            exit 1
+          fi
 
   build_esp32xx:
     name: Build for ESP32xx
     runs-on: ubuntu-latest
     needs:
       - prepare
+    if: >-
+      ${{ needs.prepare.outputs._ci_build_esp32 != '' 
+       || needs.prepare.outputs._ci_build_esp32c2 != ''
+       || needs.prepare.outputs._ci_build_esp32c3 != ''
+       || needs.prepare.outputs._ci_build_esp32c6 != ''
+       || needs.prepare.outputs._ci_build_esp32h2 != ''
+       || needs.prepare.outputs._ci_build_esp32h4 != ''
+       || needs.prepare.outputs._ci_build_esp32s2 != ''
+       || needs.prepare.outputs._ci_build_esp32s3 != '' }}
     strategy:
       # run other jobs even when one job failed
       fail-fast: false
@@ -133,7 +150,7 @@ jobs:
           sudo apt-get -y install ccache
 
       - id: build_esp32
-        name: esp-idf build
+        name: Build
         uses: espressif/esp-idf-ci-action@v1
         with:
           esp_idf_version: ${{ matrix.esp_idf_version }}
@@ -203,14 +220,20 @@ jobs:
             fi
 
             if [ -z "${examples}" ]; then
-              echo "Nothing to build: no component supports ${{ matrix.target }} or ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
+              echo "Nothing to build: no component supports ${{ matrix.target }} or " \
+                   "ESP-IDF ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
               exit 0
             fi
+
+            echo "========================================================="
+            echo "Examples to build for components:"
+            echo "========================================================="
+            echo "${examples}"
 
             for component in ${examples}; do
               for dir in ${component}/*; do
                 cd ${dir}
-                idf.py --ccache build
+                idf.py --ccache build; res=$?; [ $res -ne 0 ] && exit $res
                 rm -rf build
                 cd ../..
               done
@@ -221,6 +244,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - prepare
+    if: ${{ needs.prepare.outputs._ci_build_esp8266 != '' }}
     strategy:
       fail-fast: false
       matrix:

@@ -103,6 +103,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mhz19b**               | Driver for MH-Z19B NDIR CO₂ sensor                                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **scd30**                | Driver for SCD30 CO₂ sensor                                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sgp40**                | Driver for SGP40 Indoor Air Quality Sensor for VOC Measurements                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
@@ -145,6 +146,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mhz19b**               | Driver for MH-Z19B NDIR CO₂ sensor                                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **scd30**                | Driver for SCD30 CO₂ sensor                                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
 ### GPIO expanders
@@ -156,6 +158,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **pca9557**              | Driver for PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **pcf8574**              | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                         | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **pcf8575**              | Driver for PCF8575 remote 16-bit I/O expander for I2C-bus                        | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **tca6424a**             | Driver for TCA6424A low-voltage 24-bit I2C I/O expander                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **tca95x5**              | Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
@@ -169,6 +172,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **hts221**               | Driver for HTS221 temperature and humidity sensor                                | ISC     | esp32, esp32s2, esp32c3 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
@@ -179,6 +183,8 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
 | **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU                                            | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **l3gx**                 | Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **mpu6050**              | Driver for MPU6000/MPU6050 6-axis MotionTracking device                          | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
@@ -217,6 +223,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
 | **hmc5883l**             | Driver for 3-axis digital compass HMC5883L and HMC5983L                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **qmc5883l**             | Driver for QMC5883L 3-axis magnetic sensor                                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
@@ -253,7 +260,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **ds1302**               | Driver for DS1302 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **ds1307**               | Driver for DS1307 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **ds3231**               | Driver for DS1337 RTC and DS3231 high precision RTC module                       | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **pcf8563**              | Driver for PCF8563 real-time clock/calendar                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **pcf8563**              | Driver for PCF8563 (BM8563) real-time clock/calendar                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
 ### Temperature sensors
@@ -278,6 +285,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mcp960x**              | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **mcp9808**              | Driver for MCP9808 digital temperature sensor                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
@@ -308,6 +316,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Grupo de Pesquisa em Cultura Digital](http://gepid.upf.br/): `mpu6050` 
 - GrzegorzH: `ds18x20` 
 - [Gunar Schorcht](https://github.com/gschorcht): `bme680` `ccs811` `sht3x` `sts3x` 
+- [Jakub Turek](https://github.com/QB4-dev): `l3gx` `lsm303` 
 - [Jan Veeh](https://github.com/janveeh): `icm42670` 
 - [Jeff Rowberg](https://www.i2cdevlib.com/): `mpu6050` 
 - [Jose Manuel Perez](https://github.com/jmpmscorp): `lc709203f` `sgm58031` 
@@ -321,8 +330,8 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - Pavel Merzlyakov: `ds1302` 
 - [Raghav Jha](https://github.com/horsemann07): `mpu6050` 
 - RichardA: `ds3231` 
-- [Ruslan V. Uss](https://github.com/UncleRus): `ads111x` `aht` `am2320` `bh1750` `bh1900nux` `bme680` `bmp180` `bmp280` `button` `calibration` `ccs811` `dht` `ds1302` `ds1307` `ds18x20` `ds3231` `ds3502` `encoder` `framebuffer` `hd44780` `hdc1000` `hmc5883l` `hx711` `i2cdev` `ina219` `ina260` `ina3221` `led_strip` `led_strip_spi` `max31725` `max31855` `max31865` `max7219` `mcp23008` `mcp23x17` `mcp342x` `mcp4725` `mcp960x` `mcp9808` `mpu6050` `ms5611` `onewire` `pca9557` `pca9685` `pcf8563` `pcf8574` `pcf8575` `pcf8591` `qmc5883l` `rda5807m` `scd30` `scd4x` `sgp40` `sht3x` `sht4x` `si7021` `sts21` `sts3x` `tca9548` `tca95x5` `tda74xx` `tsl2561` `tsl4531` `tsys01` `ultrasonic` `wiegand` 
-- [Sensirion AG](https://github.com/Sensirion): `scd30` `scd4x` 
+- [Ruslan V. Uss](https://github.com/UncleRus): `ads111x` `aht` `am2320` `bh1750` `bh1900nux` `bme680` `bmp180` `bmp280` `button` `calibration` `ccs811` `dht` `ds1302` `ds1307` `ds18x20` `ds3231` `ds3502` `encoder` `framebuffer` `hd44780` `hdc1000` `hmc5883l` `hx711` `i2cdev` `ina219` `ina260` `ina3221` `led_strip` `led_strip_spi` `max31725` `max31855` `max31865` `max7219` `mcp23008` `mcp23x17` `mcp342x` `mcp4725` `mcp960x` `mcp9808` `mpu6050` `ms5611` `onewire` `pca9557` `pca9685` `pcf8563` `pcf8574` `pcf8575` `pcf8591` `qmc5883l` `rda5807m` `scd30` `scd4x` `sfa3x` `sgp40` `sht3x` `sht4x` `si7021` `sts21` `sts3x` `tca6424a` `tca9548` `tca95x5` `tda74xx` `tsl2561` `tsl4531` `tsys01` `ultrasonic` `wiegand` 
+- [Sensirion AG](https://github.com/Sensirion): `scd30` `scd4x` `sfa3x` 
 - [sheinz](https://github.com/sheinz): `bmp280` 
 - [Thanh Pham](https://github.com/panoti): `pcf8591` 
 - [Timofei Korostelev](https://github.com/chudsaviet): `ht16k33` 

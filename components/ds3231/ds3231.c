@@ -36,6 +36,7 @@
  *
  * MIT Licensed as described in the file LICENSE
  */
+#include <stdio.h>
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>
 #include "ds3231.h"
@@ -77,6 +78,9 @@ enum {
     DS3231_REPLACE
 };
 
+static const int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static const int days_per_month_leap_year[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
 static uint8_t bcd2dec(uint8_t val)
 {
     return (val >> 4) * 10 + (val & 0x0f);
@@ -85,6 +89,25 @@ static uint8_t bcd2dec(uint8_t val)
 static uint8_t dec2bcd(uint8_t val)
 {
     return ((val / 10) << 4) + (val % 10);
+}
+
+// Function to convert year, month, and day to days since January 1st
+static inline int days_since_january_1st(int year, int month, int day)
+{
+    int days = day - 1;
+    const int *ptr = days_per_month; 
+
+    // Handle leap year
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+        ptr = days_per_month_leap_year;
+
+    // Add days from previous months
+    for (int i = 0; i < month; i++)
+    {
+        days += ptr[i];
+    }
+
+    return days;
 }
 
 esp_err_t ds3231_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio)
@@ -433,6 +456,7 @@ esp_err_t ds3231_get_time(i2c_dev_t *dev, struct tm *time)
     time->tm_mon  = bcd2dec(data[5] & DS3231_MONTH_MASK) - 1;
     time->tm_year = bcd2dec(data[6]) + 100;
     time->tm_isdst = 0;
+    time->tm_yday = days_since_january_1st(time->tm_year, time->tm_mon, time->tm_mday);
 
     // apply a time zone (if you are not using localtime on the rtc or you want to check/apply DST)
     //applyTZ(time);
