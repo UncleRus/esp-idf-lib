@@ -10,6 +10,7 @@
 * [Can I use I2C device drivers from interrupts?](#can-i-use-i2c-device-drivers-from-interrupts)
 * [Porting I2C libs to I2Cdev](#porting-i2c-libs-to-i2cdev)
 * [My DHT sensor doesn't work well/doesn't work at all.](#my-dht-sensor-doesnt-work-welldoesnt-work-at-all)
+* [How can I include ets_sys.h in my code without complex macros and remain compatible with different targets?](#how-can-i-include-ets_sysh-in-my-code-without-complex-macros-and-remain-compatible-with-different-targets)
 
 <!-- vim-markdown-toc -->
 
@@ -25,7 +26,7 @@ Common causes of I2C issues are:
 
 When any of I2C-based drivers does not work, follow the steps below.
 
-Build an [_I2C scanner_ device](examples/i2c_scanner). The device is not
+Build an [_I2C scanner_ device](examples/i2cdev/default). The device is not
 necessarily an ESP device. There are many examples for various platforms.
 Search by keyword `i2c scanner`.
 
@@ -153,3 +154,8 @@ See [Porting.md](Porting.md).
 3. Shorten the wires that connect the sensor.
 4. Use 5V for powering the sensor, not 3.3V. ESP chips are 5V tolerant.
 5. Use shielded wires where the shield is connected to the GND.
+
+## How can I include ets_sys.h in my code without complex macros and remain compatible with different targets?
+
+Just add the `esp_idf_lib_helpers` component to the list of required ones and after that you can simply write `#include <ets_sys.h>` in your code.
+See, for example, source code of `scd30` component.
