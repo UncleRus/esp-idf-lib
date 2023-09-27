@@ -260,8 +260,8 @@ esp_err_t ina219_get_bus_voltage(ina219_t *dev, float *voltage)
 {
     CHECK_ARG(dev && voltage);
 
-    int16_t raw;
-    CHECK(read_reg_16(dev, REG_BUS_U, (uint16_t *)&raw));
+    uint16_t raw;
+    CHECK(read_reg_16(dev, REG_BUS_U, &raw));
 
     *voltage = (raw >> 3) * 0.004;
 
