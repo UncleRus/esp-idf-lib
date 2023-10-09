@@ -113,6 +113,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
 | **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **max1704x**             | Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **mp2660**               | Driver for MP2660 5V USB, 500mA, I2C-Controlled Linear Charger with Power Path Management for Single-Cell Li-Ion Battery | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
 
 
 ### Common libraries
@@ -325,6 +326,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [jsuiker](https://github.com/jsuiker): `dht` 
 - [Julian Doerner](https://github.com/juliandoerner): `tsl2591` 
 - [Lucio Tarantino](https://github.com/dianlight): `ads111x` 
+- [Manuel Markwort](https://github.com/mmarkwort): `mp2660` 
 - [Marc Luehr](https://github.com/th3link): `veml7700` 
 - [Nate Usher](https://github.com/nated0g): `scd30` 
 - Pavel Merzlyakov: `ds1302` 

@@ -1,0 +1,8 @@
+.. _mp2660:
+
+mp2660 - 5V USB, 500mA, I2C-Controlled Linear Charger with Power Path Management for Single-Cell Li-Ion Battery
+===============================================================================================================
+
+.. doxygengroup:: mp2660
+   :members:
+
