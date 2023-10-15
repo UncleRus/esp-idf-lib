@@ -236,6 +236,7 @@ Battery controllers
 
    groups/lc709203f
    groups/max1704x
+   groups/mp2660
 
 Other
 =====
