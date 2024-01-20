@@ -1,8 +1,54 @@
+/*
+ * Copyright (c) 2019 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (c) 2022 m5stack (https://github.com/m5stack)
+ * Copyright (c) 2024 vonguced (https://github.com/vonguced)
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * @file qmp6988.h
+ * @defgroup qmp6988 qmp6988
+ * @{
+ *
+ * ESP-IDF driver for QMP6988 digital temperature and pressure sensor
+ *
+ * Code based on m5stack <https://github.com/m5stack/M5Unit-ENV>\n
+ * and Ruslan V. Uss <https://github.com/UncleRus>
+ *
+ * Copyright (c) 2019 Ruslan V. Uss (https://github.com/UncleRus)\n
+ * Copyright (c) 2022 m5stack (https://github.com/m5stack)\n
+ * Copyright (c) 2024 vonguced (https://github.com/vonguced)\n
+ *
+ * BSD Licensed as described in the file LICENSE
+ */
 
 #ifndef __QMP6988_H__
 #define __QMP6988_H__
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <i2cdev.h>
 #include <esp_err.h>
 
@@ -10,38 +56,15 @@
 extern "C" {
 #endif
 
-#define QMP6988_U16_t uint16_t
-#define QMP6988_S16_t int16_t
-#define QMP6988_U32_t uint32_t
-#define QMP6988_S32_t int32_t
-#define QMP6988_U64_t uint64_t
-#define QMP6988_S64_t int64_t
+typedef uint16_t QMP6988_U16_t;
+typedef int16_t QMP6988_S16_t;
+typedef uint32_t QMP6988_U32_t;
+typedef int32_t QMP6988_S32_t;
+typedef uint64_t QMP6988_U64_t;
+typedef int64_t QMP6988_S64_t;
 
 #define QMP6988_I2C_ADDR_GND 0x70
 #define QMP6988_I2C_ADDR_VDD 0x56
-
-#define QMP6988_CHIP_ID 0x5C
-
-#define QMP6988_CHIP_ID_REG         0xD1
-#define QMP6988_RESET_REG           0xE0 /* Device reset register */
-#define QMP6988_DEVICE_STAT_REG     0xF3 /* Device state register */
-#define QMP6988_CTRLMEAS_REG        0xF4 /* Measurement Condition Control Register */
-#define QMP6988_PRESSURE_MSB_REG    0xF7 /* Pressure MSB Register */
-#define QMP6988_TEMPERATURE_MSB_REG 0xFA /* Temperature MSB Reg */
-
-#define SUBTRACTOR 8388608
-
-/* compensation calculation */
-#define QMP6988_CALIBRATION_DATA_START  0xA0 /* QMP6988 compensation coefficients */
-#define QMP6988_CALIBRATION_DATA_LENGTH 25
-
-#define SHIFT_RIGHT_4_POSITION 4
-#define SHIFT_LEFT_2_POSITION  2
-#define SHIFT_LEFT_4_POSITION  4
-#define SHIFT_LEFT_5_POSITION  5
-#define SHIFT_LEFT_8_POSITION  8
-#define SHIFT_LEFT_12_POSITION 12
-#define SHIFT_LEFT_16_POSITION 16
 
 /**
  * Possible measurement modes
@@ -51,10 +74,6 @@ typedef enum {
     QMP6988_FORCED_MODE = 0x01, // one measurement then sleep again
     QMP6988_NORMAL_MODE = 0x03  // power mode
 } qmp6988_power_mode_t;
-
-#define QMP6988_CTRLMEAS_REG_MODE__POS 0
-#define QMP6988_CTRLMEAS_REG_MODE__MSK 0x03
-#define QMP6988_CTRLMEAS_REG_MODE__LEN 2
 
 /**
  * Possible filter modes
@@ -67,11 +86,6 @@ typedef enum {
     QMP6988_FILTERCOEFF_16 = 0x04,
     QMP6988_FILTERCOEFF_32 = 0x05
 } qmp6988_filter_t;
-
-#define QMP6988_CONFIG_REG             0xF1 /*IIR filter co-efficient setting Register*/
-#define QMP6988_CONFIG_REG_FILTER__POS 0
-#define QMP6988_CONFIG_REG_FILTER__MSK 0x07
-#define QMP6988_CONFIG_REG_FILTER__LEN 3
 
 /**
  * Possible oversampling modes
@@ -87,39 +101,9 @@ typedef enum {
     QMP6988_OVERSAMPLING_64X = 0x07
 } qmp6988_oversampling_t;
 
-#define QMP6988_CTRLMEAS_REG_OSRST__POS 5
-#define QMP6988_CTRLMEAS_REG_OSRST__MSK 0xE0
-#define QMP6988_CTRLMEAS_REG_OSRST__LEN 3
-
-#define QMP6988_CTRLMEAS_REG_OSRSP__POS 2
-#define QMP6988_CTRLMEAS_REG_OSRSP__MSK 0x1C
-#define QMP6988_CTRLMEAS_REG_OSRSP__LEN 3
-
-// #define QMP6988_RAW_DATA_SIZE 8
-typedef uint8_t qmp6988_raw_data_t;
-
-typedef struct _qmp6988_cali_data
-{
-    QMP6988_S32_t COE_a0;
-    QMP6988_S16_t COE_a1;
-    QMP6988_S16_t COE_a2;
-    QMP6988_S32_t COE_b00;
-    QMP6988_S16_t COE_bt1;
-    QMP6988_S16_t COE_bt2;
-    QMP6988_S16_t COE_bp1;
-    QMP6988_S16_t COE_b11;
-    QMP6988_S16_t COE_bp2;
-    QMP6988_S16_t COE_b12;
-    QMP6988_S16_t COE_b21;
-    QMP6988_S16_t COE_bp3;
-} qmp6988_cali_data_t;
-
-typedef struct _qmp6988_fk_data
-{
-    float a0, b00;
-    float a1, a2, bt1, bt2, bp1, b11, bp2, b12, b21, bp3;
-} qmp6988_fk_data_t;
-
+/**
+ * Structure holding calibration data for QMP6988.
+ */
 typedef struct _qmp6988_ik_data
 {
     QMP6988_S32_t a0, b00;
@@ -139,26 +123,21 @@ typedef struct
     qmp6988_oversampling_t oversampling_t_mode; //!< used oversampling temp mode
     qmp6988_oversampling_t oversampling_p_mode; //!< used oversampling pressure mode
 
-    qmp6988_cali_data_t qmp6988_cali;
-    qmp6988_ik_data_t ik;
+    qmp6988_ik_data_t ik;                       //!< used calibration data
 
-    float temperature;
-    float pressure;
-
-    // bool meas_started;            //!< indicates whether measurement started
-    // uint64_t meas_start_time;     //!< measurement start time in us
-    // bool meas_first;              //!< first measurement in periodic mode
+    float temperature;                          //!< measured temperature
+    float pressure;                             //!< measured pressure
 } qmp6988_t;
 
 /**
- * @brief Initialize device descriptor
+ * @brief Initialize device descriptor.
  *
- * @param dev       Device descriptor
- * @param port      I2C port
- * @param addr      Device address
- * @param sda_gpio  SDA GPIO
- * @param scl_gpio  SCL GPIO
- * @return          `ESP_OK` on success
+ * @param dev       Device descriptor.
+ * @param addr      Device address.
+ * @param port      I2C port.
+ * @param sda_gpio  SDA GPIO.
+ * @param scl_gpio  SCL GPIO.
+ * @return          `ESP_OK` on success.
  */
 esp_err_t qmp6988_init_desc(qmp6988_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
 
@@ -178,20 +157,62 @@ esp_err_t qmp6988_free_desc(qmp6988_t *dev);
  */
 esp_err_t qmp6988_init(qmp6988_t *dev);
 
+/**
+ * @brief Set up power mode for QMP6988.
+ *
+ * @param dev           Device descriptor.
+ * @param power_mode    Power mode to be set.
+ * @return              `ESP_OK` on success.
+ */
 esp_err_t qmp6988_setup_powermode(qmp6988_t *dev, qmp6988_power_mode_t power_mode);
 
+/**
+ * @brief Set up filter mode for QMP6988.
+ *
+ * @param dev           Device descriptor.
+ * @param filter_mode   Filter mode to be set.
+ * @return              `ESP_OK` on success.
+ */
 esp_err_t qmp6988_set_filter(qmp6988_t *dev, qmp6988_filter_t filter_mode);
 
+/**
+ * @brief Set up pressure oversampling mode for QMP6988.
+ *
+ * @param dev                   Device descriptor.
+ * @param oversampling_p_mode   Oversampling mode for pressure to be set.
+ * @return                      `ESP_OK` on success.
+ */
 esp_err_t qmp6988_set_p_oversampling(qmp6988_t *dev, qmp6988_oversampling_t oversampling_p_mode);
 
+/**
+ * @brief Set up temperature oversampling mode for QMP6988.
+ *
+ * @param dev                   Device descriptor.
+ * @param oversampling_t_mode   Oversampling mode for temperature to be set.
+ * @return                      `ESP_OK` on success.
+ */
 esp_err_t qmp6988_set_t_oversampling(qmp6988_t *dev, qmp6988_oversampling_t oversampling_t_mode);
 
+/**
+ * @brief Calculate pressure based on QMP6988 sensor data.
+ *
+ * @param dev       Device descriptor.
+ * @return          Calculated pressure in Pascals (Pa).
+ */
 float qmp6988_calc_pressure(qmp6988_t *dev);
 
+/**
+ * @brief Calculate temperature based on QMP6988 sensor data.
+ *
+ * @param dev       Device descriptor.
+ * @return          Calculated temperature in degrees Celsius (°C).
+ */
 float qmp6988_calc_temperature(qmp6988_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
+
+/**@}*/
 
 #endif /* __QMP6988_H__ */

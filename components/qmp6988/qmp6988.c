@@ -1,3 +1,47 @@
+/*
+ * Copyright (c) 2019 Ruslan V. Uss (https://github.com/UncleRus)
+ * Copyright (c) 2022 m5stack (https://github.com/m5stack)
+ * Copyright (c) 2024 vonguced (https://github.com/vonguced)
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of itscontributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * @file qmp6988.c
+ *
+ * ESP-IDF driver for QMP6988 digital temperature and pressure sensor
+ *
+ * Code based on m5stack <https://github.com/m5stack/M5Unit-ENV>\n
+ * and Ruslan V. Uss <https://github.com/UncleRus>
+ *
+ * Copyright (c) 2019 Ruslan V. Uss (https://github.com/UncleRus)\n
+ * Copyright (c) 2022 m5stack (https://github.com/m5stack)\n
+ * Copyright (c) 2024 vonguced (https://github.com/vonguced)\n
+ *
+ * BSD Licensed as described in the file LICENSE
+ */
+
 #include <math.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -7,6 +51,67 @@
 #include "qmp6988.h"
 
 #define I2C_FREQ_HZ 1000000 // 1MHz
+
+typedef uint8_t qmp6988_raw_data_t;
+
+#define QMP6988_CHIP_ID 0x5C
+
+#define QMP6988_CHIP_ID_REG         0xD1
+#define QMP6988_RESET_REG           0xE0 /* Device reset register */
+#define QMP6988_DEVICE_STAT_REG     0xF3 /* Device state register */
+#define QMP6988_CTRLMEAS_REG        0xF4 /* Measurement Condition Control Register */
+#define QMP6988_PRESSURE_MSB_REG    0xF7 /* Pressure MSB Register */
+#define QMP6988_TEMPERATURE_MSB_REG 0xFA /* Temperature MSB Reg */
+
+#define SUBTRACTOR 8388608
+
+/* compensation calculation */
+#define QMP6988_CALIBRATION_DATA_START  0xA0 /* QMP6988 compensation coefficients */
+#define QMP6988_CALIBRATION_DATA_LENGTH 25
+
+#define SHIFT_RIGHT_4_POSITION 4
+#define SHIFT_LEFT_2_POSITION  2
+#define SHIFT_LEFT_4_POSITION  4
+#define SHIFT_LEFT_5_POSITION  5
+#define SHIFT_LEFT_8_POSITION  8
+#define SHIFT_LEFT_12_POSITION 12
+#define SHIFT_LEFT_16_POSITION 16
+
+#define QMP6988_CTRLMEAS_REG_MODE__POS 0
+#define QMP6988_CTRLMEAS_REG_MODE__MSK 0x03
+#define QMP6988_CTRLMEAS_REG_MODE__LEN 2
+
+#define QMP6988_CTRLMEAS_REG_OSRST__POS 5
+#define QMP6988_CTRLMEAS_REG_OSRST__MSK 0xE0
+#define QMP6988_CTRLMEAS_REG_OSRST__LEN 3
+
+#define QMP6988_CTRLMEAS_REG_OSRSP__POS 2
+#define QMP6988_CTRLMEAS_REG_OSRSP__MSK 0x1C
+#define QMP6988_CTRLMEAS_REG_OSRSP__LEN 3
+
+#define QMP6988_CONFIG_REG             0xF1 /*IIR filter co-efficient setting Register*/
+#define QMP6988_CONFIG_REG_FILTER__POS 0
+#define QMP6988_CONFIG_REG_FILTER__MSK 0x07
+#define QMP6988_CONFIG_REG_FILTER__LEN 3
+
+/**
+ * Structure holding raw calibration data for QMP6988.
+ */
+typedef struct _qmp6988_cali_data
+{
+    QMP6988_S32_t COE_a0;
+    QMP6988_S16_t COE_a1;
+    QMP6988_S16_t COE_a2;
+    QMP6988_S32_t COE_b00;
+    QMP6988_S16_t COE_bt1;
+    QMP6988_S16_t COE_bt2;
+    QMP6988_S16_t COE_bp1;
+    QMP6988_S16_t COE_b11;
+    QMP6988_S16_t COE_bp2;
+    QMP6988_S16_t COE_b12;
+    QMP6988_S16_t COE_b21;
+    QMP6988_S16_t COE_bp3;
+} qmp6988_cali_data_t;
 
 static const char *TAG = "qmp6988";
 
@@ -68,6 +173,7 @@ esp_err_t qmp6988_device_check(qmp6988_t *dev)
 esp_err_t qmp6988_get_calibration_data(qmp6988_t *dev)
 {
     uint8_t a_data_uint8_tr[QMP6988_CALIBRATION_DATA_LENGTH] = { 0 };
+    qmp6988_cali_data_t qmp6988_cali;
     int len;
 
     for (len = 0; len < QMP6988_CALIBRATION_DATA_LENGTH; len += 1)
@@ -75,48 +181,48 @@ esp_err_t qmp6988_get_calibration_data(qmp6988_t *dev)
         CHECK(qmp6988_read_reg(dev, QMP6988_CALIBRATION_DATA_START + len, &a_data_uint8_tr[len]));
     }
 
-    dev->qmp6988_cali.COE_a0 = (QMP6988_S32_t)(((QMP6988_S32_t)a_data_uint8_tr[18] << SHIFT_LEFT_12_POSITION) | (a_data_uint8_tr[19] << SHIFT_LEFT_4_POSITION) | (a_data_uint8_tr[24] & 0x0f)) << 12;
-    dev->qmp6988_cali.COE_a0 = dev->qmp6988_cali.COE_a0 >> 12;
+    qmp6988_cali.COE_a0 = (QMP6988_S32_t)(((QMP6988_S32_t)a_data_uint8_tr[18] << SHIFT_LEFT_12_POSITION) | (a_data_uint8_tr[19] << SHIFT_LEFT_4_POSITION) | (a_data_uint8_tr[24] & 0x0f)) << 12;
+    qmp6988_cali.COE_a0 = qmp6988_cali.COE_a0 >> 12;
 
-    dev->qmp6988_cali.COE_a1 = (QMP6988_S16_t)((a_data_uint8_tr[20] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[21]);
+    qmp6988_cali.COE_a1 = (QMP6988_S16_t)((a_data_uint8_tr[20] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[21]);
 
-    dev->qmp6988_cali.COE_a2 = (QMP6988_S16_t)((a_data_uint8_tr[22] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[23]);
+    qmp6988_cali.COE_a2 = (QMP6988_S16_t)((a_data_uint8_tr[22] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[23]);
 
-    dev->qmp6988_cali.COE_b00
+    qmp6988_cali.COE_b00
         = (QMP6988_S32_t)((((QMP6988_S32_t)a_data_uint8_tr[0] << SHIFT_LEFT_12_POSITION) | (a_data_uint8_tr[1] << SHIFT_LEFT_4_POSITION) | ((a_data_uint8_tr[24] & 0xf0) >> SHIFT_RIGHT_4_POSITION))
                           << 12);
-    dev->qmp6988_cali.COE_b00 = dev->qmp6988_cali.COE_b00 >> 12;
+    qmp6988_cali.COE_b00 = qmp6988_cali.COE_b00 >> 12;
 
-    dev->qmp6988_cali.COE_bt1 = (QMP6988_S16_t)((a_data_uint8_tr[2] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[3]);
+    qmp6988_cali.COE_bt1 = (QMP6988_S16_t)((a_data_uint8_tr[2] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[3]);
 
-    dev->qmp6988_cali.COE_bt2 = (QMP6988_S16_t)((a_data_uint8_tr[4] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[5]);
+    qmp6988_cali.COE_bt2 = (QMP6988_S16_t)((a_data_uint8_tr[4] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[5]);
 
-    dev->qmp6988_cali.COE_bp1 = (QMP6988_S16_t)((a_data_uint8_tr[6] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[7]);
+    qmp6988_cali.COE_bp1 = (QMP6988_S16_t)((a_data_uint8_tr[6] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[7]);
 
-    dev->qmp6988_cali.COE_b11 = (QMP6988_S16_t)((a_data_uint8_tr[8] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[9]);
+    qmp6988_cali.COE_b11 = (QMP6988_S16_t)((a_data_uint8_tr[8] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[9]);
 
-    dev->qmp6988_cali.COE_bp2 = (QMP6988_S16_t)((a_data_uint8_tr[10] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[11]);
+    qmp6988_cali.COE_bp2 = (QMP6988_S16_t)((a_data_uint8_tr[10] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[11]);
 
-    dev->qmp6988_cali.COE_b12 = (QMP6988_S16_t)((a_data_uint8_tr[12] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[13]);
+    qmp6988_cali.COE_b12 = (QMP6988_S16_t)((a_data_uint8_tr[12] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[13]);
 
-    dev->qmp6988_cali.COE_b21 = (QMP6988_S16_t)((a_data_uint8_tr[14] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[15]);
+    qmp6988_cali.COE_b21 = (QMP6988_S16_t)((a_data_uint8_tr[14] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[15]);
 
-    dev->qmp6988_cali.COE_bp3 = (QMP6988_S16_t)((a_data_uint8_tr[16] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[17]);
+    qmp6988_cali.COE_bp3 = (QMP6988_S16_t)((a_data_uint8_tr[16] << SHIFT_LEFT_8_POSITION) | a_data_uint8_tr[17]);
 
-    dev->ik.a0 = dev->qmp6988_cali.COE_a0;   // 20Q4
-    dev->ik.b00 = dev->qmp6988_cali.COE_b00; // 20Q4
+    dev->ik.a0 = qmp6988_cali.COE_a0;   // 20Q4
+    dev->ik.b00 = qmp6988_cali.COE_b00; // 20Q4
 
-    dev->ik.a1 = 3608L * (QMP6988_S32_t)dev->qmp6988_cali.COE_a1 - 1731677965L; // 31Q23
-    dev->ik.a2 = 16889L * (QMP6988_S32_t)dev->qmp6988_cali.COE_a2 - 87619360L;  // 30Q47
+    dev->ik.a1 = 3608L * (QMP6988_S32_t)qmp6988_cali.COE_a1 - 1731677965L; // 31Q23
+    dev->ik.a2 = 16889L * (QMP6988_S32_t)qmp6988_cali.COE_a2 - 87619360L;  // 30Q47
 
-    dev->ik.bt1 = 2982L * (QMP6988_S64_t)dev->qmp6988_cali.COE_bt1 + 107370906L;   // 28Q15
-    dev->ik.bt2 = 329854L * (QMP6988_S64_t)dev->qmp6988_cali.COE_bt2 + 108083093L; // 34Q38
-    dev->ik.bp1 = 19923L * (QMP6988_S64_t)dev->qmp6988_cali.COE_bp1 + 1133836764L; // 31Q20
-    dev->ik.b11 = 2406L * (QMP6988_S64_t)dev->qmp6988_cali.COE_b11 + 118215883L;   // 28Q34
-    dev->ik.bp2 = 3079L * (QMP6988_S64_t)dev->qmp6988_cali.COE_bp2 - 181579595L;   // 29Q43
-    dev->ik.b12 = 6846L * (QMP6988_S64_t)dev->qmp6988_cali.COE_b12 + 85590281L;    // 29Q53
-    dev->ik.b21 = 13836L * (QMP6988_S64_t)dev->qmp6988_cali.COE_b21 + 79333336L;   // 29Q60
-    dev->ik.bp3 = 2915L * (QMP6988_S64_t)dev->qmp6988_cali.COE_bp3 + 157155561L;   // 28Q65
+    dev->ik.bt1 = 2982L * (QMP6988_S64_t)qmp6988_cali.COE_bt1 + 107370906L;   // 28Q15
+    dev->ik.bt2 = 329854L * (QMP6988_S64_t)qmp6988_cali.COE_bt2 + 108083093L; // 34Q38
+    dev->ik.bp1 = 19923L * (QMP6988_S64_t)qmp6988_cali.COE_bp1 + 1133836764L; // 31Q20
+    dev->ik.b11 = 2406L * (QMP6988_S64_t)qmp6988_cali.COE_b11 + 118215883L;   // 28Q34
+    dev->ik.bp2 = 3079L * (QMP6988_S64_t)qmp6988_cali.COE_bp2 - 181579595L;   // 29Q43
+    dev->ik.b12 = 6846L * (QMP6988_S64_t)qmp6988_cali.COE_b12 + 85590281L;    // 29Q53
+    dev->ik.b21 = 13836L * (QMP6988_S64_t)qmp6988_cali.COE_b21 + 79333336L;   // 29Q60
+    dev->ik.bp3 = 2915L * (QMP6988_S64_t)qmp6988_cali.COE_bp3 + 157155561L;   // 28Q65
     return ESP_OK;
 }
 
