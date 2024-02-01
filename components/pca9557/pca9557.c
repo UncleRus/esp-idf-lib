@@ -28,7 +28,7 @@
 /**
  * @file pca9557.c
  *
- * ESP-IDF driver for PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
+ * ESP-IDF driver for PCA9536/PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
  *
  * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -103,7 +103,7 @@ esp_err_t pca9557_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_
     CHECK_ARG(dev && (
             (addr & PCA9557_I2C_ADDR_BASE) == PCA9557_I2C_ADDR_BASE ||
             (addr & TCA9534_I2C_ADDR_BASE) == TCA9534_I2C_ADDR_BASE ||
-            addr == PCA9537_I2C_ADDR));
+            addr == PCA9537_I2C_ADDR || addr == PCA9536_I2C_ADDR));
 
     dev->port = port;
     dev->addr = addr;

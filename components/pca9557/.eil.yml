@@ -1,5 +1,5 @@
 name: pca9557
-description: Driver for PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
+description: Driver for PCA9536/PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
 version: 1.0.0
 groups:
   - gpio

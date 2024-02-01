@@ -30,7 +30,7 @@
  * @defgroup pca9557 pca9557
  * @{
  *
- * ESP-IDF driver for PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
+ * ESP-IDF driver for PCA9536/PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus
  *
  * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
  *
@@ -47,6 +47,7 @@
 extern "C" {
 #endif
 
+#define PCA9536_I2C_ADDR      0x41 ///< I2C address for PCA9536
 #define PCA9537_I2C_ADDR      0x49 ///< I2C address for PCA9537
 #define PCA9557_I2C_ADDR_BASE 0x18 ///< Base I2C address for PCA9557
 #define TCA9534_I2C_ADDR_BASE 0x20 ///< Base I2C address for TCA9534
@@ -129,7 +130,7 @@ esp_err_t pca9557_port_set_polarity(i2c_dev_t *dev, uint8_t pol);
  * @brief Read I/O port value
  *
  * @param dev       Pointer to I2C device descriptor
- * @param[out] val  8-bit GPIO port value for PCA9557 or 4-bit port value for PCA9537
+ * @param[out] val  8-bit GPIO port value for PCA9557 or 4-bit port value for PCA9536/PCA9537
  * @return `ESP_OK` on success
  */
 esp_err_t pca9557_port_read(i2c_dev_t *dev, uint8_t *val);
@@ -138,7 +139,7 @@ esp_err_t pca9557_port_read(i2c_dev_t *dev, uint8_t *val);
  * @brief Write value to I/O port
  *
  * @param dev     Pointer to I2C device descriptor
- * @param val     8-bit GPIO port value for PCA9557 or 4-bit port value for PCA9537
+ * @param val     8-bit GPIO port value for PCA9557 or 4-bit port value for PCA9536/PCA9537
  * @return ESP_OK on success
  */
 esp_err_t pca9557_port_write(i2c_dev_t *dev, uint8_t val);
@@ -147,7 +148,7 @@ esp_err_t pca9557_port_write(i2c_dev_t *dev, uint8_t val);
  * @brief Read I/O pin mode
  *
  * @param dev       Pointer to device descriptor
- * @param pin       Pin number, 0..7 for PCA9557, 0..3 for PC9537
+ * @param pin       Pin number, 0..7 for PCA9557, 0..3 for PCA9536/PC9537
  * @param[out] mode Pin mode
  * @return `ESP_OK` on success
  */
@@ -157,7 +158,7 @@ esp_err_t pca9557_get_mode(i2c_dev_t *dev, uint8_t pin, pca9557_mode_t *mode);
  * @brief Set I/O pin mode
  *
  * @param dev      Pointer to device descriptor
- * @param pin      Pin number, 0..7 for PCA9557, 0..3 for PC9537
+ * @param pin      Pin number, 0..7 for PCA9557, 0..3 for PCA9536/PC9537
  * @param mode     Pin mode
  * @return `ESP_OK` on success
  */
@@ -167,7 +168,7 @@ esp_err_t pca9557_set_mode(i2c_dev_t *dev, uint8_t pin, pca9557_mode_t mode);
  * @brief Read I/O pin level
  *
  * @param dev      Pointer to device descriptor
- * @param pin      Pin number, 0..7 for PCA9557, 0..3 for PC9537
+ * @param pin      Pin number, 0..7 for PCA9557, 0..3 for PCA9536/PC9537
  * @param[out] val 1 if pin currently in high state, 0 otherwise
  * @return `ESP_OK` on success
  */
@@ -179,7 +180,7 @@ esp_err_t pca9557_get_level(i2c_dev_t *dev, uint8_t pin, uint32_t *val);
  * Pin must be set up as output
  *
  * @param dev      Pointer to device descriptor
- * @param pin      Pin number, 0..7 for PCA9557, 0..3 for PC9537
+ * @param pin      Pin number, 0..7 for PCA9557, 0..3 for PCA9536/PC9537
  * @param val      Pin level. 1 - high, 0 - low
  * @return `ESP_OK` on success
  */
