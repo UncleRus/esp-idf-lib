@@ -17,7 +17,11 @@ static void IRAM_ATTR intr_handler(void *arg)
     // On interrupt set bit in event group
     BaseType_t hp_task;
     if (xEventGroupSetBitsFromISR(eg, BIT_BUTTON_CHANGED, &hp_task) != pdFAIL)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
         portYIELD_FROM_ISR(hp_task);
+#else
+        portYIELD_FROM_ISR();
+#endif
 }
 
 void button_handler(void *pvParameters)
