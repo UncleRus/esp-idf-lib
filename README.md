@@ -156,7 +156,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
 | **mcp23008**             | Driver for 8-bit I2C GPIO expander MCP23008                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **mcp23x17**             | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17                       | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
-| **pca9557**              | Driver for PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **pca9557**              | Driver for PCA9536/PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **pcf8574**              | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                         | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **pcf8575**              | Driver for PCF8575 remote 16-bit I/O expander for I2C-bus                        | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **tca6424a**             | Driver for TCA6424A low-voltage 24-bit I2C I/O expander                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
