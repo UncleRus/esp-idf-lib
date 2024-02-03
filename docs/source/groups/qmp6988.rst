@@ -1,0 +1,8 @@
+.. _qmp6988:
+
+qmp6988 - Driver for QMP6988 digital temperature and pressure sensor
+====================================================================
+
+.. doxygengroup:: qmp6988
+   :members:
+

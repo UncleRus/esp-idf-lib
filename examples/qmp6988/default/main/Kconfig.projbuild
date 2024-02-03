@@ -1,5 +1,5 @@
 menu "Example configuration"
-    choice EXAMPLE_SHT3X_DEMO
+    choice EXAMPLE_QMP6988_DEMO
         prompt "Demo mode"
         default EXAMPLE_QMP6988_DEMO_NORMAL
         help
@@ -12,7 +12,7 @@ menu "Example configuration"
                 In this example the qmp6988 makes a single measurement before entering
                 sleep mode again.
 
-        config EXAMPLE_SHT3X_DEMO_NORMAL
+        config EXAMPLE_QMP6988_DEMO_NORMAL
             bool "Normal mode"
             help
                 In this example the qmp6988 makes continuous measurements.

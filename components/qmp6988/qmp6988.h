@@ -56,13 +56,6 @@
 extern "C" {
 #endif
 
-typedef uint16_t QMP6988_U16_t;
-typedef int16_t QMP6988_S16_t;
-typedef uint32_t QMP6988_U32_t;
-typedef int32_t QMP6988_S32_t;
-typedef uint64_t QMP6988_U64_t;
-typedef int64_t QMP6988_S64_t;
-
 #define QMP6988_I2C_ADDR_GND 0x70
 #define QMP6988_I2C_ADDR_VDD 0x56
 
@@ -70,9 +63,9 @@ typedef int64_t QMP6988_S64_t;
  * Possible measurement modes
  */
 typedef enum {
-    QMP6988_SLEEP_MODE = 0x00,  // sleep mode
-    QMP6988_FORCED_MODE = 0x01, // one measurement then sleep again
-    QMP6988_NORMAL_MODE = 0x03  // power mode
+    QMP6988_SLEEP_MODE = 0x00,  //!< sleep mode
+    QMP6988_FORCED_MODE = 0x01, //!< one measurement then sleep again
+    QMP6988_NORMAL_MODE = 0x03  //!< power mode
 } qmp6988_power_mode_t;
 
 /**
@@ -104,11 +97,11 @@ typedef enum {
 /**
  * Structure holding calibration data for QMP6988.
  */
-typedef struct _qmp6988_ik_data
+typedef struct
 {
-    QMP6988_S32_t a0, b00;
-    QMP6988_S32_t a1, a2;
-    QMP6988_S64_t bt1, bt2, bp1, b11, bp2, b12, b21, bp3;
+    int32_t a0, b00;
+    int32_t a1, a2;
+    int64_t bt1, bt2, bp1, b11, bp2, b12, b21, bp3;
 } qmp6988_ik_data_t;
 
 /**
@@ -197,17 +190,19 @@ esp_err_t qmp6988_set_t_oversampling(qmp6988_t *dev, qmp6988_oversampling_t over
  * @brief Calculate pressure based on QMP6988 sensor data.
  *
  * @param dev       Device descriptor.
- * @return          Calculated pressure in Pascals (Pa).
+ * @param[out] p    Calculated pressure in Pascals (Pa).
+ * @return          `ESP_OK` on success.
  */
-float qmp6988_calc_pressure(qmp6988_t *dev);
+esp_err_t qmp6988_calc_pressure(qmp6988_t *dev, float *p);
 
 /**
  * @brief Calculate temperature based on QMP6988 sensor data.
  *
  * @param dev       Device descriptor.
- * @return          Calculated temperature in degrees Celsius (°C).
+ * @param[out] t    Calculated temperature in degrees Celsius (°C).
+ * @return          `ESP_OK` on success.
  */
-float qmp6988_calc_temperature(qmp6988_t *dev);
+esp_err_t qmp6988_calc_temperature(qmp6988_t *dev, float *t);
 
 #ifdef __cplusplus
 }

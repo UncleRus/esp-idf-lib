@@ -59,7 +59,7 @@ void task(void *pvParameters)
 
         /*Calculate pressure values (this includes temperature as well,
         as temp is needed to calc pressure)*/
-        pressure = qmp6988_calc_pressure(&dev);
+        ESP_ERROR_CHECK(qmp6988_calc_pressure(&dev, &pressure));
         temperature = dev.temperature;
         printf("QMP6988 Sensor: %.2f °C, %.2f Pa\n", temperature, pressure);
 
@@ -94,7 +94,7 @@ void task(void *pvParameters)
     {
         /*Calculate pressure values (this includes temperature as well,
         as temp is needed to calc pressure)*/
-        pressure = qmp6988_calc_pressure(&dev);
+        ESP_ERROR_CHECK(qmp6988_calc_pressure(&dev, &pressure));
         temperature = dev.temperature;
         printf("QMP6988 Sensor: %.2f °C, %.2f Pa\n", temperature, pressure);
 

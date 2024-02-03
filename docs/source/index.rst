@@ -132,6 +132,7 @@ Pressure sensors
    groups/bme680
    groups/dps310
    groups/ms5611
+   groups/qmp6988
 
 Air quality/Gas sensors
 =======================
