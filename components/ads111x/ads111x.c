@@ -139,6 +139,9 @@ static esp_err_t write_conf_bits(i2c_dev_t *dev, uint16_t val, uint8_t offs,
 
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, read_reg(dev, REG_CONFIG, &old));
+    // Issue #593
+    if (offs != OS_OFFSET || mask != OS_MASK)
+        old &= ~(OS_MASK << OS_OFFSET);
     I2C_DEV_CHECK(dev, write_reg(dev, REG_CONFIG, (old & ~(mask << offs)) | (val << offs)));
     I2C_DEV_GIVE_MUTEX(dev);
 
