@@ -252,6 +252,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **qmp6988**              | Driver for QMP6988 digital temperature and pressure sensor                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
 ### Real-time clocks
@@ -286,6 +287,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **mcp960x**              | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **mcp9808**              | Driver for MCP9808 digital temperature sensor                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **qmp6988**              | Driver for QMP6988 digital temperature and pressure sensor                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
@@ -308,6 +310,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [BernhardG](https://gitlab.com/mrnice): `ms5611` 
 - [BhuvanchandraD](https://github.com/bhuvanchandra): `ds3231` 
 - [Brian Schwind](https://github.com/bschwind): `tsl2561` `tsl4531` 
+- [Cedric von Gunten](https://github.com/vonguced): `qmp6988` 
 - [Christian Skjerning](https://github.com/slimcdk): `sts3x` 
 - [David Douard](https://github.com/douardda): `mhz19b` 
 - [Erriez](https://github.com/Erriez): `mhz19b` 
@@ -332,7 +335,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - Pavel Merzlyakov: `ds1302` 
 - [Raghav Jha](https://github.com/horsemann07): `mpu6050` 
 - RichardA: `ds3231` 
-- [Ruslan V. Uss](https://github.com/UncleRus): `ads111x` `aht` `am2320` `bh1750` `bh1900nux` `bme680` `bmp180` `bmp280` `button` `calibration` `ccs811` `dht` `ds1302` `ds1307` `ds18x20` `ds3231` `ds3502` `encoder` `framebuffer` `hd44780` `hdc1000` `hmc5883l` `hx711` `i2cdev` `ina219` `ina260` `ina3221` `led_strip` `led_strip_spi` `max31725` `max31855` `max31865` `max7219` `mcp23008` `mcp23x17` `mcp342x` `mcp4725` `mcp960x` `mcp9808` `mpu6050` `ms5611` `onewire` `pca9557` `pca9685` `pcf8563` `pcf8574` `pcf8575` `pcf8591` `qmc5883l` `rda5807m` `scd30` `scd4x` `sfa3x` `sgp40` `sht3x` `sht4x` `si7021` `sts21` `sts3x` `tca6424a` `tca9548` `tca95x5` `tda74xx` `tsl2561` `tsl4531` `tsys01` `ultrasonic` `wiegand` 
+- [Ruslan V. Uss](https://github.com/UncleRus): `ads111x` `aht` `am2320` `bh1750` `bh1900nux` `bme680` `bmp180` `bmp280` `button` `calibration` `ccs811` `dht` `ds1302` `ds1307` `ds18x20` `ds3231` `ds3502` `encoder` `framebuffer` `hd44780` `hdc1000` `hmc5883l` `hx711` `i2cdev` `ina219` `ina260` `ina3221` `led_strip` `led_strip_spi` `max31725` `max31855` `max31865` `max7219` `mcp23008` `mcp23x17` `mcp342x` `mcp4725` `mcp960x` `mcp9808` `mpu6050` `ms5611` `onewire` `pca9557` `pca9685` `pcf8563` `pcf8574` `pcf8575` `pcf8591` `qmc5883l` `qmp6988` `rda5807m` `scd30` `scd4x` `sfa3x` `sgp40` `sht3x` `sht4x` `si7021` `sts21` `sts3x` `tca6424a` `tca9548` `tca95x5` `tda74xx` `tsl2561` `tsl4531` `tsys01` `ultrasonic` `wiegand` 
 - [Sensirion AG](https://github.com/Sensirion): `scd30` `scd4x` `sfa3x` 
 - [sheinz](https://github.com/sheinz): `bmp280` 
 - [Thanh Pham](https://github.com/panoti): `pcf8591` 

@@ -1,0 +1,23 @@
+name: qmp6988
+description: Driver for QMP6988 digital temperature and pressure sensor
+version: 0.0.1
+groups:
+  - temperature
+  - pressure
+code_owners: vonguced
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: UncleRus
+    year: 2016
+  - name: vonguced
+    year: 2024
