@@ -174,8 +174,7 @@ static esp_err_t exec_cmd(sht4x_t *dev, uint8_t cmd, size_t delay_ticks, sht4x_r
 {
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
     I2C_DEV_CHECK(&dev->i2c_dev, send_cmd_nolock(dev, cmd));
-    if (delay_ticks)
-        vTaskDelay(delay_ticks);
+    vTaskDelay(delay_ticks + 1);
     I2C_DEV_CHECK(&dev->i2c_dev, read_res_nolock(dev, res));
     I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
 
