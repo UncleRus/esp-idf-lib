@@ -48,6 +48,10 @@
 #define BTN_PRESSED_LEVEL 1
 #endif
 
+#if defined(CONFIG_IDF_TARGET_ESP8266) && CONFIG_RE_INTERVAL_US < 10000
+#error Too small CONFIG_RE_INTERVAL_US! For ESP8266 it should be >= 10000
+#endif
+
 static const char *TAG = "encoder";
 static rotary_encoder_t *encs[CONFIG_RE_MAX] = { 0 };
 static const int8_t valid_states[] = { 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 };
