@@ -220,7 +220,7 @@ esp_err_t ina219_get_mode(ina219_t *dev, ina219_mode_t *mode)
     return read_conf_bits(dev, MASK_MODE, BIT_MODE, (uint16_t *)mode);
 }
 
-esp_err_t ina219_calibrate(ina219_t *dev, float i_expected_max, float r_shunt)
+esp_err_t ina219_calibrate(ina219_t *dev, float r_shunt)
 {
     CHECK_ARG(dev);
 
@@ -237,7 +237,7 @@ esp_err_t ina219_calibrate(ina219_t *dev, float i_expected_max, float r_shunt)
 
     uint16_t cal = (uint16_t)((0.04096) / (dev->i_lsb * r_shunt));
 
-    ESP_LOGD(TAG, "Calibration: %.04f A, %.04f Ohm, 0x%04x", i_expected_max, r_shunt, cal);
+    ESP_LOGD(TAG, "Calibration: %.04f Ohm, 0x%04x", r_shunt, cal);
 
     return write_reg_16(dev, REG_CALIBRATION, cal);
 }

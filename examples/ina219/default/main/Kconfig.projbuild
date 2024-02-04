@@ -1,10 +1,4 @@
 menu "Example configuration"
-    config EXAMPLE_MAX_CURRENT
-        int "Expected max current in Ampare to measure"
-        default 5
-        help
-            Expected max current in Ampare. Note that the value must be int, not float.
-
     config EXAMPLE_SHUNT_RESISTOR_MILLI_OHM
         int "Shunt resistor value in milliohm)"
         default 100

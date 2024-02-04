@@ -232,11 +232,10 @@ esp_err_t ina219_get_mode(ina219_t *dev, ina219_mode_t *mode);
  * Current readings will be valid only after calibration
  *
  * @param dev Device descriptor
- * @param i_expected_max Maximum expected current, A
  * @param r_shunt Shunt resistance, Ohm
  * @return `ESP_OK` on success
  */
-esp_err_t ina219_calibrate(ina219_t *dev, float i_expected_max, float r_shunt);
+esp_err_t ina219_calibrate(ina219_t *dev, float r_shunt);
 
 /**
  * @brief Trigger single conversion
