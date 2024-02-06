@@ -161,7 +161,7 @@ class Devtool:
 
         diff = tuple(l.split('/') for l in diff.stdout.strip().replace('\r', '').split('\n'))
         dirs = set((l[0] for l in diff))
-        changed_components = set((l[1] for l in diff if len(l) > 1 and l[0] == 'components'))
+        changed_components = set((l[1] for l in diff if len(l) > 1 and l[0] in ('components', 'examples')))
         all_components = {c.name: c for c in self.iter_components()}
         components_to_build = set()
 
