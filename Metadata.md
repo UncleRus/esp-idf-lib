@@ -62,15 +62,15 @@ Resources defined here represents various objects used in the metadata.
 
 A resource has unique `name` as a primary key.
 
-When referring to a resource in another resource, use `name` as key and its
+When referring to a resource in another resource, use `name` as 
 value to identify the resource. As a shorthand, you may use the name of a
-resource as `String`. In this case, the value is assumed to be `name: $VALUE`.
+resource as `String`. In this case, the value is assumed to be `$VALUE`.
 
 When a resource expects a `Person` as a value,
 
 ```yaml
 foo:
-  name: trombik
+  - trombik
 ```
 
 This is a shorthand version of the above example:
@@ -84,13 +84,13 @@ foo: trombik
 A `Person` represents a person. `Person` is used to describe a copyrights
 holder and a code owner. A `Person` must be defined in `persons.yml` file.
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | A unique ID string of the person. Use GitHub account or GitHub project if the person has one | Yes |
-| `full_name` | `String` | Full name of the person or the project | No |
-| `gh_id` | `String` | GitHub account name or project name | No |
-| `email` | `String` | Email address of the person | No |
-| `website` | `String` | Web site URL | No |
+| Name        | Type     | Description                                                                                  | Required |
+|-------------|----------|----------------------------------------------------------------------------------------------|----------|
+| `name`      | `String` | A unique ID string of the person. Use GitHub account or GitHub project if the person has one | Yes      |
+| `full_name` | `String` | Full name of the person or the project                                                       | No       |
+| `gh_id`     | `String` | GitHub account name or project name                                                          | No       |
+| `email`     | `String` | Email address of the person                                                                  | No       |
+| `url`       | `String` | Web site URL                                                                                 | No       |
 
 When any of `gh_id`, `email`, or `website` is not available, `person` must
 have a full name because it is used to identify the source of code.
@@ -108,7 +108,7 @@ name: trombik
 gh_id: trombik
 full_name: Tomoyuki Sakurai
 email: y@trombik.org
-website: https://github.com/trombik
+url: https://github.com/trombik
 ```
 
 ```yaml
@@ -119,9 +119,9 @@ full_name: Foo `bar` buz
 
 ### Target
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | Name of the build target in `esp-idf`, or `esp8266`. | Yes |
+| Name   | Type     | Description                                          | Required |
+|--------|----------|------------------------------------------------------|----------|
+| `name` | `String` | Name of the build target in `esp-idf`, or `esp8266`. | Yes      |
 
 An example:
 
@@ -131,9 +131,9 @@ name: esp32
 
 ### License
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | SPDX License Identifier (see [the list of licenses](https://spdx.org/licenses/)) | Yes |
+| Name   | Type     | Description                                                                      | Required |
+|--------|----------|----------------------------------------------------------------------------------|----------|
+| `name` | `String` | SPDX License Identifier (see [the list of licenses](https://spdx.org/licenses/)) | Yes      |
 
 An example:
 
@@ -143,11 +143,11 @@ name: BSD-3
 
 ### Copyright
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `author` | `Person` | Copyrights holder. See also `Person`. | No |
-| `name` | `String` | The value of `name` of `Person`. A shorthand for `author` | No |
-| `year` | `Integer` | Registration year of the copyrights | Yes |
+| Name     | Type      | Description                                               | Required |
+|----------|-----------|-----------------------------------------------------------|----------|
+| `author` | `Person`  | Copyrights holder. See also `Person`.                     | No       |
+| `name`   | `String`  | The value of `name` of `Person`. A shorthand for `author` | No       |
+| `year`   | `Integer` | Registration year of the copyrights                       | Yes      |
 
 `Copyright` must have only one of `author` and `name`, not both.
 
@@ -171,10 +171,10 @@ year: 2021
 A `Group` represents a group of `Component`s. A `Group` must be in
 `groups.yml`.
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | A unique ID of the group | Yes |
-| `description` | `String` | Description of the group | Yes |
+| Name          | Type     | Description              | Required |
+|---------------|----------|--------------------------|----------|
+| `name`        | `String` | A unique ID of the group | Yes      |
+| `description` | `String` | Description of the group | Yes      |
 
 `name` should be short, and memorable. Use `-` as a word separator. It must
 not include spaces (`[0-9a-zA-Z-]+` in regular expression).
@@ -202,36 +202,32 @@ components:
 
 ### Component
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| `name` | `String` | The name of the component. Must be unique. | Yes |
-| `description` | `String` | A short description of the component. | Yes |
-| `group` | `Group` | The primary group name of the component. | Yes |
-| `groups` | A list of `Group` | A list of zero or more of `Group` | No |
-| `code_owners` | A list of `Person` | A list of one or more of `Person` | Yes |
-| `depends` | A list of `Component` | Zero or more of `component` that the component depends on | No |
-| `thread_safe` | `Strnig` | One of `yes`, `no`, and `N/A` | Yes |
-| `targets` | A list of `Target` | One or more of supported `target` | Yes |
-| `licenses` | A list of `License` | One or more of licenses used in the component | Yes |
-| `copyrights` | A list of `Copyright` | One or more of copyright holder | Yes |
+| Name          | Type                  | Description                                               | Required |
+|---------------|-----------------------|-----------------------------------------------------------|----------|
+| `name`        | `String`              | The name of the component. Must be unique.                | Yes      |
+| `description` | `String`              | A short description of the component.                     | Yes      |
+| `version`     | `String`              | Component version.                                        | Yes      |
+| `groups`      | A list of `Group`     | A list of one or more of `Group`                          | No       |
+| `code_owners` | A list of `Person`    | A list of one or more of `Person`                         | Yes      |
+| `depends`     | A list of `Component` | Zero or more of `component` that the component depends on | No       |
+| `thread_safe` | `Strnig`              | One of `yes`, `no`, and `N/A`                             | Yes      |
+| `targets`     | A list of `Target`    | One or more of supported `target`                         | Yes      |
+| `license`     | `License`             | License used in the component                             | Yes      |
+| `copyrights`  | A list of `Copyright` | One or more of copyright holder                           | Yes      |
 
 FIXME `depends` must be a list because some drivers have conditional `REQUIRES`
 in `CMakeLists.txt`.
 
 ## Usages of metadata in the project
 
-The current implementation uses `ruby` and `rspec` ruby gem to validate
-metadata in all components, and generate `README.md`.
-
 Requirements are:
 
-* `ruby` 2.7 (other version should also work)
-* [`bundler`](https://bundler.io/)
+* `python` >=3.10
 
 After installing requirements, run:
 
 ```console
-bundle install
+pip install -r devtool/requirements.txt
 ```
 
 ### Validating metadata of components
@@ -239,34 +235,17 @@ bundle install
 To validate metadata, run:
 
 ```console
-bundle exec rake -C devtools rspec
+python ./devtools/devtool.py check
 ```
 
-The implementation uses `rspec` to validate metadata because:
-
-1. the output is readable
-2. requires less `ruby` knowledge to maintain the spec than validating
-   everything in ruby code
-3. porting tests to other languages is easier than porting ruby code
-
-Under `spec` directory, there are:
-
-* `spec_helper.rb`, which is a helper for the test
-* `*_spec.rb`, which is a test script
-* other ruby files, such as `person.rb`, which are class definitions used in
-  the test
-
-The ruby classes for the test validate minimum requirements only, such as the
-`.eil.yml` file exists, or a resource has a required primary key. Actual
-test should be performed in `*_spec.rb` files.
 
 ### Generating `README.md`
 
-`README.md` is generated from the metadata and `README.md.erb`. To update
+`README.md` is generated from the metadata and `devtools/devtools/template/README.md`. To update
 `README.md`, run the following command at the repository root directory:
 
 ```console
-bundle exec rake -C devtools readme > README.md
+python ./devtools/devtool.py render
 ```
 
 ## Known issues
@@ -279,17 +258,17 @@ the following case.
 ```yaml
 # for esp32
 depends:
-  - name: driver
-  - name: freertos
-  - name: log
+  - driver
+  - freertos
+  - log
 ```
 
 ```yaml
 # for esp8266
 depends:
-  - name: esp8266
-  - name: freertos
-  - name: log
+  - esp8266
+  - freertos
+  - log
 ```
 
 A possible solution:
@@ -298,12 +277,12 @@ A possible solution:
 depends:
   - name: driver
     target:
-      - name: esp32
-      - name: esp32s2
-      - name: esp32c3
+      - esp32
+      - esp32s2
+      - esp32c3
   - name: esp8266
     target:
-      - name: esp8266
-  - name: freertos
-  - name: log
+      - esp8266
+  - freertos
+  - log
 ```

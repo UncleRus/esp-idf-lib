@@ -180,7 +180,9 @@ inline static bool cfg_equal(const i2c_config_t *a, const i2c_config_t *b)
 #if HELPER_TARGET_IS_ESP32
         && a->master.clk_speed == b->master.clk_speed
 #elif HELPER_TARGET_IS_ESP8266
-        && a->clk_stretch_tick == b->clk_stretch_tick
+        && ((a->clk_stretch_tick && a->clk_stretch_tick == b->clk_stretch_tick) 
+            || (!a->clk_stretch_tick && b->clk_stretch_tick == I2CDEV_MAX_STRETCH_TIME)
+        ) // see line 232
 #endif
         && a->scl_pullup_en == b->scl_pullup_en
         && a->sda_pullup_en == b->sda_pullup_en;
@@ -205,10 +207,18 @@ static esp_err_t i2c_setup_port(const i2c_dev_t *dev)
             states[dev->port].installed = false;
         }
 #if HELPER_TARGET_IS_ESP32
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 0)
+        // See https://github.com/espressif/esp-idf/issues/10163
+        if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
+            return res;
+        if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
+            return res;
+#else
         if ((res = i2c_param_config(dev->port, &temp)) != ESP_OK)
             return res;
         if ((res = i2c_driver_install(dev->port, temp.mode, 0, 0, 0)) != ESP_OK)
             return res;
+#endif
 #endif
 #if HELPER_TARGET_IS_ESP8266
         // Clock Stretch time, depending on CPU frequency

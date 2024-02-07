@@ -1,5 +1,3 @@
----
-
 - name: adc-dac
   description: ADC/DAC libraries
 
@@ -44,3 +42,9 @@
 
 - name: misc
   description: Other misc libraries
+
+- name: imu
+  description: Inertial measurement units
+
+- name: battery
+  description: Battery controllers

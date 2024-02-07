@@ -1,20 +1,17 @@
----
-components:
-  - name: ls7366r
-    description: Driver for LS7366R Quadrature Encoder Counter
-    group: input
-    groups: []
-    code_owners: Jkallus
-    depends:
-      - name: driver
-    thread_safe: yes
-    targets:
-      - name: esp32
-      - name: esp32s2
-      - name: esp32c3
-    licenses:
-      - name: MIT
-    copyrights:
-      - author:
-          name: Jkallus
-        year: 2021
+name: ls7366r
+description: Driver for LS7366R Quadrature Encoder Counter
+version: 1.0.0
+groups:
+  - input
+code_owners: Jkallus
+depends:
+  - driver
+thread_safe: yes
+targets:
+  - esp32
+  - esp32s2
+  - esp32c3
+license: MIT
+copyrights:
+  - name: Jkallus
+    year: 2021

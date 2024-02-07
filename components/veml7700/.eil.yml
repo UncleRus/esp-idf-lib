@@ -1,0 +1,20 @@
+name: veml7700
+description: Driver for VEML7700 ambient light sensor
+version: 1.0.0
+groups:
+  - light
+code_owners: Th3Link
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: ISC
+copyrights:
+  - name: Th3Link
+    year: 2019

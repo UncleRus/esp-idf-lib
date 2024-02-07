@@ -70,14 +70,6 @@ static const char *TAG = "tsl2591";
 #define TSL2591_SPECIAL_CLEAR_BOTH      0x07    // Clear ALS and no persist ALS interrupt
 #define TSL2591_SPECIAL_CLEAR_NP_INTR   0x0A    // Clear no persist ALS interrupt
 
-// TSL2591 integration times in useconds.
-#define TSL2591_INTEGRATION_TIME_100MS  110
-#define TSL2591_INTEGRATION_TIME_200MS  210
-#define TSL2591_INTEGRATION_TIME_300MS  310
-#define TSL2591_INTEGRATION_TIME_400MS  410
-#define TSL2591_INTEGRATION_TIME_500MS  510
-#define TSL2591_INTEGRATION_TIME_600MS  610
-
 // TSL2591 status flags.
 #define TSL2591_STATUS_ALS_INTR     0x10
 #define TSL2591_STATUS_ALS_NP_INTR  0x20
@@ -89,6 +81,15 @@ static const char *TAG = "tsl2591";
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 #define SLEEP_MS(x) do { vTaskDelay(pdMS_TO_TICKS(x)); } while (0)
+
+static const uint32_t integration_time_ms[] = {
+    [TSL2591_INTEGRATION_100MS] = 100,
+    [TSL2591_INTEGRATION_200MS] = 200,
+    [TSL2591_INTEGRATION_300MS] = 300,
+    [TSL2591_INTEGRATION_400MS] = 400,
+    [TSL2591_INTEGRATION_500MS] = 500,
+    [TSL2591_INTEGRATION_600MS] = 600,
+};
 
 // Read/write to registers.
 static inline esp_err_t write_register(tsl2591_t *dev, uint8_t reg, uint8_t value)
@@ -147,7 +148,6 @@ static inline esp_err_t read_register16(tsl2591_t *dev, uint8_t low_register, ui
     *value = (uint16_t)buf[1] << 8 | buf[0];
 
     return ESP_OK;
-
 }
 
 
@@ -201,27 +201,12 @@ esp_err_t tsl2591_init(tsl2591_t *dev)
     // Wait until the first integration cycle is completed.
     tsl2591_integration_time_t integration_time;
     ESP_ERROR_CHECK(tsl2591_get_integration_time(dev, &integration_time));
-    switch (integration_time)
+    if (integration_time > TSL2591_INTEGRATION_600MS)
     {
-    case TSL2591_INTEGRATION_100MS:
-        SLEEP_MS(110);
-        break;
-    case TSL2591_INTEGRATION_200MS:
-        SLEEP_MS(210);
-        break;
-    case TSL2591_INTEGRATION_300MS:
-        SLEEP_MS(310);
-        break;
-    case TSL2591_INTEGRATION_400MS:
-        SLEEP_MS(410);
-        break;
-    case TSL2591_INTEGRATION_500MS:
-        SLEEP_MS(510);
-        break;
-    case TSL2591_INTEGRATION_600MS:
-        SLEEP_MS(610);
-        break;
+        ESP_LOGE(TAG, "Invalid integration time: %d", integration_time);
+        return ESP_ERR_INVALID_STATE;
     }
+    SLEEP_MS(integration_time_ms[integration_time] + 10);
 
     return ESP_OK;
 }
@@ -247,53 +232,33 @@ esp_err_t tsl2591_calculate_lux(tsl2591_t *dev, uint16_t channel0, uint16_t chan
 {
     CHECK_ARG(dev && lux);
 
-    float atime, again;
-    switch (dev->settings.control_reg & 0x07)
-    {
-    case TSL2591_INTEGRATION_100MS:
-        atime = 100;
-        break;
-    case TSL2591_INTEGRATION_200MS:
-        atime = 200;
-        break;
-    case TSL2591_INTEGRATION_300MS:
-        atime = 300;
-        break;
-    case TSL2591_INTEGRATION_400MS:
-        atime = 400;
-        break;
-    case TSL2591_INTEGRATION_500MS:
-        atime = 500;
-        break;
-    case TSL2591_INTEGRATION_600MS:
-        atime = 600;
-        break;
-    default:
-        atime = 100;
-    }
+    uint8_t itime = dev->settings.control_reg & 0x07;
+    if (itime > TSL2591_INTEGRATION_600MS)
+        itime = TSL2591_INTEGRATION_100MS;
+    float atime = (float)integration_time_ms[itime];
 
+    float again;
     switch (dev->settings.control_reg & TSL2591_GAIN_MAX)
     {
-    case TSL2591_GAIN_LOW:
-        again = 1;
-        break;
-    case TSL2591_GAIN_MEDIUM:
-        again = 25;
-        break;
-    case TSL2591_GAIN_HIGH:
-        again = 428;
-        break;
-    case TSL2591_GAIN_MAX:
-        again = 9876;
-        break;
-    default:
-        again = 1;
+        case TSL2591_GAIN_LOW:
+            again = 1;
+            break;
+        case TSL2591_GAIN_MEDIUM:
+            again = 25;
+            break;
+        case TSL2591_GAIN_HIGH:
+            again = 428;
+            break;
+        case TSL2591_GAIN_MAX:
+            again = 9876;
+            break;
+        default:
+            again = 1;
     }
 
     // See Adafruit Arduino driver.
     float cpl = (atime * again) / TSL2591_LUX_DF;
-    *lux = (((float)channel0 - (float)channel1)) * 
-        (1.0F - ((float)channel1 / (float)channel0)) / cpl;
+    *lux = (((float)channel0 - (float)channel1)) * (1.0F - ((float)channel1 / (float)channel0)) / cpl;
 
     return ESP_OK;
 }
@@ -418,7 +383,7 @@ esp_err_t tsl2591_set_integration_time(tsl2591_t *dev, tsl2591_integration_time_
     I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
 
     // Last 3 bits represent the integration time.
-    I2C_DEV_CHECK(&dev->i2c_dev, 
+    I2C_DEV_CHECK(&dev->i2c_dev,
         write_control_register(dev, (dev->settings.control_reg & ~0x07) | integration_time));
     dev->settings.control_reg = (dev->settings.control_reg & ~0x07) | integration_time;
 

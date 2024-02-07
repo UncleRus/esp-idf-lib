@@ -57,9 +57,9 @@ static const char *TAG = "si7021";
 #define CMD_READ_USER_REG    0xe7
 #define CMD_WRITE_HEATER_REG 0x51
 #define CMD_READ_HEATER_REG  0x11
-#define CMD_READ_ID_1        0xfa0f
-#define CMD_READ_ID_2        0xfcc9
-#define CMD_READ_FW_REV_1    0x84b8
+#define CMD_READ_ID_1        0x0ffa
+#define CMD_READ_ID_2        0xc9fc
+#define CMD_READ_FW_REV_1    0xb884
 
 #define BIT_USER_REG_RES0 0
 #define BIT_USER_REG_HTRE 2
@@ -313,6 +313,19 @@ esp_err_t si7021_get_device_id(i2c_dev_t *dev, si7021_device_id_t *id)
         default:
             *id = SI_MODEL_UNKNOWN;
     }
+
+    return ESP_OK;
+}
+
+esp_err_t si7021_get_device_revision(i2c_dev_t *dev, uint8_t *rev)
+{
+    CHECK_ARG(dev && rev);
+
+    uint16_t cmd = CMD_READ_FW_REV_1;
+
+    I2C_DEV_TAKE_MUTEX(dev);
+    I2C_DEV_CHECK(dev, i2c_dev_read(dev, &cmd, 2, rev, 1));
+    I2C_DEV_GIVE_MUTEX(dev);
 
     return ESP_OK;
 }

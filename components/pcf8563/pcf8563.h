@@ -30,7 +30,7 @@
  * @defgroup pcf8563 pcf8563
  * @{
  *
- * ESP-IDF driver for PCF8563 real-time clock/calendar
+ * ESP-IDF driver for PCF8563 (BM8563) real-time clock/calendar
  *
  * Copyright (c) 2020 Ruslan V. Uss <unclerus@gmail.com>
  *

@@ -28,9 +28,9 @@
 /**
  * @file sts21.c
  *
- * ESP-IDF driver for humidty/temperature sensors sts2110/sts2115/sts2120
+ * ESP-IDF driver for humidty/temperature sensors STS2110/STS2115/STS2120
  *
- * Copyright (c) 2021 Ruslan V. Uss <unclerus@gmail.com>
+ * Copyright (c) 2022 Ruslan V. Uss <unclerus@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */

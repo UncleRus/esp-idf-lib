@@ -1,5 +1,77 @@
 # Changelog
 
+## v.0.9.4
+
+### Features
+- (sgm58031): Driver for SGM58031 16-bit I2C ADC by @jmpmscorp in https://github.com/UncleRus/esp-idf-lib/pull/511
+- (sts3x): Driver for Sensirion STS30/STS31/STS35 digital temperature sensor by @slimcdk in https://github.com/UncleRus/esp-idf-lib/pull/532
+- (mpu6050): Driver for MPU6000/MPU6050 6-axis MotionTracking device by @horsemann07 in https://github.com/UncleRus/esp-idf-lib/pull/455
+- (max1704x): Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge by @shuki25 in https://github.com/UncleRus/esp-idf-lib/pull/542
+- (calibration): Multi-point calibration library by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/545
+
+### Bugfixes
+- (veml7700): Fixed wrong resolution divider by @Throows in https://github.com/UncleRus/esp-idf-lib/pull/534
+- (docs): Fixed section in docs for max7219 by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/529
+- (mcp23x17): Fixed function name in mcp23x17.c to match the one in the header by @oisalb in https://github.com/UncleRus/esp-idf-lib/pull/536
+- (tsl2591): Added sensor init to default tsl2591 example by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/541
+- (ci): New devtool, simpler metadata, simpler CI by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/546
+- (docs): Fixed doxygen comments and docs, updated doxygen config by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/553
+
+## New Contributors
+* @slimcdk made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/532
+* @Throows made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/534
+* @oisalb made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/536
+* @horsemann07 made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/455
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.4/
+
+## v.0.9.3
+
+### Features
+- (icm42670): Driver for TDK ICM-42670-P 6-Axis IMU by @janveeh in https://github.com/UncleRus/esp-idf-lib/pull/485
+- (veml7700): Driver for ambient light sensor VEML7700 by @Th3Link in https://github.com/UncleRus/esp-idf-lib/pull/492
+- (am2320): Driver for temperature and humidity sensor AM2320 (I2C mode) by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/508
+
+### Bugfixes
+- (ci): Added esp-idf 5.x build to CI by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/483
+- (hx711): Fixed signed division of HX711 average read by @gaialucas in https://github.com/UncleRus/esp-idf-lib/pull/487
+- (esp_idf_lib_helpers): Added support for esp32c2 by @vaemc in https://github.com/UncleRus/esp-idf-lib/pull/488
+- (esp_idf_lib_helpers): Added support for esp32c6 by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/524
+- (noise): Added cpp guards by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/490
+- (doc): Fixed multiple documentation errors @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/493
+- (encoder): Fixed incorrect pin configuration by @klaasjanhorlings in https://github.com/UncleRus/esp-idf-lib/pull/526
+- (si7021): Fixed reversed bytes in command words by @stvnjns and @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/527 
+
+## New Contributors
+* @gaialucas made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/487
+* @vaemc made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/488
+* @janveeh made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/485
+* @Th3Link made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/492
+* @klaasjanhorlings made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/526
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.3/
+
+## v.0.9.2
+
+### Features
+- (ds3231): Added ds3231_get_squarewave_freq by @dizcza in https://github.com/UncleRus/esp-idf-lib/pull/447
+- (ads130e08): Driver for ADS130E08 ADC by @weslleymfd in https://github.com/UncleRus/esp-idf-lib/pull/462
+- (dps310): DPS310 driver by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/463
+
+### Bugfixes
+- (pca9557): Fixed incorrect I2C address and register bug by @AxelLin in https://github.com/UncleRus/esp-idf-lib/pull/453
+- (max7219) Fix string bounds check by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/471
+- (ci) Updated esp-idf versions by @trombik
+- (ci) Updated actions/checkout to v3 by @trombik in https://github.com/UncleRus/esp-idf-lib/pull/476
+- (esp_idf_lib_helpers): Fixed ets_sys.h error by @UncleRus in https://github.com/UncleRus/esp-idf-lib/pull/479
+- (i2cdev): Fixed i2c param config and driver install order for esp32 target by @AxelLin in https://github.com/UncleRus/esp-idf-lib/pull/475
+
+## New Contributors
+* @AxelLin made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/453
+* @weslleymfd made their first contribution in https://github.com/UncleRus/esp-idf-lib/pull/462
+
+### Documentation: https://esp-idf-lib.readthedocs.io/en/0.9.2/
+
 ## v.0.9.1
 
 ### Features

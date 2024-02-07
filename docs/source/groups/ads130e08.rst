@@ -1,0 +1,8 @@
+.. _ads130e08:
+
+ads130e08 - Driver for ADS130E08 SPI ADC
+========================================
+
+.. doxygengroup:: ads130e08
+   :members:
+

@@ -62,7 +62,7 @@ dkms.conf
 /__garbage__/
 **/.vscode/
 **/.devcontainer
-/.idea/
+.idea/
 cmake-build-debug/
 
 /esp-idf-lib.code-workspace
@@ -71,3 +71,10 @@ Gemfile.lock
 # macOS .DS_Store and .AppleDouble files
 .DS_Store
 .AppleDouble
+
+# bundled files by ruby bundler and configuration
+/.bundle/
+/vendor/
+
+# python cache
+__pycache__/

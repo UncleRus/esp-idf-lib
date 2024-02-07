@@ -1,0 +1,392 @@
+name: Main CI process
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+
+  prepare:
+    name: Prepare CI
+    runs-on: ubuntu-latest
+    outputs:
+      _ci_readme:        ${{ steps.ci.outputs._ci_readme }}
+      _ci_docs:          ${{ steps.ci.outputs._ci_docs }}
+      _ci_build_esp32:   ${{ steps.ci.outputs._ci_build_esp32 }}
+      _ci_build_esp32c2: ${{ steps.ci.outputs._ci_build_esp32c2 }}
+      _ci_build_esp32c3: ${{ steps.ci.outputs._ci_build_esp32c3 }}
+      _ci_build_esp32c6: ${{ steps.ci.outputs._ci_build_esp32c6 }}
+      _ci_build_esp32h2: ${{ steps.ci.outputs._ci_build_esp32h2 }}
+      _ci_build_esp32h4: ${{ steps.ci.outputs._ci_build_esp32h4 }}
+      _ci_build_esp32s2: ${{ steps.ci.outputs._ci_build_esp32s2 }}
+      _ci_build_esp32s3: ${{ steps.ci.outputs._ci_build_esp32s3 }}
+      _ci_build_esp8266: ${{ steps.ci.outputs._ci_build_esp8266 }}
+    steps:
+      - id: setup_python
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+
+      - id: requirements
+        name: Install devtool requirements
+        run: pip install -r ./devtools/requirements.txt
+
+      - id: ci
+        name: Build list of CI jobs
+        run: python ./devtools/devtool.py ci >> $GITHUB_OUTPUT
+
+  readme:
+    name: Test README.md
+    needs:
+      - prepare
+    if: ${{ needs.prepare.outputs._ci_readme == '1' }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: setup_python
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+
+      - id: requirements
+        name: Install devtool requirements
+        run: pip install -r ./devtools/requirements.txt
+
+      - id: check
+        name: Check README.md
+        run: |
+          python ./devtools/devtool.py render
+          git diff --exit-code README.md
+
+  docs:
+    name: Documentation build check
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    if: ${{ needs.prepare.outputs._ci_docs == '1' }}
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+
+      - id: dependencies
+        name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-sphinx python3-sphinx-rtd-theme python3-breathe doxygen
+
+      # FIXME: extract sphinx errors and warnings, not just run make!
+      - id: build
+        name: Build docs
+        run: |
+          cd docs
+          make dirhtml
+          if [ -s doxygen.log ]; then
+            echo "========================================================="
+            echo "Found errors:"
+            echo "========================================================="
+            cat doxygen.log
+            exit 1
+          fi
+
+  build_esp32xx:
+    name: Build for ESP32xx
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    if: >-
+      ${{ needs.prepare.outputs._ci_build_esp32 != '' 
+       || needs.prepare.outputs._ci_build_esp32c2 != ''
+       || needs.prepare.outputs._ci_build_esp32c3 != ''
+       || needs.prepare.outputs._ci_build_esp32c6 != ''
+       || needs.prepare.outputs._ci_build_esp32h2 != ''
+       || needs.prepare.outputs._ci_build_esp32h4 != ''
+       || needs.prepare.outputs._ci_build_esp32s2 != ''
+       || needs.prepare.outputs._ci_build_esp32s3 != '' }}
+    strategy:
+      # run other jobs even when one job failed
+      fail-fast: false
+      # releases, see https://github.com/espressif/esp-idf#esp-idf-release-support-schedule
+      matrix:
+        esp_idf_version:
+          - latest
+          - release-v5.1
+          - release-v5.0
+          - release-v4.4
+          - release-v4.3
+        target:
+          - esp32
+          - esp32s2
+          - esp32s3
+          - esp32c2
+          - esp32c3
+          - esp32c6
+          - esp32h2
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - id: ccache
+        name: Install ccache
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install ccache
+
+      - id: build_esp32
+        name: Build
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ matrix.esp_idf_version }}
+          target: ${{ matrix.target }}
+          path: examples
+          command: |
+            # XXX share cache between examples.
+            # see "Compiling In Different Directories" in ccache(1)
+            export CCACHE_BASEDIR="$(pwd)"
+            export CCACHE_NOHASHDIR=true
+
+            # see suppot matrix at https://github.com/espressif/esp-idf#esp-idf-release-and-soc-compatibility
+            examples=
+            
+            # ESP32: all
+            if [ "${{ matrix.target }}" = "esp32" ]; then
+              examples="${{ needs.prepare.outputs._ci_build_esp32 }}"
+            fi
+            
+            # ESP32-S2: all
+            if [ "${{ matrix.target }}" = "esp32s2" ]; then
+              examples="${{ needs.prepare.outputs._ci_build_esp32s2 }}"
+            fi
+
+            # ESP32-C3: 4.3, 4.4, 5.0, 5.1
+            if [ "${{ matrix.target }}" = "esp32c3" ]; then
+              if [ "${{ matrix.esp_idf_version }}" != "release-v4.2" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32c3 }}"
+              fi
+            fi
+            
+            # ESP32-S3: 4.4, 5.0, 5.1
+            if [ "${{ matrix.target }}" = "esp32s3" ]; then
+              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3"]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32s3 }}"
+              fi
+            fi
+
+            # ESP32-C2: 5.0, 5.1
+            if [ "${{ matrix.target }}" = "esp32c2" ]; then
+              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.4" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32c2 }}"
+              fi
+            fi
+            
+            # ESP32-C6: 5.1
+            if [ "${{ matrix.target }}" = "esp32c6" ]; then
+              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.4" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v5.0" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32c6 }}"
+              fi
+            fi
+
+            # ESP32-H2: 5.1
+            if [ "${{ matrix.target }}" = "esp32h2" ]; then
+              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v4.4" \
+                  -a "${{ matrix.esp_idf_version }}" != "release-v5.0" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32h2 }}"
+              fi
+            fi
+
+            if [ -z "${examples}" ]; then
+              echo "Nothing to build: no component supports ${{ matrix.target }} or " \
+                   "ESP-IDF ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
+              exit 0
+            fi
+
+            echo "========================================================="
+            echo "Examples to build for components:"
+            echo "========================================================="
+            echo "${examples}"
+
+            for component in ${examples}; do
+              for dir in ${component}/*; do
+                cd ${dir}
+                idf.py --ccache build; res=$?; [ $res -ne 0 ] && exit $res
+                rm -rf build
+                cd ../..
+              done
+            done
+
+  build_esp8266:
+    name: Build for ESP8266
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    if: ${{ needs.prepare.outputs._ci_build_esp8266 != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        esp_open_rtos:
+          - v3.4
+          - master
+        build_method:
+          # XXX build examples with make only
+          # idf.py in ESP8266 RTOS SDK is broken in many ways.
+          - make
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v3
+
+      - id: setup_python
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - id: devtool_requirements
+        name: Install devtool requirements
+        run: pip install -r ./devtools/requirements.txt
+
+      - id: prerequisites
+        name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install \
+            bison          \
+            ccache         \
+            flex           \
+            gcc            \
+            git            \
+            gperf          \
+            libffi-dev     \
+            libncurses-dev \
+            libssl-dev     \
+            make           \
+            wget
+
+      - name: Set environment variables
+        id: set_env
+        run: |
+          SDK_NAME="ESP8266_RTOS_SDK"
+          GCC_PREFIX="xtensa-lx106-elf"
+          GCC_FILE="${GCC_PREFIX}-gcc"
+          TOOLCHAIN_DIR="${HOME}/.espressif/tools"
+          REPO_DIR=`pwd`
+          EXAMPLE_DIR="${REPO_DIR}/examples"
+          __PROJECT_PATH=`pwd`
+          __PROJECT_TOOLCHAIN_VERSION="esp-2020r3-49-gd5524c1-8.4.0"
+
+          # XXX actions/checkout does not allow to checkout a repository other
+          # than under __PROJECT_PATH
+          IDF_PATH="${__PROJECT_PATH}/idf"
+
+          echo "IDF_PATH=${IDF_PATH}" >> ${GITHUB_ENV}
+          echo "IDF_TARGET=esp8266" >> ${GITHUB_ENV}
+
+          # cache-idf-tools needs PROJECT_TOOLCHAIN_DIR
+          echo "PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> $GITHUB_OUTPUT
+
+          # XXX prefix all the environment variables with `__PROJECT_` to avoid pollution
+          echo "__PROJECT_EXAMPLE_DIR=${EXAMPLE_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_GCC_FILE=${GCC_FILE}" >> ${GITHUB_ENV}
+          echo "__PROJECT_GCC_PREFIX=${GCC_PREFIX}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_DIR=${TOOLCHAIN_DIR}" >> ${GITHUB_ENV}
+          echo "__PROJECT_PATH=${__PROJECT_PATH}" >> ${GITHUB_ENV}
+          echo "__PROJECT_BUILD_COMMAND=${__PROJECT_BUILD_COMMAND}" >> ${GITHUB_ENV}
+          echo "__PROJECT_BUILD_COMMAND_ARG=${__PROJECT_BUILD_COMMAND_ARG}" >> ${GITHUB_ENV}
+          echo "__PROJECT_TOOLCHAIN_VERSION=${__PROJECT_TOOLCHAIN_VERSION}" >> ${GITHUB_ENV}
+
+      - name: Checkout the SDK
+        uses: actions/checkout@v3
+        with:
+          repository: espressif/ESP8266_RTOS_SDK
+          path: idf
+          submodules: recursive
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - name: Install python requirements (pip)
+        run: |
+          python -m pip install --user -r ${IDF_PATH}/requirements.txt
+
+      - id: cache-idf-tools
+        name: Cache toolchain
+        if: ${{ matrix.branch != 'master' }}
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.set_env.outputs.PROJECT_TOOLCHAIN_DIR }}
+          key: ${{ runner.os }}-${{ matrix.branch }}-esp8266-cache-tools
+
+      - name: Install toolchain
+        if: ${{ steps.cache-idf-tools.outputs.cache-hit != 'true' || matrix.branch == 'master' }}
+        run: |
+          ${IDF_PATH}/install.sh
+
+      - name: Setup ccache (make)
+        run: |
+          __PROJECT_CCACHE_BIN_DIR="${HOME}/ccache_bin"
+          mkdir -p "${__PROJECT_CCACHE_BIN_DIR}"
+          (cd "${__PROJECT_CCACHE_BIN_DIR}" && ln -s /usr/bin/ccache "${__PROJECT_GCC_FILE}")
+          echo "PATH=${__PROJECT_CCACHE_BIN_DIR}:$PATH:${__PROJECT_TOOLCHAIN_DIR}/${__PROJECT_GCC_PREFIX}/${__PROJECT_TOOLCHAIN_VERSION}/${__PROJECT_GCC_PREFIX}/bin" >> ${GITHUB_ENV}
+          echo "CCACHE_BASEDIR=${__PROJECT_EXAMPLE_DIR}" >> ${GITHUB_ENV}
+          echo "CCACHE_NOHASHDIR=true" >> ${GITHUB_ENV}
+
+      - name: Build (make)
+        if: ${{ matrix.build_method == 'make' }}
+        run: |
+          # make sure gcc is in $PATH
+          echo ${PATH}
+          ${__PROJECT_GCC_FILE} --version
+
+          # find out drivers that do not support the target
+          EXCLUDE_COMPONENTS="$(python ./devtools/devtool.py target esp8266 -x)"
+          echo "EXCLUDE_COMPONENTS=${EXCLUDE_COMPONENTS}"
+          export EXCLUDE_COMPONENTS
+          
+          components_to_build="${{ needs.prepare.outputs._ci_build_esp8266 }}"
+
+          # XXX share cache between examples.
+          # see "Compiling In Different Directories" in ccache(1)
+          # |                                        |  4.0.1  | master  |
+          # |----------------------------------------|---------|---------|
+          # | without ccache                         | 33m 42s | 50m 27s |
+          # | CCACHE_BASEDIR and CCACHE_NOHASHDIR    | 10m 41s | 16m 38s |
+          export CCACHE_BASEDIR="${__PROJECT_EXAMPLE_DIR}"
+          export CCACHE_NOHASHDIR=true
+
+          echo "final components_to_build:"
+          echo "${components_to_build}"
+          for component_to_build in ${components_to_build}; do
+            cd ${GITHUB_WORKSPACE}
+            echo "Building examples for ${component_to_build} under directory ${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}"
+            for i in $(ls -d *); do
+              cd "${__PROJECT_EXAMPLE_DIR}/${component_to_build}/${i}"
+              echo "Building example ${i} for component ${component_to_build} in directory ${PWD}..."
+              make defconfig
+              make -j$(nproc)
+            done
+          done

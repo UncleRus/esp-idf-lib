@@ -1,0 +1,22 @@
+name: dps310
+description: Driver for DPS310 barometric pressure sensor
+version: 1.0.0
+groups:
+  - pressure
+  - temperature
+code_owners:
+  - trombik
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: ISC
+copyrights:
+  - name: trombik
+    year: 2022

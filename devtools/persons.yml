@@ -1,4 +1,3 @@
----
 - name: UncleRus
   email: unclerus@gmail.com
   full_name: Ruslan V. Uss
@@ -15,6 +14,7 @@
 
 - name: Andrej
   full_name: Andrej Krutak
+  gh_id: andree182
   email: dev@andree.sk
 
 - name: gschorcht
@@ -35,15 +35,19 @@
   gh_id: jsuiker
 
 - name: PavelM
+  full_name: Pavel Merzlyakov
   email: merzlyakovpavel@gmail.com
 
 - name: AlexS
+  full_name: Alex Stewart
+  gh_id: astewart-consensus
   email: foogod@gmail.com
 
 - name: GrzegorzH
   email: ghetman@gmail.com
 
 - name: BhuvanchandraD
+  gh_id: bhuvanchandra
   email: bhuvanchandra.dv@gmail.com
 
 - name: RichardA
@@ -54,16 +58,19 @@
 
 - name: BernhardG
   email: Bernhard.Guillon@begu.org
+  url: https://gitlab.com/mrnice
 
 - name: zeroday
   # GH account does not exist
   email: zeroday@nodemcu.com
 
 - name: PhamNgocT
-  # GH account exists, but not sure that is the correct one
+  full_name: Thanh Pham
+  gh_id: panoti
   email: pnt239@gmail.com
 
 - name: Sensirion
+  full_name: Sensirion AG
   gh_id: Sensirion
 
 - name: nated0g
@@ -83,6 +90,7 @@
 
 - name: DavidD
   full_name: David Douard
+  gh_id: douardda
   email: david.douard@sdfa3.org
 
 - name: Jkallus
@@ -102,3 +110,57 @@
 - name: jmpmscorp
   full_name: Jose Manuel Perez
   gh_id: jmpmscorp
+
+- name: weslleymfd
+  full_name: Weslley Duarte
+  gh_id: weslleymfd
+
+- name: janveeh
+  full_name: Jan Veeh
+  gh_id: janveeh
+
+- name: Th3Link
+  full_name: Marc Luehr
+  gh_id: th3link
+  email: marcluehr@gmail.com
+
+- name: shuki25
+  full_name: Joshua Butler
+  gh_id: shuki25
+  email: josh.butler929@gmail.com
+
+- name: horsemann07
+  full_name: Raghav Jha
+  gh_id: horsemann07
+
+- name: jeff_rowberg
+  full_name: Jeff Rowberg
+  url: https://www.i2cdevlib.com/
+
+- name: a_e_dalzotto
+  full_name: Angelo Elias Dalzotto
+  email: 150633@upf.br
+
+- name: g_b_vicari
+  full_name: Gabriel Boni Vicari
+  email: 133192@upf.br
+
+- name: gepid
+  full_name: Grupo de Pesquisa em Cultura Digital
+  url: http://gepid.upf.br/
+
+- name: slimcdk
+  full_name: Christian Skjerning
+  gh_id: slimcdk
+
+- name: qb4-dev
+  full_name: Jakub Turek
+  gh_id: QB4-dev
+
+- name: mmarkwort
+  full_name: Manuel Markwort
+  gh_id: mmarkwort
+
+- name: vonguced
+  full_name: Cedric von Gunten
+  gh_id: vonguced

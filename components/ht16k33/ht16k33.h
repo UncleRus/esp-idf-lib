@@ -63,6 +63,7 @@ typedef enum {
  * @param port     I2C port number
  * @param sda_gpio GPIO pin number for SDA
  * @param scl_gpio GPIO pin number for SCL
+ * @param addr     I2C address
  * @return `ESP_OK` on success
  */
 esp_err_t ht16k33_init_desc(i2c_dev_t *dev, i2c_port_t port,
@@ -108,6 +109,7 @@ esp_err_t ht16k33_display_setup(i2c_dev_t *dev, uint8_t on_flag,
 /**
  * @brief Write whole HT16K33_RAM_SIZE_BYTES into RAM.
  *
+ * @param dev I2C device descriptor
  * @param data Bytes to write.
  * @return ESP_OK to indicate success
  */

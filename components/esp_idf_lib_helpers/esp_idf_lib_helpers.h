@@ -43,7 +43,10 @@
 #if defined(CONFIG_IDF_TARGET_ESP32) \
         || defined(CONFIG_IDF_TARGET_ESP32S2) \
         || defined(CONFIG_IDF_TARGET_ESP32S3) \
-        || defined(CONFIG_IDF_TARGET_ESP32C3)
+        || defined(CONFIG_IDF_TARGET_ESP32C2) \
+        || defined(CONFIG_IDF_TARGET_ESP32C3) \
+        || defined(CONFIG_IDF_TARGET_ESP32C6) \
+        || defined(CONFIG_IDF_TARGET_ESP32H2)
 #define HELPER_TARGET_IS_ESP32     (1)
 #define HELPER_TARGET_IS_ESP8266   (0)
 
@@ -71,6 +74,7 @@
 #define VALUE(x) VALUE_TO_STRING(x)
 #define VAR_NAME_VALUE(var) #var "="  VALUE(var)
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32C3))
+#pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32H2))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32S2))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP32))
 #pragma message(VAR_NAME_VALUE(CONFIG_IDF_TARGET_ESP8266))

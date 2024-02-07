@@ -1,0 +1,20 @@
+name: icm42670
+description: Driver for TDK ICM-42670-P 6-Axis IMU
+version: 1.0.0
+groups:
+  - imu
+code_owners: janveeh
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: ISC
+copyrights:
+  - name: janveeh
+    year: 2022

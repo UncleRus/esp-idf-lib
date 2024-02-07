@@ -6,7 +6,8 @@ menu "Rotary encoders"
 			
 	config RE_INTERVAL_US
 		int "Polling interval, us"
-		default 1000
+		default 10000 if IDF_TARGET_ESP8266
+		default 1000 if !IDF_TARGET_ESP8266
 		
 	config RE_BTN_DEAD_TIME_US
 		int "Button dead time, us"

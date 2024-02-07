@@ -1,0 +1,36 @@
+menu "Example configuration"
+    config EXAMPLE_MOSI_GPIO
+        int "SPI MOSI GPIO Number"
+        default 23 if IDF_TARGET_ESP32
+        default 11 if IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI MOSI (Master Output / Slave Input) line.
+
+    config EXAMPLE_MISO_GPIO
+        int "SPI MISO GPIO Number"
+        default 19 if IDF_TARGET_ESP32
+        default 13 if IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI MISO (Master Input / Slave Output) line.
+
+    config EXAMPLE_SCLK_GPIO
+        int "SPI SCLK GPIO Number"
+        default 18 if IDF_TARGET_ESP32
+        default 12 if IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI SCLK (Clock) line.
+
+    config EXAMPLE_CS_GPIO
+        int "SPI CS GPIO Number"
+        default 5 if IDF_TARGET_ESP32
+        default 10 if IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI CS (Chip Select) line.
+
+    config EXAMPLE_INT_GPIO
+        int "SPI INT GPIO Number"
+        default 26 if IDF_TARGET_ESP32
+        default 2 if IDF_TARGET_ESP32S3
+        help
+            GPIO number for SPI INT (Interrupt) line.
+endmenu
