@@ -3,7 +3,7 @@ description: Driver for generic shift register interface.
 version: 0.0.1
 groups:
   - misc
-code_owners: jaimealbq
+code_owners: JaimeAlbq
 depends:
   - name: driver
   - name: log
@@ -16,5 +16,5 @@ targets:
   - esp32c3
 license: ISC
 copyrights:
-  - name: jaimealbq
+  - name: JaimeAlbq
     year: 2022
