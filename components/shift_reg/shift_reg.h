@@ -42,26 +42,48 @@ extern "C" {
 #include <driver/gpio.h>
 #include <ets_sys.h>
 
+/**
+ * @brief Direction of the data
+ * 
+ * @todo Add Input mode
+ * 
+ */
 typedef enum {
     SHIFT_DIR_OUTPUT = 0,
 } shift_reg_dir_t;
 
+/**
+ * @brief Register orientation mode
+ * 
+ */
 typedef enum {
     SHIFT_BIT_MODE_LSB = 0,
     SHIFT_BIT_MODE_MSB,
 } shift_reg_bit_mode_t;
 
+/**
+ * @brief This structure stores the mode of the shift register
+ * 
+ */
 typedef struct {
     shift_reg_dir_t         dir         : 2;    // Direction mode of the shift register
     shift_reg_bit_mode_t    bit_mode    : 1;    // Bit mode
 } shift_reg_mode_t;
 
+/**
+ * @brief This structure stores all used pins to interface with the shift register
+ * 
+ */
 typedef struct {
     gpio_num_t              clk;                // Clock pin
     gpio_num_t              data;               // Data/Signal pin
     gpio_num_t              latch;              // Latch pin
 } shift_reg_pin_t;
 
+/**
+ * @brief This structure stores all needed configuration of the shift register component
+ * 
+ */
 typedef struct {                                    // Configuration of shift register
     uint8_t                     num_reg;            // Number of shift registers
     uint8_t                     *reg_value;         // Last value of all registers

@@ -151,14 +151,7 @@ esp_err_t shift_reg_send8bits(shift_reg_config_t *dev, uint8_t data)
         // MSB Mode
         for (int8_t i = 7; i >= 0; i--)
         {
-            if ((data >> i) & 1)
-            {
-                gpio_set_level(dev->pin.data, true);
-            }
-            else
-            {
-                gpio_set_level(dev->pin.data, false);
-            }
+            gpio_set_level(dev->pin.data, (data >> i) & 1);
 
             gpio_set_level(dev->pin.clk, true);
             ets_delay_us(1);
@@ -171,14 +164,7 @@ esp_err_t shift_reg_send8bits(shift_reg_config_t *dev, uint8_t data)
         // LSB Mode
         for (int8_t i = 0; i < 8; i++)
         {
-            if ((data >> i) & 1)
-            {
-                gpio_set_level(dev->pin.data, true);
-            }
-            else
-            {
-                gpio_set_level(dev->pin.data, false);
-            }
+            gpio_set_level(dev->pin.data, (data >> i) & 1);
 
             gpio_set_level(dev->pin.clk, true);
             ets_delay_us(1);
@@ -194,10 +180,21 @@ esp_err_t shift_reg_send8bits(shift_reg_config_t *dev, uint8_t data)
 
 esp_err_t shift_reg_latch(shift_reg_config_t *dev)
 {
+    esp_err_t err = ESP_FAIL;
+
+    if (dev == NULL)
+    {
+        ESP_LOGE(tag, "%s: must have a valid argument;", __func__);
+        err = ESP_ERR_INVALID_ARG;
+        return err;
+    }
+
     gpio_set_level(dev->pin.latch, true);
     ets_delay_us(1);
     gpio_set_level(dev->pin.latch, false);
     ets_delay_us(1);
 
-    return ESP_OK;
+    err = ESP_OK;
+
+    return err;
 }

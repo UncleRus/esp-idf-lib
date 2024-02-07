@@ -49,7 +49,7 @@ void app_main(void)
 			ESP_ERROR_CHECK(shift_reg_send(&shifter, value, 2));
 			ESP_ERROR_CHECK(shift_reg_latch(&shifter));
 			ESP_LOGI(__func__, "reg_value: 0x%02X 0x%02X", shifter.reg_value[0], shifter.reg_value[1]);
-			vTaskDelay(2 / portTICK_PERIOD_MS);
+			vTaskDelay(2 / pdMS_TO_TICKS);
 		}
 	}
 }
