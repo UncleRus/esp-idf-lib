@@ -536,6 +536,14 @@ labels:
           - "components/sgp40/**"
           - "components/sgp40/.eil.yml"
           - "examples/sgp40/**"
+  - label: "area:components:shift_reg"
+    sync: true
+    matcher:
+      files:
+        any:
+          - "components/shift_reg/**"
+          - "components/shift_reg/.eil.yml"
+          - "examples/shift_reg/**"
   - label: "area:components:sht3x"
     sync: true
     matcher:
