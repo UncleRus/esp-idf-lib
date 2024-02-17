@@ -232,6 +232,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
+| **anemometer**           | Driver for impulse wind speed sensors(anemometers)                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **example**              | An example component                                                             | ISC     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
 | **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
@@ -320,7 +321,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Grupo de Pesquisa em Cultura Digital](http://gepid.upf.br/): `mpu6050` 
 - GrzegorzH: `ds18x20` 
 - [Gunar Schorcht](https://github.com/gschorcht): `bme680` `ccs811` `sht3x` `sts3x` 
-- [Jakub Turek](https://github.com/QB4-dev): `l3gx` `lsm303` 
+- [Jakub Turek](https://github.com/QB4-dev): `anemometer` `l3gx` `lsm303` 
 - [Jan Veeh](https://github.com/janveeh): `icm42670` 
 - [Jeff Rowberg](https://www.i2cdevlib.com/): `mpu6050` 
 - [Jose Manuel Perez](https://github.com/jmpmscorp): `lc709203f` `sgm58031` 
