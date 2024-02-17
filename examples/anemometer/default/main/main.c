@@ -36,6 +36,6 @@ void app_main()
     while(1){
         anemometer_get_wind_speed(wind_sensor,&val);
         ESP_LOGI(TAG, "Wind speed = %.2f m/s", val);
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
