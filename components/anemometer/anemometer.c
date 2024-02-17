@@ -44,21 +44,20 @@
 #include <driver/gpio.h>
 #include <esp_idf_lib_helpers.h>
 
-#ifdef CONFIG_IDF_TARGET_ESP32
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
-#define PORT_ENTER_CRITICAL portENTER_CRITICAL(&mux)
-#define PORT_EXIT_CRITICAL portEXIT_CRITICAL(&mux)
+#define PORT_ENTER_CRITICAL() portENTER_CRITICAL(&mux)
+#define PORT_EXIT_CRITICAL() portEXIT_CRITICAL(&mux)
 
-#elif CONFIG_IDF_TARGET_ESP8266
-#define PORT_ENTER_CRITICAL portENTER_CRITICAL()
-#define PORT_EXIT_CRITICAL portEXIT_CRITICAL()
+#elif HELPER_TARGET_IS_ESP8266
+#define PORT_ENTER_CRITICAL() portENTER_CRITICAL()
+#define PORT_EXIT_CRITICAL() portEXIT_CRITICAL()
 
 #else
 #error cannot identify the target
 #endif
 
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
-#define RETURN_CRITICAL(RES) do { PORT_EXIT_CRITICAL; return RES; } while(0)
 
 typedef struct {
 	gpio_num_t input_pin;      //!< GPIO input pin
@@ -126,10 +125,10 @@ esp_err_t anemometer_get_wind_speed(anemometer_t *anemometer, float *speed)
     anemometer_priv_t *priv = (anemometer_priv_t *)anemometer;
     TickType_t ticks = xTaskGetTickCount();
 
-    PORT_ENTER_CRITICAL;
+    PORT_ENTER_CRITICAL();
     pps_iterate(priv,ticks);
     *speed = priv->sf * priv->pps;
-    PORT_EXIT_CRITICAL;
+    PORT_EXIT_CRITICAL();
     return ESP_OK;
 }
 
