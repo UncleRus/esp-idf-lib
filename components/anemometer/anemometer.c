@@ -42,6 +42,7 @@
 #include <freertos/task.h>
 #include <esp_timer.h>
 #include <driver/gpio.h>
+#include <esp_idf_lib_helpers.h>
 
 #ifdef CONFIG_IDF_TARGET_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
