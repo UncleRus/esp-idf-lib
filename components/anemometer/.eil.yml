@@ -14,7 +14,6 @@ targets:
   - esp32
   - esp8266
   - esp32s2
-  - esp32c3
 license: BSD-3
 copyrights:
   - name: qb4-dev
