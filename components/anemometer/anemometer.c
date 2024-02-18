@@ -40,11 +40,18 @@
 #include <freertos/task.h>
 #include <driver/gpio.h>
 #include <esp_timer.h>
-#include <esp_log.h>
 #include <esp_idf_lib_helpers.h>
 
-#if HELPER_TARGET_IS_ESP32
+#if defined(HELPER_TARGET_IS_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3) \
+        && ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+
+#define ESP_PCNT_SUPPORTED     (1)
 #include <driver/pulse_cnt.h>
+#else
+#define ESP_PCNT_SUPPORTED     (0)
+#endif
+
+#if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define PORT_ENTER_CRITICAL() portENTER_CRITICAL(&mux)
 #define PORT_EXIT_CRITICAL() portEXIT_CRITICAL(&mux)
@@ -55,14 +62,6 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 #else
 #error cannot identify the target
-#endif
-
-#if defined(HELPER_TARGET_IS_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3) \
-        && ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
-
-#define ESP_PCNT_SUPPORTED     (1)
-#else
-#define ESP_PCNT_SUPPORTED     (0)
 #endif
 
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
