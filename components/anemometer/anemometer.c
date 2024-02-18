@@ -30,8 +30,6 @@
  *
  * ESP-IDF driver for impulse wind speed sensors(anemometers)
  *
- * Ported from esp-open-rtos
- *
  * Copyright (c) 2024 Jakub Turek <qb4.dev@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
@@ -60,10 +58,10 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 typedef struct {
-	gpio_num_t input_pin;      //!< GPIO input pin
-	float sf;                  //!< scale factor
-	uint32_t pps;              //!< measured pulses count per second
-	TickType_t init_tick;      //!< measurement init tick
+    gpio_num_t input_pin;      //!< GPIO input pin
+    float sf;                  //!< scale factor
+    uint32_t pps;              //!< measured pulses count per second
+    TickType_t init_tick;      //!< measurement init tick
 } anemometer_priv_t;
 
 static inline void pps_iterate(anemometer_priv_t *priv, TickType_t ticks)
@@ -84,8 +82,15 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 
 anemometer_t anemometer_init(const anemometer_config_t *conf)
 {
-	gpio_config_t io_conf;
+    gpio_config_t io_conf;
     anemometer_priv_t *priv;
+    esp_err_t rc;
+
+    /* enable interrupts */
+    rc = gpio_install_isr_service(0);
+    if (rc != ESP_OK && rc != ESP_ERR_INVALID_STATE){
+        return NULL;
+    }
 
     priv = (anemometer_priv_t *)calloc(1,sizeof(anemometer_priv_t));
     if(priv == NULL){
@@ -102,8 +107,6 @@ anemometer_t anemometer_init(const anemometer_config_t *conf)
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
 
-    /* enable interrupts */
-    gpio_install_isr_service(0);
     gpio_isr_handler_add(priv->input_pin, gpio_isr_handler, (void *) priv);
     return priv;
 }
@@ -131,7 +134,4 @@ esp_err_t anemometer_get_wind_speed(anemometer_t *anemometer, float *speed)
     PORT_EXIT_CRITICAL();
     return ESP_OK;
 }
-
-
-
 

@@ -27,7 +27,7 @@
 
 /**
  * @file anemometer.h
- * @defgroup misc wind
+ * @defgroup anemometer
  * @{
  *
  * ESP-IDF driver for impulse wind speed sensors(anemometers)
