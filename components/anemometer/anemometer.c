@@ -80,25 +80,29 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
     priv->pps++;
 }
 
-anemometer_t anemometer_init(const anemometer_config_t *conf)
+esp_err_t anemometer_init(const anemometer_config_t *conf, anemometer_t *anemometer)
 {
+    CHECK_ARG(conf);
+    CHECK_ARG(anemometer);
+
     gpio_config_t io_conf;
     anemometer_priv_t *priv;
     esp_err_t rc;
 
-    /* enable interrupts */
-    rc = gpio_install_isr_service(0);
-    if (rc != ESP_OK && rc != ESP_ERR_INVALID_STATE){
-        return NULL;
-    }
-
     priv = (anemometer_priv_t *)calloc(1,sizeof(anemometer_priv_t));
     if(priv == NULL){
-        return NULL;
+        return ESP_ERR_NO_MEM;
     }
 
     priv->input_pin = conf->input_pin;
     priv->sf = conf->scale_factor ? conf->scale_factor : ANEMOMETER_DEFAULT_SF;
+
+    /* enable interrupts */
+    rc = gpio_install_isr_service(0);
+    if (rc != ESP_OK && rc != ESP_ERR_INVALID_STATE){
+        free(priv);
+        return rc;
+    }
 
     /* setup GPIO */
     io_conf.intr_type = GPIO_INTR_POSEDGE;
@@ -106,9 +110,10 @@ anemometer_t anemometer_init(const anemometer_config_t *conf)
     io_conf.mode = GPIO_MODE_INPUT;
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     gpio_config(&io_conf);
-
     gpio_isr_handler_add(priv->input_pin, gpio_isr_handler, (void *) priv);
-    return priv;
+
+    *anemometer = priv;
+    return ESP_OK;
 }
 
 esp_err_t anemometer_deinit(anemometer_t *anemometer)

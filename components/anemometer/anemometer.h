@@ -64,10 +64,10 @@ typedef struct
  * @brief Init anemometer sensor
  *
  * @param config Pointer to the device config
- * @return anemometer device or NULL if failed
+ * @param[out] Pointer to created anemometer device
+ * @return `ESP_OK` on success
  */
-anemometer_t anemometer_init(const anemometer_config_t *config);
-
+esp_err_t anemometer_init(const anemometer_config_t *conf, anemometer_t *anemometer);
 /**
  * @brief Deinit anemometer sensor
  *

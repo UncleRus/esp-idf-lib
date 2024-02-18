@@ -23,18 +23,21 @@
 
 static const char *TAG="APP";
 
+static anemometer_t anemometer;
+
+static anemometer_config_t config = {
+    .input_pin = CONFIG_EXAMPLE_ANEMOMETER_GPIO,
+    .scale_factor = ANEMOMETER_DEFAULT_SF
+};
+
 void app_main()
 {
     float val;
-    anemometer_config_t config = {
-        .input_pin = CONFIG_EXAMPLE_ANEMOMETER_GPIO,
-        .scale_factor = ANEMOMETER_DEFAULT_SF
-    };
-
-    anemometer_t wind_sensor = anemometer_init(&config);
+    ESP_LOGI(TAG, "Anemometer test");
+    ESP_ERROR_CHECK(anemometer_init(&config,&anemometer));
 
     while(1){
-        anemometer_get_wind_speed(wind_sensor,&val);
+        anemometer_get_wind_speed(anemometer,&val);
         ESP_LOGI(TAG, "Wind speed = %.2f m/s", val);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
