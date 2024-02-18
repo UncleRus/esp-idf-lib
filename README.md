@@ -232,7 +232,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component                | Description                                                                      | License | Supported on       | Thread safety |
 |--------------------------|----------------------------------------------------------------------------------|---------|--------------------|---------------|
-| **anemometer**           | Driver for impulse wind speed sensors(anemometers)                               | BSD-3-Clause | esp32, esp8266, esp32s2 | no            |
+| **anemometer**           | Driver for impulse wind speed sensors(anemometers)                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **example**              | An example component                                                             | ISC     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
 | **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |

@@ -57,6 +57,14 @@ static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #error cannot identify the target
 #endif
 
+#if defined(HELPER_TARGET_IS_ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3) \
+        && ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+
+#define ESP_PCNT_SUPPORTED     (1)
+#else
+#define ESP_PCNT_SUPPORTED     (0)
+#endif
+
 #define CHECK_ARG(VAL) do { if (!(VAL)) return ESP_ERR_INVALID_ARG; } while (0)
 
 typedef struct {
@@ -64,15 +72,58 @@ typedef struct {
     float sf;                      //!< scale factor
     int pps;                       //!< measured pulses count per second
     esp_timer_handle_t timer;      //!< periodic timer to reset pps count
-#if HELPER_TARGET_IS_ESP8266
-    int pulse_count;               //!< pulses counter
-#elif HELPER_TARGET_IS_ESP32
+
+#if ESP_PCNT_SUPPORTED
     pcnt_unit_handle_t pcnt_unit;  //!< hardware pulse counter
     pcnt_channel_handle_t pcnt_ch; //!< hardware pulse counter channel
+#else
+    int pulse_count;               //!< pulses counter
 #endif
 } anemometer_priv_t;
 
-#if HELPER_TARGET_IS_ESP8266
+#if ESP_PCNT_SUPPORTED
+
+static esp_err_t anemometer_pulse_counter_init(anemometer_priv_t *priv)
+{
+    pcnt_unit_config_t unit_config = {
+        .high_limit = 2048,
+        .low_limit = -1
+    };
+
+    pcnt_chan_config_t ch_config = {
+        .edge_gpio_num = priv->input_pin,
+        .level_gpio_num = -1
+    };
+
+    ESP_ERROR_CHECK(pcnt_new_unit(&unit_config,&priv->pcnt_unit));
+    ESP_ERROR_CHECK(pcnt_new_channel(priv->pcnt_unit,&ch_config,&priv->pcnt_ch));
+    ESP_ERROR_CHECK(pcnt_channel_set_edge_action(priv->pcnt_ch,
+            PCNT_CHANNEL_EDGE_ACTION_INCREASE,PCNT_CHANNEL_EDGE_ACTION_HOLD));
+    ESP_ERROR_CHECK(pcnt_unit_enable(priv->pcnt_unit));
+    ESP_ERROR_CHECK(pcnt_unit_clear_count(priv->pcnt_unit));
+    ESP_ERROR_CHECK(pcnt_unit_start(priv->pcnt_unit));
+    return ESP_OK;
+}
+
+static esp_err_t anemometer_pulse_counter_deinit(anemometer_priv_t *priv)
+{
+    ESP_ERROR_CHECK(pcnt_unit_stop(priv->pcnt_unit));
+    ESP_ERROR_CHECK(pcnt_unit_disable(priv->pcnt_unit));
+    ESP_ERROR_CHECK(pcnt_del_channel(priv->pcnt_ch));
+    ESP_ERROR_CHECK(pcnt_del_unit(priv->pcnt_unit));
+    return ESP_OK;
+}
+
+static void timer_event_callback(void *arg)
+{
+    anemometer_priv_t *priv = (anemometer_priv_t *)arg;
+
+    pcnt_unit_get_count(priv->pcnt_unit,&priv->pps);
+    pcnt_unit_clear_count(priv->pcnt_unit);
+}
+
+#else
+
 static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
     anemometer_priv_t *priv = (anemometer_priv_t *)arg;
@@ -114,45 +165,6 @@ static void timer_event_callback(void *arg)
     PORT_EXIT_CRITICAL();
 }
 
-#elif HELPER_TARGET_IS_ESP32
-static esp_err_t anemometer_pulse_counter_init(anemometer_priv_t *priv)
-{
-    pcnt_unit_config_t unit_config = {
-        .high_limit = 2048,
-        .low_limit = -1
-    };
-
-    pcnt_chan_config_t ch_config = {
-        .edge_gpio_num = priv->input_pin,
-        .level_gpio_num = -1
-    };
-
-    ESP_ERROR_CHECK(pcnt_new_unit(&unit_config,&priv->pcnt_unit));
-    ESP_ERROR_CHECK(pcnt_new_channel(priv->pcnt_unit,&ch_config,&priv->pcnt_ch));
-    ESP_ERROR_CHECK(pcnt_channel_set_edge_action(priv->pcnt_ch,
-            PCNT_CHANNEL_EDGE_ACTION_INCREASE,PCNT_CHANNEL_EDGE_ACTION_HOLD));
-    ESP_ERROR_CHECK(pcnt_unit_enable(priv->pcnt_unit));
-    ESP_ERROR_CHECK(pcnt_unit_clear_count(priv->pcnt_unit));
-    ESP_ERROR_CHECK(pcnt_unit_start(priv->pcnt_unit));
-    return ESP_OK;
-}
-
-static esp_err_t anemometer_pulse_counter_deinit(anemometer_priv_t *priv)
-{
-    ESP_ERROR_CHECK(pcnt_unit_stop(priv->pcnt_unit));
-    ESP_ERROR_CHECK(pcnt_unit_disable(priv->pcnt_unit));
-    ESP_ERROR_CHECK(pcnt_del_channel(priv->pcnt_ch));
-    ESP_ERROR_CHECK(pcnt_del_unit(priv->pcnt_unit));
-    return ESP_OK;
-}
-
-static void timer_event_callback(void *arg)
-{
-    anemometer_priv_t *priv = (anemometer_priv_t *)arg;
-
-    pcnt_unit_get_count(priv->pcnt_unit,&priv->pps);
-    pcnt_unit_clear_count(priv->pcnt_unit);
-}
 #endif
 
 static esp_err_t anemometer_timer_setup(anemometer_priv_t *priv)
