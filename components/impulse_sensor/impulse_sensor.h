@@ -27,7 +27,7 @@
 
 /**
  * @file impulse_sensor.h
- * @defgroup impulse_sensor
+ * @defgroup impulse_sensor impulse_sensor
  * @{
  *
  * ESP-IDF driver for impulse sensors
