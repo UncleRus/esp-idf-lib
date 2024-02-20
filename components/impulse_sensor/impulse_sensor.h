@@ -65,11 +65,12 @@ typedef struct
 /**
  * @brief Init impulse sensor
  *
- * @param config Pointer to sensor config
- * @param[out] Pointer to created sensor object
+ * @param conf Pointer to sensor config
+ * @param[out] imp_sensor Pointer to created sensor object
  * @return `ESP_OK` on success
  */
 esp_err_t imp_sensor_init(const imp_sensor_config_t *conf, imp_sensor_t *imp_sensor);
+
 /**
  * @brief Deinit impulse sensor
  *
@@ -82,7 +83,7 @@ esp_err_t imp_sensor_deinit(imp_sensor_t *imp_sensor);
  * @brief Deinit impulse sensor
  *
  * @param imp_sensor Pointer to sensor device
- * @param[out] value output value multiplied by scale factor
+ * @param[out] value Output value multiplied by scale factor
  * @return `ESP_OK` on success
  */
 esp_err_t imp_sensor_get_value(imp_sensor_t *imp_sensor, float *value);
