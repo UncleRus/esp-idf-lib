@@ -26,18 +26,18 @@
  */
 
 /**
- * @file anemometer.h
- * @defgroup anemometer
+ * @file impulse_sensor.h
+ * @defgroup impulse_sensor
  * @{
  *
- * ESP-IDF driver for impulse wind speed sensors(anemometers)
+ * ESP-IDF driver for impulse sensors
  *
  * Copyright (c) 2024 Jakub Turek <qb4.dev@gmail.com>
  *
  * BSD Licensed as described in the file LICENSE
  */
-#ifndef __ANEMOMETER_H__
-#define __ANEMOMETER_H__
+#ifndef __IMPULSE_SENSOR_H__
+#define __IMPULSE_SENSOR_H__
 
 #include <driver/gpio.h>
 #include <esp_err.h>
@@ -46,45 +46,46 @@
 extern "C" {
 #endif
 
-#define ANEMOMETER_DEFAULT_SF (1.75/20) //!< 1.75 m/s = 20 pps
+#define IMP_SENSOR_DEFAULT_SF          1.0  ///< default scale factor
+#define IMP_SENSOR_DEFAULT_MEAS_PERIOD 1000 ///< default measurement period[1sec]
 
 /**
  * Device descriptor
  */
 
-typedef void *anemometer_t;
+typedef void *imp_sensor_t;
 
 typedef struct
 {
-    gpio_num_t input_pin;      //!< GPIO input pin
-    const float scale_factor;  //!< scale factor
-} anemometer_config_t;
+    gpio_num_t input_pin;       //!< GPIO input pin
+    const float scale_factor;   //!< scale factor
+    const uint32_t meas_period; //!< measurement period[msecs]
+} imp_sensor_config_t;
 
 /**
- * @brief Init anemometer sensor
+ * @brief Init impulse sensor
  *
- * @param config Pointer to the device config
- * @param[out] Pointer to created anemometer device
+ * @param config Pointer to sensor config
+ * @param[out] Pointer to created sensor object
  * @return `ESP_OK` on success
  */
-esp_err_t anemometer_init(const anemometer_config_t *conf, anemometer_t *anemometer);
+esp_err_t imp_sensor_init(const imp_sensor_config_t *conf, imp_sensor_t *imp_sensor);
 /**
- * @brief Deinit anemometer sensor
+ * @brief Deinit impulse sensor
  *
- * @param anemometer Pointer to the anemometer device
+ * @param imp_sensor Pointer to sensor device
  * @return `ESP_OK` on success
  */
-esp_err_t anemometer_deinit(anemometer_t *anemometer);
+esp_err_t imp_sensor_deinit(imp_sensor_t *imp_sensor);
 
 /**
- * @brief Deinit anemometer sensor
+ * @brief Deinit impulse sensor
  *
- * @param anemometer Pointer to the anemometer device
- * @param[out] speed calculated wind speed in [m/s]
+ * @param imp_sensor Pointer to sensor device
+ * @param[out] value output value multiplied by scale factor
  * @return `ESP_OK` on success
  */
-esp_err_t anemometer_get_wind_speed(anemometer_t *anemometer, float *speed);
-
+esp_err_t imp_sensor_get_value(imp_sensor_t *imp_sensor, float *value);
 
 #ifdef __cplusplus
 }
@@ -92,4 +93,4 @@ esp_err_t anemometer_get_wind_speed(anemometer_t *anemometer, float *speed);
 
 /**@}*/
 
-#endif /* __ANEMOMETER_H__ */
+#endif /* __IMPULSE_SENSOR_H__ */

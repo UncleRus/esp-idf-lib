@@ -1,8 +1,8 @@
-# Example for `anemometer` driver
+# Example for `impulse_counter` driver
 
 ## What it does
 
-It shows anemometer impulse wind sensor sensor data in a loop.
+It shows anemometer - impulse wind speed sensor data in a loop.
 
 ## Wiring
 
@@ -11,7 +11,7 @@ resistors.
 
 | Name | Description | Defaults |
 |------|-------------|----------|
-| `CONFIG_EXAMPLE_ANEMOMETER_GPIO` | GPIO number for `DATA` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
+| `CONFIG_EXAMPLE_DATA_GPIO` | GPIO number for `DATA` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
 
 ## Notes
 

@@ -18,26 +18,26 @@
 #include <esp_netif.h>
 #include <esp_wifi.h>
 #include <driver/gpio.h>
+#include <impulse_sensor.h>
 
-#include <anemometer.h>
+static const char *TAG = "APP";
 
-static const char *TAG="APP";
+static imp_sensor_t anemometer;
 
-static anemometer_t anemometer;
-
-static anemometer_config_t config = {
-    .input_pin = CONFIG_EXAMPLE_ANEMOMETER_GPIO,
-    .scale_factor = ANEMOMETER_DEFAULT_SF
+static imp_sensor_config_t config = {
+    .input_pin = CONFIG_EXAMPLE_DATA_GPIO,
+    .scale_factor = (1.75 / 20) //!< 1.75 m/s = 20 pps,
 };
 
 void app_main()
 {
     float val;
     ESP_LOGI(TAG, "Anemometer test");
-    ESP_ERROR_CHECK(anemometer_init(&config,&anemometer));
+    ESP_ERROR_CHECK(imp_sensor_init(&config, &anemometer));
 
-    while(1){
-        anemometer_get_wind_speed(anemometer,&val);
+    while (1)
+    {
+        imp_sensor_get_value(anemometer, &val);
         ESP_LOGI(TAG, "Wind speed = %.2f m/s", val);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

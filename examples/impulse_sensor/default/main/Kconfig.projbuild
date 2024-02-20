@@ -1,5 +1,5 @@
 menu "Example configuration"
-    config EXAMPLE_ANEMOMETER_GPIO
+    config EXAMPLE_DATA_GPIO
         int "DATA GPIO Number"
         default 2 if IDF_TARGET_ESP8266
         default 6 if IDF_TARGET_ESP32C3

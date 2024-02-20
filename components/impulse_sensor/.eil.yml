@@ -1,5 +1,5 @@
-name: anemometer
-description: Driver for impulse wind speed sensors(anemometers)
+name: impulse_sensor
+description: Driver for impulse output sensors
 version: 1.0.0
 groups:
   - misc

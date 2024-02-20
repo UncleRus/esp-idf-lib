@@ -7,7 +7,7 @@ else()
 endif()
 
 idf_component_register(
-    SRCS anemometer.c
+    SRCS impulse_sensor.c
     INCLUDE_DIRS .
     REQUIRES ${req}
 )
