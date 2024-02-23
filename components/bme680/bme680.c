@@ -346,13 +346,15 @@ static int16_t bme680_convert_temperature(bme680_t *dev, uint32_t raw_temperatur
 
     int64_t var1;
     int64_t var2;
+    int64_t var3;
     int16_t temperature;
 
-    var1 = ((((raw_temperature >> 3) - ((int32_t) cd->par_t1 << 1))) * ((int32_t) cd->par_t2)) >> 11;
-    var2 = (((((raw_temperature >> 4) - ((int32_t) cd->par_t1)) * ((raw_temperature >> 4) - ((int32_t) cd->par_t1))) >> 12)
-            * ((int32_t) cd->par_t3)) >> 14;
-    cd->t_fine = (int32_t) (var1 + var2);
-    temperature = (cd->t_fine * 5 + 128) >> 8;
+    var1 = ((int32_t)raw_temperature >> 3) - ((int32_t)cd->par_t1 << 1);
+    var2 = (var1 * (int32_t)cd->par_t2) >> 11;
+    var3 = ((var1 >> 1) * (var1 >> 1)) >> 12;
+    var3 = ((var3) * ((int32_t)cd->par_t3 << 4)) >> 14;
+    cd->t_fine = (int32_t)(var2 + var3);
+    temperature = (int16_t)(((cd->t_fine * 5) + 128) >> 8);
 
     return temperature;
 }
