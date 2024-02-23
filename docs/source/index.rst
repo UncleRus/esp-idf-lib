@@ -252,6 +252,7 @@ Other
    groups/tca9548
    groups/ds3502
    groups/wiegand
+   groups/impulse_sensor
 
 
 ===========
