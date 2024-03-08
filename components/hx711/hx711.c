@@ -91,10 +91,18 @@ esp_err_t hx711_init(hx711_t *dev)
 {
     CHECK_ARG(dev);
 
-    CHECK(gpio_reset_pin(dev->dout));
-    CHECK(gpio_reset_pin(dev->pd_sck));
-    CHECK(gpio_set_direction(dev->dout, GPIO_MODE_INPUT));
-    CHECK(gpio_set_direction(dev->pd_sck, GPIO_MODE_OUTPUT));
+    gpio_config_t conf = {
+        .pin_bit_mask = BIT(dev->dout),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = 0,
+        .pull_down_en = 0,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    CHECK(gpio_config(&conf));
+
+    conf.pin_bit_mask = BIT(dev->pd_sck);
+    conf.mode = GPIO_MODE_OUTPUT;
+    CHECK(gpio_config(&conf));
 
     CHECK(hx711_power_down(dev, false));
 
