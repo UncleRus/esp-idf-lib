@@ -91,6 +91,8 @@ esp_err_t hx711_init(hx711_t *dev)
 {
     CHECK_ARG(dev);
 
+    CHECK(gpio_reset_pin(dev->dout));
+    CHECK(gpio_reset_pin(dev->pd_sck));
     CHECK(gpio_set_direction(dev->dout, GPIO_MODE_INPUT));
     CHECK(gpio_set_direction(dev->pd_sck, GPIO_MODE_OUTPUT));
 
