@@ -342,12 +342,20 @@ esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg, const void *out_d
 
 esp_err_t i2c_dev_write_read_nonstop(const i2c_dev_t *dev,
         const void* wbuff, size_t wsize, void* rbuff, size_t rsize) {
-    if (!dev || !wbuff || !rbuff) return ESP_ERR_INVALID_ARG;
+    if (!dev || !wbuff || !wsize || !rbuff || !rsize) return ESP_ERR_INVALID_ARG;
 
     SEMAPHORE_TAKE(dev->port);
     esp_err_t res;
 
-    res = i2c_master_write_read_device(dev->port, dev->addr, wbuff, wsize, rbuff, rsize, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, dev->addr << 1 | I2C_MASTER_WRITE, true);
+    i2c_master_write(cmd, (void *)wbuff, wsize, true);
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, dev->addr << 1 | I2C_MASTER_READ, true);
+    i2c_master_read(cmd, rbuff, rsize, I2C_MASTER_LAST_NACK);
+    i2c_master_stop(cmd);
+    res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
 
     SEMAPHORE_GIVE(dev->port);
     return res;

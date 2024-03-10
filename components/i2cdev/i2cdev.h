@@ -215,6 +215,19 @@ esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg,
 esp_err_t i2c_dev_write_reg(const i2c_dev_t *dev, uint8_t reg,
         const void *out_data, size_t out_size);
 
+
+/**
+ * @brief Perform a write followed by a read to a device on the I2C bus
+ *
+ * Wrapper of i2c_master_write_read_device().
+ *
+ * @param dev Device descriptor
+ * @param wbuff Write buffer (const)
+ * @param wsize Write buffer size
+ * @param rbuff Read buffer (modifiable)
+ * @param rsize Read buffer size
+ * @return ESP_OK on success
+ */
 esp_err_t i2c_dev_write_read_nonstop(const i2c_dev_t *dev,
         const void* wbuff, size_t wsize, void* rbuff, size_t rsize);
 
