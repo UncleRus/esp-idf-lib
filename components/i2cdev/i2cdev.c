@@ -348,14 +348,49 @@ esp_err_t i2c_dev_write_read_nonstop(const i2c_dev_t *dev,
     esp_err_t res;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, dev->addr << 1 | I2C_MASTER_WRITE, true);
-    i2c_master_write(cmd, wbuff, wsize, true);
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, dev->addr << 1 | I2C_MASTER_READ, true);
-    i2c_master_read(cmd, rbuff, rsize, I2C_MASTER_LAST_NACK);
-    i2c_master_stop(cmd);
+    res = i2c_master_start(cmd);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
+    res = i2c_master_write_byte(cmd, dev->addr << 1 | I2C_MASTER_WRITE, true);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
+    res = i2c_master_write(cmd, wbuff, wsize, true);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
+    res = i2c_master_start(cmd);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
+    res = i2c_master_write_byte(cmd, dev->addr << 1 | I2C_MASTER_READ, true);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
+    res = i2c_master_read(cmd, rbuff, rsize, I2C_MASTER_LAST_NACK);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
+    res = i2c_master_stop(cmd);
+    if (res != ESP_OK) {
+        goto end;
+    }
+
     res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
+
+end:
+
+    if (res != ESP_OK) {
+        ESP_LOGE(TAG, "Could not write & read from device [0x%02x at %d]: %d (%s)", dev->addr, dev->port, res, esp_err_to_name(res));
+    }
+    i2c_cmd_link_delete(cmd);
 
     SEMAPHORE_GIVE(dev->port);
     return res;
