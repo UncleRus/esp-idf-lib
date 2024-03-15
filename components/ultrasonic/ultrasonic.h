@@ -108,6 +108,41 @@ esp_err_t ultrasonic_measure(const ultrasonic_sensor_t *dev, float max_distance,
  */
 esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance);
 
+/**
+ * @brief Measure distance in meters with temperature compensation
+ *
+ * This function measures the distance by taking into account the temperature of the air,
+ * which affects the speed of sound. This method improves the accuracy of measurements
+ * in various environmental conditions.
+ *
+ * @param dev Pointer to the device descriptor
+ * @param max_distance Maximal distance to measure, meters
+ * @param[out] distance Distance in meters
+ * @param temperature_c Current air temperature in degrees Celsius
+ * @return `ESP_OK` on success, otherwise:
+ *         - ::ESP_ERR_ULTRASONIC_PING         - Invalid state (previous ping is not ended)
+ *         - ::ESP_ERR_ULTRASONIC_PING_TIMEOUT - Device is not responding
+ *         - ::ESP_ERR_ULTRASONIC_ECHO_TIMEOUT - Distance is too big or wave is scattered
+ */
+esp_err_t ultrasonic_measure_temp_compensated(const ultrasonic_sensor_t *dev, float max_distance, float *distance, float temperature_c);
+
+/**
+ * @brief Measure distance in centimeters with temperature compensation
+ *
+ * Similar to ultrasonic_measure_temp_compensated but provides the distance in centimeters.
+ * It factors in the temperature of the air for more accurate measurements across a range of environmental conditions.
+ *
+ * @param dev Pointer to the device descriptor
+ * @param max_distance Maximal distance to measure, centimeters
+ * @param[out] distance Distance in centimeters
+ * @param temperature_c Current air temperature in degrees Celsius
+ * @return `ESP_OK` on success, otherwise:
+ *         - ::ESP_ERR_ULTRASONIC_PING         - Invalid state (previous ping is not ended)
+ *         - ::ESP_ERR_ULTRASONIC_PING_TIMEOUT - Device is not responding
+ *         - ::ESP_ERR_ULTRASONIC_ECHO_TIMEOUT - Distance is too big or wave is scattered
+ */
+esp_err_t ultrasonic_measure_cm_temp_compensated(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance, float temperature_c);
+
 #ifdef __cplusplus
 }
 #endif

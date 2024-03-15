@@ -48,6 +48,7 @@
 #define PING_TIMEOUT 6000
 #define ROUNDTRIP_M 5800.0f
 #define ROUNDTRIP_CM 58
+#define SPEED_OF_SOUND_AT_0C_M_S 331.4 // Speed of sound in m/s at 0 degrees Celsius
 
 #if HELPER_TARGET_IS_ESP32
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -138,6 +139,38 @@ esp_err_t ultrasonic_measure_cm(const ultrasonic_sensor_t *dev, uint32_t max_dis
     uint32_t time_us;
     CHECK(ultrasonic_measure_raw(dev, max_distance * ROUNDTRIP_CM, &time_us));
     *distance = time_us / ROUNDTRIP_CM;
+
+    return ESP_OK;
+}
+
+esp_err_t ultrasonic_measure_temp_compensated(const ultrasonic_sensor_t *dev, float max_distance, float *distance, float temperature_c)
+{
+    CHECK_ARG(dev && distance);
+
+    // Calculate the speed of sound in m/us based on temperature
+    float speed_of_sound = (SPEED_OF_SOUND_AT_0C_M_S + 0.6 * temperature_c) / 1000000; // Convert m/s to m/us
+
+    uint32_t time_us;
+    // Adjust max_time_us based on the recalculated speed of sound
+    CHECK(ultrasonic_measure_raw(dev, max_distance / speed_of_sound, &time_us));
+    // Calculate distance using the temperature-compensated speed of sound
+    *distance = time_us * speed_of_sound;
+
+    return ESP_OK;
+}
+
+esp_err_t ultrasonic_measure_cm_temp_compensated(const ultrasonic_sensor_t *dev, uint32_t max_distance, uint32_t *distance, float temperature_c)
+{
+    CHECK_ARG(dev && distance);
+
+    // Calculate the speed of sound in cm/us based on temperature
+    float speed_of_sound_cm_us = ((SPEED_OF_SOUND_AT_0C_M_S + 0.6 * temperature_c) * 100) / 1000000; // Convert m/s to cm/us
+
+    uint32_t time_us;
+    // Adjust max_time_us based on the recalculated speed of sound in cm
+    CHECK(ultrasonic_measure_raw(dev, max_distance * 100 / speed_of_sound_cm_us, &time_us));
+    // Calculate distance using the temperature-compensated speed of sound, converting result to cm
+    *distance = time_us * speed_of_sound_cm_us;
 
     return ESP_OK;
 }
