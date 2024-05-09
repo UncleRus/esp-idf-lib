@@ -240,6 +240,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 | **tda74xx**              | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                            | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **tps63101x**            | Driver for Texas Instruments TPS631012 and TPS631013 1.6-V to 5.5-V Input Voltage 1.5-A Buck-boost Converter with I2C | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
 | **ultrasonic**           | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 | **wiegand**              | Wiegand protocol receiver                                                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
 
@@ -330,7 +331,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [jsuiker](https://github.com/jsuiker): `dht` 
 - [Julian Doerner](https://github.com/juliandoerner): `tsl2591` 
 - [Lucio Tarantino](https://github.com/dianlight): `ads111x` 
-- [Manuel Markwort](https://github.com/mmarkwort): `mp2660` 
+- [Manuel Markwort](https://github.com/mmarkwort): `mp2660` `tps63101x` 
 - [Marc Luehr](https://github.com/th3link): `veml7700` 
 - [Nate Usher](https://github.com/nated0g): `scd30` 
 - Pavel Merzlyakov: `ds1302` 

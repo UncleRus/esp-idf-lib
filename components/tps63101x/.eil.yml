@@ -1,0 +1,19 @@
+name: tps63101x
+description: Driver for Texas Instruments TPS631012 and TPS631013 1.6-V to 5.5-V Input Voltage 1.5-A Buck-boost Converter with I2C
+version: 1.0.0
+groups:
+  - misc
+code_owners:
+  - mmarkwort
+depends:
+  - i2cdev
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp32s2
+  - esp32c3
+license: BSD-3
+copyrights:
+  - name: mmarkwort
+    year: 2024
