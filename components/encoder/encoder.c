@@ -275,6 +275,7 @@ esp_err_t rotary_encoder_remove(rotary_encoder_t *re)
 
 esp_err_t rotary_encoder_enable_acceleration(rotary_encoder_t *re, uint16_t coeff)
 {
+    CHECK_ARG(re);
     re->acceleration.coeff = coeff;
     re->acceleration.last_time = esp_timer_get_time();
     return ESP_OK;
@@ -282,6 +283,7 @@ esp_err_t rotary_encoder_enable_acceleration(rotary_encoder_t *re, uint16_t coef
 
 esp_err_t rotary_encoder_disable_acceleration(rotary_encoder_t *re)
 {
+    CHECK_ARG(re);
     re->acceleration.coeff = 0;
     return ESP_OK;
 }

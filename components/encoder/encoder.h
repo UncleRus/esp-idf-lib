@@ -121,9 +121,23 @@ esp_err_t rotary_encoder_add(rotary_encoder_t *re);
  */
 esp_err_t rotary_encoder_remove(rotary_encoder_t *re);
 
+/**
+ * @brief Enable acceleration on the rotary encoder
+ *
+ * @param re Encoder descriptor
+ * @param coeff Acceleration coefficient. Higher value means faster acceleration
+ * @return esp_err_t
+ */
 esp_err_t rotary_encoder_enable_acceleration(rotary_encoder_t *re, uint16_t coeff);
 
+/**
+ * @brief Disable acceleration on the rotary encoder
+ *
+ * @param re Encoder descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t rotary_encoder_disable_acceleration(rotary_encoder_t *re);
+
 #ifdef __cplusplus
 }
 #endif
