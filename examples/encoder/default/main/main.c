@@ -61,9 +61,13 @@ void test(void *arg)
                 break;
             case RE_ET_BTN_CLICKED:
                 ESP_LOGI(TAG, "Button clicked");
+                rotary_encoder_enable_acceleration(&re, 100);
+                ESP_LOGI(TAG, "Acceleration enabled");
                 break;
             case RE_ET_BTN_LONG_PRESSED:
                 ESP_LOGI(TAG, "Looooong pressed button");
+                rotary_encoder_disable_acceleration(&re);
+                ESP_LOGI(TAG, "Acceleration disabled");
                 break;
             case RE_ET_CHANGED:
                 val += e.diff;

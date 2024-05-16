@@ -57,6 +57,11 @@ typedef enum {
     RE_BTN_LONG_PRESSED = 2   //!< Button currently long pressed
 } rotary_encoder_btn_state_t;
 
+//Rotary encoder acceleration variables
+typedef struct {
+    int64_t last_time;
+    uint16_t coeff;
+} rotary_encoder_acceleration_t;
 /**
  * Rotary encoder descriptor
  */
@@ -68,6 +73,7 @@ typedef struct
     size_t index;
     uint64_t btn_pressed_time_us;
     rotary_encoder_btn_state_t btn_state;
+    rotary_encoder_acceleration_t acceleration;
 } rotary_encoder_t;
 
 /**
@@ -114,6 +120,23 @@ esp_err_t rotary_encoder_add(rotary_encoder_t *re);
  * @return `ESP_OK` on success
  */
 esp_err_t rotary_encoder_remove(rotary_encoder_t *re);
+
+/**
+ * @brief Enable acceleration on the rotary encoder
+ *
+ * @param re Encoder descriptor
+ * @param coeff Acceleration coefficient. Higher value means faster acceleration
+ * @return esp_err_t
+ */
+esp_err_t rotary_encoder_enable_acceleration(rotary_encoder_t *re, uint16_t coeff);
+
+/**
+ * @brief Disable acceleration on the rotary encoder
+ *
+ * @param re Encoder descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t rotary_encoder_disable_acceleration(rotary_encoder_t *re);
 
 #ifdef __cplusplus
 }

@@ -128,13 +128,33 @@ inline static void read_encoder(rotary_encoder_t *re)
 
     re->store = (re->store << 4) | re->code;
 
-    if (re->store == 0xe817) inc = 1;
-    if (re->store == 0xd42b) inc = -1;
+    if ((re->store == 0xe817)||(re->store == 0x17e8)) inc = 1;
+    if ((re->store == 0xd42b)||(re->store == 0x2bd4)) inc = -1;
 
     if (inc)
     {
-        ev.type = RE_ET_CHANGED;
         ev.diff = inc;
+        if (re->acceleration.coeff > 1)
+        {        
+            int64_t nowMicros = esp_timer_get_time();
+            // at 200 ms, we want to have minimum acceleration
+            uint32_t accelerationMinCutoffMillis = CONFIG_RE_ACCELERATION_MIN_CUTOFF;
+            // at 4 ms, we want to have maximum acceleration
+            uint32_t accelerationMaxCutoffMillis = CONFIG_RE_ACCELERATION_MAX_CUTOFF;
+            uint32_t millisAfterLastMotion = (nowMicros - re->acceleration.last_time) / 1000u;
+            re->acceleration.last_time = nowMicros;
+
+            if (millisAfterLastMotion < accelerationMinCutoffMillis)
+            {
+                if (millisAfterLastMotion < accelerationMaxCutoffMillis)
+                {
+                    millisAfterLastMotion = accelerationMaxCutoffMillis; // limit to maximum acceleration
+                }
+                ev.diff = inc * ((int32_t)(re->acceleration.coeff / millisAfterLastMotion) == 0 ? 1 : (int32_t)(re->acceleration.coeff / millisAfterLastMotion));
+            }
+        }
+
+        ev.type = RE_ET_CHANGED;
         xQueueSendToBack(_queue, &ev, 0);
     }
 }
@@ -251,4 +271,19 @@ esp_err_t rotary_encoder_remove(rotary_encoder_t *re)
     ESP_LOGE(TAG, "Unknown encoder");
     xSemaphoreGive(mutex);
     return ESP_ERR_NOT_FOUND;
+}
+
+esp_err_t rotary_encoder_enable_acceleration(rotary_encoder_t *re, uint16_t coeff)
+{
+    CHECK_ARG(re);
+    re->acceleration.coeff = coeff;
+    re->acceleration.last_time = esp_timer_get_time();
+    return ESP_OK;
+}
+
+esp_err_t rotary_encoder_disable_acceleration(rotary_encoder_t *re)
+{
+    CHECK_ARG(re);
+    re->acceleration.coeff = 0;
+    return ESP_OK;
 }
