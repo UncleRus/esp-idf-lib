@@ -253,6 +253,7 @@ Other
    groups/ds3502
    groups/wiegand
    groups/impulse_sensor
+   groups/tps63101x
 
 
 ===========

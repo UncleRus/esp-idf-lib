@@ -25,4 +25,15 @@ menu "Rotary encoders"
 		int "Long press timeout, us"
 		default 500000
 
+	config RE_ACCELERATION_MIN_CUTOFF
+		int "Minimum Acceleration cutoff time (ms)"
+		default 200
+		help
+            At this time in milliseconds between rotary ticks we want to be at the minimum acceleration
+
+	config RE_ACCELERATION_MAX_CUTOFF
+		int "Maximum Acceleration cutoff time (ms)"
+		default 4
+		help
+            At this time in milliseconds between rotary ticks we want to be at the maximum acceleration
 endmenu
