@@ -1,0 +1,8 @@
+.. _tps63101x:
+
+tps63101x - Texas Instruments TPS631012 and TPS631013 1.6-V to 5.5-V Input Voltage 1.5-A Buck-boost Converter with I2C
+===============================================================================================================
+
+.. doxygengroup:: tps63101x
+   :members:
+
