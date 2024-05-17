@@ -37,6 +37,8 @@
 
 #include <esp_idf_lib_helpers.h>
 #include "tps63101x.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #define I2C_FREQ_HZ 400000 //!< 400kHz bus speed
 
