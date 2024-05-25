@@ -1,0 +1,20 @@
+name: shift_reg
+description: Driver for generic shift register interface.
+version: 0.0.1
+groups:
+  - misc
+code_owners: JaimeAlbq
+depends:
+  - name: driver
+  - name: log
+  - name: esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp8266
+  - esp32s2
+  - esp32c3
+license: ISC
+copyrights:
+  - name: JaimeAlbq
+    year: 2022
