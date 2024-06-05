@@ -237,7 +237,7 @@ esp_err_t scd4x_set_sensor_altitude(i2c_dev_t *dev, uint16_t altitude);
  *                 Convert value to Pa by: value * 100
  * @return         `ESP_OK` on success
  */
-esp_err_t scd4x_set_ambient_ressure(i2c_dev_t *dev, uint16_t pressure);
+esp_err_t scd4x_set_ambient_pressure(i2c_dev_t *dev, uint16_t pressure);
 
 /**
  * @brief Perform forced recalibration.
