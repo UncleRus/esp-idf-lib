@@ -267,7 +267,7 @@ esp_err_t scd4x_set_sensor_altitude(i2c_dev_t *dev, uint16_t altitude)
     return execute_cmd(dev, CMD_SET_SENSOR_ALTITUDE, 1, &altitude, 1, NULL, 0);
 }
 
-esp_err_t scd4x_set_ambient_ressure(i2c_dev_t *dev, uint16_t pressure)
+esp_err_t scd4x_set_ambient_pressure(i2c_dev_t *dev, uint16_t pressure)
 {
     return execute_cmd(dev, CMD_SET_AMBIENT_PRESSURE, 1, &pressure, 1, NULL, 0);
 }
