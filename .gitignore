@@ -78,3 +78,4 @@ Gemfile.lock
 
 # python cache
 __pycache__/
+/.venv

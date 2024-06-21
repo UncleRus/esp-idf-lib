@@ -50,7 +50,7 @@
 #define REG_THRESH_L   2
 #define REG_THRESH_H   3
 
-#define COMP_QUE_OFFSET  1
+#define COMP_QUE_OFFSET  0
 #define COMP_QUE_MASK    0x03
 #define COMP_LAT_OFFSET  2
 #define COMP_LAT_MASK    0x01
