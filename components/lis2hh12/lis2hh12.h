@@ -593,9 +593,11 @@ esp_err_t lis2hh12_temperature_raw_get(i2c_dev_t *dev, int16_t *val);
 
 esp_err_t lis2hh12_acceleration_raw_get(i2c_dev_t *dev, int16_t *val);
 
-esp_err_t lis2hh12_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio, bool pin_sa0)
+esp_err_t lis2hh12_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio, bool pin_sa0);
 
-    esp_err_t lis2hh12_dev_id_get(i2c_dev_t *dev, uint8_t *buff);
+esp_err_t lis2hh12_free_desc(i2c_dev_t *dev);
+
+esp_err_t lis2hh12_dev_id_get(i2c_dev_t *dev, uint8_t *buff);
 
 esp_err_t lis2hh12_dev_reset_set(i2c_dev_t *dev, uint8_t val);
 esp_err_t lis2hh12_dev_reset_get(i2c_dev_t *dev, uint8_t *val);

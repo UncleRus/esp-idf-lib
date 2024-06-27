@@ -57,7 +57,7 @@
  * @retval       interface status
  *
  */
-static esp_err_t lis2hh12_read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *data, uint16_t len)
+esp_err_t lis2hh12_read_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *data, uint16_t len)
 {
     CHECK_ARG(dev);
 
