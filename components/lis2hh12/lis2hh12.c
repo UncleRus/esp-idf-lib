@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    lis2hh12_reg.c
+  * @file    lis2hh12.c
   * @author  Sensors Software Solution Team
   * @brief   LIS2HH12 driver file
   ******************************************************************************
@@ -16,7 +16,9 @@
   *
   ******************************************************************************
   */
-#include "lis2hh12_reg.h"
+#include <esp_err.h>
+#include <esp_idf_lib_helpers.h>
+#include "lis2hh12.h"
 
 /**
   * @defgroup    LIS2HH12
@@ -25,6 +27,10 @@
   * @{
   *
   */
+
+#define I2C_FREQ_HZ 400000
+
+#define CHECK_ARG(ARG) do { if (!(ARG)) return ESP_ERR_INVALID_ARG; } while (0)
 
 /**
   * @defgroup    LIS2HH12_Interfaces_Functions
@@ -38,25 +44,24 @@
 /**
   * @brief  Read generic device register
   *
-  * @param  ctx   read / write interface definitions(ptr)
+  * @param  dev   I2C device to use
   * @param  reg   register to read
   * @param  data  pointer to buffer that store the data read(ptr)
   * @param  len   number of consecutive register to read
-  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  * @retval       interface status
   *
   */
-int32_t __weak lis2hh12_read_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+static esp_err_t lis2hh12_read_reg(i2c_dev_t *dev, uint8_t reg,
                                  uint8_t *data,
                                  uint16_t len)
 {
-  int32_t ret;
+  CHECK_ARG(dev);
 
-  if (ctx == NULL)
-  {
-    return -1;
-  }
+  esp_err_t ret;
 
-  ret = ctx->read_reg(ctx->handle, reg, data, len);
+  I2C_DEV_TAKE_MUTEX(dev);
+  ret = i2c_dev_read_reg(dev, reg, data, len);
+  I2C_DEV_GIVE_MUTEX(dev);
 
   return ret;
 }
@@ -64,25 +69,24 @@ int32_t __weak lis2hh12_read_reg(const stmdev_ctx_t *ctx, uint8_t reg,
 /**
   * @brief  Write generic device register
   *
-  * @param  ctx   read / write interface definitions(ptr)
+  * @param  dev   I2C device to use
   * @param  reg   register to write
   * @param  data  pointer to data to write in register reg(ptr)
   * @param  len   number of consecutive register to write
-  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  * @retval       interface status
   *
   */
-int32_t __weak lis2hh12_write_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+esp_err_t lis2hh12_write_reg(i2c_dev_t *dev, uint8_t reg,
                                   uint8_t *data,
                                   uint16_t len)
 {
-  int32_t ret;
+  CHECK_ARG(dev);
 
-  if (ctx == NULL)
-  {
-    return -1;
-  }
+  esp_err_t ret;
 
-  ret = ctx->write_reg(ctx->handle, reg, data, len);
+  I2C_DEV_TAKE_MUTEX(dev);
+  ret = i2c_dev_write_reg(dev, reg, data, len);
+  I2C_DEV_GIVE_MUTEX(dev);
 
   return ret;
 }
@@ -136,25 +140,25 @@ float_t lis2hh12_from_lsb_to_celsius(int16_t lsb)
 /**
   * @brief   Enable accelerometer axis.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev     I2C device to use
   * @param  val     Accelerometer’s X-axis output enable.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval         Interface status.
   *
   */
-int32_t lis2hh12_xl_axis_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_axis_set(i2c_dev_t *dev,
                              lis2hh12_xl_axis_t val)
 {
   lis2hh12_ctrl1_t ctrl1;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl1.xen  = val.xen;
     ctrl1.yen  = val.yen;
     ctrl1.zen  = val.zen;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
   }
 
   return ret;
@@ -163,21 +167,25 @@ int32_t lis2hh12_xl_axis_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Enable accelerometer axis.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     Accelerometer’s X-axis output enable.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_axis_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_axis_get(i2c_dev_t *dev,
                              lis2hh12_xl_axis_t *val)
 {
   lis2hh12_ctrl1_t ctrl1;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
-  val->xen = ctrl1.xen;
-  val->yen = ctrl1.yen;
-  val->zen = ctrl1.zen;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret == ESP_OK)
+  {
+    val->xen = ctrl1.xen;
+    val->yen = ctrl1.yen;
+    val->zen = ctrl1.zen;
+  }
 
   return ret;
 }
@@ -185,22 +193,22 @@ int32_t lis2hh12_xl_axis_get(const stmdev_ctx_t *ctx,
 /**
   * @brief  Blockdataupdate.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of bdu in reg CTRL1.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_block_data_update_set(const stmdev_ctx_t *ctx, uint8_t val)
+esp_err_t lis2hh12_block_data_update_set(i2c_dev_t *dev, uint8_t val)
 {
   lis2hh12_ctrl1_t ctrl1;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl1.bdu = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
   }
 
   return ret;
@@ -209,19 +217,23 @@ int32_t lis2hh12_block_data_update_set(const stmdev_ctx_t *ctx, uint8_t val)
 /**
   * @brief  Blockdataupdate.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of bdu in reg CTRL1.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_block_data_update_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_block_data_update_get(i2c_dev_t *dev,
                                        uint8_t *val)
 {
   lis2hh12_ctrl1_t ctrl1;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
-  *val = (uint8_t)ctrl1.bdu;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret == ESP_OK)
+  {
+    *val = (uint8_t)ctrl1.bdu;
+  }
 
   return ret;
 }
@@ -229,23 +241,23 @@ int32_t lis2hh12_block_data_update_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer data rate selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "odr" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_data_rate_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_data_rate_set(i2c_dev_t *dev,
                                   lis2hh12_xl_data_rate_t val)
 {
   lis2hh12_ctrl1_t ctrl1;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl1.odr = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
   }
 
   return ret;
@@ -254,18 +266,23 @@ int32_t lis2hh12_xl_data_rate_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer data rate selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of odr in reg CTRL1.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_data_rate_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_data_rate_get(i2c_dev_t *dev,
                                   lis2hh12_xl_data_rate_t *val)
 {
   lis2hh12_ctrl1_t ctrl1;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl1.odr)
   {
@@ -308,23 +325,23 @@ int32_t lis2hh12_xl_data_rate_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer full-scale selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "fs" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_full_scale_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_full_scale_set(i2c_dev_t *dev,
                                    lis2hh12_xl_fs_t val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl4.fs = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
   }
 
   return ret;
@@ -333,18 +350,23 @@ int32_t lis2hh12_xl_full_scale_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer full-scale selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of fs in reg CTRL4.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_full_scale_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_full_scale_get(i2c_dev_t *dev,
                                    lis2hh12_xl_fs_t *val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl4.fs)
   {
@@ -371,23 +393,23 @@ int32_t lis2hh12_xl_full_scale_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Decimation of acceleration data on OUT REG and FIFO.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "dec" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_decimation_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_decimation_set(i2c_dev_t *dev,
                                    lis2hh12_dec_t val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl5.dec = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
   }
 
   return ret;
@@ -396,18 +418,23 @@ int32_t lis2hh12_xl_decimation_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Decimation of acceleration data on OUT REG and FIFO.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of dec in reg CTRL5.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_decimation_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_decimation_get(i2c_dev_t *dev,
                                    lis2hh12_dec_t *val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl5.dec)
   {
@@ -438,19 +465,23 @@ int32_t lis2hh12_xl_decimation_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   New data available.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Iet the values of "zyxda" in reg STATUS.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_flag_data_ready_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_flag_data_ready_get(i2c_dev_t *dev,
                                         uint8_t *val)
 {
   lis2hh12_status_t status;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_STATUS, (uint8_t *)&status, 1);
-  *val = status.zyxda;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_STATUS, (uint8_t *)&status, 1);
+
+  if (ret == ESP_OK)
+  {
+    *val = status.zyxda;
+  }
 
   return ret;
 }
@@ -471,19 +502,23 @@ int32_t lis2hh12_xl_flag_data_ready_get(const stmdev_ctx_t *ctx,
   * @brief   Temperature data output register (r). L and H registers together
   *          express a 16-bit word in two’s complement.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  buff   Buffer that stores the data read.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
+esp_err_t lis2hh12_temperature_raw_get(i2c_dev_t *dev, int16_t *val)
 {
   uint8_t buff[2];
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_TEMP_L, buff, 2);
-  *val = (int16_t)buff[1];
-  *val = (*val * 256) + (int16_t)buff[0];
+  ret = lis2hh12_read_reg(dev, LIS2HH12_TEMP_L, buff, 2);
+
+  if (ret == ESP_OK)
+  {
+    *val = (int16_t)buff[1];
+    *val = (*val * 256) + (int16_t)buff[0];
+  }
 
   return ret;
 }
@@ -492,23 +527,27 @@ int32_t lis2hh12_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
   * @brief   Linear acceleration output register. The value is expressed
   *          as a 16-bit word in two’s complement.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  buff   Buffer that stores the data read.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_acceleration_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
+esp_err_t lis2hh12_acceleration_raw_get(i2c_dev_t *dev, int16_t *val)
 {
   uint8_t buff[6];
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_OUT_X_L, buff, 6);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_OUT_X_L, buff, 6);
+
+  if (ret == ESP_OK)
+  {
   val[0] = (int16_t)buff[1];
   val[0] = (val[0] * 256) + (int16_t)buff[0];
   val[1] = (int16_t)buff[3];
   val[1] = (val[1] * 256) + (int16_t)buff[2];
   val[2] = (int16_t)buff[5];
   val[2] = (val[2] * 256) + (int16_t)buff[4];
+  }
 
   return ret;
 }
@@ -526,18 +565,54 @@ int32_t lis2hh12_acceleration_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
   */
 
 /**
+  * @brief Initialize device descriptor
+  *
+  * @param   dev       Device descriptor
+  * @param   port      I2C port
+  * @param   sda_gpio  SDA GPIO
+  * @param   scl_gpio  SCL GPIO
+  * @retval            `ESP_OK` on success
+  */
+esp_err_t lis2hh12_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio, bool pin_sa0)
+{
+    CHECK_ARG(dev);
+
+    dev->port = port;
+    dev->addr = pin_sa0 ? LIS2HH12_ADDR_SA0_H : LIS2HH12_ADDR_SA0_L;
+    dev->cfg.sda_io_num = sda_gpio;
+    dev->cfg.scl_io_num = scl_gpio;
+#if HELPER_TARGET_IS_ESP32
+    dev->cfg.master.clk_speed = I2C_FREQ_HZ;
+#endif
+    return i2c_dev_create_mutex(dev);
+}
+
+/**
+  * @brief Free device descriptor
+  *
+  * @param   dev  Device descriptor
+  * @return       `ESP_OK` on success
+  */
+esp_err_t lis2hh12_free_desc(i2c_dev_t *dev)
+{
+    CHECK_ARG(dev);
+
+    return i2c_dev_delete_mutex(dev);
+}
+
+/**
   * @brief  DeviceWhoamI.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores the data read.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @param  dev   I2C device to use
+  * @param  buff  Buffer that stores the data read.(ptr)
+  * @retval       Interface status.
   *
   */
-int32_t lis2hh12_dev_id_get(const stmdev_ctx_t *ctx, uint8_t *buff)
+esp_err_t lis2hh12_dev_id_get(i2c_dev_t *dev, uint8_t *buff)
 {
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_WHO_AM_I, buff, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_WHO_AM_I, buff, 1);
 
   return ret;
 }
@@ -546,22 +621,22 @@ int32_t lis2hh12_dev_id_get(const stmdev_ctx_t *ctx, uint8_t *buff)
   * @brief   Software reset. Restore the default values
   *          in user registers.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of soft_reset in reg CTRL5.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_dev_reset_set(const stmdev_ctx_t *ctx, uint8_t val)
+esp_err_t lis2hh12_dev_reset_set(i2c_dev_t *dev, uint8_t val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl5.soft_reset = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
   }
 
   return ret;
@@ -571,18 +646,22 @@ int32_t lis2hh12_dev_reset_set(const stmdev_ctx_t *ctx, uint8_t val)
   * @brief   Software reset. Restore the default values in
   *          user registers.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of soft_reset in reg CTRL5.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_dev_reset_get(const stmdev_ctx_t *ctx, uint8_t *val)
+esp_err_t lis2hh12_dev_reset_get(i2c_dev_t *dev, uint8_t *val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
-  *val = (uint8_t)ctrl5.soft_reset;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret == ESP_OK)
+  {
+    *val = (uint8_t)ctrl5.soft_reset;
+  }
 
   return ret;
 }
@@ -590,22 +669,22 @@ int32_t lis2hh12_dev_reset_get(const stmdev_ctx_t *ctx, uint8_t *val)
 /**
   * @brief   Reboot memory content. Reload the calibration parameters.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of boot in reg CTRL6.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_dev_boot_set(const stmdev_ctx_t *ctx, uint8_t val)
+esp_err_t lis2hh12_dev_boot_set(i2c_dev_t *dev, uint8_t val)
 {
   lis2hh12_ctrl6_t ctrl6;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl6.boot = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
   }
 
   return ret;
@@ -614,18 +693,21 @@ int32_t lis2hh12_dev_boot_set(const stmdev_ctx_t *ctx, uint8_t val)
 /**
   * @brief   Reboot memory content. Reload the calibration parameters.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of boot in reg CTRL6.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_dev_boot_get(const stmdev_ctx_t *ctx, uint8_t *val)
+esp_err_t lis2hh12_dev_boot_get(i2c_dev_t *dev, uint8_t *val)
 {
   lis2hh12_ctrl6_t ctrl6;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
-  *val = (uint8_t)ctrl6.boot;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+
+  if (ret == ESP_OK) {
+    *val = (uint8_t)ctrl6.boot;
+  }
 
   return ret;
 }
@@ -633,26 +715,30 @@ int32_t lis2hh12_dev_boot_get(const stmdev_ctx_t *ctx, uint8_t *val)
 /**
   * @brief   Device status register.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     X-axis new data available.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_dev_status_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_dev_status_get(i2c_dev_t *dev,
                                 lis2hh12_status_reg_t *val)
 {
   lis2hh12_status_t status;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_STATUS, (uint8_t *)&status, 1);
-  val->xda = status.xda;
-  val->yda = status.yda;
-  val->zda = status.zda;
-  val->zyxda = status.zyxda;
-  val->_xor = status._xor;
-  val->yor = status.yor;
-  val->zor = status.zor;
-  val->zyxor = status.zyxor;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_STATUS, (uint8_t *)&status, 1);
+
+  if (ret == ESP_OK)
+  {
+    val->xda = status.xda;
+    val->yda = status.yda;
+    val->zda = status.zda;
+    val->zyxda = status.zyxda;
+    val->_xor = status._xor;
+    val->yor = status.yor;
+    val->zor = status.zor;
+    val->zyxor = status.zyxor;
+  }
 
   return ret;
 }
@@ -673,23 +759,23 @@ int32_t lis2hh12_dev_status_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer filter routing on interrupt generators.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "hpis" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_int_path_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_int_path_set(i2c_dev_t *dev,
                                         lis2hh12_xl_hp_path_t val)
 {
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl2.hpis = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
   }
 
   return ret;
@@ -698,18 +784,23 @@ int32_t lis2hh12_xl_filter_int_path_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer filter routing on interrupt generators.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of hpis in reg CTRL2.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_int_path_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_int_path_get(i2c_dev_t *dev,
                                         lis2hh12_xl_hp_path_t *val)
 {
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl2.hpis)
   {
@@ -736,35 +827,35 @@ int32_t lis2hh12_xl_filter_int_path_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer output filter path configuration.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "fds" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_out_path_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_out_path_set(i2c_dev_t *dev,
                                         lis2hh12_xl_out_path_t val)
 {
   lis2hh12_ctrl1_t ctrl1;
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl1.hr = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl2.fds = ((uint8_t) val & 0x02U) >> 1;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
   }
 
   return ret;
@@ -773,23 +864,28 @@ int32_t lis2hh12_xl_filter_out_path_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer output filter path configuration.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of fds in reg CTRL2.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_out_path_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_out_path_get(i2c_dev_t *dev,
                                         lis2hh12_xl_out_path_t *val)
 {
   lis2hh12_ctrl1_t ctrl1;
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL1, (uint8_t *)&ctrl1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+    if (ret != ESP_OK)
+    {
+      return ret;
+    }
 
     switch ((ctrl2.fds << 1) | ctrl1.hr)
     {
@@ -818,24 +914,24 @@ int32_t lis2hh12_xl_filter_out_path_get(const stmdev_ctx_t *ctx,
   * @brief   Accelerometer digital filter high pass cutoff
   *          frequency selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "hpm" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_hp_bandwidth_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_hp_bandwidth_set(i2c_dev_t *dev,
                                             lis2hh12_xl_hp_bw_t val)
 {
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl2.hpm = (uint8_t) val & 0x01U;
     ctrl2.dfc = (((uint8_t) val  & 0x30U) >> 4);
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
   }
 
   return ret;
@@ -845,18 +941,23 @@ int32_t lis2hh12_xl_filter_hp_bandwidth_set(const stmdev_ctx_t *ctx,
   * @brief   Accelerometer digital filter high pass cutoff frequency
   *          selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of hpm in reg CTRL2.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_hp_bandwidth_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_hp_bandwidth_get(i2c_dev_t *dev,
                                             lis2hh12_xl_hp_bw_t *val)
 {
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch ((ctrl2.dfc << 4) | ctrl2.hpm)
   {
@@ -904,23 +1005,23 @@ int32_t lis2hh12_xl_filter_hp_bandwidth_get(const stmdev_ctx_t *ctx,
   * @brief   Accelerometer digital filter low pass cutoff frequency
   *          selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "dfc" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_low_bandwidth_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_low_bandwidth_set(i2c_dev_t *dev,
                                              lis2hh12_xl_lp_bw_t val)
 {
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl2.dfc = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
   }
 
   return ret;
@@ -930,19 +1031,23 @@ int32_t lis2hh12_xl_filter_low_bandwidth_set(const stmdev_ctx_t *ctx,
   * @brief   Accelerometer digital filter low pass cutoff frequency
   *          selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of dfc in reg CTRL2.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_low_bandwidth_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_low_bandwidth_get(i2c_dev_t *dev,
                                              lis2hh12_xl_lp_bw_t *val)
 {
   lis2hh12_ctrl2_t ctrl2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL2, (uint8_t *)&ctrl2, 1);
 
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
   switch (ctrl2.dfc)
   {
     case LIS2HH12_LP_ODR_DIV_50:
@@ -972,24 +1077,24 @@ int32_t lis2hh12_xl_filter_low_bandwidth_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Set anti-aliasing filter bandwidth.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "bw_scale_odr" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_aalias_bandwidth_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_aalias_bandwidth_set(i2c_dev_t *dev,
                                                 lis2hh12_xl_filt_aa_bw_t val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl4.bw_scale_odr = (((uint8_t) val & 0x10U) >> 4);
     ctrl4.bw = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
   }
 
   return ret;
@@ -998,18 +1103,23 @@ int32_t lis2hh12_xl_filter_aalias_bandwidth_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Set anti-aliasing filter bandwidth.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of bw_scale_odr in reg CTRL4.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_aalias_bandwidth_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_aalias_bandwidth_get(i2c_dev_t *dev,
                                                 lis2hh12_xl_filt_aa_bw_t *val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch ((ctrl4.bw_scale_odr << 4) | ctrl4.bw)
   {
@@ -1044,16 +1154,16 @@ int32_t lis2hh12_xl_filter_aalias_bandwidth_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Reference value for acelerometer digital high-pass filter.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  buff   Buffer that stores data to be write.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_reference_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_reference_set(i2c_dev_t *dev,
                                          int16_t *val)
 {
   uint8_t buff[6];
-  int32_t ret;
+  esp_err_t ret;
 
   buff[1] = (uint8_t)((uint16_t)val[0] / 256U);
   buff[0] = (uint8_t)((uint16_t)val[0] - (buff[1] * 256U));
@@ -1061,7 +1171,7 @@ int32_t lis2hh12_xl_filter_reference_set(const stmdev_ctx_t *ctx,
   buff[2] = (uint8_t)((uint16_t)val[1] - (buff[3] * 256U));
   buff[5] = (uint8_t)((uint16_t)val[2] / 256U);
   buff[4] = (uint8_t)((uint16_t)val[2] - (buff[5] * 256U));
-  ret = lis2hh12_write_reg(ctx, LIS2HH12_XL_REFERENCE, buff, 6);
+  ret = lis2hh12_write_reg(dev, LIS2HH12_XL_REFERENCE, buff, 6);
 
   return ret;
 }
@@ -1069,18 +1179,18 @@ int32_t lis2hh12_xl_filter_reference_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Reference value for acelerometer digital high-pass filter.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  buff   Buffer that stores data read.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_filter_reference_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_filter_reference_get(i2c_dev_t *dev,
                                          int16_t *val)
 {
   uint8_t buff[6];
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_XL_REFERENCE, buff, 6);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_XL_REFERENCE, buff, 6);
   val[0] = (int16_t)buff[1];
   val[0] = (val[0] * 256) + (int16_t)buff[0];
   val[1] = (int16_t)buff[3];
@@ -1107,22 +1217,22 @@ int32_t lis2hh12_xl_filter_reference_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   SPI Serial Interface Mode selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "sim" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_spi_mode_set(const stmdev_ctx_t *ctx, lis2hh12_sim_t val)
+esp_err_t lis2hh12_spi_mode_set(i2c_dev_t *dev, lis2hh12_sim_t val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl4.sim = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
   }
 
   return ret;
@@ -1131,17 +1241,22 @@ int32_t lis2hh12_spi_mode_set(const stmdev_ctx_t *ctx, lis2hh12_sim_t val)
 /**
   * @brief   SPI Serial Interface Mode selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of sim in reg CTRL4.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_spi_mode_get(const stmdev_ctx_t *ctx, lis2hh12_sim_t *val)
+esp_err_t lis2hh12_spi_mode_get(i2c_dev_t *dev, lis2hh12_sim_t *val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl4.sim)
   {
@@ -1164,23 +1279,23 @@ int32_t lis2hh12_spi_mode_get(const stmdev_ctx_t *ctx, lis2hh12_sim_t *val)
 /**
   * @brief   Disable I2C interface.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "i2c_disable" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_i2c_interface_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_i2c_interface_set(i2c_dev_t *dev,
                                    lis2hh12_i2c_dis_t val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl4.i2c_disable = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
   }
 
   return ret;
@@ -1189,18 +1304,23 @@ int32_t lis2hh12_i2c_interface_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Disable I2C interface.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of i2c_disable in reg CTRL4.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_i2c_interface_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_i2c_interface_get(i2c_dev_t *dev,
                                    lis2hh12_i2c_dis_t *val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl4.i2c_disable)
   {
@@ -1224,23 +1344,23 @@ int32_t lis2hh12_i2c_interface_get(const stmdev_ctx_t *ctx,
   * @brief   Register address automatically incremented during a
   *          multiple byte access with a serial interface.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "if_add_inc" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_auto_increment_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_auto_increment_set(i2c_dev_t *dev,
                                     lis2hh12_auto_inc_t val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl4.if_add_inc = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
   }
 
   return ret;
@@ -1250,18 +1370,23 @@ int32_t lis2hh12_auto_increment_set(const stmdev_ctx_t *ctx,
   * @brief   Register address automatically incremented during a multiple
   *          byte access with a serial interface.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of if_add_inc in reg CTRL4.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_auto_increment_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_auto_increment_get(i2c_dev_t *dev,
                                     lis2hh12_auto_inc_t *val)
 {
   lis2hh12_ctrl4_t ctrl4;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl4.if_add_inc)
   {
@@ -1297,20 +1422,20 @@ int32_t lis2hh12_auto_increment_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Route a signal on INT 1 pin.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     Accelerometer data ready on INT 1 pin.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_int1_route_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_int1_route_set(i2c_dev_t *dev,
                                     lis2hh12_pin_int1_route_t val)
 {
   lis2hh12_ctrl3_t ctrl3;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl3.int1_drdy  = val.int1_drdy;
     ctrl3.int1_fth  = val.int1_fth;
@@ -1318,7 +1443,7 @@ int32_t lis2hh12_pin_int1_route_set(const stmdev_ctx_t *ctx,
     ctrl3.int1_ig1  = val.int1_ig1;
     ctrl3.int1_ig2  = val.int1_ig2;
     ctrl3.int1_inact  = val.int1_inact;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
   }
 
   return ret;
@@ -1327,18 +1452,24 @@ int32_t lis2hh12_pin_int1_route_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Route a signal on INT 1 pin.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     Accelerometer data ready on INT 1 pin.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_int1_route_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_int1_route_get(i2c_dev_t *dev,
                                     lis2hh12_pin_int1_route_t *val)
 {
   lis2hh12_ctrl3_t ctrl3;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
+
   val->int1_drdy = ctrl3.int1_drdy;
   val->int1_fth = ctrl3.int1_fth;
   val->int1_ovr = ctrl3.int1_ovr;
@@ -1352,22 +1483,22 @@ int32_t lis2hh12_pin_int1_route_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Push-pull/open drain selection on interrupt pads.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "pp_od" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_mode_set(const stmdev_ctx_t *ctx, lis2hh12_pp_od_t val)
+esp_err_t lis2hh12_pin_mode_set(i2c_dev_t *dev, lis2hh12_pp_od_t val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl5.pp_od = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
   }
 
   return ret;
@@ -1376,18 +1507,23 @@ int32_t lis2hh12_pin_mode_set(const stmdev_ctx_t *ctx, lis2hh12_pp_od_t val)
 /**
   * @brief   Push-pull/open drain selection on interrupt pads.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of pp_od in reg CTRL5.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_mode_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_mode_get(i2c_dev_t *dev,
                               lis2hh12_pp_od_t *val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl5.pp_od)
   {
@@ -1410,23 +1546,23 @@ int32_t lis2hh12_pin_mode_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Interrupt active-high/low.Interrupt active-high/low.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "h_lactive" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_polarity_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_polarity_set(i2c_dev_t *dev,
                                   lis2hh12_pin_pol_t val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl5.h_lactive = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
   }
 
   return ret;
@@ -1435,18 +1571,23 @@ int32_t lis2hh12_pin_polarity_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Interrupt active-high/low.Interrupt active-high/low.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of h_lactive in reg CTRL5.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_polarity_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_polarity_get(i2c_dev_t *dev,
                                   lis2hh12_pin_pol_t *val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl5.h_lactive)
   {
@@ -1469,20 +1610,20 @@ int32_t lis2hh12_pin_polarity_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Route a signal on INT 2 pin.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     Accelerometer data ready on INT2 pin.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_int2_route_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_int2_route_set(i2c_dev_t *dev,
                                     lis2hh12_pin_int2_route_t val)
 {
   lis2hh12_ctrl6_t ctrl6;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl6.int2_drdy   = val.int2_drdy;
     ctrl6.int2_fth    = val.int2_fth;
@@ -1490,7 +1631,7 @@ int32_t lis2hh12_pin_int2_route_set(const stmdev_ctx_t *ctx,
     ctrl6.int2_ig1    = val.int2_ig1;
     ctrl6.int2_ig2    = val.int2_ig2;
     ctrl6.int2_boot   = val.int2_boot;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
   }
 
   return ret;
@@ -1499,18 +1640,24 @@ int32_t lis2hh12_pin_int2_route_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Route a signal on INT 2 pin.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     Accelerometer data ready on INT2 pin.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_int2_route_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_int2_route_get(i2c_dev_t *dev,
                                     lis2hh12_pin_int2_route_t *val)
 {
   lis2hh12_ctrl6_t ctrl6;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL6, (uint8_t *)&ctrl6, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
+
   val->int2_drdy  = ctrl6.int2_drdy;
   val->int2_fth   = ctrl6.int2_fth;
   val->int2_empty = ctrl6.int2_empty;
@@ -1524,23 +1671,23 @@ int32_t lis2hh12_pin_int2_route_get(const stmdev_ctx_t *ctx,
 /**
   * @brief    Latched/pulsed interrupt.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "lir" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_notification_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_notification_set(i2c_dev_t *dev,
                                       lis2hh12_lir_t val)
 {
   lis2hh12_ctrl7_t ctrl7;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl7.lir = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
   }
 
   return ret;
@@ -1549,18 +1696,23 @@ int32_t lis2hh12_pin_notification_set(const stmdev_ctx_t *ctx,
 /**
   * @brief    Latched/pulsed interrupt.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of lir in reg CTRL7.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_notification_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_notification_get(i2c_dev_t *dev,
                                       lis2hh12_lir_t *val)
 {
   lis2hh12_ctrl7_t ctrl7;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl7.lir)
   {
@@ -1583,35 +1735,35 @@ int32_t lis2hh12_pin_notification_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   AND/OR combination of accelerometer’s interrupt events.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "aoi" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_logic_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_logic_set(i2c_dev_t *dev,
                                lis2hh12_pin_logic_t val)
 {
   lis2hh12_ig_cfg1_t ig_cfg1;
   lis2hh12_ig_cfg2_t ig_cfg2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ig_cfg1.aoi = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ig_cfg2.aoi = (((uint8_t) val & 0x02U) >> 1);
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
   return ret;
@@ -1620,23 +1772,23 @@ int32_t lis2hh12_pin_logic_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   AND/OR combination of accelerometer’s interrupt events.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of aoi in reg IG_CFG1.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_pin_logic_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_pin_logic_get(i2c_dev_t *dev,
                                lis2hh12_pin_logic_t *val)
 {
   lis2hh12_ig_cfg1_t ig_cfg1;
   lis2hh12_ig_cfg2_t ig_cfg2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
   switch ((ig_cfg2.aoi << 1) |  ig_cfg1.aoi)
@@ -1681,23 +1833,23 @@ int32_t lis2hh12_pin_logic_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Decrement or reset counter mode selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "dcrm" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_mode_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_mode_set(i2c_dev_t *dev,
                                     lis2hh12_dcrm_t val)
 {
   lis2hh12_ctrl7_t ctrl7;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl7.dcrm = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
   }
 
   return ret;
@@ -1706,18 +1858,23 @@ int32_t lis2hh12_xl_trshld_mode_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Decrement or reset counter mode selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of dcrm in reg CTRL7.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_mode_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_mode_get(i2c_dev_t *dev,
                                     lis2hh12_dcrm_t *val)
 {
   lis2hh12_ctrl7_t ctrl7;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl7.dcrm)
   {
@@ -1740,22 +1897,22 @@ int32_t lis2hh12_xl_trshld_mode_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Enable interrupt generation on threshold event.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Enable interrupt generation on accelerometer’s
   *                X-axis low event.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_axis_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_axis_set(i2c_dev_t *dev,
                                     lis2hh12_xl_trshld_en_t val)
 {
   lis2hh12_ig_cfg1_t ig_cfg1;
   lis2hh12_ig_cfg2_t ig_cfg2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ig_cfg1.xlie  = (uint8_t)val.ig1_xlie;
     ig_cfg1.xhie  = (uint8_t)val.ig1_xhie;
@@ -1763,15 +1920,15 @@ int32_t lis2hh12_xl_trshld_axis_set(const stmdev_ctx_t *ctx,
     ig_cfg1.yhie  = (uint8_t)val.ig1_yhie;
     ig_cfg1.zlie  = (uint8_t)val.ig1_zlie;
     ig_cfg1.zhie  = (uint8_t)val.ig1_zhie;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ig_cfg2.xlie  = (uint8_t)val.ig2_xlie;
     ig_cfg2.xhie  = (uint8_t)val.ig2_xhie;
@@ -1779,7 +1936,7 @@ int32_t lis2hh12_xl_trshld_axis_set(const stmdev_ctx_t *ctx,
     ig_cfg2.yhie  = (uint8_t)val.ig2_yhie;
     ig_cfg2.zlie  = (uint8_t)val.ig2_zlie;
     ig_cfg2.zhie  = (uint8_t)val.ig2_zhie;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
   return ret;
@@ -1788,24 +1945,24 @@ int32_t lis2hh12_xl_trshld_axis_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Enable interrupt generation on threshold event.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Enable interrupt generation on accelerometer’s
   *                X-axis low event.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_axis_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_axis_get(i2c_dev_t *dev,
                                     lis2hh12_xl_trshld_en_t *val)
 {
   lis2hh12_ig_cfg1_t ig_cfg1;
   lis2hh12_ig_cfg2_t ig_cfg2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
   val->ig1_xlie = ig_cfg1.xlie;
@@ -1827,23 +1984,23 @@ int32_t lis2hh12_xl_trshld_axis_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Accelerometer interrupt on threshold source.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val     Accelerometer’s X low. event.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_src_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_src_get(i2c_dev_t *dev,
                                    lis2hh12_xl_trshld_src_t *val)
 {
   lis2hh12_ig_src1_t ig_src1;
   lis2hh12_ig_src2_t ig_src2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_SRC1, (uint8_t *)&ig_src1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_SRC1, (uint8_t *)&ig_src1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_SRC2, (uint8_t *)&ig_src2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_SRC2, (uint8_t *)&ig_src2, 1);
   }
 
   val->ig1_xl = ig_src1.xl;
@@ -1867,32 +2024,32 @@ int32_t lis2hh12_xl_trshld_src_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Axis interrupt threshold.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  buff   Buffer that stores data to be write.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_set(const stmdev_ctx_t *ctx, uint8_t ig1_x,
+esp_err_t lis2hh12_xl_trshld_set(i2c_dev_t *dev, uint8_t ig1_x,
                                uint8_t ig1_y, uint8_t ig1_z,
                                uint8_t ig2_xyz)
 {
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_THS_X1, &ig1_x, 1);
+  ret = lis2hh12_write_reg(dev, LIS2HH12_IG_THS_X1, &ig1_x, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_THS_Y1, &ig1_y, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_THS_Y1, &ig1_y, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_THS_Z1, &ig1_z, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_THS_Z1, &ig1_z, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_THS2, &ig2_xyz, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_THS2, &ig2_xyz, 1);
   }
 
   return ret;
@@ -1901,32 +2058,32 @@ int32_t lis2hh12_xl_trshld_set(const stmdev_ctx_t *ctx, uint8_t ig1_x,
 /**
   * @brief   Axis interrupt threshold.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  buff   Buffer that stores data read.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_get(const stmdev_ctx_t *ctx, uint8_t *ig1_x,
+esp_err_t lis2hh12_xl_trshld_get(i2c_dev_t *dev, uint8_t *ig1_x,
                                uint8_t *ig1_y, uint8_t *ig1_z,
                                uint8_t *ig2_xyz)
 {
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_THS_X1, ig1_x, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_THS_X1, ig1_x, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_THS_Y1, ig1_y, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_THS_Y1, ig1_y, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_THS_Z1, ig1_z, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_THS_Z1, ig1_z, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_THS2, ig2_xyz, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_THS2, ig2_xyz, 1);
   }
 
   return ret;
@@ -1935,21 +2092,21 @@ int32_t lis2hh12_xl_trshld_get(const stmdev_ctx_t *ctx, uint8_t *ig1_x,
 /**
   * @brief   Enter/exit interrupt duration value.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of dur1 in reg IG_DUR1.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_min_sample_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_min_sample_set(i2c_dev_t *dev,
                                           uint8_t ig1_sam, uint8_t ig2_sam)
 {
   lis2hh12_ig_dur1_t ig_dur1;
   lis2hh12_ig_dur2_t ig_dur2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_DUR1, (uint8_t *)&ig_dur1, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_DUR1, (uint8_t *)&ig_dur1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     if (ig1_sam == 0x00U)
     {
@@ -1962,15 +2119,15 @@ int32_t lis2hh12_xl_trshld_min_sample_set(const stmdev_ctx_t *ctx,
     }
 
     ig_dur1.dur1 = ig1_sam;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_DUR1, (uint8_t *)&ig_dur1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_DUR1, (uint8_t *)&ig_dur1, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_DUR2, (uint8_t *)&ig_dur2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_DUR2, (uint8_t *)&ig_dur2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     if (ig2_sam == 0x00U)
     {
@@ -1983,7 +2140,7 @@ int32_t lis2hh12_xl_trshld_min_sample_set(const stmdev_ctx_t *ctx,
     }
 
     ig_dur2.dur2 = ig2_sam;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_DUR2, (uint8_t *)&ig_dur2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_DUR2, (uint8_t *)&ig_dur2, 1);
   }
 
   return ret;
@@ -1992,24 +2149,28 @@ int32_t lis2hh12_xl_trshld_min_sample_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Enter/exit interrupt duration value.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of dur1 in reg IG_DUR1.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_trshld_min_sample_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_trshld_min_sample_get(i2c_dev_t *dev,
                                           uint8_t *ig1_sam, uint8_t *ig2_sam)
 {
   lis2hh12_ig_dur1_t ig_dur1;
   lis2hh12_ig_dur2_t ig_dur2;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_DUR1, (uint8_t *)&ig_dur1, 1);
-  *ig1_sam = (uint8_t)ig_dur1.dur1;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_IG_DUR1, (uint8_t *)&ig_dur1, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_DUR2, (uint8_t *)&ig_dur2, 1);
+    *ig1_sam = (uint8_t)ig_dur1.dur1;
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_DUR2, (uint8_t *)&ig_dur2, 1);
+  }
+
+  if (ret == ESP_OK)
+  {
     *ig2_sam = (uint8_t)ig_dur2.dur2;
   }
 
@@ -2032,22 +2193,22 @@ int32_t lis2hh12_xl_trshld_min_sample_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Inactivity threshold.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of ths in reg ACT_THS.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_act_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
+esp_err_t lis2hh12_act_threshold_set(i2c_dev_t *dev, uint8_t val)
 {
   lis2hh12_act_ths_t act_ths;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_ACT_THS, (uint8_t *)&act_ths, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_ACT_THS, (uint8_t *)&act_ths, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     act_ths.ths = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_ACT_THS, (uint8_t *)&act_ths, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_ACT_THS, (uint8_t *)&act_ths, 1);
   }
 
   return ret;
@@ -2056,18 +2217,22 @@ int32_t lis2hh12_act_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
 /**
   * @brief   Inactivity threshold.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of ths in reg ACT_THS.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_act_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val)
+esp_err_t lis2hh12_act_threshold_get(i2c_dev_t *dev, uint8_t *val)
 {
   lis2hh12_act_ths_t act_ths;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_ACT_THS, (uint8_t *)&act_ths, 1);
-  *val = (uint8_t)act_ths.ths;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_ACT_THS, (uint8_t *)&act_ths, 1);
+
+  if (ret == ESP_OK)
+  {
+    *val = (uint8_t)act_ths.ths;
+  }
 
   return ret;
 }
@@ -2075,22 +2240,22 @@ int32_t lis2hh12_act_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val)
 /**
   * @brief   Inactivity duration in number of sample.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of dur in reg ACT_DUR.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_act_duration_set(const stmdev_ctx_t *ctx, uint8_t val)
+esp_err_t lis2hh12_act_duration_set(i2c_dev_t *dev, uint8_t val)
 {
   lis2hh12_act_dur_t act_dur;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_ACT_DUR, (uint8_t *)&act_dur, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_ACT_DUR, (uint8_t *)&act_dur, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     act_dur.dur = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_ACT_DUR, (uint8_t *)&act_dur, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_ACT_DUR, (uint8_t *)&act_dur, 1);
   }
 
   return ret;
@@ -2099,18 +2264,22 @@ int32_t lis2hh12_act_duration_set(const stmdev_ctx_t *ctx, uint8_t val)
 /**
   * @brief   Inactivity duration in number of sample.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of dur in reg ACT_DUR.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_act_duration_get(const stmdev_ctx_t *ctx, uint8_t *val)
+esp_err_t lis2hh12_act_duration_get(i2c_dev_t *dev, uint8_t *val)
 {
   lis2hh12_act_dur_t act_dur;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_ACT_DUR, (uint8_t *)&act_dur, 1);
-  *val = (uint8_t)act_dur.dur;
+  ret = lis2hh12_read_reg(dev, LIS2HH12_ACT_DUR, (uint8_t *)&act_dur, 1);
+
+  if (ret == ESP_OK)
+  {
+    *val = (uint8_t)act_dur.dur;
+  }
 
   return ret;
 }
@@ -2131,47 +2300,47 @@ int32_t lis2hh12_act_duration_get(const stmdev_ctx_t *ctx, uint8_t *val)
 /**
   * @brief   6D feature working mode.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Configure 6D feature working mode.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_6d_mode_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_6d_mode_set(i2c_dev_t *dev,
                              lis2hh12_6d_mode_t val)
 {
   lis2hh12_ig_cfg1_t ig_cfg1;
   lis2hh12_ig_cfg2_t ig_cfg2;
   lis2hh12_ctrl7_t ctrl7;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl7._4d_ig = ((uint8_t)val & 0x10U) >> 4;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ig_cfg2._6d = ((uint8_t)val & 0x02U) >> 1;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ig_cfg1._6d = (uint8_t)val & 0x01U;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
   }
 
   return ret;
@@ -2180,29 +2349,34 @@ int32_t lis2hh12_6d_mode_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   6D feature working mode.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the configuration of 6D feature.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_6d_mode_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_6d_mode_get(i2c_dev_t *dev,
                              lis2hh12_6d_mode_t *val)
 {
   lis2hh12_ig_cfg1_t ig_cfg1;
   lis2hh12_ig_cfg2_t ig_cfg2;
   lis2hh12_ctrl7_t ctrl7;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL7, (uint8_t *)&ctrl7, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG2, (uint8_t *)&ig_cfg2, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+    ret = lis2hh12_read_reg(dev, LIS2HH12_IG_CFG1, (uint8_t *)&ig_cfg1, 1);
+  }
+  
+  if (ret != ESP_OK)
+  {
+    return ret;
   }
 
   switch ((ctrl7._4d_ig << 4) | (ig_cfg2._6d << 1) | ig_cfg1._6d)
@@ -2251,26 +2425,26 @@ int32_t lis2hh12_6d_mode_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   FIFO watermark level selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of stop_fth in reg CTRL3.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_fifo_watermark_set(const stmdev_ctx_t *ctx, uint8_t val)
+esp_err_t lis2hh12_fifo_watermark_set(i2c_dev_t *dev, uint8_t val)
 {
   lis2hh12_fifo_ctrl_t fifo_ctrl;
   lis2hh12_ctrl3_t ctrl3;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_FIFO_CTRL,
+    ret = lis2hh12_read_reg(dev, LIS2HH12_FIFO_CTRL,
                             (uint8_t *)&fifo_ctrl, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     if (val == 0x00U)
     {
@@ -2283,12 +2457,12 @@ int32_t lis2hh12_fifo_watermark_set(const stmdev_ctx_t *ctx, uint8_t val)
     }
 
     fifo_ctrl.fth = val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_FIFO_CTRL,
+    ret = lis2hh12_write_reg(dev, LIS2HH12_FIFO_CTRL,
                              (uint8_t *)&fifo_ctrl, 1);
   }
 
@@ -2298,18 +2472,24 @@ int32_t lis2hh12_fifo_watermark_set(const stmdev_ctx_t *ctx, uint8_t val)
 /**
   * @brief   FIFO watermark level selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of stop_fth in reg CTRL3.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_fifo_watermark_get(const stmdev_ctx_t *ctx, uint8_t *val)
+esp_err_t lis2hh12_fifo_watermark_get(i2c_dev_t *dev, uint8_t *val)
 {
   lis2hh12_fifo_ctrl_t fifo_ctrl;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_FIFO_CTRL,
+  ret = lis2hh12_read_reg(dev, LIS2HH12_FIFO_CTRL,
                           (uint8_t *)&fifo_ctrl, 1);
+  
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
+
   *val = (uint8_t)fifo_ctrl.fth;
 
   return ret;
@@ -2318,36 +2498,36 @@ int32_t lis2hh12_fifo_watermark_get(const stmdev_ctx_t *ctx, uint8_t *val)
 /**
   * @brief   FIFO mode selection.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "fifo_en" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_fifo_mode_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_fifo_mode_set(i2c_dev_t *dev,
                                lis2hh12_fifo_md_t val)
 {
   lis2hh12_fifo_ctrl_t fifo_ctrl;
   lis2hh12_ctrl3_t ctrl3;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl3.fifo_en = (((uint8_t) val & 0x10U) >> 4);
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_FIFO_CTRL,
+    ret = lis2hh12_read_reg(dev, LIS2HH12_FIFO_CTRL,
                             (uint8_t *)&fifo_ctrl, 1);
   }
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     fifo_ctrl.fmode = ((uint8_t)val & 0x0FU);
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_FIFO_CTRL,
+    ret = lis2hh12_write_reg(dev, LIS2HH12_FIFO_CTRL,
                              (uint8_t *)&fifo_ctrl, 1);
   }
 
@@ -2357,24 +2537,29 @@ int32_t lis2hh12_fifo_mode_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   FIFO mode selection.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of fifo_en in reg CTRL3.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_fifo_mode_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_fifo_mode_get(i2c_dev_t *dev,
                                lis2hh12_fifo_md_t *val)
 {
   lis2hh12_fifo_ctrl_t fifo_ctrl;
   lis2hh12_ctrl3_t ctrl3;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL3, (uint8_t *)&ctrl3, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
-    ret = lis2hh12_read_reg(ctx, LIS2HH12_FIFO_CTRL,
+    ret = lis2hh12_read_reg(dev, LIS2HH12_FIFO_CTRL,
                             (uint8_t *)&fifo_ctrl, 1);
+  }
+
+  if (ret != ESP_OK)
+  {
+    return ret;
   }
 
   switch ((ctrl3.fifo_en << 4) | fifo_ctrl.fmode)
@@ -2418,18 +2603,24 @@ int32_t lis2hh12_fifo_mode_get(const stmdev_ctx_t *ctx,
 /**
   * @brief  FIFOstatus.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    FIFOfullflag.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_fifo_status_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_fifo_status_get(i2c_dev_t *dev,
                                  lis2hh12_fifo_stat_t *val)
 {
   lis2hh12_fifo_src_t fifo_src;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_FIFO_SRC, (uint8_t *)&fifo_src, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_FIFO_SRC, (uint8_t *)&fifo_src, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
+
   val->fss = fifo_src.fss;
   val->empty = fifo_src.empty;
   val->ovr = fifo_src.ovr;
@@ -2454,23 +2645,23 @@ int32_t lis2hh12_fifo_status_get(const stmdev_ctx_t *ctx,
 /**
   * @brief   Enable/disable self-test mode for accelerometer.[set]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Change the values of "st" in reg LIS2HH12.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_self_test_set(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_self_test_set(i2c_dev_t *dev,
                                   lis2hh12_xl_st_t val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
 
-  if (ret == 0)
+  if (ret == ESP_OK)
   {
     ctrl5.st = (uint8_t)val;
-    ret = lis2hh12_write_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+    ret = lis2hh12_write_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
   }
 
   return ret;
@@ -2479,18 +2670,23 @@ int32_t lis2hh12_xl_self_test_set(const stmdev_ctx_t *ctx,
 /**
   * @brief   Enable/disable self-test mode for accelerometer.[get]
   *
-  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  dev   I2C device to use
   * @param  val    Get the values of st in reg CTRL5.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  * @retval        Interface status.
   *
   */
-int32_t lis2hh12_xl_self_test_get(const stmdev_ctx_t *ctx,
+esp_err_t lis2hh12_xl_self_test_get(i2c_dev_t *dev,
                                   lis2hh12_xl_st_t *val)
 {
   lis2hh12_ctrl5_t ctrl5;
-  int32_t ret;
+  esp_err_t ret;
 
-  ret = lis2hh12_read_reg(ctx, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret = lis2hh12_read_reg(dev, LIS2HH12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret != ESP_OK)
+  {
+    return ret;
+  }
 
   switch (ctrl5.st)
   {
