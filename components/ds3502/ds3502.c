@@ -96,7 +96,7 @@ esp_err_t ds3502_get(i2c_dev_t *dev, uint8_t *pos)
 
 esp_err_t ds3502_set(i2c_dev_t *dev, uint8_t pos, bool save)
 {
-    CHECK_ARG(dev && pos >= DS3502_MAX);
+    CHECK_ARG(dev && pos <= DS3502_MAX);
 
     I2C_DEV_TAKE_MUTEX(dev);
     if (save)
