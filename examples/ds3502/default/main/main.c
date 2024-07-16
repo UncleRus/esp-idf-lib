@@ -28,7 +28,7 @@ void test(void *pvParameters)
     memset(&dev, 0, sizeof(i2c_dev_t));
 
     // Initialize i2c device descriptor
-    ESP_ERROR_CHECK(ds3502_init_desc(&dev, 0, ADDR, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
+    ESP_ERROR_CHECK(ds3502_init_desc(&dev, ADDR, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
     // Initialize potentiometer
     ESP_ERROR_CHECK(ds3502_init(&dev));
