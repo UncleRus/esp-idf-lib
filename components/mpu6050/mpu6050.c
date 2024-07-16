@@ -1226,10 +1226,9 @@ esp_err_t mpu6050_calibrate(mpu6050_dev_t *dev, float *accel_bias_res, float *gy
 {
     CHECK_ARG(dev && accel_bias_res && gyro_bias_res);
 
-    int16_t temp_offset[3];
     int32_t accel_bias[3] = { 0, 0, 0 };
     int32_t gyro_bias[3] = { 0, 0, 0 };
-    int32_t accel_bias_reg[3] = { 0, 0, 0 };
+    int16_t accel_bias_reg[3] = { 0, 0, 0 };
     uint16_t accel_temp[3] = { 0, 0, 0 };
     uint16_t gyro_temp[3] = { 0, 0, 0 };
     uint8_t mask_bit[3] = { 0, 0, 0 };
@@ -1359,9 +1358,9 @@ esp_err_t mpu6050_calibrate(mpu6050_dev_t *dev, float *accel_bias_res, float *gy
      */
 
     // Read factory accelerometer trim values:
-    CHECK(mpu6050_get_accel_offset(dev, MPU6050_X_AXIS, &(temp_offset[0])));
-    CHECK(mpu6050_get_accel_offset(dev, MPU6050_Y_AXIS, &(temp_offset[1])));
-    CHECK(mpu6050_get_accel_offset(dev, MPU6050_Z_AXIS, &(temp_offset[2])));
+    CHECK(mpu6050_get_accel_offset(dev, MPU6050_X_AXIS, &accel_bias_reg[0]));
+    CHECK(mpu6050_get_accel_offset(dev, MPU6050_Y_AXIS, &accel_bias_reg[1]));
+    CHECK(mpu6050_get_accel_offset(dev, MPU6050_Z_AXIS, &accel_bias_reg[2]));
 
     for (int i = 0; i < 3; i++)
     {
