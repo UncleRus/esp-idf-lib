@@ -124,10 +124,10 @@ jobs:
       matrix:
         esp_idf_version:
           - latest
+          - release-v5.2
           - release-v5.1
           - release-v5.0
           - release-v4.4
-          - release-v4.3
         target:
           - esp32
           - esp32s2
@@ -175,14 +175,14 @@ jobs:
               examples="${{ needs.prepare.outputs._ci_build_esp32s2 }}"
             fi
 
-            # ESP32-C3: 4.3, 4.4, 5.0, 5.1
+            # ESP32-C3: >= 4.3
             if [ "${{ matrix.target }}" = "esp32c3" ]; then
               if [ "${{ matrix.esp_idf_version }}" != "release-v4.2" ]; then
                 examples="${{ needs.prepare.outputs._ci_build_esp32c3 }}"
               fi
             fi
             
-            # ESP32-S3: 4.4, 5.0, 5.1
+            # ESP32-S3: >= 4.4
             if [ "${{ matrix.target }}" = "esp32s3" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
                   -a "${{ matrix.esp_idf_version }}" != "release-v4.3"]; then
@@ -190,7 +190,7 @@ jobs:
               fi
             fi
 
-            # ESP32-C2: 5.0, 5.1
+            # ESP32-C2: >= 5.0
             if [ "${{ matrix.target }}" = "esp32c2" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
                   -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
@@ -199,7 +199,7 @@ jobs:
               fi
             fi
             
-            # ESP32-C6: 5.1
+            # ESP32-C6: >= 5.1
             if [ "${{ matrix.target }}" = "esp32c6" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
                   -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
@@ -209,7 +209,7 @@ jobs:
               fi
             fi
 
-            # ESP32-H2: 5.1
+            # ESP32-H2: >= 5.1
             if [ "${{ matrix.target }}" = "esp32h2" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
                   -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
