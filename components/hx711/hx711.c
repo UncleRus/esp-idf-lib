@@ -48,6 +48,10 @@
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #endif
 
+#ifndef BIT64
+#define BIT64 BIT
+#endif
+
 static uint32_t read_raw(gpio_num_t dout, gpio_num_t pd_sck, hx711_gain_t gain)
 {
 #if HELPER_TARGET_IS_ESP32
