@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
+
+import yaml
+
 import devtool
 import pathlib as p
 import typing as t
@@ -29,6 +32,7 @@ class Devtool:
         'target': 'Find components by target',
         'depends': 'Show components that depend (directly or indirectly) on a specified component',
         'ci': 'Show list of ci jobs to be done',
+        'manifest': 'Generate manifest for component'
     }
     README = 'README.md'
 
@@ -149,6 +153,53 @@ class Devtool:
         args = parser.parse_args(sys.argv[2:])
 
         print('\n'.join(self._find_dependants(args.dependency, {c.name: c for c in self.iter_components()}).keys()))
+
+    @staticmethod
+    def _get_maintainer(person: devtool.Person) -> str:
+        res = [person.full_name]
+        if person.email:
+            res.append(person.email)
+        elif person.url:
+            res.append(person.url)
+        elif person.gh_id:
+            res.append('https://github.com/%s' % person.gh_id)
+        if len(res) > 1:
+            res[1] = '<%s>' % res[1]
+        return ' '.join(res)
+
+    def cmd_manifest(self):
+        parser = argparse.ArgumentParser(
+            prog=self.PROGRAM,
+            description=self.COMMANDS['manifest'],
+            usage='devtool.py manifest [-h] [--namespace=<namespace>]'
+        )
+        parser.add_argument('--namespace', help='Component namespace', default='eil')
+        args = parser.parse_args(sys.argv[2:])
+
+        components = {c.name: c for c in self.iter_components()}
+        for name, c in components.items():
+            if name == 'example':
+                continue
+            path: p.Path = self.meta.repo_path / self.meta.COMPONENTS_DIR / name
+            manifest = {
+                'description': c.description,
+                'version': c.version,
+                'targets': [t for t in c.targets if t != 'esp8266'],
+                'license': c.license.value,
+                'maintainers': [self._get_maintainer(person) for person in c.code_owners],
+                'url': 'https://github.com/UncleRus/esp-idf-lib',
+                'repository': 'https://github.com/UncleRus/esp-idf-lib',
+                'issues': 'https://github.com/UncleRus/esp-idf-lib/issues',
+                'documentation': 'https://esp-idf-lib.readthedocs.io/en/latest/groups/%s.html' % name,
+                'examples': '../../examples/%s' % name,
+                'dependencies': {
+                    'esp-idf': '>=4.3',
+                }
+            }
+            for d in c.depends:
+                if d in components:
+                    manifest['dependencies']['eil/%s' % d] = '>=%s' % components[d].version
+            yaml.safe_dump(manifest, (path / 'idf_component.yml').open('w', encoding='utf-8'), sort_keys=False)
 
     def cmd_ci(self):
         diff = subprocess.run(
