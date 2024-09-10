@@ -1,5 +1,5 @@
 name: pcf2131
-description: Driver for PCF8563 (BM8563) real-time clock/calendar
+description: Driver for PCF2131 real-time clock/calendar
 version: 1.0.0
 groups:
   - rtc
@@ -13,6 +13,7 @@ targets:
   - esp32
   - esp8266
   - esp32s2
+  - esp32s3
   - esp32c3
 license: BSD-3
 copyrights:
