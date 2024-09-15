@@ -4,14 +4,20 @@ config I2CDEV_TIMEOUT
     int "I2C transaction timeout, milliseconds"
     default 1000
     range 10 5000
-    
+
 config I2CDEV_NOLOCK
 	bool "Disable the use of mutexes"
 	default n
 	help
 		Attention! After enabling this option, all I2C device
-		drivers will become non-thread safe. 
+		drivers will become non-thread safe.
 		Use this option if you need to access your I2C devices
-		from interrupt handlers. 
-    
+		from interrupt handlers.
+
+config I2CDEV_USING_LEGACY_I2C
+    bool "Use legacy driver/i2c.h"
+    default y
+    help
+        Use the legacy "driver/i2c.h" instead of "driver/i2c_master.h"
+        introduced in esp-idf 5.2.
 endmenu

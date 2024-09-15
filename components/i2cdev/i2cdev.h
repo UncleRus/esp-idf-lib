@@ -35,11 +35,16 @@
 #ifndef __I2CDEV_H__
 #define __I2CDEV_H__
 
-#include <driver/i2c.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>
+
+#if CONFIG_I2CDEV_USING_LEGACY_I2C
+#include <driver/i2c.h>
+#else
+#include <driver/i2c_master.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,12 +73,23 @@ extern "C" {
 typedef struct
 {
     i2c_port_t port;         //!< I2C port number
-    i2c_config_t cfg;        //!< I2C driver configuration
-    uint8_t addr;            //!< Unshifted address
-    SemaphoreHandle_t mutex; //!< Device mutex
+#if defined(CONFIG_I2CDEV_USING_LEGACY_I2C)
+    i2c_config_t cfg;        //!< I2C driver configuration (i2c.h only)
     uint32_t timeout_ticks;  /*!< HW I2C bus timeout (stretch time), in ticks. 80MHz APB clock
                                   ticks for ESP-IDF, CPU ticks for ESP8266.
-                                  When this value is 0, I2CDEV_MAX_STRETCH_TIME will be used */
+                                  When this value is 0, I2CDEV_MAX_STRETCH_TIME will be used
+                                  (i2c.h only) */
+#else
+    i2c_master_bus_handle_t bus; //!< I2C master bus handle (i2c_master.h only)
+    i2c_master_dev_handle_t device; //!< I2C master bus device handle
+                                    //(i2c_master.h only)
+    i2c_device_config_t device_config; //!< I2C device configuration (i2c_master.h only)
+    i2c_master_bus_config_t master_bus_config; /*! < I2C master bus specific
+                                                    configurations (i2c_master.h
+                                                    only) */
+#endif
+    uint8_t addr;            //!< Unshifted address
+    SemaphoreHandle_t mutex; //!< Device mutex
 } i2c_dev_t;
 
 /**
@@ -97,6 +113,7 @@ esp_err_t i2cdev_init();
 /**
  * @brief Finish work with library
  *
+ * Delete Deinitialize the I2C master bus. When the legacy i2c.h is used,
  * Uninstall i2c drivers.
  *
  * @return ESP_OK on success

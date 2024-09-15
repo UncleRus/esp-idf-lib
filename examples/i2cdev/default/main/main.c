@@ -6,9 +6,20 @@
 void task(void *ignore)
 {
     i2c_dev_t dev = { 0 };
+#if CONFIG_I2CDEV_USING_LEGACY_I2C
     dev.cfg.sda_io_num = CONFIG_EXAMPLE_I2C_MASTER_SDA;
     dev.cfg.scl_io_num = CONFIG_EXAMPLE_I2C_MASTER_SCL;
-#if HELPER_TARGET_IS_ESP32
+#else
+    dev.master_bus_config.sda_io_num = CONFIG_EXAMPLE_I2C_MASTER_SDA;
+    dev.master_bus_config.scl_io_num = CONFIG_EXAMPLE_I2C_MASTER_SCL;
+    dev.master_bus_config.i2c_port = -1;
+    dev.master_bus_config.clk_source = I2C_CLK_SRC_DEFAULT;
+    dev.master_bus_config.intr_priority = 0;
+    dev.master_bus_config.glitch_ignore_cnt = 7;
+    dev.master_bus_config.trans_queue_depth = 0;
+    dev.master_bus_config.flags.enable_internal_pullup = false;
+#endif
+#if HELPER_TARGET_IS_ESP32 && CONFIG_I2CDEV_USING_LEGACY_I2C
     dev.cfg.master.clk_speed = CONFIG_EXAMPLE_I2C_CLOCK_HZ; // 100kHz
 #endif
     while (1)
