@@ -159,6 +159,33 @@ esp_err_t pcf2131_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio
     return i2c_dev_create_mutex(dev);
 }
 
+esp_err_t pcf2131_init_default_config(i2c_dev_t *dev){
+
+    CHECK_ARG(dev);
+
+    uint8_t reg_data[1];
+
+    // control register 1 = general config
+    I2C_DEV_TAKE_MUTEX(dev);
+
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CTRL_STATUS1, reg_data, 1));
+	reg_data[0] = 0x0;    // TC_DIS 0, POR_OVRD 0, === normal run
+	I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_CTRL_STATUS1, reg_data, 1));
+	
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    // control register 3 = Battery switch over + add. intr
+    I2C_DEV_TAKE_MUTEX(dev);
+	
+	reg_data[0] = 0x72;    // PWRMNG 011, BTSE 1, BIE 1, rest 0
+	I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_CTRL_STATUS3, reg_data, 1));
+	
+    I2C_DEV_GIVE_MUTEX(dev);
+
+    return ESP_OK;
+
+}
+
 esp_err_t pcf2131_free_desc(i2c_dev_t *dev)
 {
     CHECK_ARG(dev);

@@ -50,6 +50,8 @@ extern "C" {
 
 #define PCF2131_I2C_ADDR 0x53
 
+#define PCF2131_BATT_SWITCHOVER_EN 3    // enable battery switch over per Table 22 in datasheet (011 = batt. switch over en in direct, batt. low det. en)
+
 /**
  * Frequency output at pin CLKOUT
  */
@@ -99,6 +101,14 @@ esp_err_t pcf2131_init_desc(i2c_dev_t *dev, i2c_port_t port, gpio_num_t sda_gpio
  * @return `ESP_OK` on success
  */
 esp_err_t pcf2131_free_desc(i2c_dev_t *dev);
+
+/**
+ * @brief Initialize default device configuration in registers
+ *
+ * @param dev I2C device descriptor
+ * @return `ESP_OK` on success
+ */
+esp_err_t pcf2131_init_default_config(i2c_dev_t *dev);
 
 /**
  * @brief Set the time on the RTC
