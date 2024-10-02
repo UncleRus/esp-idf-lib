@@ -120,7 +120,7 @@ esp_err_t _update_reg_nolock(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t 
     return ESP_OK;
 }
 
-esp_err_t _write_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *value)
+esp_err_t _write_reg(i2c_dev_t *dev, uint8_t reg, const uint8_t *value)
 {
     esp_err_t err = ESP_FAIL;
 
