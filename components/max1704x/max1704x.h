@@ -40,7 +40,7 @@
 #ifndef __MAX1704X__H__
 #define __MAX1704X__H__
 
-#include <i2cdev.h>
+#include <driver/i2c.h>
 #include <stdbool.h>
 #include <esp_err.h>
 
@@ -93,7 +93,8 @@ typedef struct
  */
 typedef struct
 {
-    i2c_dev_t i2c_dev;
+    int i2c_dev;
+    i2c_config_t conf;
     max1704x_model_t model;
     max1704x_config_t config;
     max1704x_status_t status;

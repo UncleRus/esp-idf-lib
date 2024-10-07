@@ -41,7 +41,11 @@
 
 #include "max1704x.h"
 
-#define I2C_FREQ_HZ 400000
+#define I2C_MASTER_NUM              0                          /*!< I2C master i2c port number, the number of i2c peripheral interfaces available will depend on the chip */
+#define I2C_MASTER_FREQ_HZ          400000                     /*!< I2C master clock frequency */
+#define I2C_MASTER_TX_BUF_DISABLE   0                          /*!< I2C master doesn't need buffer */
+#define I2C_MASTER_RX_BUF_DISABLE   0                          /*!< I2C master doesn't need buffer */
+#define I2C_MASTER_TIMEOUT_MS       1000
 
 /**
  * MAX1704X registers
@@ -119,7 +123,6 @@ int16_t le16_to_cpu_signed(const uint8_t data[2])
     memcpy(&r, &u, sizeof r);
     return r;
 }
-
 /**
  * Public functions
  */
@@ -128,21 +131,40 @@ esp_err_t max1704x_init_desc(max1704x_t *dev, i2c_port_t port, gpio_num_t sda_gp
 {
     CHECK_ARG(dev);
 
-    dev->i2c_dev.port = port;
-    dev->i2c_dev.addr = MAX1704X_I2C_ADDR;
-    dev->i2c_dev.cfg.sda_io_num = sda_gpio;
-    dev->i2c_dev.cfg.scl_io_num = scl_gpio;
-#if HELPER_TARGET_IS_ESP32
-    dev->i2c_dev.cfg.master.clk_speed = I2C_FREQ_HZ;
-#endif
-    return i2c_dev_create_mutex(&dev->i2c_dev);
+ /* Initialize and configure the software I2C bus */
+    int i2c_master_port = I2C_MASTER_NUM;
+
+    i2c_config_t conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = sda_gpio,
+        .scl_io_num = scl_gpio,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = I2C_MASTER_FREQ_HZ,
+    };
+
+    i2c_param_config(i2c_master_port, &conf);
+    return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+}
+/**
+ * @brief Read a sequence of bytes from a MPU9250 sensor registers
+ */
+static esp_err_t max1704x_register_read(uint8_t reg_addr, uint8_t *data, size_t len)
+{
+    return i2c_master_write_read_device(I2C_MASTER_NUM, MAX1704X_I2C_ADDR, &reg_addr, 1, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
 }
 
-esp_err_t max1704x_free_desc(max1704x_t *dev)
+/**
+ * @brief Write a byte to a MPU9250 sensor register
+ */
+static esp_err_t max1704x_register_write_byte(uint8_t reg_addr, uint8_t data)
 {
-    CHECK_ARG(dev);
+    int ret;
+    uint8_t write_buf[2] = {reg_addr, data};
 
-    return i2c_dev_delete_mutex(&dev->i2c_dev);
+    ret = i2c_master_write_to_device(I2C_MASTER_NUM, MAX1704X_I2C_ADDR, write_buf, sizeof(write_buf), I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+
+    return ret;
 }
 
 esp_err_t max1704x_quickstart(max1704x_t *dev)
@@ -151,9 +173,7 @@ esp_err_t max1704x_quickstart(max1704x_t *dev)
 
     uint8_t data[2] = { 0x40, 0x00 };
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, MAX1704X_REGISTER_MODE, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_write_byte(MAX1704X_REGISTER_MODE, data));
 
     ESP_LOGD(TAG, "MAX1704X Quickstart");
 
@@ -167,9 +187,7 @@ esp_err_t max1704x_get_voltage(max1704x_t *dev, float *voltage)
     uint8_t data[2];
     int value;
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, MAX1704X_REGISTER_VCELL, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_read(MAX1704X_REGISTER_VCELL, data, 2));
     // ESP_LOG_BUFFER_HEXDUMP("voltage", data, 2, ESP_LOG_INFO);
 
     if (dev->model == MAX17043_4) {
@@ -187,9 +205,7 @@ esp_err_t max1704x_get_soc(max1704x_t *dev, float *soc)
 
     uint8_t data[2];
     
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, MAX1704X_REGISTER_SOC, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_read(MAX1704X_REGISTER_SOC, data, 2));
     // ESP_LOG_BUFFER_HEXDUMP("soc", data, 2, ESP_LOG_INFO);
     
     *soc = (float)data[0] + ((float)data[1]) / 256;
@@ -206,9 +222,7 @@ esp_err_t max1704x_get_crate(max1704x_t *dev, float *crate)
     int16_t crate_value;
     uint8_t data[2];
     
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, MAX1704X_REGISTER_CRATE, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_read(MAX1704X_REGISTER_CRATE, data, 2));
     
     if (dev->model == MAX17043_4) {
         ESP_LOGE(TAG, "MAX1704X_REGISTER_CRATE is not supported by MAX17043");
@@ -226,9 +240,7 @@ esp_err_t max1704x_get_version(max1704x_t *dev, uint16_t *version)
 
     uint8_t data[2];
     
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, MAX1704X_REGISTER_VERSION, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_read(MAX1704X_REGISTER_VERSION, data, 2));
     
     *version = (data[0] << 8) | data[1];
     return ESP_OK;
@@ -240,9 +252,7 @@ esp_err_t max1704x_get_config(max1704x_t *dev)
 
     uint8_t data[2];
     
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, MAX1704X_REGISTER_CONFIG, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_read(MAX1704X_REGISTER_CONFIG, data, 2));
 
     dev->config.rcomp = data[0];
     dev->config.sleep_mode = (data[1] & MAX1704X_CONFIG_SLEEP_BIT) ? true : false;
@@ -283,9 +293,7 @@ esp_err_t max1704x_set_config(max1704x_t *dev, max1704x_config_t *config)
     dev->config.empty_alert_thresh = 32 - config->empty_alert_thresh;
     data[1] |= (32 - config->empty_alert_thresh) << MAX1704X_CONFIG_ATHD_SHIFT;
     
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, MAX1704X_REGISTER_CONFIG, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_write_byte(MAX1704X_REGISTER_CONFIG, data));
     
     return ESP_OK;
 }
@@ -301,9 +309,7 @@ esp_err_t max1704x_get_status(max1704x_t *dev)
         return ESP_ERR_NOT_SUPPORTED;
     }
 
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_read_reg(&dev->i2c_dev, MAX1704X_REGISTER_STATUS, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_read(MAX1704X_REGISTER_STATUS, data, 2));
 
     dev->status.reset_indicator = (data[0] & MAX1704X_STATUS_RI_BIT) ? true : false;
     dev->status.voltage_high = (data[0] & MAX1704X_STATUS_VH_BIT) ? true : false;
@@ -351,8 +357,6 @@ esp_err_t max1704x_set_status(max1704x_t *dev, max1704x_status_t *status)
     }
     data[1] = 0;
     
-    I2C_DEV_TAKE_MUTEX(&dev->i2c_dev);
-    I2C_DEV_CHECK(&dev->i2c_dev, i2c_dev_write_reg(&dev->i2c_dev, MAX1704X_REGISTER_STATUS, data, 2));
-    I2C_DEV_GIVE_MUTEX(&dev->i2c_dev);
+    ESP_ERROR_CHECK( max1704x_register_write_byte(MAX1704X_REGISTER_STATUS, data));
     return ESP_OK;
 }
