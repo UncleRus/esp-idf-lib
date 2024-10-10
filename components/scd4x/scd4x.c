@@ -284,13 +284,19 @@ esp_err_t scd4x_perform_forced_recalibration(i2c_dev_t *dev, uint16_t target_co2
 esp_err_t scd4x_get_automatic_self_calibration(i2c_dev_t *dev, bool *enabled)
 {
     CHECK_ARG(enabled);
-
-    return execute_cmd(dev, CMD_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, NULL, 0, (uint16_t *)enabled, 1);
+    uint16_t e = *enabled;
+    esp_err_t err = execute_cmd(dev, CMD_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, NULL, 0, &e, 1);
+    if(err == ESP_OK)
+    {
+        *enabled = !!e;
+    }
+    return err;
 }
 
 esp_err_t scd4x_set_automatic_self_calibration(i2c_dev_t *dev, bool enabled)
 {
-    return execute_cmd(dev, CMD_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, (uint16_t *)&enabled, 1, NULL, 0);
+    uint16_t e = enabled;
+    return execute_cmd(dev, CMD_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, &e, 1, NULL, 0);
 }
 
 esp_err_t scd4x_start_low_power_periodic_measurement(i2c_dev_t *dev)
