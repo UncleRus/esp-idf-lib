@@ -33,7 +33,7 @@
 
 /* do NOT use upper case for variables. use `snake_case` instead of
  * `CamelCase`. */
-static char *tag = "example";
+static const char *tag = "example";
 
 /* prefix public function names with the component name, `example_` in this
  * case. */
