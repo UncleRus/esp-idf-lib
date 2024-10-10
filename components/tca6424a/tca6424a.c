@@ -166,7 +166,7 @@ esp_err_t tca6424a_set_level(i2c_dev_t *dev, uint8_t pin, uint32_t val)
     uint8_t raw;
     I2C_DEV_TAKE_MUTEX(dev);
     I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_OUTPUT_0 + pin / 8, &raw, 1));
-    raw &= BIT(pin % 8);
+    raw &= ~BIT(pin % 8);
     if (val)
         raw |= BIT(pin % 8);
     I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_OUTPUT_0 + pin / 8, &raw, 1));
