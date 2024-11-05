@@ -218,6 +218,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips                    | MIT     | esp32, esp32s2, esp32c3 | yes           |
 | **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
 | **max7219**              | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                          | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
+| **pca9632**              | Driver for PCA9632 4-channel PWM chip                                            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
 
 
 
@@ -359,7 +360,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 - [Gunar Schorcht](https://github.com/gschorcht): `bme680` `ccs811` `sht3x` `sts3x` 
 
-- [Jakub Turek](https://github.com/QB4-dev): `impulse_sensor` `l3gx` `lsm303` 
+- [Jakub Turek](https://github.com/QB4-dev): `impulse_sensor` `l3gx` `lsm303` `pca9632` 
 
 - [Jan Veeh](https://github.com/janveeh): `icm42670` 
 
