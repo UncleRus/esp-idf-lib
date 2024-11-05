@@ -1,8 +1,8 @@
-# Example for `l3gx` driver
+# Example for `pca9632` driver
 
 ## What it does
 
-It shows L3Gx gyroscope(L3GD20/L3G4200D) sensor data in a loop.
+It shows PCA9632 output PWM control in loop.
 
 ## Wiring
 
@@ -13,7 +13,3 @@ resistors.
 |------|-------------|----------|
 | `CONFIG_EXAMPLE_I2C_MASTER_SCL` | GPIO number for `SCL` | "5" for `esp8266`, "6" for `esp32c3`, "19" for `esp32`, `esp32s2`, and `esp32s3` |
 | `CONFIG_EXAMPLE_I2C_MASTER_SDA` | GPIO number for `SDA` | "4" for `esp8266`, "5" for `esp32c3`, "18" for `esp32`, `esp32s2`, and `esp32s3` |
-
-## Notes
-
-`CONFIG_NEWLIB_LIBRARY_LEVEL_NORMAL` must be `y` on `esp8266`.

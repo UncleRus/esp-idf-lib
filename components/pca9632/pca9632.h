@@ -51,11 +51,11 @@ extern "C" {
 
 // Auto-Increment options (page 10, table 6)
 typedef enum {
-    AI_DISABLED, //!< no Auto-Increment
-    AI_ALL,      //!< Auto-Increment for all registers
-    AI_IND,      //!< Auto-Increment for Individual brightness registers only
-    AI_GBL,      //!< Auto-Increment for global control registers only
-    AI_IND_GBL   //!< Auto-Increment for individual and global control registers only
+    AI_DISABLED,    //!< no Auto-Increment
+    AI_ALL,         //!< Auto-Increment for all registers
+    AI_INDIV,       //!< Auto-Increment for Individual brightness registers only
+    AI_GLOBAL,      //!< Auto-Increment for global control registers only
+    AI_INDIV_GLOBAL //!< Auto-Increment for individual and global control registers only
 } pca9632_autoincr_mode_t;
 
 // Group control options (page 10, table 6)
@@ -65,6 +65,11 @@ typedef enum {
 } pca9632_gcm_t;
 
 typedef enum {
+    OUTDRV_OPEN_DRAIN = 0, //!< open-drain output
+    OUTDRV_TOTEM_POLE = 1  //!< totem-pole output
+} pca9632_outdrv_t;
+
+typedef enum {
     LED0 = 0, //!< LED0 PWM output
     LED1 = 1, //!< LED1 PWM output
     LED2 = 2, //!< LED2 PWM output
@@ -72,10 +77,10 @@ typedef enum {
 } pca9632_led_t;
 
 typedef enum {
-    LDR_OFF = 0x00,     //!< LED driver x is off (default power-up state)
-    LDR_ON = 0x01,      //!< LED driver x is fully on (individual brightness and group dimming/blinking not controlled)
-    LDR_IND = 0x02,     //!< LED driver x individual brightness can be controlled through its PWMx register
-    LDR_IND_GRP = 0x03, //!< LED driver x individual brightness and group dimming/blinking can be controlled through its PWMx register and the GRPPWM registers
+    LDR_OFF = 0x00,       //!< LED driver x is off (default power-up state)
+    LDR_ON = 0x01,        //!< LED driver x is fully on (individual brightness and group dimming/blinking not controlled)
+    LDR_INDIV = 0x02,     //!< LED driver x individual brightness can be controlled through its PWMx register
+    LDR_INDIV_GRP = 0x03, //!< LED driver x individual brightness and group dimming/blinking can be controlled through its PWMx register and the GRPPWM registers
 } pca9632_ldr_t;
 
 /**
@@ -100,20 +105,99 @@ esp_err_t pca9632_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_
  */
 esp_err_t pca9632_free_desc(i2c_dev_t *dev);
 
+/**
+ * @brief Initialize device. Individual dimming mode by default
+ *
+ * @param dev       Pointer to I2C device descriptor
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_init(i2c_dev_t *dev);
-esp_err_t pca9632_debug(i2c_dev_t *dev);
 
+/**
+ * @brief Set register address auto-increment mode, See 'pca9632_autoincr_mode_t' for details
+ *
+ * @param dev  Pointer to I2C device descriptor
+ * @param ai   Auto-increment mode
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_autoincrement(i2c_dev_t *dev, pca9632_autoincr_mode_t ai);
-esp_err_t pca9632_set_group_control_mode(i2c_dev_t *dev, pca9632_gcm_t mode);
-esp_err_t pca9632_set_output_params(i2c_dev_t *dev, bool invert, bool outdrv);
 
+/**
+ * @brief Set group control mode. See 'pca9632_gcm_t' for details
+ *
+ * @param dev   Pointer to I2C device descriptor
+ * @param mode  Group control mode
+ * @return `ESP_OK` on success
+ */
+esp_err_t pca9632_set_group_control_mode(i2c_dev_t *dev, pca9632_gcm_t mode);
+
+/**
+ * @brief Set up PWM outputs. See 'pca9632_outdrv_t' for details
+ *
+ * @param dev     Pointer to I2C device descriptor
+ * @param invert  Use inverted logic on outputs
+ * @param outdrv  Enable Totem-Pole output mode
+ * @return `ESP_OK` on success
+ */
+esp_err_t pca9632_set_output_params(i2c_dev_t *dev, bool invert, pca9632_outdrv_t outdrv);
+
+/**
+ * @brief Set PWM duty on selected channel
+ *
+ * @param dev      Pointer to I2C device descriptor
+ * @param channel  PWM output channel
+ * @param duty     PWM duty-cycle value
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_pwm(i2c_dev_t *dev, pca9632_led_t channel, uint8_t duty);
+
+/**
+ * @brief Set PWM duty on all channels
+ *
+ * @param dev   Pointer to I2C device descriptor
+ * @param led0  PWM duty-cycle value on LED0 output
+ * @param led1  PWM duty-cycle value on LED1 output
+ * @param led2  PWM duty-cycle value on LED2 output
+ * @param led3  PWM duty-cycle value on LED3 output
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_pwm_all(i2c_dev_t *dev, uint8_t led0, uint8_t led1, uint8_t led2, uint8_t led3);
 
+/**
+ * @brief Set GRPPWM register value
+ *
+ * @param dev  Pointer to I2C device descriptor
+ * @param val  GRPPWM value
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_grp_pwm(i2c_dev_t *dev, uint8_t val);
+
+/**
+ * @brief Set GRPFREQ register value
+ *
+ * @param dev  Pointer to I2C device descriptor
+ * @param val  GRPFREQ value
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_grp_freq(i2c_dev_t *dev, uint8_t val);
 
+/**
+ * @brief Set LED driver on selected channel. See 'pca9632_ldr_t' for details
+ *
+ * @param dev      Pointer to I2C device descriptor
+ * @param channel  PWM output channel
+ * @param ldr      LED driver type
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_led_driver(i2c_dev_t *dev, pca9632_led_t channel, pca9632_ldr_t ldr);
+
+/**
+ * @brief Set LED driver on all outputs. See 'pca9632_ldr_t' for details
+ *
+ * @param dev      Pointer to I2C device descriptor
+ * @param ldr      LED driver type
+ * @return `ESP_OK` on success
+ */
 esp_err_t pca9632_set_led_driver_all(i2c_dev_t *dev, pca9632_ldr_t ldr);
 
 #ifdef __cplusplus

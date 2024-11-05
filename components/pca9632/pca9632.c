@@ -74,9 +74,6 @@
 #define BIT_OUTNE1 1
 #define BIT_OUTNE0 0
 
-#define OUTDRV_OPEN_DRAIN 0
-#define OUTDRV_TOTEM_POLE 1
-
 // Bits in REG_LEDOUT (page 14, table 13)
 #define BIT_LDR3 6
 #define BIT_LDR2 4
@@ -148,43 +145,8 @@ esp_err_t pca9632_init(i2c_dev_t *dev)
     pca9632_write_reg(dev, REG_MODE1, 0x00);
     pca9632_write_reg(dev, REG_MODE2, 0x00);
     // set default states
-    pca9632_set_led_driver_all(dev, LDR_IND);
+    pca9632_set_led_driver_all(dev, LDR_INDIV);
     pca9632_set_group_control_mode(dev, GROUP_CONTROL_MODE_DIMMING);
-    return ESP_OK;
-}
-
-esp_err_t pca9632_debug(i2c_dev_t *dev)
-{
-    uint8_t reg_mode1;
-    uint8_t reg_mode2;
-    uint8_t reg_grppwm;
-    uint8_t reg_grpfreq;
-    uint8_t reg_ledout;
-    uint8_t reg_pwm[4];
-
-    pca9632_read_reg(dev, REG_MODE1, &reg_mode1);
-    pca9632_read_reg(dev, REG_MODE2, &reg_mode2);
-    pca9632_read_reg(dev, REG_GRPPWM, &reg_grppwm);
-    pca9632_read_reg(dev, REG_GRPFREQ, &reg_grpfreq);
-    pca9632_read_reg(dev, REG_LEDOUT, &reg_ledout);
-
-    pca9632_read_reg(dev, REG_PWM0, &reg_pwm[0]);
-    pca9632_read_reg(dev, REG_PWM1, &reg_pwm[1]);
-    pca9632_read_reg(dev, REG_PWM2, &reg_pwm[2]);
-    pca9632_read_reg(dev, REG_PWM3, &reg_pwm[3]);
-
-    printf("PCA9632:\n");
-    printf("REG_MODE1: 0x%02x\n", reg_mode1);
-    printf("REG_MODE2: 0x%02x\n", reg_mode2);
-    printf("REG_GRPPWM: 0x%02x\n", reg_grppwm);
-    printf("REG_GRPFREQ: 0x%02x\n", reg_grpfreq);
-    printf("REG_LEDOUT: 0x%02x\n", reg_ledout);
-
-    printf("REG_PWM0: 0x%02x\n", reg_pwm[0]);
-    printf("REG_PWM1: 0x%02x\n", reg_pwm[1]);
-    printf("REG_PWM2: 0x%02x\n", reg_pwm[2]);
-    printf("REG_PWM3: 0x%02x\n", reg_pwm[3]);
-    puts("");
     return ESP_OK;
 }
 
@@ -199,15 +161,15 @@ esp_err_t pca9632_set_autoincrement(i2c_dev_t *dev, pca9632_autoincr_mode_t ai)
             val = (1 << BIT_AI2) | (0 << BIT_AI1) | (0 << BIT_AI0);
             break;
 
-        case AI_IND:
+        case AI_INDIV:
             val = (1 << BIT_AI2) | (1 << BIT_AI1) | (0 << BIT_AI0);
             break;
 
-        case AI_GBL:
+        case AI_GLOBAL:
             val = (1 << BIT_AI2) | (0 << BIT_AI1) | (1 << BIT_AI0);
             break;
 
-        case AI_IND_GBL:
+        case AI_INDIV_GLOBAL:
             val = (1 << BIT_AI2) | (1 << BIT_AI1) | (1 << BIT_AI0);
             break;
 
@@ -238,7 +200,7 @@ esp_err_t pca9632_set_group_control_mode(i2c_dev_t *dev, pca9632_gcm_t mode)
     return ESP_ERR_INVALID_ARG;
 }
 
-esp_err_t pca9632_set_output_params(i2c_dev_t *dev, bool invert, bool outdrv)
+esp_err_t pca9632_set_output_params(i2c_dev_t *dev, bool invert, pca9632_outdrv_t outdrv)
 {
     CHECK_ARG(dev);
     uint8_t reg;
