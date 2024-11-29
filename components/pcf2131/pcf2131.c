@@ -168,7 +168,7 @@ esp_err_t pcf2131_init_default_config(i2c_dev_t *dev){
     // control register 1 = general config
     I2C_DEV_TAKE_MUTEX(dev);
 
-    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CTRL_STATUS1, reg_data, 1));
+    //I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CTRL_STATUS1, reg_data, 1));
 	reg_data[0] = 0x0;    // TC_DIS 0, POR_OVRD 0, === normal run
 	I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_CTRL_STATUS1, reg_data, 1));	
     //I2C_DEV_GIVE_MUTEX(dev);
