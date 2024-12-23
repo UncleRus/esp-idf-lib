@@ -164,10 +164,16 @@ esp_err_t pcf2131_init_default_config(i2c_dev_t *dev){
     CHECK_ARG(dev);
 
     uint8_t reg_data[1];
+    uint8_t read_data[16];
 
     // control register 1 = general config
     I2C_DEV_TAKE_MUTEX(dev);
-
+    // read all registers
+    /*
+    I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CTRL_STATUS1, read_data, 4));	
+    for (uint8_t i=0; i < 15; i++) 
+        printf("Read reg. data i: %d -- %d", i, read_data[i]);
+    */
     //I2C_DEV_CHECK(dev, i2c_dev_read_reg(dev, REG_CTRL_STATUS1, reg_data, 1));
 	reg_data[0] = 0x0;    // TC_DIS 0, POR_OVRD 0, === normal run
 	I2C_DEV_CHECK(dev, i2c_dev_write_reg(dev, REG_CTRL_STATUS1, reg_data, 1));	
