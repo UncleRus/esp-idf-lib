@@ -1,3 +1,4 @@
+---
 name: Main CI process
 on:
   workflow_dispatch:
@@ -35,7 +36,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: '0'
+          fetch-depth: "0"
 
       - id: requirements
         name: Install devtool requirements
@@ -109,7 +110,7 @@ jobs:
     needs:
       - prepare
     if: >-
-      ${{ needs.prepare.outputs._ci_build_esp32 != '' 
+      ${{ needs.prepare.outputs._ci_build_esp32 != ''
        || needs.prepare.outputs._ci_build_esp32c2 != ''
        || needs.prepare.outputs._ci_build_esp32c3 != ''
        || needs.prepare.outputs._ci_build_esp32c6 != ''
@@ -164,12 +165,12 @@ jobs:
 
             # see suppot matrix at https://github.com/espressif/esp-idf#esp-idf-release-and-soc-compatibility
             examples=
-            
+
             # ESP32: all
             if [ "${{ matrix.target }}" = "esp32" ]; then
               examples="${{ needs.prepare.outputs._ci_build_esp32 }}"
             fi
-            
+
             # ESP32-S2: all
             if [ "${{ matrix.target }}" = "esp32s2" ]; then
               examples="${{ needs.prepare.outputs._ci_build_esp32s2 }}"
@@ -181,7 +182,7 @@ jobs:
                 examples="${{ needs.prepare.outputs._ci_build_esp32c3 }}"
               fi
             fi
-            
+
             # ESP32-S3: 4.4, 5.0, 5.1
             if [ "${{ matrix.target }}" = "esp32s3" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
@@ -198,7 +199,7 @@ jobs:
                 examples="${{ needs.prepare.outputs._ci_build_esp32c2 }}"
               fi
             fi
-            
+
             # ESP32-C6: 5.1
             if [ "${{ matrix.target }}" = "esp32c6" ]; then
               if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
@@ -365,7 +366,7 @@ jobs:
           EXCLUDE_COMPONENTS="$(python ./devtools/devtool.py target esp8266 -x)"
           echo "EXCLUDE_COMPONENTS=${EXCLUDE_COMPONENTS}"
           export EXCLUDE_COMPONENTS
-          
+
           components_to_build="${{ needs.prepare.outputs._ci_build_esp8266 }}"
 
           # XXX share cache between examples.
