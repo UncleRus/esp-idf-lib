@@ -17,13 +17,15 @@ jobs:
       _ci_readme:        ${{ steps.ci.outputs._ci_readme }}
       _ci_docs:          ${{ steps.ci.outputs._ci_docs }}
       _ci_build_esp32:   ${{ steps.ci.outputs._ci_build_esp32 }}
-      _ci_build_esp32c2: ${{ steps.ci.outputs._ci_build_esp32c2 }}
+      _ci_build_esp32s2: ${{ steps.ci.outputs._ci_build_esp32s2 }}
       _ci_build_esp32c3: ${{ steps.ci.outputs._ci_build_esp32c3 }}
+      _ci_build_esp32s3: ${{ steps.ci.outputs._ci_build_esp32s3 }}
+      _ci_build_esp32c2: ${{ steps.ci.outputs._ci_build_esp32c2 }}
       _ci_build_esp32c6: ${{ steps.ci.outputs._ci_build_esp32c6 }}
       _ci_build_esp32h2: ${{ steps.ci.outputs._ci_build_esp32h2 }}
-      _ci_build_esp32h4: ${{ steps.ci.outputs._ci_build_esp32h4 }}
-      _ci_build_esp32s2: ${{ steps.ci.outputs._ci_build_esp32s2 }}
-      _ci_build_esp32s3: ${{ steps.ci.outputs._ci_build_esp32s3 }}
+      _ci_build_esp32p4: ${{ steps.ci.outputs._ci_build_esp32p4 }}
+      _ci_build_esp32c5: ${{ steps.ci.outputs._ci_build_esp32c5 }}
+      _ci_build_esp32c61: ${{ steps.ci.outputs._ci_build_esp32c61 }}
       _ci_build_esp8266: ${{ steps.ci.outputs._ci_build_esp8266 }}
     steps:
       - id: setup_python
@@ -111,13 +113,16 @@ jobs:
       - prepare
     if: >-
       ${{ needs.prepare.outputs._ci_build_esp32 != ''
-       || needs.prepare.outputs._ci_build_esp32c2 != ''
+       || needs.prepare.outputs._ci_build_esp32s2 != ''
        || needs.prepare.outputs._ci_build_esp32c3 != ''
+       || needs.prepare.outputs._ci_build_esp32s3 != ''
+       || needs.prepare.outputs._ci_build_esp32c2 != ''
        || needs.prepare.outputs._ci_build_esp32c6 != ''
        || needs.prepare.outputs._ci_build_esp32h2 != ''
-       || needs.prepare.outputs._ci_build_esp32h4 != ''
-       || needs.prepare.outputs._ci_build_esp32s2 != ''
-       || needs.prepare.outputs._ci_build_esp32s3 != '' }}
+       || needs.prepare.outputs._ci_build_esp32p4 != ''
+       || needs.prepare.outputs._ci_build_esp32c5 != ''
+       || needs.prepare.outputs._ci_build_esp32c61 != ''
+      }}
     strategy:
       # run other jobs even when one job failed
       fail-fast: false
@@ -125,18 +130,25 @@ jobs:
       matrix:
         esp_idf_version:
           - latest
+          - release-v5.4
+          - release-v5.3
+          - release-v5.2
           - release-v5.1
           - release-v5.0
-          - release-v4.4
-          - release-v4.3
         target:
+          # see ESP-IDF Release and SoC Compatibility at:
+          # https://github.com/espressif/esp-idf#esp-idf-release-and-soc-compatibility
           - esp32
           - esp32s2
+          - esp32c3
           - esp32s3
           - esp32c2
-          - esp32c3
           - esp32c6
           - esp32h2
+          - esp32p4
+          - esp32c5
+          - esp32c61
+
     steps:
       - id: checkout
         name: Checkout
@@ -165,6 +177,8 @@ jobs:
 
             # see suppot matrix at https://github.com/espressif/esp-idf#esp-idf-release-and-soc-compatibility
             examples=
+            echo "::notice::matrix.target: '${{ matrix.target }}'"
+            echo "::notice::matrix.matrix.esp_idf_version: '${{ matrix.esp_idf_version }}'"
 
             # ESP32: all
             if [ "${{ matrix.target }}" = "esp32" ]; then
@@ -176,53 +190,70 @@ jobs:
               examples="${{ needs.prepare.outputs._ci_build_esp32s2 }}"
             fi
 
-            # ESP32-C3: 4.3, 4.4, 5.0, 5.1
+            # ESP32-C3: all
             if [ "${{ matrix.target }}" = "esp32c3" ]; then
-              if [ "${{ matrix.esp_idf_version }}" != "release-v4.2" ]; then
-                examples="${{ needs.prepare.outputs._ci_build_esp32c3 }}"
-              fi
+              examples="${{ needs.prepare.outputs._ci_build_esp32c3 }}"
             fi
 
-            # ESP32-S3: 4.4, 5.0, 5.1
+            # ESP32-S3: all
             if [ "${{ matrix.target }}" = "esp32s3" ]; then
-              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3"]; then
-                examples="${{ needs.prepare.outputs._ci_build_esp32s3 }}"
-              fi
+              examples="${{ needs.prepare.outputs._ci_build_esp32s3 }}"
             fi
 
-            # ESP32-C2: 5.0, 5.1
+            # ESP32-C2: all
             if [ "${{ matrix.target }}" = "esp32c2" ]; then
-              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.4" ]; then
-                examples="${{ needs.prepare.outputs._ci_build_esp32c2 }}"
-              fi
+              examples="${{ needs.prepare.outputs._ci_build_esp32c2 }}"
             fi
 
             # ESP32-C6: 5.1
             if [ "${{ matrix.target }}" = "esp32c6" ]; then
-              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.4" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v5.0" ]; then
+              if [ "${{ matrix.esp_idf_version }}" != "release-v5.0" ]; then
                 examples="${{ needs.prepare.outputs._ci_build_esp32c6 }}"
               fi
             fi
 
             # ESP32-H2: 5.1
             if [ "${{ matrix.target }}" = "esp32h2" ]; then
-              if [   "${{ matrix.esp_idf_version }}" != "release-v4.2" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.3" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v4.4" \
-                  -a "${{ matrix.esp_idf_version }}" != "release-v5.0" ]; then
+              if [ "${{ matrix.esp_idf_version }}" != "release-v5.0" ]; then
                 examples="${{ needs.prepare.outputs._ci_build_esp32h2 }}"
+              fi
+            fi
+
+            # ESP32-P4: 5.3
+            if [ "${{ matrix.target }}" = "esp32p4" ]; then
+              if [ "${{ matrix.esp_idf_version }}" != "release-v5.0" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.1" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.2" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32p4 }}"
+              fi
+            fi
+            # ESP32-C5: 5.4
+            if [ "${{ matrix.target }}" = "esp32c5" ]; then
+              if [ "${{ matrix.esp_idf_version }}" != "release-v5.0" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.1" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.2" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.3" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32c5 }}"
+              fi
+            fi
+            # ESP32-C61: 5.4
+            if [ "${{ matrix.target }}" = "esp32c61" ]; then
+              if [ "${{ matrix.esp_idf_version }}" != "release-v5.0" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.1" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.2" \
+                   -a "${{ matrix.esp_idf_version }}" != "release-v5.3" ]; then
+                examples="${{ needs.prepare.outputs._ci_build_esp32c61 }}"
               fi
             fi
 
             if [ -z "${examples}" ]; then
               echo "Nothing to build: no component supports ${{ matrix.target }} or " \
                    "ESP-IDF ${{ matrix.esp_idf_version }} does not support ${{ matrix.target }}"
+              if [ "${{ matrix.esp_idf_version }}" = "latest" ]; then
+                echo "::error::The latest esp-idf should support the target ${{ matrix.target }} " \
+                     "but the example is empty. Please fix .github/workflows/ci.yml"
+                exit 1
+              fi
               exit 0
             fi
 
