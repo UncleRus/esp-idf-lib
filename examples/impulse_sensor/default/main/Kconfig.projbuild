@@ -5,6 +5,7 @@ menu "Example configuration"
         default 6 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
         default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
         default 6 if IDF_TARGET_ESP32H2
+        default 6 if IDF_TARGET_ESP32P4
         help
             GPIO number for anemometer sensor DATA line.
 
