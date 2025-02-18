@@ -14,7 +14,7 @@ menu "Example configuration"
             help
                 Choose this when ADDR pin is connected to VCC
     endchoice
-    
+
     config EXAMPLE_INT_GPIO
         int "INT GPIO Number"
         default 14 if IDF_TARGET_ESP8266
@@ -23,21 +23,5 @@ menu "Example configuration"
         help
             GPIO number connected to INT pin.
 
-    config EXAMPLE_I2C_MASTER_SCL
-        int "SCL GPIO Number"
-        default 5 if IDF_TARGET_ESP8266
-        default 6 if IDF_TARGET_ESP32C3
-        default 4 if IDF_TARGET_ESP32H2
-        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
-        help
-            GPIO number for I2C Master clock line.
-
-    config EXAMPLE_I2C_MASTER_SDA
-        int "SDA GPIO Number"
-        default 4 if IDF_TARGET_ESP8266
-        default 5 if IDF_TARGET_ESP32C3
-        default 3 if IDF_TARGET_ESP32H2
-        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
-        help
-            GPIO number for I2C Master data line.
+    rsource "../../../../devtools/Kconfig.i2c"
 endmenu

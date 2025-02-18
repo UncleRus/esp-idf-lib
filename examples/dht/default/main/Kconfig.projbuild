@@ -13,7 +13,9 @@ menu "Example configuration"
 
     config EXAMPLE_DATA_GPIO
         int "Data GPIO number"
-        default 4 if IDF_TARGET_ESP8266 || IDF_TARGET_ESP32C3
+        default 4 if IDF_TARGET_ESP8266
+        default 4 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 4 if IDF_TARGET_ESP32H2
         default 17 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
         help
             GPIO number connected to DATA pin
@@ -25,5 +27,4 @@ menu "Example configuration"
         	Check this option if you don't have external pull-up resistor on data GPIO.
         	DHT sensors that come mounted on a PCB generally have pull-up resistors on the data pin.
         	But for stable operation, it is recommended to provide an external pull-up resistor.
-        	
 endmenu
