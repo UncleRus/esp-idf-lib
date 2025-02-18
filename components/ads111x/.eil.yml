@@ -1,10 +1,11 @@
+---
 name: ads111x
 description: Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC
 version: 1.1.2
 groups:
   - adc-dac
 code_owners: UncleRus
-depends: 
+depends:
   - i2cdev
   - log
   - esp_idf_lib_helpers
@@ -14,6 +15,13 @@ targets:
   - esp8266
   - esp32s2
   - esp32c3
+  - esp32s3
+  - esp32c2
+  - esp32c6
+  - esp32h2
+  - esp32p4
+  - esp32c5
+  - esp32c61
 license: BSD-3
 copyrights:
   - name: UncleRus

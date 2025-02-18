@@ -1,3 +1,4 @@
+---
 name: si7021
 description: Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors
 version: 1.0.1
@@ -16,6 +17,13 @@ targets:
   - esp8266
   - esp32s2
   - esp32c3
+  - esp32s3
+  - esp32c2
+  - esp32c6
+  - esp32h2
+  - esp32p4
+  - esp32c5
+  - esp32c61
 license: BSD-3
 copyrights:
   - name: UncleRus
