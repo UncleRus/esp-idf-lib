@@ -21,6 +21,10 @@
 #define HOST SPI1_HOST
 #endif
 
+#ifndef APP_CPU_NUM
+#define APP_CPU_NUM PRO_CPU_NUM
+#endif
+
 static const char *TAG_ADS130E08 = "ads130e08";
 
 ads130e08_t adc_dev;
