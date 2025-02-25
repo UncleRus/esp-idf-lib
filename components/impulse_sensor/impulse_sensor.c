@@ -44,7 +44,8 @@
 
 #if defined(HELPER_TARGET_IS_ESP32) \
     && !defined(CONFIG_IDF_TARGET_ESP32C2) \
-    && !defined(CONFIG_IDF_TARGET_ESP32C3)
+    && !defined(CONFIG_IDF_TARGET_ESP32C3) \
+    && !defined(CONFIG_IDF_TARGET_ESP32C61)
 
 
 #define ESP_PCNT_SUPPORTED (1)
