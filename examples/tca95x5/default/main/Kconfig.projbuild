@@ -11,8 +11,9 @@ menu "Example configuration"
         int "INT GPIO Number"
         default 14 if IDF_TARGET_ESP8266
         default 7 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
-        default 5 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
         default 5 if IDF_TARGET_ESP32H2
+        default 5 if IDF_TARGET_ESP32P4
+        default 5 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
         help
             GPIO number connected to INT pin.
 
