@@ -292,6 +292,20 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
 
+      - id: setup_ruby
+        name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - id: rewrite_kconfig
+        name: Rewrite Kconfig for ESP8266
+        run: |
+          # XXX ESP8266 RTOS SDK uses old Kconfig parser, which does not
+          # understand "rsource" keyword. Rewrite all the Kconfig.projbuild in
+          # the example directories.
+          ruby devtools/rewrite_kconfig.rb examples/*/*/*/Kconfig.projbuild
+
       - id: setup_python
         name: Setup Python
         uses: actions/setup-python@v4
