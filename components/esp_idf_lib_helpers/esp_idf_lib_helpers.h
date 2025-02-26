@@ -51,13 +51,11 @@
         || defined(CONFIG_IDF_TARGET_ESP32C61) \
         || defined(CONFIG_IDF_TARGET_ESP32H2)
 #define HELPER_TARGET_IS_ESP32     (1)
-#define HELPER_TARGET_IS_ESP8266   (0)
 
 /* HELPER_TARGET_IS_ESP8266
  * 1 when the target is esp8266
  */
 #elif defined(CONFIG_IDF_TARGET_ESP8266)
-#define HELPER_TARGET_IS_ESP32     (0)
 #define HELPER_TARGET_IS_ESP8266   (1)
 #else
 #error BUG: cannot determine the target
