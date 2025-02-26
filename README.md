@@ -72,6 +72,13 @@ EXCLUDE_COMPONENTS := ads130e08 max7219 mcp23x17 led_strip max31865 ls7366r max3
 include $(IDF_PATH)/make/project.mk
 ```
 
+As some `Kconfig.projbuild` files use `rsource`, which the `Kconfig` parser of
+ESP8266 RTOS SDK does not understand, run `devtools/rewrite_kconfig.rb` to
+rewrite it before building the examples.
+
+```console
+ruby devtools/rewrite_kconfig.rb path/to/Kconfig.projbuild
+```
 See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples)
 or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/examples).
 
