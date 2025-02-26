@@ -1,3 +1,4 @@
+---
 name: hts221
 description: Driver for HTS221 temperature and humidity sensor
 version: 1.0.0
@@ -15,6 +16,13 @@ targets:
   - esp32
   - esp32s2
   - esp32c3
+  - esp32s3
+  - esp32c2
+  - esp32c6
+  - esp32h2
+  - esp32p4
+  - esp32c5
+  - esp32c61
 license: ISC
 copyrights:
   - name: saasaa

@@ -72,6 +72,13 @@ EXCLUDE_COMPONENTS := ads130e08 max7219 mcp23x17 led_strip max31865 ls7366r max3
 include $(IDF_PATH)/make/project.mk
 ```
 
+As some `Kconfig.projbuild` files use `rsource`, which the `Kconfig` parser of
+ESP8266 RTOS SDK does not understand, run `devtools/rewrite_kconfig.rb` to
+rewrite it before building the examples.
+
+```console
+ruby devtools/rewrite_kconfig.rb path/to/Kconfig.projbuild
+```
 See [GitHub examples](https://github.com/UncleRus/esp-idf-lib/tree/master/examples)
 or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/examples).
 
@@ -88,13 +95,13 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ads111x**              | Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC           | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ads130e08**            | Driver for ADS130E08 ADC                                                         | MIT     | esp32, esp32s3     | yes           |
-| **hx711**                | Driver for HX711 24-bit ADC for weigh scales                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **mcp342x**              | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mcp4725**              | Driver for 12-bit DAC MCP4725                                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **pcf8591**              | Driver for 8-bit ADC and an 8-bit DAC PCF8591                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sgm58031**             | Driver for SGM58031 16-bit I2C ADC                                               | ISC     | esp32, esp8266, esp32s2, esp32s3, esp32c3 | yes           |
+| **ads111x**              | Driver for ADS1113/ADS1114/ADS1115 and ADS1013/ADS1014/ADS1015 I2C ADC           | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ads130e08**            | Driver for ADS130E08 ADC                                                         | MIT     | esp32, esp32s3, esp32s2, esp32c3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **hx711**                | Driver for HX711 24-bit ADC for weigh scales                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **mcp342x**              | Driver for 18-Bit, delta-sigma ADC MCP3426/MCP3427/MCP3428                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mcp4725**              | Driver for 12-bit DAC MCP4725                                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **pcf8591**              | Driver for 8-bit ADC and an 8-bit DAC PCF8591                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sgm58031**             | Driver for SGM58031 16-bit I2C ADC                                               | ISC     | esp32, esp8266, esp32s2, esp32s3, esp32c3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -102,12 +109,12 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ccs811**               | Driver for AMS CCS811 digital gas sensor                                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mhz19b**               | Driver for MH-Z19B NDIR CO₂ sensor                                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **scd30**                | Driver for SCD30 CO₂ sensor                                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sgp40**                | Driver for SGP40 Indoor Air Quality Sensor for VOC Measurements                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **ccs811**               | Driver for AMS CCS811 digital gas sensor                                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mhz19b**               | Driver for MH-Z19B NDIR CO₂ sensor                                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **scd30**                | Driver for SCD30 CO₂ sensor                                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sgp40**                | Driver for SGP40 Indoor Air Quality Sensor for VOC Measurements                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -115,9 +122,9 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **max1704x**             | Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mp2660**               | Driver for MP2660 5V USB, 500mA, I2C-Controlled Linear Charger with Power Path Management for Single-Cell Li-Ion Battery | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
+| **lc709203f**            | Driver for LC709203F battery fuel gauge                                          | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **max1704x**             | Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mp2660**               | Driver for MP2660 5V USB, 500mA, I2C-Controlled Linear Charger with Power Path Management for Single-Cell Li-Ion Battery | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -125,14 +132,14 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **calibration**          | Multi-point calibration library                                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | n/a           |
-| **color**                | Common library for RGB and HSV colors                                            | MIT     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
-| **esp_idf_lib_helpers**  | Common support library for esp-idf-lib                                           | ISC     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
-| **framebuffer**          | RGB framebuffer component                                                        | MIT     | esp32, esp32s2, esp32c3 | n/a           |
-| **i2cdev**               | ESP-IDF I2C master thread-safe utilities                                         | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **lib8tion**             | Math functions specifically designed for LED programming                         | MIT     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
-| **noise**                | Noise generation functions                                                       | MIT     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
-| **onewire**              | Bit-banging 1-Wire driver                                                        | MIT     | esp32, esp8266, esp32s2, esp32c3 | no            |
+| **calibration**          | Multi-point calibration library                                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | n/a           |
+| **color**                | Common library for RGB and HSV colors                                            | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | n/a           |
+| **esp_idf_lib_helpers**  | Common support library for esp-idf-lib                                           | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | n/a           |
+| **framebuffer**          | RGB framebuffer component                                                        | MIT     | esp32, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | n/a           |
+| **i2cdev**               | ESP-IDF I2C master thread-safe utilities                                         | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **lib8tion**             | Math functions specifically designed for LED programming                         | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | n/a           |
+| **noise**                | Noise generation functions                                                       | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | n/a           |
+| **onewire**              | Bit-banging 1-Wire driver                                                        | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
 
 
 
@@ -140,9 +147,9 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ina219**               | Driver for INA219/INA220 bidirectional current/power monitor                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ina260**               | Driver for INA260 precision digital current and power monitor                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ina3221**              | Driver for INA3221 shunt and bus voltage monitor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **ina219**               | Driver for INA219/INA220 bidirectional current/power monitor                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ina260**               | Driver for INA260 precision digital current and power monitor                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ina3221**              | Driver for INA3221 shunt and bus voltage monitor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -150,11 +157,11 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ccs811**               | Driver for AMS CCS811 digital gas sensor                                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mhz19b**               | Driver for MH-Z19B NDIR CO₂ sensor                                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **scd30**                | Driver for SCD30 CO₂ sensor                                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **ccs811**               | Driver for AMS CCS811 digital gas sensor                                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mhz19b**               | Driver for MH-Z19B NDIR CO₂ sensor                                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **scd30**                | Driver for SCD30 CO₂ sensor                                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **scd4x**                | Driver for SCD40/SCD41 miniature CO₂ sensor                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -162,13 +169,13 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **mcp23008**             | Driver for 8-bit I2C GPIO expander MCP23008                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mcp23x17**             | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17                       | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
-| **pca9557**              | Driver for PCA9536/PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **pcf8574**              | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                         | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **pcf8575**              | Driver for PCF8575 remote 16-bit I/O expander for I2C-bus                        | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tca6424a**             | Driver for TCA6424A low-voltage 24-bit I2C I/O expander                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tca95x5**              | Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **mcp23008**             | Driver for 8-bit I2C GPIO expander MCP23008                                      | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mcp23x17**             | Driver for I2C/SPI 16 bit GPIO expanders MCP23017/MCP23S17                       | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **pca9557**              | Driver for PCA9536/PCA9537/PCA9557/TCA9534 remote 4/8-bit I/O expanders for I2C-bus | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **pcf8574**              | Driver for PCF8574 remote 8-bit I/O expander for I2C-bus                         | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **pcf8575**              | Driver for PCF8575 remote 16-bit I/O expander for I2C-bus                        | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tca6424a**             | Driver for TCA6424A low-voltage 24-bit I2C I/O expander                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tca95x5**              | Driver for TCA9535/TCA9555 remote 16-bit I/O expanders for I2C-bus               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -176,16 +183,16 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **am2320**               | Driver for AM2320 temperature and humidity sensor (I2C)                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **hts221**               | Driver for HTS221 temperature and humidity sensor                                | ISC     | esp32, esp32s2, esp32c3 | yes           |
-| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
+| **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **am2320**               | Driver for AM2320 temperature and humidity sensor (I2C)                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **hts221**               | Driver for HTS221 temperature and humidity sensor                                | ISC     | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -193,10 +200,10 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU                                            | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **l3gx**                 | Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mpu6050**              | Driver for MPU6000/MPU6050 6-axis MotionTracking device                          | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU                                            | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **l3gx**                 | Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mpu6050**              | Driver for MPU6000/MPU6050 6-axis MotionTracking device                          | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -204,9 +211,9 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **button**               | HW timer-based driver for GPIO buttons                                           | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **encoder**              | HW timer-based driver for incremental rotary encoders                            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ls7366r**              | Driver for LS7366R Quadrature Encoder Counter                                    | MIT     | esp32, esp32s2, esp32c3 | yes           |
+| **button**               | HW timer-based driver for GPIO buttons                                           | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **encoder**              | HW timer-based driver for incremental rotary encoders                            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ls7366r**              | Driver for LS7366R Quadrature Encoder Counter                                    | MIT     | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -214,10 +221,10 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ht16k33**              | HT16K33 LED controller driver                                                    | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips                    | MIT     | esp32, esp32s2, esp32c3 | yes           |
-| **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
-| **max7219**              | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                          | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
+| **ht16k33**              | HT16K33 LED controller driver                                                    | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips                    | MIT     | esp32, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | yes           |
+| **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | esp32, esp32c3, esp8266, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | yes           |
+| **max7219**              | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                          | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -225,11 +232,11 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **bh1750**               | Driver for BH1750 light sensor                                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tsl2561**              | Driver for light-to-digital converter TSL2561                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tsl2591**              | Driver for light-to-digital converter TSL2591                                    | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tsl4531**              | Driver for digital ambient light sensor TSL4531                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **veml7700**             | Driver for VEML7700 ambient light sensor                                         | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **bh1750**               | Driver for BH1750 light sensor                                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tsl2561**              | Driver for light-to-digital converter TSL2561                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tsl2591**              | Driver for light-to-digital converter TSL2591                                    | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tsl4531**              | Driver for digital ambient light sensor TSL4531                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **veml7700**             | Driver for VEML7700 ambient light sensor                                         | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -237,9 +244,9 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **hmc5883l**             | Driver for 3-axis digital compass HMC5883L and HMC5983L                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **qmc5883l**             | Driver for QMC5883L 3-axis magnetic sensor                                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **hmc5883l**             | Driver for 3-axis digital compass HMC5883L and HMC5983L                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **qmc5883l**             | Driver for QMC5883L 3-axis magnetic sensor                                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -247,17 +254,17 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **example**              | An example component                                                             | ISC     | esp32, esp8266, esp32s2, esp32c3 | n/a           |
-| **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **impulse_sensor**       | Driver for impulse output sensors                                                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **pca9685**              | Driver for 16-channel, 12-bit PWM PCA9685                                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tda74xx**              | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                            | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tps63101x**            | Driver for Texas Instruments TPS631012 and TPS631013 1.6-V to 5.5-V Input Voltage 1.5-A Buck-boost Converter with I2C | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
-| **ultrasonic**           | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **wiegand**              | Wiegand protocol receiver                                                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
+| **ds3502**               | Driver for nonvolatile digital potentiometer DS3502                              | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **example**              | An example component                                                             | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | n/a           |
+| **hd44780**              | Driver for HD44780 compatible LCD text displays                                  | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **impulse_sensor**       | Driver for impulse output sensors                                                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **pca9685**              | Driver for 16-channel, 12-bit PWM PCA9685                                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **rda5807m**             | Driver for single-chip broadcast FM radio tuner RDA5807M                         | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tca9548**              | Driver for TCA9548A/PCA9548A low-voltage 8-channel I2C switch                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tda74xx**              | Driver for TDA7439/TDA7439DS/TDA7440D audioprocessors                            | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tps63101x**            | Driver for Texas Instruments TPS631012 and TPS631013 1.6-V to 5.5-V Input Voltage 1.5-A Buck-boost Converter with I2C | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ultrasonic**           | Driver for ultrasonic range meters, e.g. HC-SR04, HY-SRF05                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **wiegand**              | Wiegand protocol receiver                                                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
 
 
 
@@ -265,12 +272,12 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **qmp6988**              | Driver for QMP6988 digital temperature and pressure sensor                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **qmp6988**              | Driver for QMP6988 digital temperature and pressure sensor                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -278,10 +285,10 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **ds1302**               | Driver for DS1302 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **ds1307**               | Driver for DS1307 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ds3231**               | Driver for DS1337 RTC and DS3231 high precision RTC module                       | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **pcf8563**              | Driver for PCF8563 (BM8563) real-time clock/calendar                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **ds1302**               | Driver for DS1302 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **ds1307**               | Driver for DS1307 RTC module                                                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ds3231**               | Driver for DS1337 RTC and DS3231 high precision RTC module                       | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **pcf8563**              | Driver for PCF8563 (BM8563) real-time clock/calendar                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
@@ -289,32 +296,32 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
-| **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **am2320**               | Driver for AM2320 temperature and humidity sensor (I2C)                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bh1900nux**            | Driver for BH1900NUX temperature sensor                                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ds18x20**              | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | no            |
-| **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **hts221**               | Driver for HTS221 temperature and humidity sensor                                | ISC     | esp32, esp32s2, esp32c3 | yes           |
-| **lm75**                 | Driver for LM75, a digital temperature sensor and thermal watchdog               | ISC     | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **max31725**             | Driver for MAX31725/MAX31726 temperature sensors                                 | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **max31855**             | Driver for MAX31855 cold-junction compensated thermocouple-to-digital converter  | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
-| **max31865**             | Driver for MAX31865 resistance converter for platinum RTDs                       | BSD-3-Clause | esp32, esp32s2, esp32c3 | yes           |
-| **mcp960x**              | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **mcp9808**              | Driver for MCP9808 digital temperature sensor                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **qmp6988**              | Driver for QMP6988 digital temperature and pressure sensor                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3 | yes           |
-| **sts21**                | Driver for STS21 temperature sensor                                              | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **sts3x**                | Driver for Sensirion STS30/STS31/STS35 digital temperature sensor                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
-| **tsys01**               | Driver for precision digital temperature sensor TSYS01                           | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **aht**                  | Driver for AHT10/AHT15/AHT20 temperature and humidity sensor                     | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **am2320**               | Driver for AM2320 temperature and humidity sensor (I2C)                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bh1900nux**            | Driver for BH1900NUX temperature sensor                                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bme680**               | Driver for BME680 digital environmental sensor                                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bmp180**               | Driver for BMP180 digital pressure sensor                                        | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **bmp280**               | Driver for BMP280/BME280 digital pressure sensor                                 | MIT     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **dht**                  | Driver for DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), Itead Si7021            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **dps310**               | Driver for DPS310 barometric pressure sensor                                     | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ds18x20**              | Driver for DS18B20/DS18S20 families of 1-Wire temperature sensor ICs             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | no            |
+| **hdc1000**              | Driver for HDC1000 temperature and humidity sensor                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **hts221**               | Driver for HTS221 temperature and humidity sensor                                | ISC     | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **lm75**                 | Driver for LM75, a digital temperature sensor and thermal watchdog               | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **max31725**             | Driver for MAX31725/MAX31726 temperature sensors                                 | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **max31855**             | Driver for MAX31855 cold-junction compensated thermocouple-to-digital converter  | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **max31865**             | Driver for MAX31865 resistance converter for platinum RTDs                       | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mcp960x**              | Driver for MCP9600/MCP9601, thermocouple EMF to temperature converter            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **mcp9808**              | Driver for MCP9808 digital temperature sensor                                    | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **ms5611**               | Driver for barometic pressure sensor MS5611-01BA03                               | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **qmp6988**              | Driver for QMP6988 digital temperature and pressure sensor                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sfa3x**                | Driver for SFA30 formaldehyde detection module (I2C)                             | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sht3x**                | Driver for Sensirion SHT30/SHT31/SHT35 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sht4x**                | Driver for Sensirion SHT40/SHT41/SHT45 digital temperature and humidity sensor   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **si7021**               | Driver for Si7013/Si7020/Si7021/HTU2xD/SHT2x and compatible temperature and humidity sensors | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sts21**                | Driver for STS21 temperature sensor                                              | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **sts3x**                | Driver for Sensirion STS30/STS31/STS35 digital temperature sensor                | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **tsys01**               | Driver for precision digital temperature sensor TSYS01                           | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 ## Library maintainers
 

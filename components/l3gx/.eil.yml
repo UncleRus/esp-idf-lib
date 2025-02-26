@@ -1,9 +1,10 @@
+---
 name: l3gx
 description: Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors
 version: 1.0.0
 groups:
   - imu
-code_owners: 
+code_owners:
   - qb4-dev
 depends:
   - i2cdev
@@ -15,8 +16,14 @@ targets:
   - esp8266
   - esp32s2
   - esp32c3
+  - esp32s3
+  - esp32c2
+  - esp32c6
+  - esp32h2
+  - esp32p4
+  - esp32c5
+  - esp32c61
 license: BSD-3
 copyrights:
   - name: qb4-dev
     year: 2023
-
