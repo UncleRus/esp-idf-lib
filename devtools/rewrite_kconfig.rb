@@ -29,10 +29,14 @@ def process(file)
   rewrite(dir, kconfig_file)
 end
 
-kconfig_files = ARGV
+def uniq_abs_path(paths)
+  paths.map { |path| File.realpath(path) }.uniq
+end
+
+kconfig_files = uniq_abs_path(ARGV)
 kconfig_files.each do |kconfig_file|
   old_kconfig_file = "#{kconfig_file}.old"
-  if File.exist? kconfig_file
+  if File.exist?(kconfig_file) && File.file?(kconfig_file)
     rewrited = process(kconfig_file)
     FileUtils.mv kconfig_file, old_kconfig_file
     File.open(kconfig_file, "w").write(rewrited)
