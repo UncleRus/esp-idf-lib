@@ -47,6 +47,11 @@ body:
         - label: esp32s2
         - label: esp32s3
         - label: esp32c2
+        - label: esp32c5
+        - label: esp32c6
+        - label: esp32c61
+        - label: esp32h2
+        - label: esp32p4
         - label: esp8266
         - label: other
 
