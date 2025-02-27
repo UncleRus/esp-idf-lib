@@ -72,7 +72,7 @@ esp_err_t calibration_init(calibration_handle_t *handler, size_t count, calibrat
     handler->type = type;
     handler->count = count;
     handler->filled = 0;
-    handler->points = calloc(sizeof(calibration_point_t), handler->count);
+    handler->points = calloc(handler->count, sizeof(calibration_point_t));
     if (!handler->points)
     {
         ESP_LOGE(TAG, "Could not allocate memory for calibration points");
