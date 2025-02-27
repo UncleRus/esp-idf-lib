@@ -45,7 +45,7 @@ class Licenses(str, Enum):
 
     @staticmethod
     def from_value(raw: str) -> Licenses:
-        if raw == 'BSD-3':
+        if raw.upper() == 'BSD-3':
             return Licenses.BSD3
         return Licenses(raw)
 
@@ -114,7 +114,7 @@ class Component(pydantic.BaseModel):
 
         lc = str(raw['license'])
         try:
-            lc = Licenses.from_value(lc.upper())
+            lc = Licenses.from_value(lc)
         except:
             raise InvalidLicenseError(ctx, lc)
 
