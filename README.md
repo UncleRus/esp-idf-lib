@@ -225,7 +225,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **led_strip**            | RMT-based driver for WS2812B/SK6812/APA106/SM16703 LED strips                    | MIT     | esp32, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | yes           |
 | **led_strip_spi**        | SPI-based driver for SK9822/APA102 LED strips                                    | MIT     | esp32, esp32c3, esp8266, esp32s2, esp32c3, esp32s3, esp32c6, esp32h2, esp32p4, esp32c5 | yes           |
 | **max7219**              | Driver for 8-Digit LED display drivers, MAX7219/MAX7221                          | BSD-3-Clause | esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
-| **pca9632**              | Driver for PCA9632 4-channel PWM chip                                            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3 | yes           |
+| **pca9632**              | Driver for PCA9632 4-channel PWM chip                                            | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 
 
 
