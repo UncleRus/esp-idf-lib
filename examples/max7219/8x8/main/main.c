@@ -3,15 +3,12 @@
 #include <freertos/task.h>
 #include <esp_idf_version.h>
 #include <max7219.h>
+#include <esp_idf_lib_helpers.h>
+
+#define HOST HELPER_SPI_HOST_DEFAULT
 
 #ifndef APP_CPU_NUM
 #define APP_CPU_NUM PRO_CPU_NUM
-#endif
-
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0)
-#define HOST    HSPI_HOST
-#else
-#define HOST    SPI2_HOST
 #endif
 
 static const uint64_t symbols[] = {

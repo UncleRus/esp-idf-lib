@@ -8,11 +8,12 @@
 #include <driver/gpio.h>
 #include <esp_task_wdt.h>
 #include <ads130e08.h>
+#include <esp_idf_lib_helpers.h>
 
-#if CONFIG_IDF_TARGET_ESP32
-#define HOST HSPI_HOST
-#elif CONFIG_IDF_TARGET_ESP32S3
-#define HOST SPI2_HOST
+#define HOST HELPER_SPI_HOST_DEFAULT
+
+#ifndef APP_CPU_NUM
+#define APP_CPU_NUM PRO_CPU_NUM
 #endif
 
 static const char *TAG_ADS130E08 = "ads130e08";

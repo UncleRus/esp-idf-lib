@@ -1,11 +1,12 @@
 ---
-
+- name: esp8266
 - name: esp32
-- name: esp32c2
+- name: esp32s2
 - name: esp32c3
+- name: esp32s3
+- name: esp32c2
 - name: esp32c6
 - name: esp32h2
-- name: esp32h4
-- name: esp32s2
-- name: esp32s3
-- name: esp8266
+- name: esp32p4
+- name: esp32c5
+- name: esp32c61

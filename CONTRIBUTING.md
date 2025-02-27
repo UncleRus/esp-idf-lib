@@ -464,6 +464,10 @@ the metadata and a template.
 
 See also [`Metadata.md`](Metadata.md).
 
+If the code is target-independent, specify all the targets (see
+[devtools/targets.yml](devtools/targets.yml)) in `.eil.yml`. The
+`esp_idf_lib_helpers.h` has some useful macros.
+
 ### Creating a Pull Request
 
 To test your code, you need to create a Pull Request. It is not practical to

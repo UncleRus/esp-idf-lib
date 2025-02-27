@@ -1,3 +1,4 @@
+---
 name: mpu6050
 description: Driver for MPU6000/MPU6050 6-axis MotionTracking device
 version: 2.1.0
@@ -16,6 +17,13 @@ targets:
   - esp8266
   - esp32s2
   - esp32c3
+  - esp32s3
+  - esp32c2
+  - esp32c6
+  - esp32h2
+  - esp32p4
+  - esp32c5
+  - esp32c61
 license: MIT
 copyrights:
   - name: jeff_rowberg

@@ -1,3 +1,4 @@
+---
 name: max1704x
 description: Driver for MAX17043/MAX17044/MAX17048/MAX17049 battery fuel gauge
 version: 0.9.0
@@ -14,6 +15,13 @@ targets:
   - esp8266
   - esp32s2
   - esp32c3
+  - esp32s3
+  - esp32c2
+  - esp32c6
+  - esp32h2
+  - esp32p4
+  - esp32c5
+  - esp32c61
 license: BSD-3
 copyrights:
   - name: shuki25

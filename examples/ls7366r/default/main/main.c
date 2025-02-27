@@ -9,16 +9,14 @@
 #include <esp_log.h>
 #include <ls7366r.h>
 
+#include <esp_idf_lib_helpers.h>
+
 #define TEST_PIN CONFIG_EXAMPLE_PIN_NUM_TEST
 #define INTR_PIN CONFIG_EXAMPLE_PIN_NUM_INTR
 #define GPIO_OUTPUT_PIN_SEL (1ULL << TEST_PIN)
 #define GPIO_INPUT_PIN_SEL (1ULL << INTR_PIN)
 
-#ifdef HSPI_HOST
-#define LS7366R_HOST HSPI_HOST
-#else
-#define LS7366R_HOST SPI2_HOST
-#endif
+#define HOST HELPER_SPI_HOST_DEFAULT
 
 #define PIN_NUM_MISO CONFIG_EXAMPLE_PIN_NUM_MISO
 #define PIN_NUM_MOSI CONFIG_EXAMPLE_PIN_NUM_MOSI
@@ -91,9 +89,9 @@ void app_main(void)
 		.flags = 0
 	};
 
-	ESP_ERROR_CHECK(spi_bus_initialize(LS7366R_HOST, &cfg, 0));
+	ESP_ERROR_CHECK(spi_bus_initialize(HOST, &cfg, 0));
 	ls7366r_t dev;
-	ESP_ERROR_CHECK(ls7366r_init_desc(&dev, LS7366R_HOST, LS7366R_MAX_CLOCK_SPEED_HZ, PIN_NUM_CS));
+	ESP_ERROR_CHECK(ls7366r_init_desc(&dev, HOST, LS7366R_MAX_CLOCK_SPEED_HZ, PIN_NUM_CS));
 	ESP_ERROR_CHECK(ls7366r_set_config(&dev, &config));
 
 	// setup for gpio output (gpio_toggle_task)
