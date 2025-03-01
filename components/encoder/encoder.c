@@ -154,6 +154,7 @@ inline static void read_encoder(rotary_encoder_t *re)
             }
         }
 
+        re->store = 0;
         ev.type = RE_ET_CHANGED;
         xQueueSendToBack(_queue, &ev, 0);
     }
