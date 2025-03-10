@@ -58,7 +58,7 @@ esp_err_t _read_reg_mask(i2c_dev_t *dev, uint8_t reg, uint8_t mask, uint8_t *val
 /**
  * @brief Write a single byte to a 8-bit resister with locking.
  */
-esp_err_t _write_reg(i2c_dev_t *dev, uint8_t reg, uint8_t *value);
+esp_err_t _write_reg(i2c_dev_t *dev, uint8_t reg, const uint8_t *value);
 
 /**
  * @brief Update a 8-bit resister with a masked value without locking.
