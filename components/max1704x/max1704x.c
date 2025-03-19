@@ -98,7 +98,7 @@
 #define CHECK(x) do { esp_err_t __; if ((__ = x) != ESP_OK) return __; } while (0)
 #define CHECK_ARG(ARG) do { if (!(ARG)) return ESP_ERR_INVALID_ARG; } while (0)
 
-static char *TAG = "max1704x";
+static const char *TAG = "max1704x";
 
 /**
  * Private functions
