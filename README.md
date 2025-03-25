@@ -200,6 +200,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 | Component | Description | License | Supported on | Thread safety |
 | --------- | ----------- | ------- | ------------ | ------------- |
+| **bmi160**               | Driver for BMI160 6-DOF IMU                                                      | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 | **icm42670**             | Driver for TDK ICM-42670-P 6-Axis IMU                                            | ISC     | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 | **l3gx**                 | Driver for L3Gx(L3GD20/L3G4200D) 3-axis gyroscope sensors                        | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 | **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
@@ -384,6 +385,8 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Julian Doerner](https://github.com/juliandoerner): `tsl2591` 
 
 - [Lucio Tarantino](https://github.com/dianlight): `ads111x` 
+
+- [Lukasz Bielinski](https://github.com/lukbieli): `bmi160` 
 
 - [Manuel Markwort](https://github.com/mmarkwort): `mp2660` `tps63101x` 
 
