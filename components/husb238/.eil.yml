@@ -2,7 +2,7 @@ name: husb238
 description: Driver for HUSB238 USB PD Sink Controller
 version: 1.0.0
 groups:
-  - power
+  - current
 code_owners: xyzroe
 depends:
   - i2cdev

@@ -2,7 +2,7 @@ name: qmi8658c
 description: Driver for QMI8658C 6-axis IMU sensor
 version: 0.5.0
 groups:
-  - imu
+  - magnetic
 code_owners: xyzroe
 depends:
   - i2cdev

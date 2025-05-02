@@ -2,7 +2,8 @@ name: ags10
 description: Driver for AGS10 TVOC sensor
 version: 0.5.0
 groups:
-  - tvoc
+  - air-quality
+  - gas
 code_owners: xyzroe
 depends:
   - i2cdev
