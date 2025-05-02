@@ -1,0 +1,22 @@
+name: ags10
+description: Driver for AGS10 TVOC sensor
+version: 0.5.0
+groups:
+  - tvoc
+code_owners: xyzroe
+depends:
+  - i2cdev
+  - log
+  - esp_idf_lib_helpers
+thread_safe: yes
+targets:
+  - esp32
+  - esp32c3
+  - esp8266
+  - esp32s2
+  - esp32c3
+  - esp32c6
+license: BSD-3
+copyrights:
+  - name: xyzroe
+    year: 2024
