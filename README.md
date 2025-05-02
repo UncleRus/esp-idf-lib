@@ -413,4 +413,4 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 
 - [Zaltora](https://github.com/Zaltora): `ina3221` 
 
-- zeroday: `onewire` 
+- zeroday: `onewire`
