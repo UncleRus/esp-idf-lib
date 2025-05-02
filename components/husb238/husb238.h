@@ -159,7 +159,7 @@ esp_err_t husb238_get_5v_contract_current(husb238_t *dev, uint8_t *current);
 /**
  * @brief check if voltage is detected
  * @param dev Device descriptor
- *  @param pd PD selection
+ * @param voltage Voltage to check
  * @param detected Pointer to store voltage detection status
  */
 esp_err_t husb238_is_voltage_detected(husb238_t *dev, uint8_t voltage, bool *detected);
@@ -167,7 +167,7 @@ esp_err_t husb238_is_voltage_detected(husb238_t *dev, uint8_t voltage, bool *det
 /**
  * @brief Read detected current
  * @param dev Device descriptor
- * @param pd PD selection
+ * @param voltage Voltage to read current for
  * @param current Pointer to store detected current
  */
 esp_err_t husb238_read_detected_current(husb238_t *dev, uint8_t voltage, uint16_t *current);
