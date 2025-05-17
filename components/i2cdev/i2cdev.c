@@ -303,7 +303,7 @@ esp_err_t i2c_dev_read(const i2c_dev_t *dev, const void *out_data, size_t out_si
     return res;
 }
 
-esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_reg_size, const void *out_data, size_t out_size)
+static esp_err_t i2c_dev_write_internal(const i2c_dev_t *dev, const void *out_reg, size_t out_reg_size, const void *out_data, size_t out_size, bool ack_en)
 {
     if (!dev || !out_data || !out_size) return ESP_ERR_INVALID_ARG;
 
@@ -316,8 +316,8 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_re
         i2c_master_start(cmd);
         i2c_master_write_byte(cmd, dev->addr << 1, true);
         if (out_reg && out_reg_size)
-            i2c_master_write(cmd, (void *)out_reg, out_reg_size, true);
-        i2c_master_write(cmd, (void *)out_data, out_size, true);
+            i2c_master_write(cmd, (void *)out_reg, out_reg_size, ack_en);
+        i2c_master_write(cmd, (void *)out_data, out_size, ack_en);
         i2c_master_stop(cmd);
         res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
         if (res != ESP_OK)
@@ -327,6 +327,16 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_re
 
     SEMAPHORE_GIVE(dev->port);
     return res;
+}
+
+esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg, size_t out_reg_size, const void *out_data, size_t out_size)
+{
+    return i2c_dev_write_internal(dev, out_reg, out_reg_size, out_data, out_size, true);
+}
+
+esp_err_t i2c_dev_write_no_ack(const i2c_dev_t *dev, const void *out_reg, size_t out_reg_size, const void *out_data, size_t out_size)
+{
+    return i2c_dev_write_internal(dev, out_reg, out_reg_size, out_data, out_size, false);
 }
 
 esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg, void *in_data, size_t in_size)
