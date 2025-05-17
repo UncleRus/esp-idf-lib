@@ -98,12 +98,13 @@ static inline uint16_t swap(uint16_t v)
     return (v << 8) | (v >> 8);
 }
 
-static esp_err_t send_cmd(i2c_dev_t *dev, uint16_t cmd, uint16_t *data, size_t words)
+static esp_err_t send_cmd(i2c_dev_t *dev, uint16_t cmd, uint16_t *data, size_t words, bool ack_en)
 {
     uint8_t buf[2 + words * 3];
     // add command
     *(uint16_t *)buf = swap(cmd);
     if (data && words)
+    {
         // add arguments
         for (size_t i = 0; i < words; i++)
         {
@@ -111,10 +112,15 @@ static esp_err_t send_cmd(i2c_dev_t *dev, uint16_t cmd, uint16_t *data, size_t w
             *(uint16_t *)p = swap(data[i]);
             *(p + 2) = crc8(p, 2);
         }
+    }
 
     ESP_LOGV(TAG, "Sending buffer:");
     ESP_LOG_BUFFER_HEX_LEVEL(TAG, buf, sizeof(buf), ESP_LOG_VERBOSE);
 
+    if (!ack_en)
+    {
+        return i2c_dev_write_no_ack(dev, NULL, 0, buf, sizeof(buf));
+    }
     return i2c_dev_write(dev, NULL, 0, buf, sizeof(buf));
 }
 
@@ -141,12 +147,12 @@ static esp_err_t read_resp(i2c_dev_t *dev, uint16_t *data, size_t words)
 }
 
 static esp_err_t execute_cmd(i2c_dev_t *dev, uint16_t cmd, uint32_t timeout_ms,
-        uint16_t *out_data, size_t out_words, uint16_t *in_data, size_t in_words)
+        uint16_t *out_data, size_t out_words, uint16_t *in_data, size_t in_words, bool ack_en)
 {
     CHECK_ARG(dev);
 
     I2C_DEV_TAKE_MUTEX(dev);
-    I2C_DEV_CHECK(dev, send_cmd(dev, cmd, out_data, out_words));
+    I2C_DEV_CHECK(dev, send_cmd(dev, cmd, out_data, out_words, ack_en));
     if (timeout_ms)
     {
         if (timeout_ms > 10)
@@ -187,7 +193,7 @@ esp_err_t scd4x_free_desc(i2c_dev_t *dev)
 
 esp_err_t scd4x_start_periodic_measurement(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_START_PERIODIC_MEASUREMENT, 1, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_START_PERIODIC_MEASUREMENT, 1, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_read_measurement_ticks(i2c_dev_t *dev, uint16_t *co2, uint16_t *temperature, uint16_t *humidity)
@@ -195,7 +201,7 @@ esp_err_t scd4x_read_measurement_ticks(i2c_dev_t *dev, uint16_t *co2, uint16_t *
     CHECK_ARG(co2 || temperature || humidity);
 
     uint16_t buf[3];
-    CHECK(execute_cmd(dev, CMD_READ_MEASUREMENT, 1, NULL, 0, buf, 3));
+    CHECK(execute_cmd(dev, CMD_READ_MEASUREMENT, 1, NULL, 0, buf, 3, true));
     if (co2)
         *co2 = buf[0];
     if (temperature)
@@ -222,14 +228,14 @@ esp_err_t scd4x_read_measurement(i2c_dev_t *dev, uint16_t *co2, float *temperatu
 
 esp_err_t scd4x_stop_periodic_measurement(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_STOP_PERIODIC_MEASUREMENT, 500, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_STOP_PERIODIC_MEASUREMENT, 500, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_get_temperature_offset_ticks(i2c_dev_t *dev, uint16_t *t_offset)
 {
     CHECK_ARG(t_offset);
 
-    return execute_cmd(dev, CMD_GET_TEMPERATURE_OFFSET, 1, NULL, 0, t_offset, 1);
+    return execute_cmd(dev, CMD_GET_TEMPERATURE_OFFSET, 1, NULL, 0, t_offset, 1, true);
 }
 
 esp_err_t scd4x_get_temperature_offset(i2c_dev_t *dev, float *t_offset)
@@ -246,7 +252,7 @@ esp_err_t scd4x_get_temperature_offset(i2c_dev_t *dev, float *t_offset)
 
 esp_err_t scd4x_set_temperature_offset_ticks(i2c_dev_t *dev, uint16_t t_offset)
 {
-    return execute_cmd(dev, CMD_SET_TEMPERATURE_OFFSET, 1, &t_offset, 1, NULL, 0);
+    return execute_cmd(dev, CMD_SET_TEMPERATURE_OFFSET, 1, &t_offset, 1, NULL, 0, true);
 }
 
 esp_err_t scd4x_set_temperature_offset(i2c_dev_t *dev, float t_offset)
@@ -259,17 +265,17 @@ esp_err_t scd4x_get_sensor_altitude(i2c_dev_t *dev, uint16_t *altitude)
 {
     CHECK_ARG(altitude);
 
-    return execute_cmd(dev, CMD_GET_SENSOR_ALTITUDE, 1, NULL, 0, altitude, 1);
+    return execute_cmd(dev, CMD_GET_SENSOR_ALTITUDE, 1, NULL, 0, altitude, 1, true);
 }
 
 esp_err_t scd4x_set_sensor_altitude(i2c_dev_t *dev, uint16_t altitude)
 {
-    return execute_cmd(dev, CMD_SET_SENSOR_ALTITUDE, 1, &altitude, 1, NULL, 0);
+    return execute_cmd(dev, CMD_SET_SENSOR_ALTITUDE, 1, &altitude, 1, NULL, 0, true);
 }
 
 esp_err_t scd4x_set_ambient_pressure(i2c_dev_t *dev, uint16_t pressure)
 {
-    return execute_cmd(dev, CMD_SET_AMBIENT_PRESSURE, 1, &pressure, 1, NULL, 0);
+    return execute_cmd(dev, CMD_SET_AMBIENT_PRESSURE, 1, &pressure, 1, NULL, 0, true);
 }
 
 esp_err_t scd4x_perform_forced_recalibration(i2c_dev_t *dev, uint16_t target_co2_concentration,
@@ -278,24 +284,24 @@ esp_err_t scd4x_perform_forced_recalibration(i2c_dev_t *dev, uint16_t target_co2
     CHECK_ARG(frc_correction);
 
     return execute_cmd(dev, CMD_PERFORM_FORCED_RECALIBRATION, 400,
-            &target_co2_concentration, 1, frc_correction, 1);
+            &target_co2_concentration, 1, frc_correction, 1, true);
 }
 
 esp_err_t scd4x_get_automatic_self_calibration(i2c_dev_t *dev, bool *enabled)
 {
     CHECK_ARG(enabled);
 
-    return execute_cmd(dev, CMD_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, NULL, 0, (uint16_t *)enabled, 1);
+    return execute_cmd(dev, CMD_GET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, NULL, 0, (uint16_t *)enabled, 1, true);
 }
 
 esp_err_t scd4x_set_automatic_self_calibration(i2c_dev_t *dev, bool enabled)
 {
-    return execute_cmd(dev, CMD_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, (uint16_t *)&enabled, 1, NULL, 0);
+    return execute_cmd(dev, CMD_SET_AUTOMATIC_SELF_CALIBRATION_ENABLED, 1, (uint16_t *)&enabled, 1, NULL, 0, true);
 }
 
 esp_err_t scd4x_start_low_power_periodic_measurement(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_START_LOW_POWER_PERIODIC_MEASUREMENT, 0, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_START_LOW_POWER_PERIODIC_MEASUREMENT, 0, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_get_data_ready_status(i2c_dev_t *dev, bool *data_ready)
@@ -303,7 +309,7 @@ esp_err_t scd4x_get_data_ready_status(i2c_dev_t *dev, bool *data_ready)
     CHECK_ARG(data_ready);
 
     uint16_t status;
-    CHECK(execute_cmd(dev, CMD_GET_DATA_READY_STATUS, 1, NULL, 0, &status, 1));
+    CHECK(execute_cmd(dev, CMD_GET_DATA_READY_STATUS, 1, NULL, 0, &status, 1, true));
     *data_ready = (status & 0x7ff) != 0;
 
     return ESP_OK;
@@ -311,7 +317,7 @@ esp_err_t scd4x_get_data_ready_status(i2c_dev_t *dev, bool *data_ready)
 
 esp_err_t scd4x_persist_settings(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_PERSIST_SETTINGS, 800, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_PERSIST_SETTINGS, 800, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_get_serial_number(i2c_dev_t *dev, uint16_t *serial0, uint16_t *serial1, uint16_t *serial2)
@@ -319,7 +325,7 @@ esp_err_t scd4x_get_serial_number(i2c_dev_t *dev, uint16_t *serial0, uint16_t *s
     CHECK_ARG(serial0 && serial1 && serial2);
 
     uint16_t buf[3];
-    CHECK(execute_cmd(dev, CMD_GET_SERIAL_NUMBER, 1, NULL, 0, buf, 3));
+    CHECK(execute_cmd(dev, CMD_GET_SERIAL_NUMBER, 1, NULL, 0, buf, 3, true));
     *serial0 = buf[0];
     *serial1 = buf[1];
     *serial2 = buf[2];
@@ -331,35 +337,35 @@ esp_err_t scd4x_perform_self_test(i2c_dev_t *dev, bool *malfunction)
 {
     CHECK_ARG(malfunction);
 
-    return execute_cmd(dev, CMD_PERFORM_SELF_TEST, 10000, NULL, 0, (uint16_t *)malfunction, 1);
+    return execute_cmd(dev, CMD_PERFORM_SELF_TEST, 10000, NULL, 0, (uint16_t *)malfunction, 1, true);
 }
 
 esp_err_t scd4x_perform_factory_reset(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_PERFORM_FACTORY_RESET, 800, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_PERFORM_FACTORY_RESET, 800, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_reinit(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_REINIT, 20, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_REINIT, 20, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_measure_single_shot(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_MEASURE_SINGLE_SHOT, 5000, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_MEASURE_SINGLE_SHOT, 5000, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_measure_single_shot_rht_only(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_MEASURE_SINGLE_SHOT_RHT_ONLY, 50, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_MEASURE_SINGLE_SHOT_RHT_ONLY, 50, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_power_down(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_POWER_DOWN, 1, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_POWER_DOWN, 1, NULL, 0, NULL, 0, true);
 }
 
 esp_err_t scd4x_wake_up(i2c_dev_t *dev)
 {
-    return execute_cmd(dev, CMD_WAKE_UP, 20, NULL, 0, NULL, 0);
+    return execute_cmd(dev, CMD_WAKE_UP, 30, NULL, 0, NULL, 0, false);
 }

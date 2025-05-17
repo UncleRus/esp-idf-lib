@@ -188,6 +188,23 @@ esp_err_t i2c_dev_write(const i2c_dev_t *dev, const void *out_reg,
         size_t out_reg_size, const void *out_data, size_t out_size);
 
 /**
+ * @brief Write to a slave device without waiting for ACK
+ *
+ * Write \p out_size bytes from \p out_data to slave into \p out_reg register address.
+ * The master will not wait for an ACK signal from the slave device after sending data.
+ * Function is thread-safe.
+ *
+ * @param dev Device descriptor
+ * @param out_reg Pointer to register address to send if non-null
+ * @param out_reg_size Size of register address
+ * @param out_data Pointer to data to send
+ * @param out_size Size of data to send
+ * @return ESP_OK on success
+ */
+esp_err_t i2c_dev_write_no_ack(const i2c_dev_t *dev, const void *out_reg,
+        size_t out_reg_size, const void *out_data, size_t out_size);
+
+/**
  * @brief Read from register with an 8-bit address
  *
  * Shortcut to ::i2c_dev_read().
