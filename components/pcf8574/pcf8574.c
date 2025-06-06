@@ -77,6 +77,10 @@ esp_err_t pcf8574_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_
 #if HELPER_TARGET_IS_ESP32
     dev->cfg.master.clk_speed = I2C_FREQ_HZ;
 #endif
+    dev->cfg.clk_flags = 0;
+    dev->cfg.scl_pullup_en = false;
+    dev->cfg.sda_pullup_en = false;
+    dev->timeout_ticks = I2CDEV_MAX_STRETCH_TIME;
 
     return i2c_dev_create_mutex(dev);
 }
