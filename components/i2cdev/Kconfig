@@ -1,5 +1,34 @@
 menu "I2C"
 
+config I2CDEV_USE_LEGACY_DRIVER
+	bool "Use Legacy I2C Driver API"
+	default n
+	help
+		Select this option to use the older ESP-IDF I2C driver API (driver/i2c.h)
+		instead of the newer driver API (driver/i2c_master.h).
+		
+		This is automatically determined by the build system based on your ESP-IDF version.
+		For ESP-IDF versions prior to v5.3, the legacy driver will be used automatically.
+		You can manually override this setting if needed.
+
+config I2CDEV_DEFAULT_SDA_PIN
+	int "Default I2C SDA pin"
+	default 21
+	help
+		Default SDA pin for I2C devices.
+
+config I2CDEV_DEFAULT_SCL_PIN
+	int "Default I2C SCL pin"
+	default 22
+	help
+		Default SCL pin for I2C devices.
+
+config I2CDEV_MAX_DEVICES_PER_PORT
+	int "Maximum number of devices per I2C port"
+	default 8
+	help
+		Maximum number of devices that can be registered on a single I2C port.
+
 config I2CDEV_TIMEOUT
     int "I2C transaction timeout, milliseconds"
     default 1000
@@ -13,5 +42,5 @@ config I2CDEV_NOLOCK
 		drivers will become non-thread safe. 
 		Use this option if you need to access your I2C devices
 		from interrupt handlers. 
-    
+
 endmenu
