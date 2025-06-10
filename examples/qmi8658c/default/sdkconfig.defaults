@@ -1,1 +1,3 @@
 # add required non-default option for the example if any
+CONFIG_EXAMPLE_I2C_MASTER_SCL=22
+CONFIG_EXAMPLE_I2C_MASTER_SDA=21
