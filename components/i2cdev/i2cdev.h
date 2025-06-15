@@ -12,7 +12,37 @@
  * Updated 2025 by quinkq to use newer ESP-IDF I2C master driver API
  *
  * MIT Licensed as described in the file LICENSE
+ *
+ * ============================================================================
+ * OPTIONAL I2C PULLUP AUTO-CONFIGURATION
+ * ============================================================================
+ *
+ * This library can optionally enable internal I2C pullups when no explicit
+ * pullup configuration is provided. Feature is DISABLED by default for
+ * backward compatibility (CONFIG_I2CDEV_AUTO_ENABLE_PULLUPS=n).
+ *
+ * Optional auto-pullup (CONFIG_I2CDEV_AUTO_ENABLE_PULLUPS=y):
+ * - If both pullup flags are false (not set/default state), automatically enables internal pullups
+ * - Only available on ESP32 family (modern driver)
+ * - Legacy driver always uses explicit configuration
+ *
+ *
+ * Example - Enable internal pullups:
+ * i2c_dev_t sensor = {
+ *     .port = I2C_NUM_0,
+ *     .addr = 0x48,
+ *     .cfg = {
+ *         .sda_io_num = GPIO_NUM_21,
+ *         .scl_io_num = GPIO_NUM_22,
+ *         .sda_pullup_en = true,  // Enable internal pullups
+ *         .scl_pullup_en = true,  // Enable internal pullups
+ *         .master.clk_speed = 400000
+ *     }
+ * };
+ *
+ * ============================================================================
  */
+
 #ifndef __I2CDEV_H__
 #define __I2CDEV_H__
 

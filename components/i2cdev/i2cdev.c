@@ -368,10 +368,37 @@ static esp_err_t i2c_setup_port(i2c_dev_t *dev) // dev is non-const to update de
             return ESP_ERR_INVALID_ARG;
         }
 
+        /*
+         * OPTIONAL I2C PULLUP AUTO-CONFIGURATION
+         *
+         * By default: Uses whatever sda_pullup_en/scl_pullup_en you set (usually false)
+         *
+         * When CONFIG_I2CDEV_AUTO_ENABLE_PULLUPS=y: If both pullup flags are false,
+         * automatically change them to true to enable internal pullups (~45kΩ).
+         *
+         * Manual pullup configuration:
+         * - Set sda_pullup_en=true, scl_pullup_en=true for internal pullups
+         * - Set sda_pullup_en=false, scl_pullup_en=false for external pullups
+         */
+
+        // Read user's pullup configuration (defaults to false if not set)
+        bool sda_pullup = dev->cfg.sda_pullup_en;
+        bool scl_pullup = dev->cfg.scl_pullup_en;
+
+#if CONFIG_I2CDEV_AUTO_ENABLE_PULLUPS
+        // CONFIG_I2CDEV_AUTO_ENABLE_PULLUPS=y: If user didn't configure pullups, enable them automatically
+        if (!sda_pullup && !scl_pullup)
+        {
+            sda_pullup = true;
+            scl_pullup = true;
+            ESP_LOGI(TAG, "[Port %d] Auto-enabling internal pullups (CONFIG_I2CDEV_AUTO_ENABLE_PULLUPS=y)", dev->port);
+        }
+#endif
+
         ESP_LOGI(TAG,
                  "[Port %d] First initialization. Configuring bus with SDA=%d, SCL=%d (Pullups "
                  "SCL:%d SDA:%d)",
-                 dev->port, sda_pin, scl_pin, dev->cfg.scl_pullup_en, dev->cfg.sda_pullup_en);
+                 dev->port, sda_pin, scl_pin, scl_pullup, sda_pullup);
 
         i2c_master_bus_config_t bus_config = {
             .i2c_port = dev->port,
@@ -379,7 +406,7 @@ static esp_err_t i2c_setup_port(i2c_dev_t *dev) // dev is non-const to update de
             .scl_io_num = scl_pin,
             .clk_source = I2C_CLK_SRC_DEFAULT,
             .glitch_ignore_cnt = 7,
-            .flags.enable_internal_pullup = (dev->cfg.sda_pullup_en || dev->cfg.scl_pullup_en),
+            .flags.enable_internal_pullup = (sda_pullup || scl_pullup),
             // Bus speed is not set here. It's per-device or a global target for the bus can be set
             // if desired, but i2c_master supports per-device speeds.
         };
@@ -778,8 +805,19 @@ esp_err_t i2c_dev_check_present(const i2c_dev_t *dev_const)
 
     ESP_LOGV(TAG, "[0x%02x at %d] Probing device presence...", dev_const->addr, dev_const->port);
 
-    // Use ESP-IDF's i2c_master_probe for non-intrusive detection
-    // This doesn't require setting up full device contexts
+    // Cast to non-const for i2c_setup_port (which may modify internal state)
+    i2c_dev_t *dev = (i2c_dev_t *)dev_const;
+
+    // Ensure the I2C port is set up before probing
+    esp_err_t setup_res = i2c_setup_port(dev);
+    if (setup_res != ESP_OK)
+    {
+        ESP_LOGE(TAG, "[0x%02x at %d] Failed to setup port for probe: %s",
+                 dev_const->addr, dev_const->port, esp_err_to_name(setup_res));
+        return setup_res;
+    }
+
+    // Now probe using the initialized bus
     if (dev_const->port < I2C_NUM_MAX && i2c_ports[dev_const->port].lock)
     {
         if (xSemaphoreTake(i2c_ports[dev_const->port].lock, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT)) == pdTRUE)

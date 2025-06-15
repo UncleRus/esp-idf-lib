@@ -1,4 +1,4 @@
-menu "I2C"
+menu "I2C Device Library"
 
 config I2CDEV_USE_LEGACY_DRIVER
 	bool "Use Legacy I2C Driver API"
@@ -10,6 +10,25 @@ config I2CDEV_USE_LEGACY_DRIVER
 		This is automatically determined by the build system based on your ESP-IDF version.
 		For ESP-IDF versions prior to v5.3, the legacy driver will be used automatically.
 		You can manually override this setting if needed.
+
+config I2CDEV_AUTO_ENABLE_PULLUPS
+	bool "Automatically enable internal I2C pullups when not configured"
+	default n
+	depends on !IDF_TARGET_ESP8266
+	help
+		When enabled, internal pullup resistors are automatically enabled
+		when both sda_pullup_en and scl_pullup_en are false (default state).
+		
+		Useful for development and prototyping. Disable for production 
+		systems with external pullups to avoid interference.
+		
+		Considerations:
+		- May increase power consumption slightly
+		- Could interfere with carefully tuned external pullups
+		- Not recommended for battery-powered applications
+		
+		Note: This option only affects the modern i2cdev driver (ESP32 family).
+		Legacy driver behavior is unchanged for compatibility.
 
 config I2CDEV_DEFAULT_SDA_PIN
 	int "Default I2C SDA pin"

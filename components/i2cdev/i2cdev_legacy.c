@@ -608,6 +608,9 @@ esp_err_t i2c_dev_probe(const i2c_dev_t *dev, i2c_dev_type_t operation_type)
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();
         i2c_master_start(cmd);
         i2c_master_write_byte(cmd, dev->addr << 1 | (operation_type == I2C_DEV_READ ? 1 : 0), true);
+        //  Alternative Write-style probe for better device compatibility
+        //  many devices don't respond well to blind read probes.
+        //  i2c_master_write_byte(cmd, dev->addr << 1 | 0, true); // Force write bit (0)
         i2c_master_stop(cmd);
 
         res = i2c_master_cmd_begin(dev->port, cmd, pdMS_TO_TICKS(CONFIG_I2CDEV_TIMEOUT));
@@ -789,7 +792,7 @@ esp_err_t i2c_dev_read_reg(const i2c_dev_t *dev, uint8_t reg, void *in_data, siz
     return err;
 }
 
-// Implementation of i2c_dev_check_present using legacy I2C driver
+// Implementation of i2c_dev_check_present (updated version of i2c_dev_probe) using legacy I2C driver
 esp_err_t i2c_dev_check_present(const i2c_dev_t *dev)
 {
     if (!dev)
@@ -797,6 +800,6 @@ esp_err_t i2c_dev_check_present(const i2c_dev_t *dev)
 
     ESP_LOGV(TAG, "[0x%02x at %d] Checking device presence (legacy driver)...", dev->addr, dev->port);
 
-    // Use the existing probe function with write operation
+    // Use the exact same pattern as i2c_dev_probe with WRITE operation to ensure consistent behavior
     return i2c_dev_probe(dev, I2C_DEV_WRITE);
 }
