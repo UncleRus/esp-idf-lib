@@ -94,7 +94,10 @@ esp_err_t lm75_read_temperature(i2c_dev_t *dev, float *value)
             "lm75_read_temperature(): read_register16() failed: register: 0x%x", LM75_REG_TEMP);
     I2C_DEV_GIVE_MUTEX(dev);
 
-    *value = (raw_data >> 5) * 0.125;
+    raw_data >>= 5;
+    /* for negative temperatures, decode the multiplier from 2's complement */
+    *value = (raw_data & 0x0400 ? -(~(raw_data-1) & 0x07ff) : raw_data) * 0.125;
+
     return ESP_OK;
 }
 
