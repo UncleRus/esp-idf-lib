@@ -248,6 +248,7 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 | **hmc5883l**             | Driver for 3-axis digital compass HMC5883L and HMC5983L                          | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 | **lsm303**               | Driver for LSM303 3-axis accelerometer and magnetometer sensor                   | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
 | **qmc5883l**             | Driver for QMC5883L 3-axis magnetic sensor                                       | BSD-3-Clause | esp32, esp8266, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61 | yes           |
+| **qmi8658c**             | Driver for QMI8658C 6-axis IMU sensor                                            | BSD-3-Clause | esp32, esp32c3, esp8266, esp32s2, esp32c3, esp32c6 | yes           |
 
 
 
@@ -410,6 +411,8 @@ or [GitLab examples](https://gitlab.com/UncleRus/esp-idf-lib/tree/master/example
 - [Tomoyuki Sakurai](https://github.com/trombik): `dps310` `esp_idf_lib_helpers` `example` `led_strip_spi` `lm75` 
 
 - [Weslley Duarte](https://github.com/weslleymfd): `ads130e08` 
+
+- [xyzroe](https://github.com/xyzroe): `qmi8658c` 
 
 - [Zaltora](https://github.com/Zaltora): `ina3221` 
 
