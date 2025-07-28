@@ -175,6 +175,7 @@ typedef struct
         gpio_num_t scl_io_num; //!< Desired SCL pin (-1 = use Kconfig default)
         uint8_t sda_pullup_en; //!< Enable internal SDA pullup (optional)
         uint8_t scl_pullup_en; //!< Enable internal SCL pullup (optional)
+        uint32_t clk_flags;    //!< Bitwise of ``I2C_SCLK_SRC_FLAG_**FOR_DFS**`` for clk source choice
         struct
         {
             uint32_t clk_speed; //!< Clock speed in Hz
