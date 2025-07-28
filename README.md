@@ -3,6 +3,17 @@
 [![Main CI process](https://github.com/UncleRus/esp-idf-lib/actions/workflows/ci.yml/badge.svg)](https://github.com/UncleRus/esp-idf-lib/actions/workflows/ci.yml)
 [![Docs Status](https://readthedocs.org/projects/esp-idf-lib/badge/?version=latest&style=flat)](https://esp-idf-lib.readthedocs.io/en/latest/)
 
+> [!CAUTION]
+> New project, [esp-idf-lib](https://github.com/esp-idf-lib/core), succeeded
+> this project. We will NOT update this repository. All new issues and PRs
+> will NOT be accepted here. If you find any issues, please visit the relevant
+> component repository. For instance, `ads111x`'s component repository is
+> [esp-idf-lib/ads111x](https://github.com/esp-idf-lib/ads111x).
+>
+> Visit [esp-idf-lib/core/discussions](https://github.com/esp-idf-lib/core/discussions)
+> for discussions and questions.
+
+
 Components for Espressif ESP32 [ESP-IDF framework](https://github.com/espressif/esp-idf)
 and [ESP8266 RTOS SDK](https://github.com/espressif/ESP8266_RTOS_SDK).
 
